@@ -41,8 +41,8 @@ class Files extends SCRUD {
 	}
 
 	public function Create($fields = []) {
-		Debug($_SERVER['DOCUMENT_ROOT'], 'DOCUMENT_ROOT', 'log');
-		Debug($fields, 'Files Create $fields', 'log');
+		debug($_SERVER['DOCUMENT_ROOT'], 'DOCUMENT_ROOT', 'log');
+		debug($fields, 'Files Create $fields', 'log');
 		if (isset($fields['tmp_name'])) {
 			if ($fields['error'] !== 0) {
 				return null;
