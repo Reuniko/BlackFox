@@ -1,0 +1,7 @@
+<?
+require('link.php');
+
+
+
+
+
