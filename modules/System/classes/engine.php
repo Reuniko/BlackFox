@@ -245,9 +245,9 @@ class Engine extends Instanceable {
 	 * Генерирует исключение в случае если директория не найдена.
 	 *
 	 * @param string $path путь к директории относительно корня ядра
-	 * @param bool $relative
-	 * @return string
-	 * @throws Exception
+	 * @param bool $relative возвращаемый путь: true - относительный, false - абсолютный
+	 * @return string относительный\абсолютный путь к директории
+	 * @throws Exception директория не найдена
 	 */
 	public function GetCoreDir($path, $relative = false) {
 		foreach ($this->cores as $relative_path => $absolute_path) {
@@ -329,6 +329,7 @@ class Engine extends Instanceable {
 	 * @param string $file php-файл
 	 * @return string имя последнего определенного класса
 	 * @throws Exception новые классы не были определены
+	 * @deprecated use PSR-0 lol
 	 */
 	public function DetectClassNameFromFile($file) {
 		$classes1 = get_declared_classes();
