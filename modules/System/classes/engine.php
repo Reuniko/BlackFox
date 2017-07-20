@@ -43,7 +43,7 @@ class Engine extends Instanceable {
 		$this->DB = Database::Instance($this->config['database']);
 
 		// Load section info
-		$this->SECTION = require($this->GetRootFile($_SERVER['REQUEST_URI'], '.section.php'));
+		$this->SECTION = require($this->SearchAncestorFile($_SERVER['REQUEST_URI'], '.section.php'));
 		$this->TEMPLATE = isset($this->SECTION['TEMPLATE']) ? $this->SECTION['TEMPLATE'] : $this->config['template'];
 		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
 
@@ -93,7 +93,7 @@ class Engine extends Instanceable {
 				return;
 			}
 			// запрос на неизвестный адрес
-			require($this->GetRootFile($url['path'], 'controller.php'));
+			require($this->SearchAncestorFile($url['path'], 'controller.php'));
 
 		} catch (ExceptionFileNotFound $error) {
 			$this->Show404();
@@ -295,11 +295,14 @@ class Engine extends Instanceable {
 	 * Ищет ближайший файл вверх по иерархии директорий.
 	 *
 	 * @param string $uri относительный путь к директории
-	 * @param string $filename имя искомого файла (по умолчанию index.php)
+	 * @param string $filename имя искомого файла
 	 * @return string абсолютный путь к искомому файлу (если файл найден)
 	 * @throws Exception файл не найден
 	 */
-	public function GetRootFile($uri, $filename = 'index.php') {
+	public function SearchAncestorFile($uri, $filename) {
+		if (empty($filename)) {
+			throw new Exception("Specify \$filename");
+		}
 		$folders = array_filter(explode('/', $uri));
 		//$this->Debug($folders, '$folders');
 		$path = '/';
