@@ -3,8 +3,8 @@ return [
 	'debug'    => true,
 	'root'     => $_SERVER['DOCUMENT_ROOT'] . '/root',
 	'cores'    => [
-		$_SERVER['DOCUMENT_ROOT'] . '/site',
-		$_SERVER['DOCUMENT_ROOT'] . '/core',
+		'/site' => $_SERVER['DOCUMENT_ROOT'] . '/site',
+		'/core' => $_SERVER['DOCUMENT_ROOT'] . '/core',
 	],
 	'database' => [
 		'HOST'     => 'localhost',

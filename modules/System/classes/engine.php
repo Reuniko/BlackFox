@@ -38,7 +38,6 @@ class Engine extends Instanceable {
 		// Init autoload classes
 		spl_autoload_register([$this, 'AutoloadClass']);
 		$this->RegisterModuleClasses('system');
-		//$this->Debug($this->classes, '$this->classes');
 
 		// Init database connector
 		$this->DB = Database::Instance($this->config['database']);
@@ -52,19 +51,12 @@ class Engine extends Instanceable {
 		// $this->SECTION['ACCESS'];
 
 		// Init other modules
-		// TODO remove
-		Modules::Instance()->Synchronize(true);
-
 		$this->LoadModules();
 
-		// TODO remove
-		//		System::Instance()->Upgrade();
-		//		Profile::Instance()->Upgrade();
-		//		Admin::Instance()->Upgrade();
-		//		Demo::Instance()->Upgrade();
-
+		// Init TITLE from .section.php
 		$this->TITLE = $this->SECTION['NAME'];
 
+		// generate CONTENT
 		ob_start();
 		$this->ShowContent();
 		$this->CONTENT = ob_get_clean();
@@ -72,14 +64,11 @@ class Engine extends Instanceable {
 		// Launch wrapper if it needs
 		$wrap_content = (!empty($this->TEMPLATE) and !empty($this->WRAPPER));
 		if ($wrap_content) {
+			$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
 			// input:
 			// $this->CONTENT
 			// $this->TITLE
 			// $this->TEMPLATE_PATH
-
-			// TODO: replace <core>
-			$this->TEMPLATE_PATH = '/core/templates/' . $this->TEMPLATE;
-
 			require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/' . $this->WRAPPER . '.php'));
 		} else {
 			echo $this->CONTENT;
@@ -248,11 +237,27 @@ class Engine extends Instanceable {
 		throw new Exception("Found no file '{$path}' in cores");
 	}
 
-	public function GetCoreDir($path) {
-		foreach ($this->cores as $core) {
-			$full_path = "{$core}/{$path}";
+	/**
+	 * Ищет директорию в ядре.
+	 * Возвращает к ней путь в зависимости от флага:
+	 * - абсолютный
+	 * - относительно корня сайта
+	 * Генерирует исключение в случае если директория не найдена.
+	 *
+	 * @param string $path путь к директории относительно корня ядра
+	 * @param bool $relative
+	 * @return string
+	 * @throws Exception
+	 */
+	public function GetCoreDir($path, $relative = false) {
+		foreach ($this->cores as $relative_path => $absolute_path) {
+			$full_path = "{$absolute_path}/{$path}";
 			if (is_dir($full_path)) {
-				return $full_path;
+				if (!$relative) {
+					return $full_path;
+				} else {
+					return "{$relative_path}/{$path}";
+				}
 			}
 		}
 		throw new Exception("Found no dir '{$path}' in cores");
