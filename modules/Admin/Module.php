@@ -1,0 +1,18 @@
+<?php
+namespace Admin;
+
+class Module extends \System\AbstractModule {
+	public $name = 'Администрирование';
+	public $description = 'Классы и компоненты, используемые в административной части';
+	public $version = '1.0';
+
+	public function Upgrade() {
+		// ...
+	}
+
+	public function Load() {
+		// \System\Engine::Instance()->Debug("Module 'Profile' loaded");
+	}
+
+
+}

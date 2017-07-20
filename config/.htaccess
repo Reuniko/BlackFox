@@ -1,0 +1,18 @@
+<IfModule mod_dir.c>
+	DirectoryIndex index.php controller.php
+</IfModule>
+
+<IfModule mod_rewrite.c>
+	# Автодополняет слешем конец запроса если (в запросе нет точек + он не заканчивается на слеш)
+	RewriteEngine On
+	RedirectMatch ^([^\.]*[^/])$ $1/
+
+	# Перенапраляет все запросы на директории и php-файлы в движок /core/engine.php
+	RewriteCond %{REQUEST_FILENAME} !/core/engine.php$
+	RewriteRule ^[^\.]*$|\.php$ /core/engine.php [L]
+
+	# Перенаправляет все запросы на ненайденные файлы в /root/
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule (.*) /root/$1 [L]
+</IfModule>

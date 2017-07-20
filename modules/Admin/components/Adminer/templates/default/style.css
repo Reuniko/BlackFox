@@ -1,0 +1,62 @@
+.adminer .table-content {
+	display: inline-block;
+	max-width: 400px;
+	overflow-x: hidden;
+	white-space: nowrap;
+	word-break: normal;
+}
+
+.adminer .table-content-TEXT {
+	white-space: normal;
+	word-break: break-all;
+	min-width: 200px;
+}
+
+.adminer input[type=checkbox],
+.adminer input[type=radio] {
+	width: 16px;
+	height: 16px;
+}
+
+.adminer label.enum span,
+.adminer label.enum input {
+	font-weight: normal;
+	vertical-align: bottom;
+	line-height: 16px;
+}
+
+.adminer .group_header {
+	display: block;
+	border: 1px solid #DDD;
+	padding: 5px;
+	background-color: #EEE;
+	text-align: center;
+}
+
+.adminer .sort {
+	padding: 0;
+	background: #e6ffff;
+	white-space: nowrap;
+	word-break: normal;
+}
+
+.adminer .sort.active {
+	background: #b3ffff;
+}
+
+.adminer .sort a,
+.adminer .sort span {
+	display: inline-block;
+	width: 100%;
+	padding: 8px;
+
+}
+
+.adminer .sort a:hover {
+	text-decoration: none;
+	background: #66ffff;
+}
+
+.adminer .set_value {
+	display: block;
+}
