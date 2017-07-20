@@ -11,7 +11,7 @@ abstract class Component {
 	/** @var array Ассоциативный массив, описывающий возможные параметры компонента */
 	public $options = [];
 
-	/** @var \System\Engine ENGINE */
+	/** @var Engine */
 	public $ENGINE;
 	/** @var ... */
 	public $USER;
@@ -38,7 +38,11 @@ abstract class Component {
 	public $template_folder;
 
 	public function __construct() {
-		$this->ENGINE = Engine::Instance();
+		// Do not remove local variable $ENGINE, it needs for phpStorm to detect $this->ENGINE as instance of class Engine
+		/** @var Engine $ENGINE */
+		$ENGINE = Engine::Instance();
+		$this->ENGINE = $ENGINE;
+
 		$this->USER = &$_SESSION['USER'];
 
 		$this->class = get_called_class();

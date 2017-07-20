@@ -5,8 +5,9 @@ namespace System;
 class Engine extends Instanceable {
 	public $config = [];
 	public $cores = [];
-	public $root = '';
+	public $roots = [];
 	public $classes = [];
+	public $url = [];
 
 	public $DB;
 
@@ -32,18 +33,19 @@ class Engine extends Instanceable {
 
 		// read main config
 		$this->config = require($_SERVER["DOCUMENT_ROOT"] . '/config.php');
-		$this->root = $this->config['root'];
+		$this->roots = $this->config['roots'];
 		$this->cores = $this->config['cores'];
 
 		// Init autoload classes
 		spl_autoload_register([$this, 'AutoloadClass']);
-		$this->RegisterModuleClasses('system');
+		$this->RegisterModuleClasses('System');
 
 		// Init database connector
 		$this->DB = Database::Instance($this->config['database']);
 
 		// Load section info
-		$this->SECTION = require($this->SearchAncestorFile($_SERVER['REQUEST_URI'], '.section.php'));
+		$this->url = parse_url($_SERVER['REQUEST_URI']);
+		$this->SECTION = require($this->SearchAncestorFile($this->url['path'], '.section.php'));
 		$this->TEMPLATE = isset($this->SECTION['TEMPLATE']) ? $this->SECTION['TEMPLATE'] : $this->config['template'];
 		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
 
@@ -79,21 +81,28 @@ class Engine extends Instanceable {
 	}
 
 	public function ShowContent() {
-		$url = parse_url($_SERVER['REQUEST_URI']);
-		$request_path = $this->root . $url['path'];
+
 		try {
 			// запрос на конкретный скрипт
-			if (file_exists($request_path) and !is_dir($request_path)) {
-				require($request_path);
-				return;
+			foreach ($this->roots as $root) {
+				$request_path = $root . $this->url['path'];
+				if (file_exists($request_path) and !is_dir($request_path)) {
+					require($request_path);
+					return;
+				}
 			}
+
 			// запрос на директорию с index.php
-			if (is_dir($request_path) and file_exists($request_path . 'index.php')) {
-				require($request_path . 'index.php');
-				return;
+			foreach ($this->roots as $root) {
+				$request_path = $root . $this->url['path'];
+				if (is_dir($request_path) and file_exists($request_path . 'index.php')) {
+					require($request_path . 'index.php');
+					return;
+				}
 			}
+
 			// запрос на неизвестный адрес
-			require($this->SearchAncestorFile($url['path'], 'controller.php'));
+			require($this->SearchAncestorFile($this->url['path'], '.controller.php'));
 
 		} catch (ExceptionFileNotFound $error) {
 			$this->Show404();
@@ -124,9 +133,8 @@ class Engine extends Instanceable {
 	}
 
 	public function AutoloadClass($class) {
-		$class_lower = strtolower($class);
-		if (isset($this->classes[$class_lower])) {
-			require_once($this->classes[$class_lower]);
+		if (isset($this->classes[$class])) {
+			require_once($this->classes[$class]);
 		}
 	}
 
@@ -193,7 +201,7 @@ class Engine extends Instanceable {
 			$files += $this->ScanDirectoryRecursive("{$core}/modules/{$module_name}/components", 1);
 			foreach ($files as $path => $file) {
 				if ($file['extension'] === 'php') {
-					$this->classes[strtolower($module_name . '\\' . $file['filename'])] = $path;
+					$this->classes[$module_name . '\\' . $file['filename']] = $path;
 				}
 			}
 		}
@@ -313,10 +321,12 @@ class Engine extends Instanceable {
 		}
 		$paths = array_reverse($paths);
 		//$this->Debug($paths, '$paths');
-		foreach ($paths as $path) {
-			if (file_exists($this->root . $path)) {
-				$file = $this->root . $path;
-				break;
+		foreach ($this->roots as $root) {
+			foreach ($paths as $path) {
+				if (file_exists($root . $path)) {
+					$file = $root . $path;
+					break;
+				}
 			}
 		}
 		if (!empty($file)) {
