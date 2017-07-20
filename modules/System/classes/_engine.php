@@ -131,7 +131,7 @@ class Engine extends Instanceable {
 	}
 
 	public function Debug($data, $title = '', $mode = 'textarea', $target = '/debug.txt') {
-		Debug($data, $title, $mode, $target);
+		debug($data, $title, $mode, $target);
 	}
 
 	/**

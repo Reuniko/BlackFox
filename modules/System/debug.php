@@ -1,5 +1,5 @@
 <?php
-if (!function_exists('Debug')) {
+if (!function_exists('debug')) {
 	/**
 	 * Базовая глобальная отладка
 	 * работает только если в config.php определен ключ 'debug' => true
@@ -14,7 +14,7 @@ if (!function_exists('Debug')) {
 	 * - email - отправляется на почту
 	 * @param string $target путь отправки: имя файла или почтовый адрес
 	 */
-	function Debug($data = array(), $title = '', $mode = 'textarea', $target = '/debug.txt') {
+	function debug($data = array(), $title = '', $mode = 'textarea', $target = '/debug.txt') {
 		if (!\System\Engine::Instance()->config['debug']) {
 			return;
 		}
