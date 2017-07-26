@@ -9,8 +9,8 @@
 
 <title><?= $this->TITLE ?></title>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/css/bootstrap.min.css">
+<link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/css/bootstrap-theme.min.css">
 <script src="<?= $this->TEMPLATE_PATH ?>/js/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="//cdn.ckeditor.com/4.7.1/standard/ckeditor.js"></script>
+<script src="<?= $this->TEMPLATE_PATH ?>/js/bootstrap.min.js"></script>
+<script src="<?= $this->TEMPLATE_PATH ?>/js/ckeditor.js"></script>
