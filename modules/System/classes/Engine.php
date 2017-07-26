@@ -174,7 +174,7 @@ class Engine extends Instanceable {
 		$component_instance = new $component_class_name();
 		$component_instance->Init($params);
 		$component_instance->component_folder = dirname($path_class);
-		$component_instance->template_folder = $component_instance->component_folder . '/' . $template;
+		$component_instance->template_folder = $component_instance->component_folder . '/templates/' . $template;
 
 		// echo "<!-- $component_class_name -->\r\n";
 		// $this->Debug($component_class_name, '$component_class_name');

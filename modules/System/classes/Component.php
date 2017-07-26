@@ -253,8 +253,22 @@ abstract class Component {
 		throw new Exception("Template not found: '{$path}'");
 	}
 
-	public function TemplateParentPath($path) {
-
+	public function TemplateParentPath($path = null) {
+		$template_file = debug_backtrace()[0]['file'];
+		$template_file = str_replace('\\', '/', $template_file);
+		$template_folder = str_replace('\\', '/', $this->template_folder);
+		$relative_template_file = str_replace($template_folder, '', $template_file);
+		debug($this->components, '$this->components');
+		foreach ($this->components as $object => $path) {
+			if($this->class === $object) {
+				continue;
+			}
+			$search = "{$path}/templates/{$this->template}{$relative_template_file}";
+			if (file_exists($search)) {
+				return $search;
+			}
+		}
+		throw new Exception("Template parent path not found");
 	}
 
 	public function ShowMessages() {
