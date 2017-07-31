@@ -725,7 +725,7 @@ abstract class SCRUD extends Instanceable {
 		} elseif (isset($this->TYPES[$field['TYPE']])) {
 			$type = $this->TYPES[$field['TYPE']];
 		} else {
-			throw new Exception("Неизвестный тип поля '{$field["CODE"]}' - '{$field['TYPE']}'");
+			throw new Exception("Неизвестный тип поля [{$this->code}.{$field["CODE"]}] - [{$field['TYPE']}]");
 		}
 
 		$null = ($field["NOT_NULL"]) ? "NOT NULL" : "NULL";
