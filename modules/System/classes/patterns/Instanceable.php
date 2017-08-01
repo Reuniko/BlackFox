@@ -28,6 +28,10 @@ class Instanceable {
 	 */
 	public static function Instance($params = null) {
 		$class = get_called_class();
+		global $CONFIG;
+		if ($CONFIG['redirects'][$class]) {
+			return $CONFIG['redirects'][$class]::Instance();
+		}
 		if (is_null(self::$instance[$class])) {
 			self::$instance[$class] = new $class($params);
 			self::$instance[$class]->Init();
