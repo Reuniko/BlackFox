@@ -30,6 +30,7 @@ class Instanceable {
 		$class = get_called_class();
 		if (is_null(self::$instance[$class])) {
 			self::$instance[$class] = new $class($params);
+			self::$instance[$class]->Init();
 			self::$instance[$class]->instanced = true;
 		}
 		return self::$instance[$class];
@@ -46,4 +47,7 @@ class Instanceable {
 		return self::Instance();
 	}
 
+	public function Init() {
+
+	}
 }
