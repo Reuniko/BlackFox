@@ -19,9 +19,9 @@ class Engine extends Instanceable {
 	public $TEMPLATE_PATH = "";
 	public $WRAPPER = "wrapper";
 
-	private $initialized = false;
+	protected $initialized = false;
 
-	public function Work() {
+	public function Init() {
 		// prevent double run
 		if ($this->initialized) {
 			throw new Exception("Engine already initialized");
@@ -42,6 +42,9 @@ class Engine extends Instanceable {
 
 		// Init database connector
 		$this->DB = Database::Instance($this->config['database']);
+	}
+
+	public function Work() {
 
 		// Load section info
 		$this->url = parse_url($_SERVER['REQUEST_URI']);
@@ -268,7 +271,7 @@ class Engine extends Instanceable {
 				}
 			}
 		}
-		throw new Exception("Found no dir '{$path}' in cores");
+		throw new Exception("Found no dir '{$path}' in cores: " . print_r($this->cores, true));
 	}
 
 	public function BufferRestart() {
