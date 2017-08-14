@@ -50,6 +50,9 @@ class Users extends SCRUD {
 		if (!empty($this->Read(['LOGIN' => $fields['LOGIN']], ['ID']))) {
 			throw new Exception("Пользователь с логином '{$fields['LOGIN']}' уже зарегистрирован в системе");
 		}
+		if (!filter_var($fields['EMAIL'], FILTER_VALIDATE_EMAIL)) {
+			throw new Exception("Invalid email format");
+		}
 		$fields['PASSWORD'] = sha1(strtolower($fields['LOGIN']) . ':' . $fields['PASSWORD']);
 		return parent::Create($fields);
 	}

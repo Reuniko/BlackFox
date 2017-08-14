@@ -131,7 +131,7 @@ abstract class Component {
 		if (!empty($action)) {
 			try {
 				return (array)$this->Invoke($action, $request);
-			} catch (Exception $error) {
+			} catch (\Exception $error) {
 				$error_result = (array)$this->Error($error->getMessage(), $action, $request);
 			}
 		}
@@ -140,7 +140,7 @@ abstract class Component {
 		if (!empty($action)) {
 			try {
 				return (array)$this->Invoke($action, $request) + $error_result;
-			} catch (Exception $error) {
+			} catch (\Exception $error) {
 				return (array)$this->Error($error->getMessage(), $action, $request);
 			}
 		}
@@ -180,7 +180,7 @@ abstract class Component {
 			} else {
 				try {
 					$arguments[$code] = $parameter->getDefaultValue();
-				} catch (Exception $error) {
+				} catch (\Exception $error) {
 					$arguments[$code] = null;
 				}
 			}
@@ -217,9 +217,9 @@ abstract class Component {
 
 	public function Execute($template = 'default') {
 		$this->template = $template;
-		if (!empty($_SESSION['MESSAGES'])) {
-			$this->MESSAGES = $_SESSION['MESSAGES'];
-			$_SESSION['MESSAGES'] = [];
+		if (!empty($_SESSION['MESSAGES'][$this->class])) {
+			$this->MESSAGES = $_SESSION['MESSAGES'][$this->class];
+			$_SESSION['MESSAGES'][$this->class] = [];
 		}
 		$this->RESULT = $this->ProcessResult();
 		echo $this->ProcessView($this->RESULT);
@@ -260,7 +260,7 @@ abstract class Component {
 		$relative_template_file = str_replace($template_folder, '', $template_file);
 		debug($this->components, '$this->components');
 		foreach ($this->components as $object => $path) {
-			if($this->class === $object) {
+			if ($this->class === $object) {
 				continue;
 			}
 			$search = "{$path}/templates/{$this->template}{$relative_template_file}";
@@ -329,7 +329,7 @@ abstract class Component {
 	public function Redirect($url, $message_text = null, $message_type = 'SUCCESS') {
 		header('Location: ' . ($url ?: $_SERVER['REQUEST_URI']));
 		if (!empty($message_text)) {
-			$_SESSION['MESSAGES'][] = [
+			$_SESSION['MESSAGES'][$this->class][] = [
 				'TYPE'    => $message_type,
 				'MESSAGE' => $message_text,
 			];
