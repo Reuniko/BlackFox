@@ -120,12 +120,14 @@ class Users extends SCRUD {
 	}
 
 	public function Authorization($login, $password) {
-		$user = $this->Read(['LOGIN' => $login], ['ID', 'LOGIN', 'PASSWORD']);
+		if (empty($login)) {
+			throw new Exception("Не указан логин");
+		}
+		$user = $this->Read(['LOGIN' => $login], ['ID', 'SALT', 'LOGIN', 'PASSWORD']);
 		if (empty($user)) {
 			throw new Exception("Пользователь '{$login}' не существует");
 		}
-		$hash = sha1(strtolower($login) . ':' . $password);
-		if ($user['PASSWORD'] <> $hash) {
+		if ($user['PASSWORD'] <> sha1($user['SALT'] . ':' . $password)) {
 			throw new Exception("Введен некорректный пароль");
 		}
 		$this->Login($user['ID']);
@@ -139,6 +141,10 @@ class Users extends SCRUD {
 	}
 
 	public function Logout() {
-		$_SESSION['USER'] = [];
+		unset($_SESSION['USER']);
+	}
+
+	public function IsAuthorized() {
+		return isset($_SESSION['USER']);
 	}
 }
