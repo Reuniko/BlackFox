@@ -20,6 +20,11 @@ class Users extends SCRUD {
 				'DESCRIPTION' => 'В базе хранится sha1 хеш пароля',
 				'NOT_NULL'    => true,
 			],
+			'SALT'        => [
+				'TYPE'     => 'STRING',
+				'NAME'     => 'Соль',
+				'NOT_NULL' => true,
+			],
 			'FIRST_NAME'  => [
 				'TYPE' => 'STRING',
 				'NAME' => 'Имя',
@@ -43,27 +48,73 @@ class Users extends SCRUD {
 		];
 	}
 
+	/**
+	 * Creates a new user
+	 *
+	 * @param array $fields
+	 * @return int created users identifier
+	 * @throws Exception
+	 */
 	public function Create($fields) {
-		if (empty($fields['PASSWORD'])) {
-			throw new Exception("Не указан пароль");
+
+		if (empty($fields['LOGIN'])) {
+			throw new Exception("Login must be specified");
 		}
+
+		// prevent doubles for LOGIN
 		if (!empty($this->Read(['LOGIN' => $fields['LOGIN']], ['ID']))) {
-			throw new Exception("Пользователь с логином '{$fields['LOGIN']}' уже зарегистрирован в системе");
+			throw new Exception("User with LOGIN '{$fields['LOGIN']}' already exist");
 		}
-		if (!filter_var($fields['EMAIL'], FILTER_VALIDATE_EMAIL)) {
-			throw new Exception("Invalid email format");
+
+		// auto hash password
+		unset($fields['SALT']);
+		if (!empty($fields['PASSWORD'])) {
+			$fields['SALT'] = bin2hex(random_bytes(32));
+			$fields['PASSWORD'] = sha1($fields['SALT'] . ':' . $fields['PASSWORD']);
 		}
-		$fields['PASSWORD'] = sha1(strtolower($fields['LOGIN']) . ':' . $fields['PASSWORD']);
+
 		return parent::Create($fields);
 	}
 
+	/**
+	 * Set password for specified user
+	 *
+	 * @param int $ID users identifier
+	 * @param string $password a new password
+	 * @throws Exception Password must be specified
+	 */
+	public function SetPassword($ID, $password) {
+		if (empty($password)) {
+			throw new Exception("Password must be specified");
+		}
+		$salt = bin2hex(random_bytes(32));
+		$password = sha1($salt . ':' . $password);
+		parent::Update($ID, [
+			'SALT'     => $salt,
+			'PASSWORD' => $password,
+		]);
+	}
+
+	/**
+	 * Checks if users password match database hash
+	 *
+	 * @param int $ID user identifier
+	 * @param string $password password to check
+	 * @return bool
+	 */
+	public function CheckPassword($ID, $password) {
+		$user = $this->Read($ID, ['PASSWORD', 'SALT']);
+		return ($user['PASSWORD'] === sha1($user['SALT'] . ':' . $password));
+	}
+
+
 	public function Update($ids = [], $fields = []) {
 		if (!empty($fields['PASSWORD'])) {
-			if (!empty($fields['LOGIN'])) {
-				$fields['PASSWORD'] = sha1(strtolower($fields['LOGIN']) . ':' . $fields['PASSWORD']);
-			} else {
-				throw new Exception("Для корректной смены пароля требуется поле LOGIN");
+			$ids = is_array($ids) ? $ids : [$ids];
+			foreach ($ids as $ID) {
+				$this->SetPassword($ID, $fields['PASSWORD']);
 			}
+			unset($fields['PASSWORD']);
 		}
 		return parent::Update($ids, $fields);
 	}
