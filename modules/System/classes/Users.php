@@ -45,6 +45,11 @@ class Users extends SCRUD {
 				'TYPE' => 'DATETIME',
 				'NAME' => 'Последнее время авторизации',
 			],
+			'AVATAR'      => [
+				'TYPE' => 'FILE',
+				'NAME' => 'Аватар',
+				'LINK' => '\\System\\Files',
+			],
 		];
 	}
 
