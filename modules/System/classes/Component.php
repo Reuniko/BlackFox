@@ -97,6 +97,7 @@ abstract class Component {
 				continue;
 			}
 			$errors[] = "Для инициализации компонента '{$this->class}' требуется указать параметр '{$code}'";
+			unset($PARAMS[$code]);
 		}
 		if (!empty($PARAMS)) {
 			foreach ($PARAMS as $code => $value) {

@@ -51,6 +51,7 @@ class Engine extends Instanceable {
 		$this->SECTION = require($this->SearchAncestorFile($this->url['path'], '.section.php'));
 		$this->TEMPLATE = isset($this->SECTION['TEMPLATE']) ? $this->SECTION['TEMPLATE'] : $this->config['template'];
 		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
+		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
 
 		// TODO Check access
 		// $this->SECTION['ACCESS'];
@@ -69,7 +70,6 @@ class Engine extends Instanceable {
 		// Launch wrapper if it needs
 		$wrap_content = (!empty($this->TEMPLATE) and !empty($this->WRAPPER));
 		if ($wrap_content) {
-			$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
 			// input:
 			// $this->CONTENT
 			// $this->TITLE
