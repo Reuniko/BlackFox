@@ -285,12 +285,14 @@ class Engine extends Instanceable {
 
 	public function LoadModules() {
 
-		// TODO: remove System -> Upgrade
-		//require_once($this->GetCoreFile('modules/system/module.php'));
-		//System::Instance()->Upgrade();
-		// TODO: remove System -> Upgrade
+		try {
+			$modules = Unit::I()->GetList();
+		} catch (\Exception $error) {
+			Unit::I()->Synchronize();
+			Unit::I()->Create(['ID' => 'System']);
+			$modules = Unit::I()->GetList();
+		}
 
-		$modules = Unit::Instance()->GetList();
 		foreach ($modules as $module) {
 			$class = $module['ID'];
 			if ($class === 'System') {
