@@ -1,7 +1,7 @@
 <?php
 namespace Admin;
 
-class Module extends \System\AbstractModule {
+class Module extends \System\AModule {
 	public $name = 'Администрирование';
 	public $description = 'Классы и компоненты, используемые в административной части';
 	public $version = '1.0';

@@ -290,7 +290,7 @@ class Engine extends Instanceable {
 		//System::Instance()->Upgrade();
 		// TODO: remove System -> Upgrade
 
-		$modules = Modules::Instance()->GetList();
+		$modules = Unit::Instance()->GetList();
 		foreach ($modules as $module) {
 			$class = $module['ID'];
 			if ($class === 'System') {
