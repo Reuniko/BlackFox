@@ -1,6 +1,6 @@
 <?php
 namespace System;
-class ComponentSection extends Component {
+abstract class ComponentSection extends Component {
 
 	public function SelectMethodForView($request) {
 		$element = !empty($request['ID']) || !empty($request['id']);

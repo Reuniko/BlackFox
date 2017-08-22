@@ -1,7 +1,7 @@
 <?php
 namespace System;
 
-class Modules extends SCRUD {
+class Unit extends SCRUD {
 
 	final public function Init() {
 		$this->name = 'Модули';

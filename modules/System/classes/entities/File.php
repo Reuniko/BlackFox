@@ -2,7 +2,7 @@
 
 namespace System;
 
-class Files extends SCRUD {
+class File extends SCRUD {
 	public function Init() {
 		parent::Init();
 		$this->name = 'Файлы';
@@ -14,7 +14,7 @@ class Files extends SCRUD {
 			'CREATE_BY'   => [
 				'TYPE' => 'LINK',
 				'NAME' => 'Кем создан',
-				'LINK' => '\\System\\Users',
+				'LINK' => '\\System\\User',
 			],
 			'NAME'        => [
 				'TYPE' => 'STRING',

@@ -2,7 +2,7 @@
 
 namespace System;
 
-class Users extends SCRUD {
+class User extends SCRUD {
 	public function Init() {
 		parent::Init();
 		$this->name = 'Пользователи';
@@ -48,7 +48,7 @@ class Users extends SCRUD {
 			'AVATAR'      => [
 				'TYPE' => 'FILE',
 				'NAME' => 'Аватар',
-				'LINK' => '\\System\\Files',
+				'LINK' => '\\System\\File',
 			],
 		];
 	}

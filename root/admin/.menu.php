@@ -8,16 +8,20 @@ return [
 		'NAME' => 'Upgrade',
 		'LINK' => '/admin/_upgrade.php',
 	],
-	'system_users'  => [
-		'NAME' => 'System\Users',
-		'LINK' => '/admin/system/users.php',
+	'System_Unit' => [
+		'NAME' => 'System\Unit',
+		'LINK' => '/admin/System/Unit.php',
 	],
-	'system_files'  => [
-		'NAME' => 'System\Files',
-		'LINK' => '/admin/system/files.php',
+	'System_User'   => [
+		'NAME' => 'System\User',
+		'LINK' => '/admin/System/User.php',
 	],
-	'demo_examples' => [
-		'NAME' => 'Demo\Examples',
-		'LINK' => '/admin/demo/examples.php',
+	'System_File'   => [
+		'NAME' => 'System\File',
+		'LINK' => '/admin/System/File.php',
+	],
+	'demo_example'  => [
+		'NAME' => 'Demo\Example',
+		'LINK' => '/admin/demo/example.php',
 	],
 ];

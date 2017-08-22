@@ -1,7 +1,7 @@
 <?php
 namespace Profile;
 
-class Module extends \System\AbstractModule {
+class Module extends \System\AModule {
 	public $name = 'Профиль';
 	public $description = 'Профиль пользователя, дополнительные поля, аватар';
 	public $version = '1.0';
