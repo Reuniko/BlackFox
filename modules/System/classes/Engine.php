@@ -326,16 +326,14 @@ class Engine extends Instanceable {
 		}
 		$paths = array_reverse($paths);
 		//$this->Debug($paths, '$paths');
-		foreach ($this->roots as $root) {
-			foreach ($paths as $path) {
+		//$this->Debug($this->roots, '$this->roots');
+		foreach ($paths as $path) {
+			foreach ($this->roots as $root) {
 				if (file_exists($root . $path)) {
 					$file = $root . $path;
-					break;
+					return $file;
 				}
 			}
-		}
-		if (!empty($file)) {
-			return $file;
 		}
 		throw new ExceptionFileNotFound("Found no '{$filename}' in '{$uri}'");
 	}
