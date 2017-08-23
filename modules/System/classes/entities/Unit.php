@@ -16,7 +16,7 @@ class Unit extends SCRUD {
 						'PRIMARY'        => true,
 						'NOT_NULL'       => true,
 						'AUTO_INCREMENT' => false,
-						'DISABLED'       => true,
+						'DISABLED'       => false,
 						'JOIN'           => true,
 					],
 					'NAME'        => [
