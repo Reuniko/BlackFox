@@ -22,14 +22,14 @@ class Adminer extends \System\Component {
 	public function Init($PARAMS = []) {
 		parent::Init($PARAMS);
 
+		if (!is_subclass_of($PARAMS['SCRUD'], '\\System\\SCRUD')) {
+			throw new Exception("SCRUD OBJECT must be the child of \\System\\SCRUD");
+		}
+
 		if (is_object($PARAMS['SCRUD'])) {
 			$this->SCRUD = $PARAMS['SCRUD'];
 		} elseif (class_exists($PARAMS['SCRUD'])) {
-			$this->SCRUD = new $PARAMS['SCRUD'];
-		}
-
-		if (!is_subclass_of($this->SCRUD, '\\System\\SCRUD')) {
-			throw new Exception("SCRUD OBJECT must be the child of \\System\\SCRUD");
+			$this->SCRUD = $PARAMS['SCRUD']::I();
 		}
 
 		$this->ENGINE->TITLE = $this->SCRUD->name;
