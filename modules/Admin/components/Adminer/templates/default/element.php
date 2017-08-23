@@ -21,15 +21,15 @@
 	<input type="hidden" name="ACTION" value="<?= $RESULT['MODE'] ?>"/>
 
 	<? foreach ($this->SCRUD->composition as $group_code => $group): ?>
-		<h3 class="group_header"><?= $group['NAME'] ?></h3>
+		<h3 class="group_header"><?= $group['NAME'] ?: "{{$group_code}}" ?></h3>
 		<? foreach ($group['FIELDS'] as $code => $field): ?>
 			<div class="form-group">
 				<label
-						class="col-sm-3 control-label"
-						for="<?= $code ?>"
-						title="<?= $code ?>"
+					class="col-sm-3 control-label"
+					for="<?= $code ?>"
+					title="<?= $code ?>"
 				>
-					<?= $field['NAME'] ?>
+					<?= $field['NAME']?: "{{$code}}" ?>
 				</label>
 				<div class="col-sm-8">
 					<?
@@ -50,38 +50,38 @@
 
 
 		<button
-				class="btn btn-primary"
-				type="submit"
-				name="REDIRECT"
-				value="Return"
+			class="btn btn-primary"
+			type="submit"
+			name="REDIRECT"
+			value="Return"
 		>
 			<i class="glyphicon glyphicon-ok"></i>
 			Сохранить
 		</button>
 
 		<button
-				class="btn btn-success"
-				type="submit"
-				name="REDIRECT"
-				value="Stay"
+			class="btn btn-success"
+			type="submit"
+			name="REDIRECT"
+			value="Stay"
 		>
 			<i class="glyphicon glyphicon-ok"></i>
 			Применить
 		</button>
 
 		<a
-				class="btn btn-default"
-				href="?"
+			class="btn btn-default"
+			href="?"
 		>
 			<i class="glyphicon glyphicon-ban-circle"></i>
 			Отменить
 		</a>
 
 		<button
-				class="btn btn-danger"
-				type="submit"
-				name="ACTION"
-				value="Delete"
+			class="btn btn-danger"
+			type="submit"
+			name="ACTION"
+			value="Delete"
 		>
 			<i class="glyphicon glyphicon-remove"></i>
 			Удалить
