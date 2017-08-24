@@ -44,8 +44,34 @@ class Engine extends Instanceable {
 		$this->DB = Database::Instance($this->config['database']);
 	}
 
-	public function CheckAccess($rules = [], $groups = []) {
-		//TODO CheckAccess
+	/**
+	 * Checks access for section
+	 *
+	 * @param array $rules section rules: ['<group_code>' => '<true\false>', ...]
+	 * @param array $groups user group codes: ['<group_code>', ...]
+	 * @return bool true - allow, false - disallow
+	 */
+	public function CheckSectionAccess($rules = [], $groups = []) {
+		$rules['*'] = isset($rules['*']) ? $rules['*'] : true;
+		if ($rules['*'] === true) {
+			return true;
+		}
+		unset($rules['*']);
+		foreach ($rules as $rule_group => $rule_right) {
+			if ($rule_right === true) {
+				if (in_array($rule_group, $groups)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public function ShowAuthForm($message = null) {
+		$this->WRAPPER = 'frame';
+		$this->Component('System', 'Authorization', '', [
+			'MESSAGE' => $message,
+		]);
 	}
 
 	public function Work() {
@@ -58,13 +84,10 @@ class Engine extends Instanceable {
 		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
 
 		// Check access
-		$allow = $this->CheckAccess(
+		$allow = $this->CheckSectionAccess(
 			$this->SECTION['ACCESS'] ?: [],
 			$_SESSION['USER']['GROUPS'] ?: []
 		);
-		if (!$allow) {
-			// TODO show auth form and die
-		}
 
 		// Init other modules
 		$this->LoadModules();
@@ -74,7 +97,11 @@ class Engine extends Instanceable {
 
 		// generate CONTENT
 		ob_start();
-		$this->ShowContent();
+		if ($allow) {
+			$this->ShowContent();
+		} else {
+			$this->ShowAuthForm("Access denied");
+		}
 		$this->CONTENT = ob_get_clean();
 
 		// Launch wrapper if it needs
