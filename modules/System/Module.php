@@ -7,8 +7,10 @@ class Module extends \System\AModule {
 	public $version = '1.0';
 
 	public function Upgrade() {
-		Unit::Instance()->Synchronize();
-		User::Instance()->Synchronize();
-		File::Instance()->Synchronize();
+		Unit::I()->Synchronize();
+		User::I()->Synchronize();
+		File::I()->Synchronize();
+		Group::I()->Synchronize();
+		User2Group::I()->Synchronize();
 	}
 }
