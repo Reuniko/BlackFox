@@ -228,10 +228,18 @@ abstract class Component {
 
 	public function ProcessView($RESULT) {
 		$view_file = $this->Path("{$this->view}.php");
+
 		ob_start();
-		$this->ShowMessages();
 		require($view_file);
-		return ob_get_clean();
+		$content = ob_get_clean();
+
+		if (!empty($this->MESSAGES)) {
+			ob_start();
+			$this->ShowMessages();
+			$content = ob_get_clean() . $content;
+		}
+
+		return $content;
 	}
 
 	/**

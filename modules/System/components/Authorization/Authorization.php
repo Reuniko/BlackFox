@@ -14,6 +14,11 @@ class Authorization extends \System\Component {
 				'NAME'    => 'Использовать каптчу',
 				'DEFAULT' => 'Y',
 			],
+			'MESSAGE'  => [
+				'TYPE'    => 'STRING',
+				'NAME'    => 'Сообщение',
+				'DEFAULT' => '',
+			],
 			'TITLE'    => [
 				'TYPE'    => 'STRING',
 				'NAME'    => 'Заголовок',
