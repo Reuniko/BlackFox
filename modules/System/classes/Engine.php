@@ -58,9 +58,12 @@ class Engine extends Instanceable {
 		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
 
 		// Check access
-		if (is_array($this->SECTION['ACCESS'])) {
-			$allow = $this->CheckAccess($this->SECTION['ACCESS'], $_SESSION['USER']['GROUPS']);
-			// TODO disallow
+		$allow = $this->CheckAccess(
+			$this->SECTION['ACCESS'] ?: [],
+			$_SESSION['USER']['GROUPS'] ?: []
+		);
+		if (!$allow) {
+			// TODO show auth form and die
 		}
 
 		// Init other modules

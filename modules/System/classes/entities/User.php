@@ -19,11 +19,13 @@ class User extends SCRUD {
 				'NAME'        => 'Пароль',
 				'DESCRIPTION' => 'В базе хранится sha1 хеш пароля',
 				'NOT_NULL'    => true,
+				'DISABLED'    => true,
 			],
 			'SALT'        => [
 				'TYPE'     => 'STRING',
 				'NAME'     => 'Соль',
 				'NOT_NULL' => true,
+				'DISABLED' => true,
 			],
 			'FIRST_NAME'  => [
 				'TYPE' => 'STRING',
@@ -139,10 +141,12 @@ class User extends SCRUD {
 	}
 
 	public function Login($ID) {
-		$this->Update($ID, [
-			'LAST_AUTH' => time(),
-		]);
+		if (!$this->Present($ID)) {
+			throw new Exception("User #{$ID} not found");
+		}
+		$this->Update($ID, ['LAST_AUTH' => time()]);
 		$_SESSION['USER'] = $this->Read($ID);
+		$_SESSION['USER']['GROUPS'] = $this->GetGroups($ID);
 	}
 
 	public function Logout() {
@@ -151,6 +155,18 @@ class User extends SCRUD {
 
 	public function IsAuthorized() {
 		return isset($_SESSION['USER']);
+	}
+
+	/**
+	 * Get user groups
+	 *
+	 * @param int $ID user id
+	 * @return array list of group codes
+	 */
+	public function GetGroups($ID) {
+		$group_ids = User2Group::I()->Select(['USER' => $ID], [], 'GROUP');
+		$groups = Group::I()->Select(['ID' => $group_ids], [], 'CODE');
+		return $groups;
 	}
 
 }
