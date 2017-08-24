@@ -1,8 +1,7 @@
 <?php
-
 namespace System;
-
 class File extends SCRUD {
+
 	public function Init() {
 		parent::Init();
 		$this->name = 'Файлы';
@@ -41,8 +40,6 @@ class File extends SCRUD {
 	}
 
 	public function Create($fields = []) {
-		debug($_SERVER['DOCUMENT_ROOT'], 'DOCUMENT_ROOT', 'log');
-		debug($fields, 'Files Create $fields', 'log');
 		if (isset($fields['tmp_name'])) {
 			if ($fields['error'] !== 0) {
 				return null;
@@ -71,4 +68,5 @@ class File extends SCRUD {
 	public function Update($ids = array(), $fields = array()) {
 		throw new ExceptionNotAllowed();
 	}
+
 }

@@ -1,27 +1,31 @@
 <?php
 return [
-	'root'          => [
-		'NAME' => 'Root',
+	'root'              => [
+		'NAME' => 'Рабочий стол',
 		'LINK' => '/admin/index.php',
 	],
-	'upgrade'       => [
-		'NAME' => 'Upgrade',
+	'~upgrade'          => [
+		'NAME' => '~upgrade',
 		'LINK' => '/admin/_upgrade.php',
 	],
-	'System_Unit' => [
-		'NAME' => 'System\Unit',
+	'System_Unit'       => [
+		'NAME' => 'Модули',
 		'LINK' => '/admin/System/Unit.php',
 	],
-	'System_User'   => [
-		'NAME' => 'System\User',
+	'System_User'       => [
+		'NAME' => 'Пользователи',
 		'LINK' => '/admin/System/User.php',
 	],
-	'System_File'   => [
-		'NAME' => 'System\File',
-		'LINK' => '/admin/System/File.php',
+	'System_Group'      => [
+		'NAME' => 'Группы',
+		'LINK' => '/admin/System/Group.php',
 	],
-	'demo_example'  => [
-		'NAME' => 'Demo\Example',
-		'LINK' => '/admin/demo/example.php',
+	'System_User2Group' => [
+		'NAME' => 'Пользователи в группах',
+		'LINK' => '/admin/System/User2Group.php',
+	],
+	'System_File'       => [
+		'NAME' => 'Файлы',
+		'LINK' => '/admin/System/File.php',
 	],
 ];

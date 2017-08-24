@@ -44,6 +44,10 @@ class Engine extends Instanceable {
 		$this->DB = Database::Instance($this->config['database']);
 	}
 
+	public function CheckAccess($rules = [], $groups = []) {
+		//TODO CheckAccess
+	}
+
 	public function Work() {
 
 		// Load section info
@@ -53,8 +57,11 @@ class Engine extends Instanceable {
 		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
 		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
 
-		// TODO Check access
-		// $this->SECTION['ACCESS'];
+		// Check access
+		if (is_array($this->SECTION['ACCESS'])) {
+			$allow = $this->CheckAccess($this->SECTION['ACCESS'], $_SESSION['USER']['GROUPS']);
+			// TODO disallow
+		}
 
 		// Init other modules
 		$this->LoadModules();

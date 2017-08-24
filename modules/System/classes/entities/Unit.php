@@ -1,6 +1,5 @@
 <?php
 namespace System;
-
 class Unit extends SCRUD {
 
 	final public function Init() {
@@ -35,6 +34,5 @@ class Unit extends SCRUD {
 			],
 		];
 	}
-
 
 }

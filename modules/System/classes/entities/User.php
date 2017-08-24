@@ -1,8 +1,7 @@
 <?php
-
 namespace System;
-
 class User extends SCRUD {
+
 	public function Init() {
 		parent::Init();
 		$this->name = 'Пользователи';
@@ -13,6 +12,7 @@ class User extends SCRUD {
 				'NOT_NULL' => true,
 				'INDEX'    => true,
 				'UNIQUE'   => true,
+				'JOIN'     => true,
 			],
 			'PASSWORD'    => [
 				'TYPE'        => 'STRING',
@@ -152,4 +152,5 @@ class User extends SCRUD {
 	public function IsAuthorized() {
 		return isset($_SESSION['USER']);
 	}
+
 }
