@@ -75,8 +75,8 @@ abstract class Component {
 	public function Init($PARAMS = []) {
 		$errors = [];
 		foreach ($this->options as $code => $option) {
-			$value = $PARAMS[$code];
-			if (!empty($value)) {
+			if (array_key_exists($code, $PARAMS)) {
+				$value = $PARAMS[$code];
 				switch ($this->options[$code]['TYPE']) {
 					case 'STRING':
 						$value = (string)$value;
@@ -92,7 +92,7 @@ abstract class Component {
 				unset($PARAMS[$code]);
 				continue;
 			}
-			if (!empty($option['DEFAULT'])) {
+			if (array_key_exists('DEFAULT', $option)) {
 				$this->PARAMS[$code] = $option['DEFAULT'];
 				continue;
 			}
@@ -227,6 +227,10 @@ abstract class Component {
 	}
 
 	public function ProcessView($RESULT) {
+		if (empty($this->view)) {
+			return null;
+		}
+
 		$view_file = $this->Path("{$this->view}.php");
 
 		ob_start();
@@ -374,6 +378,12 @@ abstract class Component {
 	 */
 	public function Breadcrumb($title, $link = "") {
 		throw new ExceptionNotImplemented();
+	}
+
+	public function ShowAuthForm() {
+		$this->view = null;
+		$this->ENGINE->ShowAuthForm();
+		return null;
 	}
 
 }
