@@ -113,7 +113,7 @@ abstract class Component {
 		$this->ENGINE->Debug($data, $title, $mode, $target);
 	}
 
-	public function SelectMethodForAction($request = array()) {
+	public function SelectMethodForAction($request = []) {
 		return $request['ACTION'] ?: $request['action'];
 	}
 
@@ -125,8 +125,8 @@ abstract class Component {
 		throw new Exception("Действие 'Work' в компоненте '{$this->class}' не переопределено");
 	}
 
-	public function Controller($request = array()) {
-		$error_result = array();
+	public function Controller($request = []) {
+		$error_result = [];
 
 		$action = $this->SelectMethodForAction($request);
 		if (!empty($action)) {
@@ -139,11 +139,7 @@ abstract class Component {
 
 		$action = $this->SelectMethodForView($request);
 		if (!empty($action)) {
-			try {
-				return (array)$this->Invoke($action, $request) + $error_result;
-			} catch (\Exception $error) {
-				return (array)$this->Error($error->getMessage(), $action, $request);
-			}
+			return (array)$this->Invoke($action, $request) + $error_result;
 		}
 
 		throw new Exception("Не удалось определить требуемое действие");
@@ -173,7 +169,7 @@ abstract class Component {
 		$request = array_change_key_case($request);
 		$parameters = $reflection->getParameters();
 		//$this->Debug($parameters, 'Invoke $parameters');
-		$arguments = array();
+		$arguments = [];
 		foreach ($parameters as $parameter) {
 			$code = strtolower($parameter->name);
 			if (isset($request[$code])) {
@@ -200,10 +196,10 @@ abstract class Component {
 	 * @param array $request
 	 * @return array
 	 */
-	public function Error($message, $action = null, $request = array()) {
-		$this->Debug($message, 'Error $error');
-		$this->Debug($action, 'Error $action');
-		$this->Debug($request, 'Error $request');
+	public function Error($message, $action = null, $request = []) {
+		//$this->Debug($message, 'Error $error');
+		//$this->Debug($action, 'Error $action');
+		//$this->Debug($request, 'Error $request');
 		$this->MESSAGES[] = [
 			'TYPE'    => 'ERROR',
 			'MESSAGE' => $message,
@@ -308,20 +304,20 @@ abstract class Component {
 	 * @todo упорядочивать на неограниченную вложенность
 	 */
 	private function _files() {
-		$files = array();
+		$files = [];
 		foreach ($_FILES as $code1 => $file) {
 			if (!is_array($file['name'])) {
 				$files[$code1] = $file;
 			} else {
 				foreach ($_FILES[$code1]['name'] as $code2 => $crap) {
 					if (empty($_FILES[$code1]['error'][$code2])) {
-						$files[$code1][$code2] = array(
+						$files[$code1][$code2] = [
 							'name'     => $_FILES[$code1]['name'][$code2],
 							'type'     => $_FILES[$code1]['type'][$code2],
 							'tmp_name' => $_FILES[$code1]['tmp_name'][$code2],
 							'error'    => $_FILES[$code1]['error'][$code2],
 							'size'     => $_FILES[$code1]['size'][$code2],
-						);
+						];
 					}
 				}
 			}
@@ -347,43 +343,12 @@ abstract class Component {
 				'MESSAGE' => $message_text,
 			];
 		}
-		echo json_encode(array(
+		echo json_encode([
 			'URL'     => $url,
 			'TYPE'    => $message_type,
 			'MESSAGE' => $message_text,
-		));
+		]);
 		die();
-	}
-
-	/**
-	 * Прерывает выполнение компонента и страницы.
-	 * Показывает форму авторизации, обернутую в хедер+футер.
-	 * Форма авторизации находится и переадресует по оригинальному адресу.
-	 * Умирает.
-	 *
-	 * @param string $message сообщение пользователю
-	 * @throws ExceptionNotImplemented
-	 */
-	public function AuthForm($message = null) {
-		throw new ExceptionNotImplemented();
-	}
-
-	/**
-	 * Добавляет в хлебные крошки пункт.
-	 * Устанавливает заголовок страницы - TITLE и H1 под хлебными крошками.
-	 *
-	 * @param string $title название пункта
-	 * @param string $link ссылка на пункт (не обязательно)
-	 * @throws ExceptionNotImplemented
-	 */
-	public function Breadcrumb($title, $link = "") {
-		throw new ExceptionNotImplemented();
-	}
-
-	public function ShowAuthForm() {
-		$this->view = null;
-		$this->ENGINE->ShowAuthForm();
-		return null;
 	}
 
 }
