@@ -49,22 +49,29 @@ class Engine extends Instanceable {
 	 *
 	 * @param array $rules section rules: ['<group_code>' => '<true\false>', ...]
 	 * @param array $groups user group codes: ['<group_code>', ...]
-	 * @return bool true - allow, false - disallow
+	 * @throws ExceptionAccessDenied
+	 * @throws ExceptionAuthRequired
 	 */
 	public function CheckSectionAccess($rules = [], $groups = []) {
+		$rules = $rules ?: [];
+		$groups = $groups ?: [];
 		$rules['*'] = isset($rules['*']) ? $rules['*'] : true;
 		if ($rules['*'] === true) {
-			return true;
+			return;
 		}
 		unset($rules['*']);
 		foreach ($rules as $rule_group => $rule_right) {
 			if ($rule_right === true) {
 				if (in_array($rule_group, $groups)) {
-					return true;
+					return;
 				}
 			}
 		}
-		return false;
+		if (User::I()->IsAuthorized()) {
+			throw new ExceptionAccessDenied('This section requires higher privileges');
+		} else {
+			throw new ExceptionAuthRequired('This section requires authorisation');
+		}
 	}
 
 	public function ShowAuthForm($message = null) {
@@ -82,47 +89,33 @@ class Engine extends Instanceable {
 		$this->TEMPLATE = isset($this->SECTION['TEMPLATE']) ? $this->SECTION['TEMPLATE'] : $this->config['template'];
 		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
 		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
-
-		// Check access
-		$allow = $this->CheckSectionAccess(
-			$this->SECTION['ACCESS'] ?: [],
-			$_SESSION['USER']['GROUPS'] ?: []
-		);
+		$this->TITLE = $this->SECTION['NAME'];
 
 		// Init other modules
 		$this->LoadModules();
 
-		// Init TITLE from .section.php
-		$this->TITLE = $this->SECTION['NAME'];
-
 		// generate CONTENT
 		ob_start();
-		if ($allow) {
-			$this->ShowContent();
-		} else {
-			$this->ShowAuthForm("Access denied");
-		}
+		$this->ShowContent();
 		$this->CONTENT = ob_get_clean();
 
 		// Launch wrapper if it needs
-		$wrap_content = (!empty($this->TEMPLATE) and !empty($this->WRAPPER));
-		if ($wrap_content) {
-			// input:
-			// $this->CONTENT
-			// $this->TITLE
-			// $this->TEMPLATE_PATH
+		if ((!empty($this->TEMPLATE) and !empty($this->WRAPPER))) {
+			// input: $this-> CONTENT, TITLE, TEMPLATE_PATH
 			require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/' . $this->WRAPPER . '.php'));
 		} else {
 			echo $this->CONTENT;
 		}
 
-		// Do last triggers
-		// ...
 	}
 
 	public function ShowContent() {
 
 		try {
+
+			// Check access
+			$this->CheckSectionAccess($this->SECTION['ACCESS'], $_SESSION['USER']['GROUPS']);
+
 			// запрос на конкретный скрипт
 			foreach ($this->roots as $root) {
 				$request_path = $root . $this->url['path'];
@@ -144,14 +137,16 @@ class Engine extends Instanceable {
 			// запрос на неизвестный адрес
 			require($this->SearchAncestorFile($this->url['path'], '.controller.php'));
 
-		} catch (ExceptionFileNotFound $error) {
+		} catch (ExceptionAuthRequired $exception) {
+			$this->ShowAuthForm($exception->getMessage());
+		} catch (ExceptionNotFound $exception) {
 			$this->Show404();
-		} catch (ExceptionAccessDenied $error) {
+		} catch (ExceptionAccessDenied $exception) {
 			$this->Show403();
-		} catch (Exception $error) {
-			$this->ShowErrors($error->getArray());
-		} catch (\Exception $error) {
-			$this->ShowErrors([$error->getMessage()]);
+		} catch (Exception $exception) {
+			$this->ShowErrors($exception->getArray());
+		} catch (\Exception $exception) {
+			$this->ShowErrors([$exception->getMessage()]);
 		}
 	}
 
@@ -372,7 +367,7 @@ class Engine extends Instanceable {
 				}
 			}
 		}
-		throw new ExceptionFileNotFound("Found no '{$filename}' in '{$uri}'");
+		throw new ExceptionNotFound("Found no '{$filename}' in '{$uri}'");
 	}
 
 	/**
