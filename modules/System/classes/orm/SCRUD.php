@@ -789,6 +789,13 @@ abstract class SCRUD extends Instanceable {
 			}
 			unset($content);
 
+			if ($code === '*') {
+				list($addSelect, $addJoin) = $this->_prepareSelectAndJoin($this->GetFieldList(), $prefix);
+				$select = array_merge($select, $addSelect);
+				$join = array_merge($join, $addJoin);
+				continue;
+			}
+
 			if (empty($this->selection[$code])) {
 				throw new Exception("Unknown field code: '{$code}' in table '{$this->code}'");
 			}
