@@ -153,7 +153,9 @@ abstract class Component {
 
 	/**
 	 * Selects the necessary methods (for action, for view)
-	 * and returns the combined result of their launch
+	 * and returns the combined result of their launch:
+	 * 1) Invoke method for action - catch any exceptions, add them to result if necessary
+	 * 2) Invoke method for view - return result
 	 *
 	 * @param array $request user request
 	 * @return array result data
@@ -253,7 +255,7 @@ abstract class Component {
 
 	/**
 	 * Returns the result of the execution of the controller,
-	 * passing a combined request of $_REQUEST and $_FILES
+	 * passing a request combined from globals
 	 *
 	 * @return array result data
 	 */
