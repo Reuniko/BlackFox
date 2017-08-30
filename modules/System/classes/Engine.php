@@ -185,6 +185,7 @@ class Engine extends Instanceable {
 	 * @param string $template символьный код шаблона
 	 * @param array $params массив параметров компонента
 	 * @throws Exception
+	 * @deprecated use Component::Run() instead
 	 */
 	public function Component($module, $component, $template = 'default', $params = []) {
 
@@ -197,35 +198,9 @@ class Engine extends Instanceable {
 		if (!is_string($template)) {
 			throw new Exception("Символьный код шаблона должен быть строкой");
 		}
-
-		if (empty($template)) {
-			$template = 'default';
-		}
-		$path_class = $this->GetCoreFile("modules/{$module}/components/{$component}/{$component}.php");
-
 		$component_class_name = "$module\\$component";
-
-		/** @var Component $component_instance */
-		$component_instance = new $component_class_name();
-		$component_instance->Init($params);
-		$component_instance->component_folder = dirname($path_class);
-		$component_instance->template_folder = $component_instance->component_folder . '/templates/' . $template;
-
-		// echo "<!-- $component_class_name -->\r\n";
-		// $this->Debug($component_class_name, '$component_class_name');
-		if ($component_instance->allow_ajax_request and (in_array($component_class_name, [$_REQUEST['AJAX'], $_REQUEST['ajax']]))) {
-			$this->BufferRestart();
-			$component_instance->Execute($template);
-			$this->BufferFlush();
-			die();
-		}
-		if ($component_instance->allow_json_request and (in_array($component_class_name, [$_REQUEST['JSON'], $_REQUEST['json']]))) {
-			$this->BufferRestart();
-			echo json_encode($component_instance->ProcessResult());
-			$this->BufferFlush();
-			die();
-		}
-		$component_instance->Execute($template);
+		/** @var Component $component_class_name */
+		$component_class_name::Run($params, $template);
 	}
 
 	public function RegisterModuleClasses($module_name) {
