@@ -48,9 +48,9 @@ abstract class Component {
 		$this->class = get_called_class();
 		list($module, $component) = explode('\\', $this->class);
 		$this->components[$this->class] = $this->ENGINE->GetCoreDir("modules/{$module}/components/{$component}");
+		$this->component_folder = $this->components[$this->class];
 
 		$parents = class_parents($this);
-		//$this->Debug($parents, '$parents');
 		foreach ($parents as $parent) {
 			if ($parent === 'System\Component') {
 				continue;
@@ -58,7 +58,33 @@ abstract class Component {
 			list($module, $component) = explode('\\', $parent);
 			$this->components[$parent] = $this->ENGINE->GetCoreDir("modules/{$module}/components/{$component}");
 		}
-		//$this->Debug($this->components, '$this->components');
+	}
+
+	public static function Run($PARAMS = [], $template = 'default') {
+		$self = new static();
+		$self->template = $template ?: $self->template;
+		$self->Execute($PARAMS);
+	}
+
+	public function Execute($PARAMS = []) {
+		$this->template_folder = $this->component_folder . '/templates/' . $this->template;
+		$this->Init($PARAMS);
+		$this->SetMessagesFromSession();
+
+		if ($this->allow_ajax_request and (in_array($this->class, [$_REQUEST['AJAX'], $_REQUEST['ajax']]))) {
+			$this->ENGINE->TEMPLATE = null;
+			echo $this->ProcessView($this->ProcessResult());
+			return;
+		}
+
+		if ($this->allow_json_request and (in_array($this->class, [$_REQUEST['JSON'], $_REQUEST['json']]))) {
+			$this->ENGINE->TEMPLATE = null;
+			echo json_encode($this->ProcessResult());
+			return;
+		}
+
+		echo $this->ProcessView($this->ProcessResult());
+		return;
 	}
 
 	/**
@@ -125,6 +151,14 @@ abstract class Component {
 		throw new Exception("Действие 'Work' в компоненте '{$this->class}' не переопределено");
 	}
 
+	/**
+	 * Selects the necessary methods (for action, for view)
+	 * and returns the combined result of their launch
+	 *
+	 * @param array $request user request
+	 * @return array result data
+	 * @throws Exception
+	 */
 	public function Controller($request = []) {
 		$error_result = [];
 
@@ -207,21 +241,35 @@ abstract class Component {
 		return [];
 	}
 
-	public function ProcessResult() {
-		$request = array_merge_recursive($_REQUEST, $this->_files());
-		return (array)$this->Controller($request);
-	}
-
-	public function Execute($template = 'default') {
-		$this->template = $template;
+	/**
+	 *
+	 */
+	public function SetMessagesFromSession() {
 		if (!empty($_SESSION['MESSAGES'][$this->class])) {
 			$this->MESSAGES = $_SESSION['MESSAGES'][$this->class];
 			$_SESSION['MESSAGES'][$this->class] = [];
 		}
-		$this->RESULT = $this->ProcessResult();
-		echo $this->ProcessView($this->RESULT);
 	}
 
+	/**
+	 * Returns the result of the execution of the controller,
+	 * passing a combined request of $_REQUEST and $_FILES
+	 *
+	 * @return array result data
+	 */
+	public function ProcessResult() {
+		$request = array_merge_recursive($_REQUEST, $this->_files());
+		$this->RESULT = (array)$this->Controller($request);
+		return $this->RESULT;
+	}
+
+	/**
+	 * Connects the [$RESULT] to a [$this->template]
+	 * and returns the resulting content
+	 *
+	 * @param array $RESULT result data
+	 * @return null|string content (html)
+	 */
 	public function ProcessView($RESULT) {
 		if (empty($this->view)) {
 			return null;
