@@ -199,6 +199,9 @@ class Engine extends Instanceable {
 			throw new Exception("Символьный код шаблона должен быть строкой");
 		}
 		$component_class_name = "$module\\$component";
+		if (!class_exists($component_class_name)) {
+			throw new Exception("Component not found: {$component_class_name}");
+		}
 		/** @var Component $component_class_name */
 		$component_class_name::Run($params, $template);
 	}
