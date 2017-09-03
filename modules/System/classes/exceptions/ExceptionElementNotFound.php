@@ -1,6 +1,6 @@
 <?php
 namespace System;
 
-class ExceptionPageNotFound extends Exception {
+class ExceptionElementNotFound extends Exception {
 
 }
