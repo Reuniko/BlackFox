@@ -139,7 +139,7 @@ class Engine extends Instanceable {
 
 		} catch (ExceptionAuthRequired $exception) {
 			$this->ShowAuthForm($exception->getMessage());
-		} catch (ExceptionNotFound $exception) {
+		} catch (ExceptionPageNotFound $exception) {
 			$this->Show404();
 		} catch (ExceptionAccessDenied $exception) {
 			$this->Show403();
@@ -345,7 +345,7 @@ class Engine extends Instanceable {
 				}
 			}
 		}
-		throw new ExceptionNotFound("Found no '{$filename}' in '{$uri}'");
+		throw new ExceptionPageNotFound("Found no '{$filename}' in '{$uri}'");
 	}
 
 	/**
