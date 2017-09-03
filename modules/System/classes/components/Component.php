@@ -45,6 +45,8 @@ abstract class Component {
 
 		$this->USER = &$_SESSION['USER'];
 
+		// TODO cache all below:
+
 		$this->class = get_called_class();
 		list($module, $component) = explode('\\', $this->class);
 		$this->components[$this->class] = $this->ENGINE->GetCoreDir("modules/{$module}/components/{$component}");
@@ -52,7 +54,7 @@ abstract class Component {
 
 		$parents = class_parents($this);
 		foreach ($parents as $parent) {
-			if ($parent === 'System\Component') {
+			if ((new \ReflectionClass($parent))->isAbstract()) {
 				continue;
 			}
 			list($module, $component) = explode('\\', $parent);
