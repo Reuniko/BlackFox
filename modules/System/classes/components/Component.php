@@ -141,11 +141,25 @@ abstract class Component {
 		$this->ENGINE->Debug($data, $title, $mode, $target);
 	}
 
+	/**
+	 * Analyzes the $request, matches the required method for action.
+	 * May setup required view ($this->view).
+	 *
+	 * @param array $request user input
+	 * @return string name of the method
+	 */
 	public function SelectMethodForAction($request = []) {
 		return $request['ACTION'] ?: $request['action'];
 	}
 
-	public function SelectMethodForView($request) {
+	/**
+	 * Analyzes the $request, matches the required method for view.
+	 * May setup required view ($this->view).
+	 *
+	 * @param array $request user input
+	 * @return string name of the method
+	 */
+	public function SelectMethodForView($request = []) {
 		return 'Work';
 	}
 
