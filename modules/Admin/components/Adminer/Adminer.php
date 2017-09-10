@@ -35,7 +35,7 @@ class Adminer extends \System\Component {
 		$this->ENGINE->TITLE = $this->SCRUD->name;
 	}
 
-	public function SelectMethodForView($request) {
+	public function SelectMethodForView($request = []) {
 		if (!empty($request['ID']) or isset($request['NEW'])) {
 			return 'Element';
 		}
