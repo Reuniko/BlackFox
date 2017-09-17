@@ -22,7 +22,7 @@
 
 	<table id="data" class="table table-bordered table-hover">
 		<tr>
-			<th class="sort"><span>...</span></th>
+			<th class="sort" width="1%"><span></span></th>
 			<?
 			$get = $_GET;
 			unset($get['SORT']);

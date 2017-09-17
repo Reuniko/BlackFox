@@ -35,7 +35,7 @@ class Authorization extends \System\Component {
 		$this->allow_json_request = true;
 	}
 
-	public function SelectMethodForView($request) {
+	public function SelectMethodForView($request = []) {
 		return 'Form';
 	}
 
