@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 class User extends SCRUD {
 
@@ -163,10 +164,23 @@ class User extends SCRUD {
 	 * @param int $ID user id
 	 * @return array list of group codes
 	 */
-	public function GetGroups($ID) {
+	public function GetGroups($ID = null) {
+		if ($ID === null) {
+			if (isset($_SESSION['USER']['GROUPS'])) {
+				return $_SESSION['USER']['GROUPS'];
+			}
+			$ID = $_SESSION['USER']['ID'];
+		}
+		if (empty($ID)) {
+			return [];
+		}
 		$group_ids = User2Group::I()->Select(['USER' => $ID], [], 'GROUP');
 		$groups = Group::I()->Select(['ID' => $group_ids], [], 'CODE');
 		return $groups;
+	}
+
+	public function InGroup($group) {
+		return in_array($group, $this->GetGroups());
 	}
 
 }

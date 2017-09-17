@@ -21,7 +21,7 @@ class Group extends SCRUD {
 			],
 			'DESCRIPTION' => [
 				'TYPE' => 'TEXT',
-				'NAME' => 'Имя',
+				'NAME' => 'Описание',
 			],
 		];
 	}
