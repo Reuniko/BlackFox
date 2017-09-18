@@ -84,7 +84,7 @@ class Adminer extends \System\Component {
 			$this->RESULT['DATA'] = $FIELDS;
 		} else {
 			$this->RESULT['MODE'] = 'Update';
-			$this->RESULT['DATA'] = $this->SCRUD->Read($ID);
+			$this->RESULT['DATA'] = $FIELDS + $this->SCRUD->Read($ID);
 			if (empty($this->RESULT['DATA'])) {
 				throw new Exception("Элемент не найден");
 			}
