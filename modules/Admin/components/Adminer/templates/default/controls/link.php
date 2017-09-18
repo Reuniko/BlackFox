@@ -4,7 +4,11 @@
 /** @var \System\SCRUD $Link */
 $Link = $this->SCRUD->structure[$code]['LINK']::I();
 $url = $Link->GetAdminUrl();
-$ID = $RESULT['DATA'][$code]['ID'];
+if (is_array($RESULT['DATA'][$code])) {
+	$ID = $RESULT['DATA'][$code]['ID'];
+} else {
+	$ID = $RESULT['DATA'][$code];
+}
 ?>
 <div class="btn-toolbar" style="vertical-align: middle; line-height: 34px;">
 	<div class="btn-group">
@@ -33,7 +37,7 @@ $ID = $RESULT['DATA'][$code]['ID'];
 		>
 	</div>
 	<div class="btn-group">
-		[<a href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>" data-link-a="FIELDS[<?= $code ?>]"><?= $RESULT['DATA'][$code]['ID'] ?: '...' ?></a>]
+		[<a href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>" data-link-a="FIELDS[<?= $code ?>]"><?= $ID ?: '...' ?></a>]
 		<span data-link-span="FIELDS[<?= $code ?>]">
 			<? foreach ($Link->structure as $s_code => $s_field): ?>
 				<? if ($s_field['SHOW']): ?>

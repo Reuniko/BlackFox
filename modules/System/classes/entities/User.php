@@ -14,6 +14,7 @@ class User extends SCRUD {
 				'INDEX'    => true,
 				'UNIQUE'   => true,
 				'JOIN'     => true,
+				'SHOW'     => true,
 			],
 			'PASSWORD'    => [
 				'TYPE'        => 'STRING',
