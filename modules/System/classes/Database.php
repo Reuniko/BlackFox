@@ -10,6 +10,7 @@ class Database extends Instanceable {
 	private $database;
 	private $user;
 	private $password;
+	private $charset;
 
 	/**
 	 * @var \mysqli
@@ -24,12 +25,14 @@ class Database extends Instanceable {
 		$this->user = $params['USER'];
 		$this->password = $params['PASSWORD'];
 		$this->database = $params['DATABASE'];
+		$this->charset = $params['CHARSET'] ?: 'utf8';
 
 		$this->Connect();
 	}
 
 	private function Connect() {
 		$this->link = mysqli_connect($this->host, $this->user, $this->password, $this->database, $this->port);
+		mysqli_set_charset($this->link, $this->charset);
 	}
 
 	public function Query($SQL, $key = null) {
