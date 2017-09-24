@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 
 class Database extends Instanceable {
@@ -39,7 +40,7 @@ class Database extends Instanceable {
 		$this->result = mysqli_query($this->link, $SQL);
 		if ($this->result === false) {
 			// TODO: log error to text file
-			throw new \Exception("MYSQL QUERY ERROR: " . mysqli_error($this->link) . "\r\nSQL: " . $SQL);
+			throw new ExceptionSQL(mysqli_error($this->link), $SQL);
 		}
 		if ($this->result === true) {
 			return mysqli_insert_id($this->link) ?: true;
