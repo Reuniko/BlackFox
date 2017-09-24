@@ -137,6 +137,12 @@ class Engine extends Instanceable {
 			// запрос на неизвестный адрес
 			require($this->SearchAncestorFile($this->url['path'], '.controller.php'));
 
+		} catch (ExceptionSQL $exception) {
+			$message = 'SQL QUERY ERROR: ' . $exception->getMessage();
+			if (User::I()->InGroup('root')) {
+				$message .= "<br/><br/><pre>{$exception->SQL}</pre>";
+			}
+			$this->ShowErrors([$message]);
 		} catch (ExceptionAuthRequired $exception) {
 			$this->ShowAuthForm($exception->getMessage());
 		} catch (ExceptionPageNotFound $exception) {
