@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 /**
  * Class SCRUD -- Search, Create, Read, Update, Delete
@@ -398,7 +399,7 @@ abstract class SCRUD extends Instanceable {
 			$this->SQL .= "\r\nLIMIT {$from}, {$arParams['LIMIT']}";
 		}
 
-		$result["ELEMENTS"] = $this->DB->Query($this->SQL, $arParams['KEY']);
+		$result["ELEMENTS"] = $this->Query($this->SQL, $arParams['KEY']);
 
 		if ($arParams['LIMIT'] > 0) {
 			// Битрикс предлагает следующий способ пагинации:
@@ -1269,12 +1270,22 @@ abstract class SCRUD extends Instanceable {
 	 * Исполняет SQL-запрос, не останавливая выполнение в случае ошибки.
 	 * Вместо этого кидает исключение (с текстом ошибки для администраторов).
 	 *
-	 * @param string $SQL запрос
+	 * @param string $SQL SQL-запрос
+	 * @param string $key код колонки значения которой будут использованы как ключ в результирующем массиве (не обязательно)
 	 * @return array результат выполнения
-	 * @throws Exception
+	 * @throws ExceptionSQL
 	 */
 	public function Query($SQL, $key = null) {
-		return $this->DB->Query($SQL, $key);
+		try {
+			return $this->DB->Query($SQL, $key);
+		} catch (ExceptionSQL $ExceptionSQL) {
+			if (substr($ExceptionSQL->GetMessage(), 0, 14) === 'Unknown column') {
+				$this->Synchronize();
+				return $this->DB->Query($SQL, $key);
+			} else {
+				throw $ExceptionSQL;
+			}
+		}
 	}
 
 	/**
