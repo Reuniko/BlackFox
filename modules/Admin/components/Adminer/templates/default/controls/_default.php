@@ -6,11 +6,8 @@
 	placeholder=""
 	rows="5"
 	disabled="disabled"
-
-	data-toggle="tooltip"
-	data-placement="top"
-	title="not implemented"
-
+	data-tooltip="not implemented"
+	data-tooltip-placement="top"
 ><?=print_r($RESULT['DATA'][$code], true)?></textarea>
 <? else: ?>
 	<input
@@ -21,10 +18,7 @@
 		placeholder=""
 		value="<?= $RESULT['DATA'][$code] ?>"
 		<?= ($field['DISABLED']) ? 'disabled' : '' ?>
-
-		data-toggle="tooltip"
-		data-placement="top"
-		title="not implemented"
-
+		data-tooltip="not implemented"
+		data-tooltip-placement="top"
 	>
 <? endif; ?>
