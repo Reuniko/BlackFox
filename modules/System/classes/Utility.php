@@ -19,4 +19,21 @@ class Utility extends Instanceable {
 		}
 		return date($format, $date);
 	}
+
+	/**
+	 * Форматирует имя пользователя
+	 *
+	 * @param array $user массив данных пользователя (FIRST_NAME, LAST_NAME, LOGIN, ID)
+	 * @return string
+	 */
+	public static function Name($user = []) {
+		$name = trim("{$user['FIRST_NAME']} {$user['LAST_NAME']}");
+		if (empty($name)) {
+			$name = $user['LOGIN'];
+		}
+		if (empty($name)) {
+			$name = "[ID:{$user['ID']}]";
+		}
+		return $name;
+	}
 }
