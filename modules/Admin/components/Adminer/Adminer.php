@@ -77,11 +77,21 @@ class Adminer extends \System\Component {
 		return $this->RESULT;
 	}
 
+	public function GetDefaultValues() {
+		$values = [];
+		foreach ($this->SCRUD->structure as $code => $field) {
+			if (isset($field['DEFAULT'])) {
+				$values[$code] = $field['DEFAULT'];
+			}
+		}
+		return $values;
+	}
+
 	public function Element($ID = 0, $FIELDS = []) {
 		$this->view = 'element';
 		if ($ID === 0) {
 			$this->RESULT['MODE'] = 'Create';
-			$this->RESULT['DATA'] = $FIELDS;
+			$this->RESULT['DATA'] = $FIELDS + $this->GetDefaultValues();
 		} else {
 			$this->RESULT['MODE'] = 'Update';
 			$this->RESULT['DATA'] = $FIELDS + $this->SCRUD->Read($ID);
