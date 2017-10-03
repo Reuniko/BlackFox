@@ -60,3 +60,18 @@
 .adminer .set_value {
 	display: block;
 }
+
+.sortable {
+	padding: 0;
+	border: 1px solid #eee;
+	width: 100%;
+	min-height: 200px;
+	list-style-type: none;
+}
+.sortable li {
+	margin: 5px;
+	padding: 5px;
+	cursor: move;
+	border: 1px solid #ddd;
+	background-color: #eee;
+}
