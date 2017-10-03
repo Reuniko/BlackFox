@@ -1,9 +1,6 @@
 <? /** @var \Admin\Adminer $this */ ?>
 <? /** @var array $RESULT */ ?>
 
-<? require($this->Path('filter_settings.php')); ?>
-
-
 <form method="get" class="form-horizontal">
 
 	<? foreach ($_GET as $code => $value) : ?>
@@ -15,15 +12,6 @@
 
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<a
-				data-filter-settings=""
-				class="btn btn-default pull-right"
-				style="margin: -7px;"
-				data-toggle="modal"
-				data-target="#filter-settings"
-			>
-				<i class="glyphicon glyphicon-th-list"></i>
-			</a>
 			Фильтр
 		</div>
 		<div class="panel-body">

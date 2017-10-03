@@ -7,6 +7,11 @@ $(function () {
 		});
 	});
 
-
+	$('[data-connected-sortable]').each(function (i, e) {
+		$(this).sortable({
+			connectWith: "[data-connected-sortable=" + $(this).data('connected-sortable') + "]",
+		});
+		$(this).disableSelection();
+	});
 
 });

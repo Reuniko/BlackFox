@@ -4,17 +4,32 @@
 <style>
 	<? require($this->Path('style.css')) ?>
 </style>
+<script>
+	<? require($this->Path('script.js')) ?>
+</script>
 
 <div class="adminer">
 
+	<? require($this->Path('section_settings.php')); ?>
 	<? require($this->Path('filter.php')) ?>
 
 	<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
 		<div class="margin buttons">
+
+			<a
+				data-filter-settings=""
+				class="btn btn-default"
+				data-toggle="modal"
+				data-target="#section-settings"
+			>
+				<i class="glyphicon glyphicon-cog"></i>
+			</a>
+
 			<a class="btn btn-success" href="?NEW">
 				<i class="glyphicon glyphicon-plus"></i>
 				Создать
 			</a>
+
 		</div>
 	<? endif; ?>
 

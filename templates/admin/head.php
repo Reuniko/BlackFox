@@ -12,5 +12,6 @@
 <link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/css/bootstrap.min.css">
 <link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/css/bootstrap-theme.min.css">
 <script src="<?= $this->TEMPLATE_PATH ?>/js/jquery.min.js"></script>
+<script src="<?= $this->TEMPLATE_PATH ?>/js/jquery-ui.min.js"></script>
 <script src="<?= $this->TEMPLATE_PATH ?>/js/bootstrap.min.js"></script>
 <script src="<?= $this->TEMPLATE_PATH ?>/js/ckeditor.js"></script>
