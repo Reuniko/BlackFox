@@ -71,7 +71,7 @@
 			</tr>
 		<? endif; ?>
 		<? foreach ($RESULT['DATA']['ELEMENTS'] as $row): ?>
-			<tr>
+			<tr ondblclick="window.location.href='?ID=<?= $row['ID'] ?>'">
 				<td>
 					<input type="checkbox" name="ELEMENT[]" value="<?= $row['ID'] ?>">
 				</td>
@@ -89,10 +89,10 @@
 							$content = ob_get_clean();
 							?>
 							<? if ($this->SCRUD->structure[$code]['PRIMARY']): ?>
-								<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
+								<? if ($RESULT['MODE'] === 'SECTION'): ?>
 									<a href="?ID=<?= $row[$code] ?>"><?= $content ?></a>
 								<? endif; ?>
-								<? if (in_array($RESULT['MODE'], ['POPUP'])): ?>
+								<? if ($RESULT['MODE'] === 'POPUP'): ?>
 									<?
 									$display = [];
 									foreach ($this->SCRUD->structure as $structure_code => $structure_field) {
