@@ -10,6 +10,7 @@ $(function () {
 	$('[data-connected-sortable]').each(function (i, e) {
 		$(this).sortable({
 			connectWith: "[data-connected-sortable=" + $(this).data('connected-sortable') + "]",
+			placeholder: 'sortable-placeholder',
 		});
 		$(this).disableSelection();
 	});
