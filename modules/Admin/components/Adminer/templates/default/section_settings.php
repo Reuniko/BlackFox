@@ -34,27 +34,40 @@
 				<!-- Tab panes -->
 				<div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="settings-filter">
-						<div class="row">
-							<div class="col-xs-6">
-								<h5>Отображать:</h5>
-								<ul class="sortable" data-connected-sortable="settings-filter">
-									<? foreach ($this->SCRUD->structure as $code => $field): ?>
-										<li>
-											<input type="hidden" name="SETTINGS[FILTER][]" value="<?= $code ?>"/>
-											<?= $field['NAME'] ?>
-										</li>
-									<? endforeach; ?>
-								</ul>
-							</div>
-							<div class="col-xs-6">
-								<h5>Скрыть:</h5>
-								<ul class="sortable" data-connected-sortable="settings-filter">
-								</ul>
-							</div>
-						</div>
+						<h4>Порядок и отображение фильтров</h4>
+						<ul class="sortable" data-connected-sortable="settings-filter">
+							<? foreach ($this->SCRUD->structure as $code => $field): ?>
+								<li>
+									<label class="enum">
+										<input
+											type="checkbox"
+											name="SETTINGS[FILTER][]"
+											value="<?= $code ?>"
+											checked="checked"
+										/>
+										<span><?= $field['NAME'] ?></span>
+									</label>
+								</li>
+							<? endforeach; ?>
+						</ul>
 					</div>
-					<div role="tabpanel" class="tab-pane active" id="settings-list">
-
+					<div role="tabpanel" class="tab-pane" id="settings-list">
+						<h4>Порядок и отображение колонок списка</h4>
+						<ul class="sortable" data-connected-sortable="settings-list">
+							<? foreach ($this->SCRUD->structure as $code => $field): ?>
+								<li>
+									<label class="enum">
+										<input
+											type="checkbox"
+											name="SETTINGS[LIST][]"
+											value="<?= $code ?>"
+											checked="checked"
+										/>
+										<span><?= $field['NAME'] ?></span>
+									</label>
+								</li>
+							<? endforeach; ?>
+						</ul>
 					</div>
 				</div>
 

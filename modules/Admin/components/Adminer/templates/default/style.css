@@ -18,8 +18,10 @@
 	height: 16px;
 }
 
-.adminer label.enum span,
-.adminer label.enum input {
+.adminer label > span,
+.adminer label > input,
+.adminer label.enum > span,
+.adminer label.enum > input {
 	font-weight: normal;
 	vertical-align: bottom;
 	line-height: 16px;
@@ -61,17 +63,27 @@
 	display: block;
 }
 
-.sortable {
+.adminer .sortable {
 	padding: 0;
 	border: 1px solid #eee;
 	width: 100%;
 	min-height: 200px;
 	list-style-type: none;
 }
-.sortable li {
+
+.adminer .sortable li {
 	margin: 5px;
 	padding: 5px;
 	cursor: move;
 	border: 1px solid #ddd;
 	background-color: #eee;
+}
+
+.adminer .sortable .sortable-placeholder {
+	margin: 5px;
+	padding: 5px;
+	cursor: move;
+	border: 1px dashed #ddd;
+	background-color: #fff;
+	height: 37px;
 }
