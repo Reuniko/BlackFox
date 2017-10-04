@@ -1,15 +1,17 @@
 .adminer .table-content {
 	display: inline-block;
-	max-width: 400px;
-	overflow-x: hidden;
+	max-width: 300px;
+}
+
+.adminer .table-content-LINK,
+.adminer .table-content-FILE {
 	white-space: nowrap;
-	word-break: normal;
 }
 
 .adminer .table-content-TEXT {
 	white-space: normal;
 	word-break: break-all;
-	min-width: 200px;
+	min-width: 300px;
 }
 
 .adminer input[type=checkbox],
@@ -19,9 +21,7 @@
 }
 
 .adminer label > span,
-.adminer label > input,
-.adminer label.enum > span,
-.adminer label.enum > input {
+.adminer label > input[type=checkbox] {
 	font-weight: normal;
 	vertical-align: bottom;
 	line-height: 16px;
