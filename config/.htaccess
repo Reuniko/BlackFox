@@ -1,18 +1,39 @@
+ErrorDocument 404 /site/root/404.html
+ErrorDocument 500 /site/root/500.html
+
+php_flag display_startup_errors on
+php_flag display_errors on
+php_flag html_errors on
+
 <IfModule mod_dir.c>
-	DirectoryIndex index.php controller.php
+	DirectoryIndex index.php .controller.php
 </IfModule>
 
 <IfModule mod_rewrite.c>
-	# Автодополняет слешем конец запроса если (в запросе нет точек + он не заканчивается на слеш)
 	RewriteEngine On
+
+	# если [в запросе нет точек] и [он не заканчивается на слеш]
+	# то [автодополняет слешем конец запроса]
 	RedirectMatch ^([^\.]*[^/])$ $1/
 
-	# Перенапраляет все запросы на директории и php-файлы в движок /core/engine.php
-	RewriteCond %{REQUEST_FILENAME} !/core/engine.php$
-	RewriteRule ^[^\.]*$|\.php$ /core/engine.php [L]
+	# если [запрос на php файл] или [запрос на директорию]
+	# то [перенаправляет запрос в движок]
+	RewriteCond %{REQUEST_URI} !/site/engine.php$
+	RewriteRule ^[^\.]*$|\.php$ /site/engine.php [L]
 
-	# Перенаправляет все запросы на ненайденные файлы в /root/
+	# если [запрос на статичный существующий файл]
+	# то [ничего не изменяет]
+	RewriteCond %{REQUEST_FILENAME} -f
+	RewriteRule (.*) $1 [L]
+
+	# автодополнение /site/
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteRule (.*) /site/root/$1 [L]
+	RewriteCond %{DOCUMENT_ROOT}/site/%{REQUEST_URI} -f
+	RewriteRule (.*) /site/$1 [L]
+
+	# автодополнение /root/
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{DOCUMENT_ROOT}/root/%{REQUEST_URI} -f
+	RewriteRule (.*) /root/$1 [L]
+
 </IfModule>
