@@ -41,19 +41,33 @@ class File extends SCRUD {
 
 	public function Create($fields = []) {
 		if (isset($fields['tmp_name'])) {
+
 			if ($fields['error'] !== 0) {
 				return null;
 			}
-			$dir = '/upload/' . substr(sha1($fields['name'] . time()), 0, 3);
-			mkdir($_SERVER['DOCUMENT_ROOT'] . $dir);
-			$src = $dir . '/' . $fields['name'];
-			if (file_exists($_SERVER['DOCUMENT_ROOT'] . $src)) {
-				return null; // TODO: generate better name
+
+			$file_ext = end(explode('.', $fields['name']));
+			if (empty($file_ext)) {
+				throw new Exception("File must have extension");
 			}
+
+			$dir = '';
+			$src = '';
+			while (true) {
+				$file_name = sha1(time() . $fields['name']) . '.' . $file_ext;
+				$dir = '/upload/' . substr($file_name, 0, 3);
+				$src = $dir . '/' . $file_name;
+				if (file_exists($_SERVER['DOCUMENT_ROOT'] . $src)) {
+					continue;
+				}
+				break;
+			}
+
+			mkdir($_SERVER['DOCUMENT_ROOT'] . $dir);
 			move_uploaded_file($fields['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $src);
 			$file = [
 				'CREATE_DATE' => time(),
-				'CREATE_BY'   => null, // TODO: paste user ID
+				'CREATE_BY'   => $_SESSION['USER']['ID'],
 				'NAME'        => $fields['name'],
 				'SIZE'        => $fields['size'],
 				'TYPE'        => $fields['type'],
@@ -68,5 +82,4 @@ class File extends SCRUD {
 	public function Update($ids = array(), $fields = array()) {
 		throw new ExceptionNotAllowed();
 	}
-
 }
