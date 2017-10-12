@@ -23,7 +23,7 @@ class Adminer extends \System\Component {
 		parent::Init($PARAMS);
 
 		if (!is_subclass_of($PARAMS['SCRUD'], '\\System\\SCRUD')) {
-			throw new Exception("SCRUD OBJECT must be the child of \\System\\SCRUD");
+			throw new Exception("Parameter SCRUD ({$PARAMS['SCRUD']}) must be the child of \\System\\SCRUD");
 		}
 
 		if (is_object($PARAMS['SCRUD'])) {
