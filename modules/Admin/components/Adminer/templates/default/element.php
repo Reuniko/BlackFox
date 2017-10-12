@@ -29,12 +29,15 @@
 					for="<?= $code ?>"
 					title="<?= $code ?>"
 				>
-					<?= $field['NAME']?: "{{$code}}" ?>
+					<?= $field['NAME'] ?: "{{$code}}" ?>
 				</label>
 				<div class="col-sm-8">
 					<?
+					$value = $RESULT['DATA'][$code];
+					$inc = strtolower($field['VIEW']) ?: strtolower($field['TYPE']);
+
 					try {
-						require($this->Path('controls/' . strtolower($field['TYPE']) . '.php'));
+						require($this->Path('controls/' . $inc . '.php'));
 					} catch (\Exception $error) {
 						require($this->Path('controls/' . '_default' . '.php'));
 					}
