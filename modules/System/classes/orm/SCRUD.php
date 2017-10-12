@@ -1065,6 +1065,12 @@ abstract class SCRUD extends Instanceable {
 			return null;
 		}
 
+		if ($field['ARRAY'] === 'JSON') {
+			if (is_array($value)) {
+				$value = json_encode($value, JSON_UNESCAPED_UNICODE);
+			}
+		}
+
 		switch ($field['TYPE']) {
 			case 'DATE':
 			case 'DATETIME':
@@ -1214,10 +1220,6 @@ abstract class SCRUD extends Instanceable {
 	 * Преобразует в элементе значения типа SET из текстовых строк с разделителями "," в массивы.
 	 * Например: "1,2,4" => array("1", "2", "4").
 	 *
-	 * Преобразует в элементе значения типа FILE, добавляя в массив к нему ключ SRC со значением прямого пути до файла.
-	 * Например: "scrud/d10" + "d102d931f400f6c77b2f51cbe17faf3f.jpg" => "/upload/scrud/d10/d102d931f400f6c77b2f51cbe17faf3f.jpg"
-	 * Поддерживается неограниченная вложенность элемента.
-	 *
 	 * Добавляет к каждому значению типа список (L) два ключа - ключ и визуализация.
 	 * Например для поля STATUS (L) равного 'NEW':
 	 * - [STATUS|KEY] => NEW
@@ -1227,25 +1229,31 @@ abstract class SCRUD extends Instanceable {
 	 * @return array элемент с преобразованными значениями
 	 */
 	public function FormatValues($element) {
-		$upload_dir = null;
-		if (is_array($element) && !empty($element)) {
-			foreach ($element as $code => $value) {
-				$field = $this->selection[$code];
-				if ($field['LINK']) {
-					/** @var self $external */
-					$external = $field["LINK"]::Instance();
-					$element[$code] = $external->FormatValues($value);
-					// метод должен остаться публичным, так как вызывается в контексте других
-					// объектов для доступа изнутри этих объектов к их структуре ($this->selection)
-				} elseif ($field['TYPE'] == 'ENUM') {
-					$element["$code|VALUE"] = $field['VALUES'][$value];
-				} elseif ($field['TYPE'] == 'SET') {
-					$element["$code"] = explode(",", $value);
-					$element["$code|VALUES"] = array();
-					foreach ($element["$code"] as $key) {
-						$element["$code|VALUES"][$key] = $field['VALUES'][$key];
-					}
+		if (!is_array($element)) {
+			return $element;
+		}
+		foreach ($element as $code => $value) {
+			$field = $this->selection[$code];
+			if ($field['LINK']) {
+				/** @var self $external */
+				$external = $field["LINK"]::Instance();
+				$element[$code] = $external->FormatValues($value);
+				// метод должен остаться публичным, так как вызывается в контексте других
+				// объектов для доступа изнутри этих объектов к их структуре ($this->selection)
+			}
+			if ($field['TYPE'] === 'ENUM') {
+				$element["$code|VALUE"] = $field['VALUES'][$value];
+			}
+			if ($field['TYPE'] === 'SET') {
+				$element["$code"] = explode(",", $value);
+				$element["$code|VALUES"] = array();
+				foreach ($element["$code"] as $key) {
+					$element["$code|VALUES"][$key] = $field['VALUES'][$key];
 				}
+			}
+			if ($field['ARRAY'] === 'JSON') {
+				$element["$code|JSON"] = $element[$code];
+				$element["$code"] = json_decode($element[$code]);
 			}
 		}
 		return $element;

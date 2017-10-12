@@ -8,6 +8,17 @@ $value = (array)$value;
 
 <div data-list="<?= $code ?>">
 
+	<input
+		type="hidden"
+		name="FIELDS[<?= $code ?>]"
+		value=""
+	/>
+
+	<button class="btn btn-default" type="button" data-add="">
+		<i class="glyphicon glyphicon-plus"></i>
+		Добавить
+	</button>
+
 	<div class="input-group" data-template="" style="display: none;">
 		<div class="input-group-addon" data-sort="">
 			<i class="glyphicon glyphicon-move"></i>
@@ -17,6 +28,7 @@ $value = (array)$value;
 			class="form-control"
 			name="FIELDS[<?= $code ?>][]"
 			value=""
+			disabled="disabled"
 			<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 		>
 		<div class="input-group-btn">
@@ -45,9 +57,5 @@ $value = (array)$value;
 			</div>
 		</div>
 	<? endforeach; ?>
-	<button class="btn btn-default" type="button" data-add="">
-		<i class="glyphicon glyphicon-plus"></i>
-		Добавить
-	</button>
 
 </div>
