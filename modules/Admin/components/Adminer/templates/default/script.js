@@ -20,13 +20,15 @@ $(function () {
     /* TYPE LIST */
 
     $('[data-list]').on('click', '[data-add]', function () {
-        var $clone = $(this).closest('[data-list]').find('[data-template]')
+        var $container = $(this).closest('[data-list]');
+        var $clone = $container.find('[data-template]')
             .clone()
             .removeAttr('data-template')
             .attr('data-element', 'new')
-            .css('display', 'table')
+            .find('input').removeAttr('disabled').end()
+            .appendTo($container)
+            .show()
         ;
-        $(this).before($clone);
     });
 
     $('[data-list]').on('click', '[data-delete]', function () {
