@@ -80,9 +80,10 @@
 						<div class="table-content table-content-<?= $this->SCRUD->structure[$code]['TYPE'] ?>">
 							<?
 							$value = $row[$code];
+							$inc = strtolower($field['VIEW']) ?: strtolower($field['TYPE']);
 							ob_start();
 							try {
-								require($this->Path('cells/' . strtolower($field['TYPE']) . '.php'));
+								require($this->Path('cells/' . $inc . '.php'));
 							} catch (\Exception $error) {
 								require($this->Path('cells/' . '_default' . '.php'));
 							}
