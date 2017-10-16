@@ -7,7 +7,7 @@ class TypeSet extends Type {
 	public $code = 'SET';
 
 	public function GetStructureStringType($info = []) {
-		return 'enum';
+		return 'set' . '("' . implode('", "', array_keys($info['VALUES'])) . '")';
 	}
 
 	public function FormatInputValue($values, $info = []) {

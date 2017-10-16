@@ -198,9 +198,7 @@ abstract class SCRUD extends Instanceable {
 			$this->SQL = "CREATE TABLE IF NOT EXISTS `{$this->code}` \r\n";
 			$rows = array();
 			foreach ($this->structure as $code => $field) {
-				$code = strtoupper($code);
-				$field["CODE"] = $code;
-				$rows[] = $this->_getStructureString($field);
+				$rows[] = FactoryType::I()->Get($field['TYPE'])->GetStructureString($code, $field);
 			}
 			if (!empty($this->primary_keys)) {
 				$rows[] = "PRIMARY KEY (`" . implode("`, `", $this->primary_keys) . "`)";
@@ -216,9 +214,7 @@ abstract class SCRUD extends Instanceable {
 			$rows = array();
 			$last_after_code = '';
 			foreach ($this->structure as $code => $field) {
-				$code = strtoupper($code);
-				$field["CODE"] = $code;
-				$structure_string = $this->_getStructureString($field);
+				$structure_string = FactoryType::I()->Get($field['TYPE'])->GetStructureString($code, $field);
 				if ($strict && !empty($last_after_code)) {
 					$structure_string .= " AFTER {$last_after_code}";
 				}
@@ -703,53 +699,6 @@ abstract class SCRUD extends Instanceable {
 		return true;
 	}
 
-
-	/**
-	 * Преобразует поле из структуры в строку, используемую в MySQL запросах при построении таблиц.
-	 * Например: `NAME` varchar(255) NULL COMMENT 'Имя'
-	 *
-	 * @param array $field ассоциативный массив, описывающий поле
-	 * @return string
-	 * @throws Exception если у поля неизвестный тип
-	 */
-	protected function _getStructureString($field = array()) {
-
-		$code = strtoupper($field["CODE"]);
-		if (!isset($this->structure[$code])) {
-			throw new Exception("Unknown field code: '{$code}' in class `" . get_class($this) . "`");
-		}
-
-		if ($field['TYPE'] === 'ENUM' || $field['TYPE'] === 'SET') {
-			$type = $this->TYPES[$field['TYPE']] . '("' . implode('", "', array_keys($field['VALUES'])) . '")';
-		} elseif (empty($field['TYPE'])) {
-			$type = reset($this->TYPES);
-		} elseif (isset($this->TYPES[$field['TYPE']])) {
-			$type = $this->TYPES[$field['TYPE']];
-		} else {
-			throw new Exception("Неизвестный тип поля [{$this->code}.{$field["CODE"]}] - [{$field['TYPE']}]");
-		}
-
-		$null = ($field["NOT_NULL"]) ? "NOT NULL" : "NULL";
-		if ($field['TYPE'] == 'BOOL') {
-			$null = "NOT NULL";
-		}
-
-		$default = "";
-		if ($field['DEFAULT']) {
-			if (is_array($field['DEFAULT'])) {
-				$field['DEFAULT'] = implode(',', $field['DEFAULT']);
-			}
-			$default = "DEFAULT '{$field['DEFAULT']}'";
-		}
-
-		$auto_increment = ($field["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
-
-		$comment = ($field["NAME"]) ? " COMMENT '{$field["NAME"]}'" : "";
-
-		$string = "`{$field["CODE"]}` $type $null $default $auto_increment $comment";
-
-		return $string;
-	}
 
 	/**
 	 * Формирует массив параметров на основе входящих параметров и дефолтных параметров.
