@@ -1280,7 +1280,7 @@ abstract class SCRUD extends Instanceable {
 	 *
 	 * @param string $SQL SQL-запрос
 	 * @param string $key код колонки значения которой будут использованы как ключ в результирующем массиве (не обязательно)
-	 * @return array результат выполнения
+	 * @return array|int результат выполнения
 	 * @throws ExceptionSQL
 	 */
 	public function Query($SQL, $key = null) {
