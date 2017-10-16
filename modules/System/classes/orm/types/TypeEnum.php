@@ -7,7 +7,7 @@ class TypeEnum extends Type {
 	public $code = 'ENUM';
 
 	public function GetStructureStringType($info = []) {
-		return 'enum';
+		return 'enum' . '("' . implode('", "', array_keys($info['VALUES'])) . '")';
 	}
 
 	public function FormatInputValue($value, $info = []) {
