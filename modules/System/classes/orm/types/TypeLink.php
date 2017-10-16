@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeLink extends AType {
+class TypeLink extends Type {
 	public $name = 'Link';
 	public $code = 'LINK';
 
@@ -10,7 +10,7 @@ class TypeLink extends AType {
 		return 'int';
 	}
 
-	public function FormatValue($value, $info = []) {
+	public function FormatInputValue($value, $info = []) {
 		return (int)$value;
 	}
 }

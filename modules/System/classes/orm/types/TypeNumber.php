@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeNumber extends AType {
+class TypeNumber extends Type {
 	public $name = 'Number';
 	public $code = 'NUMBER';
 
@@ -10,7 +10,7 @@ class TypeNumber extends AType {
 		return 'int';
 	}
 
-	public function FormatValue($value, $info = []) {
+	public function FormatInputValue($value, $info = []) {
 		return (int)$value;
 	}
 }

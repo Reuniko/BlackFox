@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeBool extends AType {
+class TypeBool extends Type {
 	public $name = 'Bool';
 	public $code = 'BOOL';
 

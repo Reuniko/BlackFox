@@ -2,13 +2,14 @@
 
 namespace System;
 /**
- * Class AType
+ * Class Type
  * @package System
  *
- * Родитель для всех типов данных, используемых в качестве полей базы данных
+ * Parent for all data types for using in database.
  */
-abstract class AType {
+abstract class Type extends Instanceable {
 	public $name;
+	public $code;
 
 	abstract function GetStructureStringType($info = []);
 
@@ -41,7 +42,27 @@ abstract class AType {
 		return $structure_string;
 	}
 
-	public function FormatValue($value, $info = []) {
+	/**
+	 * Format input value from user to save into database.
+	 * No escape required.
+	 *
+	 * @param mixed $value input value from user
+	 * @param array $info type info
+	 * @return string input value for database
+	 */
+	public function FormatInputValue($value, $info = []) {
+		return $value;
+	}
+
+	/**
+	 * Format output value from database to user.
+	 * No escape required.
+	 *
+	 * @param string $value output value from database
+	 * @param array $info type info
+	 * @return mixed output value for user
+	 */
+	public function FormatOutputValue($value, $info = []) {
 		return $value;
 	}
 }

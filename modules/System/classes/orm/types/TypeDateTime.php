@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeDateTime extends AType {
+class TypeDateTime extends Type {
 	public $name = 'DateTime';
 	public $code = 'DATETIME';
 
@@ -10,7 +10,7 @@ class TypeDateTime extends AType {
 		return 'datetime';
 	}
 
-	public function FormatValue($value, $info = []) {
+	public function FormatInputValue($value, $info = []) {
 		if (is_numeric($value)) {
 			$value = date(\DateTime::ISO8601, $value);
 		} else {
