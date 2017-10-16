@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeText extends AType {
+class TypeText extends Type {
 	public $name = 'Text';
 	public $code = 'TEXT';
 

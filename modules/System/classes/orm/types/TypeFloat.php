@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeFloat extends AType {
+class TypeFloat extends Type {
 	public $name = 'Float';
 	public $code = 'FLOAT';
 
@@ -10,7 +10,7 @@ class TypeFloat extends AType {
 		return 'float';
 	}
 
-	public function FormatValue($value, $info = []) {
+	public function FormatInputValue($value, $info = []) {
 		return (float)$value;
 	}
 }

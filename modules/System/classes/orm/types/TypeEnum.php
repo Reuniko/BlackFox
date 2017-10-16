@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeEnum extends AType {
+class TypeEnum extends Type {
 	public $name = 'Enum';
 	public $code = 'ENUM';
 
@@ -10,8 +10,8 @@ class TypeEnum extends AType {
 		return 'enum';
 	}
 
-	public function FormatValue($value, $info = []) {
-		if (!isset($field['VALUES'][$value])) {
+	public function FormatInputValue($value, $info = []) {
+		if (!isset($info['VALUES'][$value])) {
 			throw new ExceptionType("Unknown enum value '{$value}' for field '{$info['NAME']}'");
 		}
 		return $value;

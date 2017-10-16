@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeString extends AType {
+class TypeString extends Type {
 	public $name = 'String';
 	public $code = 'STRING';
 	public $default_length = 255;
@@ -12,7 +12,7 @@ class TypeString extends AType {
 		return "varchar({$length})";
 	}
 
-	public function FormatValue($value, $info = []) {
+	public function FormatInputValue($value, $info = []) {
 		$value = preg_replace('#\s+#', ' ', $value);
 		$value = trim($value);
 		return $value;

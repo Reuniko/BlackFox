@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeTime extends AType {
+class TypeTime extends Type {
 	public $name = 'Time';
 	public $code = 'TIME';
 

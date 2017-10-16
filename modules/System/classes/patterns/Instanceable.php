@@ -11,7 +11,7 @@ namespace System;
  * Рекомендуется при проектировании класса реализовать неизменяемость, анализируя флаг $this->instanced.
  * @package System
  */
-class Instanceable {
+abstract class Instanceable {
 
 	/** @var array массив инстациированных классов */
 	private static $instance = [];

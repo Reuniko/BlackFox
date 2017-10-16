@@ -1059,89 +1059,20 @@ abstract class SCRUD extends Instanceable {
 		if (!isset($this->selection[$code])) {
 			throw new Exception("Неизвестный код поля: '{$code}'");
 		}
-		$field = $this->selection[$code];
+		$info = $this->selection[$code];
 
 		if (!$this->_hasInformation($value)) {
 			return null;
 		}
 
-		if ($field['ARRAY'] === 'JSON') {
+		if ($info['ARRAY'] === 'JSON') {
 			if (is_array($value)) {
 				$value = json_encode($value, JSON_UNESCAPED_UNICODE);
 			}
 		}
 
-		switch ($field['TYPE']) {
-			case 'DATE':
-			case 'DATETIME':
-				if (is_numeric($value)) {
-					$value = date(\DateTime::ISO8601, $value);
-				} else {
-					$value = date(\DateTime::ISO8601, strtotime($value));
-				}
-				break;
-			case 'NUMBER':
-			case 'LINK':
-				$value = intval($value);
-				break;
-			case 'FLOAT':
-				$value = floatval($value);
-				break;
-			case 'ENUM':
-				if (!in_array($value, array_keys($field['VALUES']))) {
-					$value = null;
-				}
-				if (empty($value)) {
-					if ($field['NOT_NULL']) {
-						if (!empty($field['DEFAULT'])) {
-							$value = $field['DEFAULT'];
-						} else {
-							$value = reset(array_keys($field['VALUES']));
-						}
-					}
-				}
-				break;
-			case 'SET':
-				$values = $value;
-				if (!is_array($values)) {
-					$values = explode(',', $values);
-				}
-				$possible_values = array_keys($field['VALUES']);
-				$scraps = array();
-				foreach ($values as $scrap) {
-					if (in_array($scrap, $possible_values)) {
-						$scraps[] = $scrap;
-					}
-				}
-				$value = implode(',', $scraps);
-				break;
-			case 'BOOL':
-				if ($value === 'Y' || $value === 'N') {
-					// $value = $value;
-				} elseif ($value === false) {
-					$value = 'N';
-				} elseif ($value === true) {
-					$value = 'Y';
-				} else {
-					$value = 'N';
-				}
-				break;
-			case 'TEXT':
-				// $value = $value;
-				break;
-			case 'FILE':
-				if (is_array($value)) {
-					$value = $field['LINK']::I()->Create($value);
-				} else {
-					$value = intval($value);
-				}
-			case 'STRING':
-			default:
-				$value = substr($value, 0, 250);
-				$value = preg_replace('#\s+#', ' ', $value);
-				$value = trim($value);
-				break;
-		}
+		$value = FactoryType::I()->Get($info['TYPE'])->FormatInputValue($value, $info);
+
 		$value = $this->DB->Escape($value);
 		return $value;
 	}

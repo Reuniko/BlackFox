@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeSet extends AType {
+class TypeSet extends Type {
 	public $name = 'Set';
 	public $code = 'SET';
 
@@ -10,7 +10,7 @@ class TypeSet extends AType {
 		return 'enum';
 	}
 
-	public function FormatValue($values, $info = []) {
+	public function FormatInputValue($values, $info = []) {
 		if (!is_array($values)) {
 			$values = [$values];
 		}
