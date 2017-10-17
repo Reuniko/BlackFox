@@ -18,16 +18,18 @@ class FactoryType extends Instanceable {
 	}
 
 	/**
-	 * @param string $code
-	 * @return Type
-	 * @throws ExceptionType
+	 * Get instance of class mapped to code of the type
+	 *
+	 * @param string $type symbolic code of the type
+	 * @return Type instance of class
+	 * @throws ExceptionType Class not found
 	 */
-	public function Get($code) {
-		if (!isset($this->types[$code])) {
-			throw new ExceptionType("Class for type '{$code}' not found");
+	public function Get($type) {
+		if (!isset($this->types[$type])) {
+			throw new ExceptionType("Class for type '{$type}' not found");
 		}
 		/** @var Type $class */
-		$class = $this->types[$code];
+		$class = $this->types[$type];
 		return $class::I();
 	}
 }

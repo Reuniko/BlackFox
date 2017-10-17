@@ -22,4 +22,13 @@ class TypeSet extends Type {
 		$value = implode(',', $values);
 		return $value;
 	}
+
+	public function FormatOutputValue($element, $code, $info) {
+		$element[$code] = explode(",", $element[$code]);
+		$element["$code|VALUES"] = [];
+		foreach ($element["$code"] as $key) {
+			$element["$code|VALUES"][$key] = $info['VALUES'][$key];
+		}
+		return $element;
+	}
 }

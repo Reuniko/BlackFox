@@ -55,14 +55,17 @@ abstract class Type extends Instanceable {
 	}
 
 	/**
-	 * Format output value from database to user.
+	 * Format the specific value of the output element from the database to the user.
 	 * No escape required.
 	 *
-	 * @param string $value output value from database
+	 * The element is passed entirely to provide a possibility of adding specific keys.
+	 *
+	 * @param array $element output element
+	 * @param string $code symbolic code of specific field needs to be formatted
 	 * @param array $info type info
-	 * @return mixed output value for user
+	 * @return array output element with formatted value|values
 	 */
-	public function FormatOutputValue($value, $info = []) {
-		return $value;
+	public function FormatOutputValue($element, $code, $info) {
+		return $element;
 	}
 }
