@@ -1014,12 +1014,6 @@ abstract class SCRUD extends Instanceable {
 			return null;
 		}
 
-		if ($info['ARRAY'] === 'JSON') {
-			if (is_array($value)) {
-				$value = json_encode($value, JSON_UNESCAPED_UNICODE);
-			}
-		}
-
 		$value = FactoryType::I()->Get($info['TYPE'])->FormatInputValue($value, $info);
 
 		$value = $this->DB->Escape($value);
@@ -1057,9 +1051,9 @@ abstract class SCRUD extends Instanceable {
 			if ($medium) {
 				if ($field['LINK']) {
 					if (class_exists($field["LINK"])) {
-						/** @var self $external */
-						$external = $field["LINK"]::Instance();
-						$list[$code] = $external->GetFieldList($full, $full, true);
+						/** @var self $link */
+						$link = $field["LINK"];
+						$list[$code] = $link::I()->GetFieldList($full, $full, true);
 						continue;
 					}
 				}
@@ -1117,11 +1111,6 @@ abstract class SCRUD extends Instanceable {
 			$Type = FactoryType::I()->Get($info['TYPE']);
 			$info = $Type->ProvideInfoIntegrity($info);
 			$element = $Type->FormatOutputValue($element, $code, $info);
-
-			if ($info['ARRAY'] === 'JSON') {
-				$element["$code|JSON"] = $element[$code];
-				$element["$code"] = json_decode($element[$code]);
-			}
 		}
 		return $element;
 	}
