@@ -16,4 +16,9 @@ class TypeEnum extends Type {
 		}
 		return $value;
 	}
+
+	public function FormatOutputValue($element, $code, $info) {
+		$element["$code|VALUE"] = $info['VALUES'][$element[$code]];
+		return $element;
+	}
 }

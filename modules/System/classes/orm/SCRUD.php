@@ -416,7 +416,7 @@ abstract class SCRUD extends Instanceable {
 			}
 			$row = $this->FormatArrayKeysCase($row);
 			$row = $this->FormatListStructure($row);
-			$row = $this->FormatValues($row);
+			$row = $this->FormatOutputValues($row);
 		}
 
 		if ($arParams['LIMIT'] > 1) {
@@ -1097,41 +1097,28 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Преобразует в элементе значения типа SET из текстовых строк с разделителями "," в массивы.
-	 * Например: "1,2,4" => array("1", "2", "4").
+	 * Format output element values from database to user.
+	 * No escape.
 	 *
-	 * Добавляет к каждому значению типа список (L) два ключа - ключ и визуализация.
-	 * Например для поля STATUS (L) равного 'NEW':
-	 * - [STATUS|KEY] => NEW
-	 * - [STATUS|VALUE] => Новый
-	 *
-	 * @param array $element элемент
-	 * @return array элемент с преобразованными значениями
+	 * @param array $element output element
+	 * @return array output element with formatted values
+	 * @throws Exception Unknown field code
 	 */
-	public function FormatValues($element) {
+	public function FormatOutputValues($element) {
 		if (!is_array($element)) {
 			return $element;
 		}
 		foreach ($element as $code => $value) {
-			$field = $this->selection[$code];
-			if ($field['LINK']) {
-				/** @var self $external */
-				$external = $field["LINK"]::Instance();
-				$element[$code] = $external->FormatValues($value);
-				// метод должен остаться публичным, так как вызывается в контексте других
-				// объектов для доступа изнутри этих объектов к их структуре ($this->selection)
+			$info = $this->selection[$code];
+			if (empty($info)) {
+				throw new Exception("Unknown field code '{$code}'");
 			}
-			if ($field['TYPE'] === 'ENUM') {
-				$element["$code|VALUE"] = $field['VALUES'][$value];
-			}
-			if ($field['TYPE'] === 'SET') {
-				$element["$code"] = explode(",", $value);
-				$element["$code|VALUES"] = array();
-				foreach ($element["$code"] as $key) {
-					$element["$code|VALUES"][$key] = $field['VALUES'][$key];
-				}
-			}
-			if ($field['ARRAY'] === 'JSON') {
+
+			$Type = FactoryType::I()->Get($info['TYPE']);
+			$info = $Type->ProvideInfoIntegrity($info);
+			$element = $Type->FormatOutputValue($element, $code, $info);
+
+			if ($info['ARRAY'] === 'JSON') {
 				$element["$code|JSON"] = $element[$code];
 				$element["$code"] = json_decode($element[$code]);
 			}
