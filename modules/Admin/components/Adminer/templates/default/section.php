@@ -1,13 +1,6 @@
 <?php /** @var \Admin\Adminer $this */ ?>
 <?php $this->Debug($RESULT, '$RESULT'); ?>
 
-<style>
-	<? require($this->Path('style.css')) ?>
-</style>
-<script>
-	<? require($this->Path('script.js')) ?>
-</script>
-
 <div class="adminer">
 
 	<? require($this->Path('section_settings.php')); ?>

@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<? require('head.php'); ?>
+	<? require('_header.php'); ?>
+	<?= $this->GetHeader(); ?>
 </head>
 <body>
 <div class="container-fluid">
