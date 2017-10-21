@@ -2,12 +2,6 @@
 <?php $this->Debug($RESULT, '$RESULT'); ?>
 <?php $this->Debug($this->SCRUD->composition, 'composition'); ?>
 
-<style>
-	<? require($this->Path('style.css')) ?>
-</style>
-<script>
-	<? require($this->Path('script.js')) ?>
-</script>
 <h2>
 	<? if ($RESULT['MODE'] === 'Create'): ?>
 		Добавление элемента

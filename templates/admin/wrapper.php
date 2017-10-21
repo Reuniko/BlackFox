@@ -2,8 +2,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<? require('head.php'); ?>
-	<link href="<?= $this->TEMPLATE_PATH ?>/css/dashboard.css" rel="stylesheet">
+<? require('_header.php'); ?>
+<?= $this->GetHeader(); ?>
+<link href="<?= $this->TEMPLATE_PATH ?>/css/dashboard.css" rel="stylesheet">
 </head>
 <body>
 

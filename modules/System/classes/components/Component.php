@@ -11,18 +11,18 @@ abstract class Component {
 	/** @var array Ассоциативный массив, описывающий возможные параметры компонента */
 	public $options = [];
 
-	/** @var Engine */
+	/** @var Engine Engine */
 	public $ENGINE;
-	/** @var ... */
+	/** @var array User */
 	public $USER;
 
 	/** @var array предки компонента */
-	public $components = [];
+	public $parents = [];
 	/** @var string get_called_class */
 	public $class = '...';
 	/** @var string шаблон - имя папки шаблона в подпапке /templates/ */
 	public $template = 'default';
-	/** @var string отображение - имя php файла подключаемого по умолчанию в папке шаблона */
+	/** @var string отображение - имя php файла подключаемого в папке шаблона */
 	public $view = 'template';
 
 	/** @var array параметры вызова компонента */
@@ -34,10 +34,13 @@ abstract class Component {
 
 	public $allow_ajax_request = false;
 	public $allow_json_request = false;
-	public $component_folder;
-	public $template_folder;
 
-	public function __construct() {
+	public $component_absolute_folder;
+	public $component_relative_folder;
+	public $template_absolute_folder;
+	public $template_relative_folder;
+
+	public function __construct($template = 'default') {
 		// Do not remove local variable $ENGINE, it needs for phpStorm to detect $this->ENGINE as instance of class Engine
 		/** @var Engine $ENGINE */
 		$ENGINE = Engine::Instance();
@@ -49,27 +52,32 @@ abstract class Component {
 
 		$this->class = get_called_class();
 		list($module, $component) = explode('\\', $this->class);
-		$this->components[$this->class] = $this->ENGINE->GetCoreDir("modules/{$module}/components/{$component}");
-		$this->component_folder = $this->components[$this->class];
+		$this->parents[$this->class] = $this->ENGINE->GetCoreDir("modules/{$module}/components/{$component}");
+		$this->component_absolute_folder = $this->parents[$this->class];
+		$this->component_relative_folder = $this->ENGINE->GetRelativePath($this->component_absolute_folder);
 
+		// collect info about all parents including self, excluding abstract classes
 		$parents = class_parents($this);
 		foreach ($parents as $parent) {
 			if ((new \ReflectionClass($parent))->isAbstract()) {
 				continue;
 			}
 			list($module, $component) = explode('\\', $parent);
-			$this->components[$parent] = $this->ENGINE->GetCoreDir("modules/{$module}/components/{$component}");
+			$this->parents[$parent] = $this->ENGINE->GetCoreDir("modules/{$module}/components/{$component}");
 		}
+
+		// init template variables
+		$this->template = $template ?: $this->template;
+		$this->template_absolute_folder = $this->component_absolute_folder . '/templates/' . $this->template;
+		$this->template_relative_folder = $this->ENGINE->GetRelativePath($this->template_absolute_folder);
 	}
 
 	public static function Run($PARAMS = [], $template = 'default') {
-		$self = new static();
-		$self->template = $template ?: $self->template;
+		$self = new static($template);
 		$self->Execute($PARAMS);
 	}
 
 	public function Execute($PARAMS = []) {
-		$this->template_folder = $this->component_folder . '/templates/' . $this->template;
 		$this->Init($PARAMS);
 		$this->SetMessagesFromSession();
 
@@ -85,6 +93,7 @@ abstract class Component {
 			return;
 		}
 
+		$this->ManageHeaders();
 		echo $this->ProcessView($this->ProcessResult());
 		return;
 	}
@@ -319,7 +328,7 @@ abstract class Component {
 	 * @throws Exception Template not found...
 	 */
 	public function Path($path) {
-		foreach ($this->components as $component => $component_folder) {
+		foreach ($this->parents as $component => $component_folder) {
 			$search = "{$component_folder}/templates/{$this->template}/{$path}";
 			if (file_exists($search)) {
 				return $search;
@@ -328,13 +337,13 @@ abstract class Component {
 		throw new Exception("Template not found: '{$path}'");
 	}
 
-	public function TemplateParentPath($path = null) {
+	public function TemplateParentPath() {
 		$template_file = debug_backtrace()[0]['file'];
 		$template_file = str_replace('\\', '/', $template_file);
-		$template_folder = str_replace('\\', '/', $this->template_folder);
+		$template_folder = str_replace('\\', '/', $this->template_absolute_folder);
 		$relative_template_file = str_replace($template_folder, '', $template_file);
-		debug($this->components, '$this->components');
-		foreach ($this->components as $object => $path) {
+		//debug($this->components, '$this->components');
+		foreach ($this->parents as $object => $path) {
 			if ($this->class === $object) {
 				continue;
 			}
@@ -415,6 +424,15 @@ abstract class Component {
 			'MESSAGE' => $message_text,
 		]);
 		die();
+	}
+
+	public function ManageHeaders() {
+		if (file_exists($this->template_absolute_folder . '/style.css')) {
+			$this->ENGINE->AddHeaderStyle($this->template_relative_folder . '/style.css');
+		}
+		if (file_exists($this->template_absolute_folder . '/script.js')) {
+			$this->ENGINE->AddHeaderScript($this->template_relative_folder . '/script.js');
+		}
 	}
 
 }

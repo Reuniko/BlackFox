@@ -11,11 +11,13 @@ class Engine extends Instanceable {
 
 	public $DB;
 
-	public $BUFFER = [];
-	public $CONTENT = "";
 	public $TITLE = "";
+	public $HEADER = "";
+	public $HEADERS = [];
+	public $CONTENT = "";
+
 	public $SECTION = [];
-	public $TEMPLATE = "bootstrap";
+	public $TEMPLATE = "";
 	public $TEMPLATE_PATH = "";
 	public $WRAPPER = "wrapper";
 
@@ -107,6 +109,57 @@ class Engine extends Instanceable {
 			echo $this->CONTENT;
 		}
 
+	}
+
+	public function AddHeaderStyle($path) {
+		$this->HEADERS[$path] = [
+			'TYPE' => 'STYLE',
+			'PATH' => $path,
+		];
+	}
+
+	public function AddHeaderScript($path) {
+		$this->HEADERS[$path] = [
+			'TYPE' => 'SCRIPT',
+			'PATH' => $path,
+		];
+	}
+
+	public function AddHeaderString($string) {
+		$this->HEADERS[] = [
+			'TYPE'   => 'STRING',
+			'STRING' => $string,
+		];
+	}
+
+	public function MakeHeader() {
+		if (empty($this->HEADERS)) {
+			return null;
+		}
+		$headers = [];
+		foreach ($this->HEADERS as $header) {
+			if ($header['TYPE'] === 'STRING') {
+				$headers[] = $header['STRING'];
+				continue;
+			}
+			$path_absolute = $_SERVER['DOCUMENT_ROOT'] . $header['PATH'];
+			$version = filemtime($path_absolute);
+			if ($header['TYPE'] === 'STYLE') {
+				$headers[] = "<link rel='stylesheet' href='{$header['PATH']}?{$version}'/>";
+				continue;
+			}
+			if ($header['TYPE'] === 'SCRIPT') {
+				$headers[] = "<script src='{$header['PATH']}?{$version}'></script>";
+				continue;
+			}
+			throw new Exception("Unknown header type '{$header['TYPE']}'");
+		}
+		return implode("\r\n", $headers);
+	}
+
+	public function GetHeader() {
+		$this->HEADER = $this->HEADER ?: $this->MakeHeader();
+		return $this->HEADER;
 	}
 
 	public function ShowContent() {
@@ -292,7 +345,6 @@ class Engine extends Instanceable {
 
 	public function BufferRestart() {
 		ob_end_clean();
-		$this->BUFFER = [];
 	}
 
 	public function BufferFlush() {
@@ -378,5 +430,14 @@ class Engine extends Instanceable {
 		}
 		$class = end($diff);
 		return $class;
+	}
+
+	public function GetRelativePath($absolute_path, $root_path = null) {
+		$root_path = $root_path ?: $_SERVER['DOCUMENT_ROOT'];
+		if (strpos($absolute_path, $root_path) === false) {
+			throw new Exception("Can't find relative path for absolute path '{$absolute_path}'");
+		}
+		$relative_path = str_replace($root_path, '', $absolute_path);
+		return $relative_path;
 	}
 }
