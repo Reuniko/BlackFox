@@ -681,22 +681,21 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Удаляет строку или строки из таблицы
+	 * Удаляет строки из таблицы
 	 *
-	 * @param int|array $ids Идентификаторы удаляемых записей
-	 * @return boolean Результат выполнения
+	 * @param int|array $filter фильтр | идентификатор(ы)
 	 */
-	public function Delete($ids = array()) {
-		if (!is_array($ids)) {
-			$ids = array($ids);
+	public function Delete($filter = []) {
+		if (!is_array($filter)) {
+			$filter = [reset($this->primary_keys) => $filter];
 		}
-		if (empty($ids)) {
-			return false;
+		// if array does not has string keys
+		if (count(array_filter(array_keys($filter), 'is_string')) === 0) {
+			$filter = [reset($this->primary_keys) => $filter];
 		}
-		$primary = reset($this->primary_keys);
-		$this->SQL = "DELETE FROM {$this->code} WHERE {$primary} IN ('" . implode("', '", $ids) . "')";
+		$where = $this->_prepareWhere($filter);
+		$this->SQL = "DELETE FROM `{$this->code}` WHERE " . implode(' AND ', $where);
 		$this->Query($this->SQL);
-		return true;
 	}
 
 
