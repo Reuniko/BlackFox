@@ -1189,7 +1189,7 @@ abstract class SCRUD extends Instanceable {
 	public function GetAdminUrl() {
 		$name = get_called_class();
 		$name = str_replace('\\', '/', $name);
-		$name = strtolower($name);
+		//$name = strtolower($name);
 		return "/admin/{$name}.php";
 	}
 
