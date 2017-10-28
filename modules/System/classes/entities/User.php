@@ -54,6 +54,14 @@ class User extends SCRUD {
 				'NAME' => 'Аватар',
 				'LINK' => '\\System\\File',
 			],
+			'BIRTH_DAY'   => [
+				'TYPE' => 'DATE',
+				'NAME' => 'День рождения',
+			],
+			'ABOUT'   => [
+				'TYPE' => 'TEXT',
+				'NAME' => 'О себе',
+			],
 		];
 	}
 
