@@ -189,42 +189,42 @@ abstract class Component {
 	public function Controller($request = []) {
 		$error_result = [];
 
-		$action = $this->SelectMethodForAction($request);
-		if (!empty($action)) {
+		$method = $this->SelectMethodForAction($request);
+		if (!empty($method)) {
 			try {
-				return (array)$this->Invoke($action, $request);
+				return (array)$this->Invoke($method, $request);
 			} catch (\Exception $error) {
-				$error_result = (array)$this->Error($error->getMessage(), $action, $request);
+				$error_result = (array)$this->Error($error->getMessage(), $method, $request);
 			}
 		}
 
-		$action = $this->SelectMethodForView($request);
-		if (!empty($action)) {
-			return (array)$this->Invoke($action, $request) + $error_result;
+		$method = $this->SelectMethodForView($request);
+		if (!empty($method)) {
+			return (array)$this->Invoke($method, $request) + $error_result;
 		}
 
 		throw new Exception("Не удалось определить требуемое действие");
 	}
 
 	/**
-	 * Вызывает действие, контролируя его наличие и публичный доступ к нему.
-	 * Действие запускается через ReflectionMethod->invokeArgs() что позволяет самому действию
+	 * Вызывает метод, контролируя его наличие и публичный доступ к нему.
+	 * Метод запускается через ReflectionMethod->invokeArgs() что позволяет самому методу
 	 * контролировать принимаемые на вход параметры. Все прочие параметры отсеиваются.
 	 *
-	 * @param string $action действие - название публичного метода в классе контроллера
+	 * @param string $method метод - название публичного метода в классе контроллера
 	 * @param array $request данные запроса - ассоциативный массив данных пришедших по любому каналу
-	 * @return array результат выполнения действия (зачастую действие самостоятельно редиректит дальше)
+	 * @return array|string результат выполнения метода (зачастую метод самостоятельно редиректит дальше)
 	 * @throws Exception
 	 */
-	private function Invoke($action, $request) {
-		if (!method_exists($this, $action)) {
-			throw new Exception("Неизвестное действие - '{$action}'");
+	private function Invoke($method, $request) {
+		if (!method_exists($this, $method)) {
+			throw new Exception("Неизвестный метод - '{$method}'");
 		}
 		//$this->Debug($action, 'Invoke $action');
 		//$this->Debug($request, 'Invoke $request');
-		$reflection = new \ReflectionMethod($this, $action);
+		$reflection = new \ReflectionMethod($this, $method);
 		if (!$reflection->isPublic()) {
-			throw new Exception("Действие '{$action}' запрещено вызывать из контроллера публичной части");
+			throw new Exception("Метод '{$method}' запрещено вызывать из контроллера публичной части");
 		}
 
 		$request = array_change_key_case($request);
