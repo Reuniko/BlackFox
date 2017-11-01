@@ -29,6 +29,10 @@ class User extends SCRUD {
 				'NOT_NULL' => true,
 				'DISABLED' => true,
 			],
+			'LAST_AUTH'   => [
+				'TYPE' => 'DATETIME',
+				'NAME' => 'Последнее время авторизации',
+			],
 			'FIRST_NAME'  => [
 				'TYPE' => 'STRING',
 				'NAME' => 'Имя',
@@ -45,9 +49,9 @@ class User extends SCRUD {
 				'TYPE' => 'STRING',
 				'NAME' => 'E-mail',
 			],
-			'LAST_AUTH'   => [
-				'TYPE' => 'DATETIME',
-				'NAME' => 'Последнее время авторизации',
+			'PHONE'       => [
+				'TYPE' => 'STRING',
+				'NAME' => 'Телефон',
 			],
 			'AVATAR'      => [
 				'TYPE' => 'FILE',
