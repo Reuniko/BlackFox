@@ -18,4 +18,9 @@ class TypeDate extends Type {
 		}
 		return $value;
 	}
+
+	public function FormatOutputValue($element, $code, $info) {
+		$element[$code . '|TIMESTAMP'] = strtotime($element[$code]);
+		return parent::FormatOutputValue($element, $code, $info);
+	}
 }
