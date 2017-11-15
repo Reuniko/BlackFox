@@ -1,5 +1,6 @@
 <?php
 namespace System;
+
 class Groups extends SCRUD {
 
 	public function Init() {

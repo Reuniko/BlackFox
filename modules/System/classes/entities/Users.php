@@ -1,6 +1,6 @@
 <?php
-
 namespace System;
+
 class Users extends SCRUD {
 
 	public function Init() {
@@ -62,7 +62,7 @@ class Users extends SCRUD {
 				'TYPE' => 'DATE',
 				'NAME' => 'День рождения',
 			],
-			'ABOUT'   => [
+			'ABOUT'       => [
 				'TYPE' => 'TEXT',
 				'NAME' => 'О себе',
 			],
@@ -138,62 +138,6 @@ class Users extends SCRUD {
 			unset($fields['PASSWORD']);
 		}
 		return parent::Update($ids, $fields);
-	}
-
-	public function Authorization($login, $password) {
-		if (empty($login)) {
-			throw new Exception("Не указан логин");
-		}
-		$user = $this->Read(['LOGIN' => $login], ['ID', 'SALT', 'LOGIN', 'PASSWORD']);
-		if (empty($user)) {
-			throw new Exception("Пользователь '{$login}' не существует");
-		}
-		if ($user['PASSWORD'] <> sha1($user['SALT'] . ':' . $password)) {
-			throw new Exception("Введен некорректный пароль");
-		}
-		$this->Login($user['ID']);
-	}
-
-	public function Login($ID) {
-		if (!$this->Present($ID)) {
-			throw new Exception("User #{$ID} not found");
-		}
-		$this->Update($ID, ['LAST_AUTH' => time()]);
-		$_SESSION['USER'] = $this->Read($ID);
-		$_SESSION['USER']['GROUPS'] = $this->GetGroups($ID);
-	}
-
-	public function Logout() {
-		unset($_SESSION['USER']);
-	}
-
-	public function IsAuthorized() {
-		return isset($_SESSION['USER']);
-	}
-
-	/**
-	 * Get user groups
-	 *
-	 * @param int $ID user id
-	 * @return array list of group codes
-	 */
-	public function GetGroups($ID = null) {
-		if ($ID === null) {
-			if (isset($_SESSION['USER']['GROUPS'])) {
-				return $_SESSION['USER']['GROUPS'];
-			}
-			$ID = $_SESSION['USER']['ID'];
-		}
-		if (empty($ID)) {
-			return [];
-		}
-		$group_ids = Users2Groups::I()->Select(['USER' => $ID], [], 'GROUP');
-		$groups = Groups::I()->Select(['ID' => $group_ids], [], 'CODE');
-		return $groups;
-	}
-
-	public function InGroup($group) {
-		return in_array($group, $this->GetGroups());
 	}
 
 }

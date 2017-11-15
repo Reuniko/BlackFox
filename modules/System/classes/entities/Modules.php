@@ -1,5 +1,6 @@
 <?php
 namespace System;
+
 class Modules extends SCRUD {
 
 	final public function Init() {

@@ -69,7 +69,7 @@ class Engine extends Instanceable {
 				}
 			}
 		}
-		if (Users::I()->IsAuthorized()) {
+		if (User::I()->IsAuthorized()) {
 			throw new ExceptionAccessDenied('This section requires higher privileges');
 		} else {
 			throw new ExceptionAuthRequired('This section requires authorisation');
@@ -192,7 +192,7 @@ class Engine extends Instanceable {
 
 		} catch (ExceptionSQL $exception) {
 			$message = 'SQL QUERY ERROR: ' . $exception->getMessage();
-			if (Users::I()->InGroup('root')) {
+			if (User::I()->InGroup('root')) {
 				$message .= "<br/><br/><pre>{$exception->SQL}</pre>";
 			}
 			$this->ShowErrors([$message]);
