@@ -34,7 +34,6 @@ abstract class Instanceable {
 		}
 		if (is_null(self::$instance[$class])) {
 			self::$instance[$class] = new $class($params);
-			self::$instance[$class]->Init();
 			self::$instance[$class]->instanced = true;
 		}
 		return self::$instance[$class];
@@ -45,13 +44,11 @@ abstract class Instanceable {
 	 * - если объект уже был создан - возвращает его
 	 * - если объект еще не был создан - создает его и возвращает
 	 *
+	 * @param mixed $params параметры конструктора класса
 	 * @return static инстациируемый объект
 	 */
-	public static function I() {
-		return self::Instance();
+	public static function I($params = null) {
+		return self::Instance($params);
 	}
 
-	public function Init() {
-
-	}
 }
