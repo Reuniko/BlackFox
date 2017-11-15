@@ -68,7 +68,7 @@ class Files extends SCRUD {
 			move_uploaded_file($fields['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $src);
 			$file = [
 				'CREATE_DATE' => time(),
-				'CREATE_BY'   => $_SESSION['USER']['ID'],
+				'CREATE_BY'   => User::I()->ID,
 				'NAME'        => $fields['name'],
 				'SIZE'        => $fields['size'],
 				'TYPE'        => $fields['type'],
