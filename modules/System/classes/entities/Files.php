@@ -1,5 +1,6 @@
 <?php
 namespace System;
+
 class Files extends SCRUD {
 
 	public function Init() {

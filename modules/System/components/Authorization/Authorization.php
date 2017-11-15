@@ -54,7 +54,7 @@ class Authorization extends \System\Component {
 	}
 
 	public function Login($login = null, $password = null) {
-		Users::Instance()->Authorization($login, $password);
+		User::I()->Authorization($login, $password);
 		$this->Redirect(false, "Вы успешно авторизированы");
 	}
 
