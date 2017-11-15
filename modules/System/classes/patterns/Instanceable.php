@@ -66,6 +66,11 @@ abstract class Instanceable {
 		return self::Instance($params);
 	}
 
+	/**
+	 * @param mixed $params ...
+	 * @return static ...
+	 * @throws Exception Unsupported param type
+	 */
 	public static function InstanceDefault($params = null) {
 		$Object = self::Instance($params);
 		$class = get_class($Object);

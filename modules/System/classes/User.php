@@ -3,6 +3,34 @@ namespace System;
 
 class User extends Instanceable {
 
+	/** @var bool user is in current session */
+	public $CURRENT = false;
+	/** @var null|int user identifier */
+	public $ID = null;
+	/** @var array user fields (associative) */
+	public $FIELDS = [];
+	/** @var array user groups (list) */
+	public $GROUPS = [];
+
+	public function __construct($ID = null) {
+		$this->CURRENT = ($ID === null);
+		$this->Load($ID ?: $_SESSION['USER']['ID'] ?: null);
+	}
+
+	public function Load($ID) {
+		$this->ID = $ID;
+		$this->FIELDS = [];
+		$this->GROUPS = [];
+		if (!empty($this->ID)) {
+			$this->FIELDS = Users::I()->Read($this->ID);
+			if (empty($this->FIELDS)) {
+				throw new ExceptionElementNotFound();
+			}
+			$group_ids = Users2Groups::I()->Select(['USER' => $this->ID], [], 'GROUP');
+			$this->GROUPS = Groups::I()->Select(['ID' => $group_ids], [], 'CODE');
+		}
+	}
+
 	public function Authorization($login, $password) {
 		if (empty($login)) {
 			throw new Exception("Не указан логин");
@@ -18,32 +46,23 @@ class User extends Instanceable {
 	}
 
 	public function Login($ID) {
+		$ID = (int)$ID;
 		if (!Users::I()->Present($ID)) {
 			throw new Exception("User #{$ID} not found");
 		}
+
 		Users::I()->Update($ID, ['LAST_AUTH' => time()]);
-		$_SESSION['USER'] = Users::I()->Read($ID);
-		$_SESSION['USER']['GROUPS'] = $this->GetGroups($ID);
+		$_SESSION['USER']['ID'] = $ID;
+		self::I()->Load($ID);
 	}
 
 	public function Logout() {
 		unset($_SESSION['USER']);
+		$this->Load(null);
 	}
 
 	public function IsAuthorized() {
-		return isset($_SESSION['USER']);
-	}
-
-	/**
-	 * Get user groups
-	 *
-	 * @return array list of group codes
-	 */
-	public function GetGroups() {
-		$ID = $_SESSION['USER']['ID'];
-		$group_ids = Users2Groups::I()->Select(['USER' => $ID], [], 'GROUP');
-		$groups = Groups::I()->Select(['ID' => $group_ids], [], 'CODE');
-		return $groups;
+		return !empty($this->ID);
 	}
 
 	/**
@@ -53,6 +72,6 @@ class User extends Instanceable {
 	 * @return bool
 	 */
 	public function InGroup($group) {
-		return in_array($group, $this->GetGroups());
+		return in_array($group, $this->GROUPS);
 	}
 }

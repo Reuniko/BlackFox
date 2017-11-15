@@ -46,7 +46,10 @@ abstract class Component {
 		$ENGINE = Engine::Instance();
 		$this->ENGINE = $ENGINE;
 
-		$this->USER = &$_SESSION['USER'];
+		// Do not remove local variable $USER, it needs for phpStorm to detect $this->USER as instance of class Engine
+		/** @var User $USER */
+		$USER = User::I();
+		$this->USER = $USER;
 
 		// TODO cache all below:
 

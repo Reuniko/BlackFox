@@ -10,6 +10,8 @@ class Engine extends Instanceable {
 	public $url = [];
 
 	public $DB;
+	/** @var User */
+	public $USER;
 
 	public $TITLE = "";
 	public $HEADER = "";
@@ -96,6 +98,11 @@ class Engine extends Instanceable {
 		// Init other modules
 		$this->LoadModules();
 
+		// setup USER
+		/** @var User $USER */
+		$USER = User::InstanceDefault();
+		$this->USER = $USER;
+
 		// generate CONTENT
 		ob_start();
 		$this->ShowContent();
@@ -167,7 +174,7 @@ class Engine extends Instanceable {
 		try {
 
 			// Check access
-			$this->CheckSectionAccess($this->SECTION['ACCESS'], $_SESSION['USER']['GROUPS']);
+			$this->CheckSectionAccess($this->SECTION['ACCESS'], $this->USER->GROUPS);
 
 			// запрос на конкретный скрипт
 			foreach ($this->roots as $root) {
@@ -213,7 +220,13 @@ class Engine extends Instanceable {
 		if (!is_array($errors)) {
 			$errors = [$errors];
 		}
-		require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/errors.php'));
+		if (!empty($this->TEMPLATE)) {
+			require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/errors.php'));
+		} else {
+			foreach ($errors as $error) {
+				echo $error;
+			}
+		}
 	}
 
 	public function Show404() {
