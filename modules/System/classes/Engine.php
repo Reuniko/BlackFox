@@ -23,7 +23,7 @@ class Engine extends Instanceable {
 
 	protected $initialized = false;
 
-	public function Init() {
+	public function __construct() {
 		// prevent double run
 		if ($this->initialized) {
 			throw new Exception("Engine already initialized");
