@@ -8,24 +8,24 @@ return [
 		'NAME' => '~upgrade',
 		'LINK' => '/admin/_upgrade.php',
 	],
-	'System_Unit'       => [
+	'System_Modules'       => [
 		'NAME' => 'Модули',
-		'LINK' => '/admin/System/Unit.php',
+		'LINK' => '/admin/System/Modules.php',
 	],
-	'System_User'       => [
+	'System_Users'       => [
 		'NAME' => 'Пользователи',
-		'LINK' => '/admin/System/User.php',
+		'LINK' => '/admin/System/Users.php',
 	],
-	'System_Group'      => [
+	'System_Groups'      => [
 		'NAME' => 'Группы',
-		'LINK' => '/admin/System/Group.php',
+		'LINK' => '/admin/System/Groups.php',
 	],
-	'System_User2Group' => [
+	'System_Users2Groups' => [
 		'NAME' => 'Пользователи в группах',
-		'LINK' => '/admin/System/User2Group.php',
+		'LINK' => '/admin/System/Users2Groups.php',
 	],
-	'System_File'       => [
+	'System_Files'       => [
 		'NAME' => 'Файлы',
-		'LINK' => '/admin/System/File.php',
+		'LINK' => '/admin/System/Files.php',
 	],
 ];

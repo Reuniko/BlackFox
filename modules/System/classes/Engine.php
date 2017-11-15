@@ -69,7 +69,7 @@ class Engine extends Instanceable {
 				}
 			}
 		}
-		if (User::I()->IsAuthorized()) {
+		if (Users::I()->IsAuthorized()) {
 			throw new ExceptionAccessDenied('This section requires higher privileges');
 		} else {
 			throw new ExceptionAuthRequired('This section requires authorisation');
@@ -192,7 +192,7 @@ class Engine extends Instanceable {
 
 		} catch (ExceptionSQL $exception) {
 			$message = 'SQL QUERY ERROR: ' . $exception->getMessage();
-			if (User::I()->InGroup('root')) {
+			if (Users::I()->InGroup('root')) {
 				$message .= "<br/><br/><pre>{$exception->SQL}</pre>";
 			}
 			$this->ShowErrors([$message]);
@@ -354,11 +354,11 @@ class Engine extends Instanceable {
 	public function LoadModules() {
 
 		try {
-			$modules = Unit::I()->GetList();
+			$modules = Modules::I()->GetList();
 		} catch (\Exception $error) {
-			Unit::I()->Synchronize();
-			Unit::I()->Create(['ID' => 'System']);
-			$modules = Unit::I()->GetList();
+			Modules::I()->Synchronize();
+			Modules::I()->Create(['ID' => 'System']);
+			$modules = Modules::I()->GetList();
 		}
 
 		foreach ($modules as $module) {

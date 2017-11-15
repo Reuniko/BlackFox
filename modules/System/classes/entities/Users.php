@@ -1,7 +1,7 @@
 <?php
 
 namespace System;
-class User extends SCRUD {
+class Users extends SCRUD {
 
 	public function Init() {
 		parent::Init();
@@ -56,7 +56,7 @@ class User extends SCRUD {
 			'AVATAR'      => [
 				'TYPE' => 'FILE',
 				'NAME' => 'Аватар',
-				'LINK' => '\\System\\File',
+				'LINK' => '\\System\\Files',
 			],
 			'BIRTH_DAY'   => [
 				'TYPE' => 'DATE',
@@ -187,8 +187,8 @@ class User extends SCRUD {
 		if (empty($ID)) {
 			return [];
 		}
-		$group_ids = User2Group::I()->Select(['USER' => $ID], [], 'GROUP');
-		$groups = Group::I()->Select(['ID' => $group_ids], [], 'CODE');
+		$group_ids = Users2Groups::I()->Select(['USER' => $ID], [], 'GROUP');
+		$groups = Groups::I()->Select(['ID' => $group_ids], [], 'CODE');
 		return $groups;
 	}
 

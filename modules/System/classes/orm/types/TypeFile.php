@@ -11,7 +11,7 @@ class TypeFile extends TypeLink {
 	}
 
 	public function ProvideInfoIntegrity($info = []) {
-		$info['LINK'] = $info['LINK'] ?: 'System\File';
+		$info['LINK'] = $info['LINK'] ?: '\System\Files';
 		return $info;
 	}
 

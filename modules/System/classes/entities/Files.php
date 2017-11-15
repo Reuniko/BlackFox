@@ -1,6 +1,6 @@
 <?php
 namespace System;
-class File extends SCRUD {
+class Files extends SCRUD {
 
 	public function Init() {
 		parent::Init();
@@ -13,7 +13,7 @@ class File extends SCRUD {
 			'CREATE_BY'   => [
 				'TYPE' => 'LINK',
 				'NAME' => 'Кем создан',
-				'LINK' => '\\System\\User',
+				'LINK' => '\\System\\Users',
 			],
 			'NAME'        => [
 				'TYPE' => 'STRING',
