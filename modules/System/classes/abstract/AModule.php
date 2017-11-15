@@ -7,10 +7,10 @@ abstract class AModule extends Instanceable {
 
 	public function Install() {
 		$class = end(explode('\\', static::class));
-		if (Unit::Instance()->Present($class)) {
+		if (Modules::Instance()->Present($class)) {
 			throw new Exception("Module '{$class}' already installed");
 		} else {
-			Unit::Instance()->Create([
+			Modules::Instance()->Create([
 				'ID'          => $class,
 				'NAME'        => $this->name,
 				'DESCRIPTION' => $this->description,
@@ -22,7 +22,7 @@ abstract class AModule extends Instanceable {
 
 	public function Uninstall() {
 		$class = end(explode('\\', static::class));
-		Unit::Instance()->Delete($class);
+		Modules::Instance()->Delete($class);
 	}
 
 	public function Upgrade() {

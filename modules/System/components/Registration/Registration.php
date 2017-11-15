@@ -37,7 +37,7 @@ class Registration extends \System\Component {
 	];
 
 	public function Init($PARAMS = []) {
-		foreach (\System\User::Instance()->structure as $code => $field) {
+		foreach (\System\Users::Instance()->structure as $code => $field) {
 			if ($code === 'ID') {
 				continue;
 			}
@@ -50,7 +50,7 @@ class Registration extends \System\Component {
 
 	public function Work($VALUES = []) {
 		$this->Debug($this->PARAMS, '$this->PARAMS');
-		$RESULT['FIELDS'] = User::Instance()->ExtractStructure($this->PARAMS['FIELDS']);
+		$RESULT['FIELDS'] = Users::Instance()->ExtractStructure($this->PARAMS['FIELDS']);
 		$RESULT['VALUES'] = $VALUES;
 		$this->Debug($RESULT, '$RESULT');
 		return $RESULT;
@@ -58,7 +58,7 @@ class Registration extends \System\Component {
 
 	public function Registration($VALUES = []) {
 		$this->Debug($VALUES, '$VALUES');
-		User::Instance()->Create($VALUES);
+		Users::Instance()->Create($VALUES);
 		$this->Redirect($this->PARAMS['REDIRECT'], 'Успешная регистрация');
 	}
 }

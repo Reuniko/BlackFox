@@ -1,6 +1,6 @@
 <?php
 namespace System;
-class Group extends SCRUD {
+class Groups extends SCRUD {
 
 	public function Init() {
 		parent::Init();
