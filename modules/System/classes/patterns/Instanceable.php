@@ -25,18 +25,33 @@ abstract class Instanceable {
 	 *
 	 * @param mixed $params параметры конструктора класса
 	 * @return static инстациируемый объект
+	 * @throws Exception Unsupported param type
 	 */
 	public static function Instance($params = null) {
+
 		$class = get_called_class();
+
 		global $CONFIG;
 		if ($CONFIG['redirects'][$class]) {
-			return $CONFIG['redirects'][$class]::Instance();
+			return $CONFIG['redirects'][$class]::Instance($params);
 		}
-		if (is_null(self::$instance[$class])) {
-			self::$instance[$class] = new $class($params);
-			self::$instance[$class]->instanced = true;
+
+		$hash = null;
+		if (empty($params)) {
+			$hash = 'DEFAULT';
+		} elseif (is_string($params) or is_numeric($params)) {
+			$hash = (string)$params;
+		} elseif (is_array($params)) {
+			$hash = md5(serialize($params));
+		} else {
+			throw new Exception("Unsupported param type");
 		}
-		return self::$instance[$class];
+
+		if (is_null(self::$instance[$class][$hash])) {
+			self::$instance[$class][$hash] = new $class($params);
+			self::$instance[$class][$hash]->instanced = true;
+		}
+		return self::$instance[$class][$hash];
 	}
 
 	/**
@@ -51,4 +66,10 @@ abstract class Instanceable {
 		return self::Instance($params);
 	}
 
+	public static function InstanceDefault($params = null) {
+		$Object = self::Instance($params);
+		$class = get_class($Object);
+		self::$instance[$class]['DEFAULT'] = $Object;
+		return $Object;
+	}
 }

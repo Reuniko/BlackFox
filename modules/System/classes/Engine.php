@@ -43,7 +43,7 @@ class Engine extends Instanceable {
 		$this->RegisterModuleClasses('System');
 
 		// Init database connector
-		$this->DB = Database::Instance($this->config['database']);
+		$this->DB = Database::InstanceDefault($this->config['database']);
 	}
 
 	/**
