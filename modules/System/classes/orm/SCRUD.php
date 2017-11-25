@@ -538,6 +538,11 @@ abstract class SCRUD extends Instanceable {
 		return $keys;
 	}
 
+	public function Pick($filter = array(), $sort = array(), $field = null) {
+		$data = $this->Select($filter, $sort, $field);
+		return reset($data);
+	}
+
 	/**
 	 * Анализирует значение на наличие информации.
 	 * - 0 - информация присутствует

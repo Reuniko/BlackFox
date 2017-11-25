@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 
 class Users extends SCRUD {
@@ -138,6 +139,25 @@ class Users extends SCRUD {
 			unset($fields['PASSWORD']);
 		}
 		return parent::Update($ids, $fields);
+	}
+
+	public function AddGroup($ID, $group) {
+		$ID = (int)$ID;
+		if (empty($ID)) {
+			throw new Exception("ID required");
+		}
+		if (is_string($group)) {
+			$group_id = Groups::I()->Pick(['CODE' => $group]);
+		} else {
+			$group_id = (int)$group;
+		}
+		if (empty($group_id)) {
+			throw new Exception("Group ID required");
+		}
+		Users2Groups::I()->Create([
+			'USER'  => $ID,
+			'GROUP' => $group_id,
+		]);
 	}
 
 }
