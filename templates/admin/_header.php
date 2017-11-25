@@ -14,4 +14,4 @@
 <script src="<?= $this->TEMPLATE_PATH ?>/js/jquery.min.js"></script>
 <script src="<?= $this->TEMPLATE_PATH ?>/js/jquery-ui.min.js"></script>
 <script src="<?= $this->TEMPLATE_PATH ?>/js/bootstrap.min.js"></script>
-<script src="<?= $this->TEMPLATE_PATH ?>/js/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/4.7.3/standard/ckeditor.js"></script>
