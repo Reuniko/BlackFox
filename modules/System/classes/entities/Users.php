@@ -8,7 +8,7 @@ class Users extends SCRUD {
 		parent::Init();
 		$this->name = 'Пользователи';
 		$this->composition['SYSTEM']['FIELDS'] += [
-			'LOGIN'       => [
+			'LOGIN'     => [
 				'TYPE'     => 'STRING',
 				'NAME'     => 'Логин',
 				'NOT_NULL' => true,
@@ -17,23 +17,25 @@ class Users extends SCRUD {
 				'JOIN'     => true,
 				'SHOW'     => true,
 			],
-			'PASSWORD'    => [
+			'PASSWORD'  => [
 				'TYPE'        => 'STRING',
 				'NAME'        => 'Пароль',
 				'DESCRIPTION' => 'В базе хранится sha1 хеш пароля',
 				'NOT_NULL'    => true,
 				'DISABLED'    => true,
 			],
-			'SALT'        => [
+			'SALT'      => [
 				'TYPE'     => 'STRING',
 				'NAME'     => 'Соль',
 				'NOT_NULL' => true,
 				'DISABLED' => true,
 			],
-			'LAST_AUTH'   => [
+			'LAST_AUTH' => [
 				'TYPE' => 'DATETIME',
 				'NAME' => 'Последнее время авторизации',
 			],
+		];
+		$this->composition['CONTENT']['FIELDS'] = [
 			'FIRST_NAME'  => [
 				'TYPE' => 'STRING',
 				'NAME' => 'Имя',
