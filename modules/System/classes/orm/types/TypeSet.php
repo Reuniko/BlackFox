@@ -15,7 +15,7 @@ class TypeSet extends Type {
 			$values = [$values];
 		}
 		foreach ($values as $value) {
-			if (!isset($field['VALUES'][$value])) {
+			if (!isset($info['VALUES'][$value])) {
 				throw new ExceptionType("Unknown set value '{$value}' for field '{$info['NAME']}'");
 			}
 		}
