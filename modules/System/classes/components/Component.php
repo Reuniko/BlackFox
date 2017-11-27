@@ -328,7 +328,7 @@ abstract class Component {
 	 *
 	 * @param string $path путь к шаблону относительно корневой директории шаблона
 	 * @return string абсолютный путь к шаблону
-	 * @throws Exception Template not found...
+	 * @throws Exception View not found...
 	 */
 	public function Path($path) {
 		foreach ($this->parents as $component => $component_folder) {
@@ -337,7 +337,7 @@ abstract class Component {
 				return $search;
 			}
 		}
-		throw new Exception("Template not found: '{$path}'");
+		throw new Exception("View not found: '{$path}'");
 	}
 
 	public function TemplateParentPath() {
