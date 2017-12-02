@@ -44,10 +44,7 @@ abstract class SCRUD extends Instanceable {
 	/** @var array массив полей доступных для выборки, формируется автоматически на $this->annexes */
 	public $selection = [];
 	/** @var array массив первичных ключей, формируется автоматически */
-	public $primary_keys = [];
-	/** @var string код поля единственного первичного ключа, пустое если ключей несколько, формируется автоматически */
-	public $primary_key = null;
-
+	public $keys = [];
 
 	/**
 	 * Лист ассоциативных массивов, указывающий какие формировать дополнительные
@@ -115,6 +112,20 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
+	 * Returns the only one single primary key if it exist.
+	 * Otherwise throws exception.
+	 *
+	 * @return string
+	 * @throws Exception Single primary key required
+	 */
+	public function key() {
+		if (count($this->keys) === 1) {
+			return reset($this->keys);
+		}
+		throw new Exception("Single primary key required for " . static::class);
+	}
+
+	/**
 	 * Обеспечивает целостность данных между структурными массивами:
 	 * - structure
 	 * - groups
@@ -126,12 +137,11 @@ abstract class SCRUD extends Instanceable {
 
 		$this->selection = $this->structure;
 		$this->composition = [];
-		$this->primary_keys = [];
-		$this->primary_key = null;
+		$this->keys = [];
 
 		foreach ($this->structure as $code => $field) {
 			if ($field['PRIMARY']) {
-				$this->primary_keys[] = $code;
+				$this->keys[] = $code;
 			}
 			if (empty($field['GROUP'])) {
 				$this->structure[$code]['GROUP'] = 'OUTSIDE';
@@ -154,11 +164,9 @@ abstract class SCRUD extends Instanceable {
 				}
 			}
 		}
-		if (empty($this->primary_keys)) {
-			throw new Exception("Primary key required for " . static::class);
-		}
-		if (count($this->primary_keys) === 1) {
-			$this->primary_key = reset($this->primary_keys);
+
+		if (empty($this->keys)) {
+			throw new Exception("Primary keys required for " . static::class);
 		}
 	}
 
@@ -193,8 +201,8 @@ abstract class SCRUD extends Instanceable {
 			foreach ($this->structure as $code => $field) {
 				$rows[] = FactoryType::I()->Get($field['TYPE'])->GetStructureString($code, $field);
 			}
-			if (!empty($this->primary_keys)) {
-				$rows[] = "PRIMARY KEY (`" . implode("`, `", $this->primary_keys) . "`)";
+			if (!empty($this->keys)) {
+				$rows[] = "PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
 			}
 			$this->SQL = $this->SQL . "(" . implode(",\r\n", $rows) . ");";
 			//Debug($SQL, '$SQL CREATE TABLE');
@@ -227,8 +235,8 @@ abstract class SCRUD extends Instanceable {
 					$rows[] = "DROP COLUMN `{$code}`";
 				}
 			}
-			if (!empty($this->primary_keys)) {
-				$rows[] = "DROP PRIMARY KEY, ADD PRIMARY KEY (`" . implode("`, `", $this->primary_keys) . "`)";
+			if (!empty($this->keys)) {
+				$rows[] = "DROP PRIMARY KEY, ADD PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
 			}
 			$this->SQL = $this->SQL . implode(",\r\n", $rows) . ";";
 			//Debug($this->SQL, '$SQL ALTER TABLE');
@@ -240,7 +248,7 @@ abstract class SCRUD extends Instanceable {
 		// Debug($indexes, '$indexes');
 		// Log($indexes, '$indexes');
 		foreach ($this->structure as $code => $field) {
-			if (in_array($code, $this->primary_keys)) {
+			if (in_array($code, $this->keys)) {
 				continue;
 			}
 			if ($field['UNIQUE']) {
@@ -286,16 +294,14 @@ abstract class SCRUD extends Instanceable {
 			if (!is_array($this->annexes)) {
 				$this->annexes = [$this->annexes];
 			}
-			$primary = reset($this->primary_keys);
 			foreach ($this->annexes as $annex_alias => $annex) {
-				$annex_primary = reset($annex->primary);
 				if (is_numeric($annex_alias)) {
 					$annex_alias = $annex->code;
 				}
 				$annexes_strings[] = "\r\n" .
 					" INNER JOIN {$annex->code}" .
 					" AS {$annex_alias}" .
-					" ON {$this->code}.{$primary} = {$annex_alias}.{$annex_primary}";
+					" ON {$this->code}.{$this->key()} = {$annex_alias}.{$annex->key()}";
 				foreach ($annex->structure as $code => $field) {
 					if (!isset($this->selection[$code])) {
 						$this->selection[$code] = $field;
@@ -324,15 +330,21 @@ abstract class SCRUD extends Instanceable {
 	 */
 	public function Search($arParams = []) {
 
-		$arParams = $this->_matchParams($arParams, [
-			"SORT"   => ['ID' => 'ASC'],
-			"FILTER" => [],
-			"FIELDS" => ["**"],
-			"LIMIT"  => 100,
-			"PAGE"   => 1,
-			"KEY"    => reset($this->primary_keys),
-			"ESCAPE" => true,
-		]);
+		$defParams = [
+			'SORT'   => ['ID' => 'DESC'],
+			'FILTER' => [],
+			'FIELDS' => ['**'],
+			'LIMIT'  => 100,
+			'PAGE'   => 1,
+			'ESCAPE' => true,
+		];
+		try {
+			$defParams['KEY'] = $this->key();
+		} catch (Exception $error) {
+			$defParams['KEY'] = null;
+		}
+
+		$arParams = $this->_matchParams($arParams, $defParams);
 
 		$arParams["PAGE"] = max(1, intval($arParams["PAGE"]));
 
@@ -364,7 +376,7 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		// если программист забыл указать KEY в полях
-		if (!in_array($arParams['KEY'], $arParams['FIELDS'])) {
+		if (!empty($arParams['KEY']) and !in_array($arParams['KEY'], $arParams['FIELDS'])) {
 			$arParams['FIELDS'][] = $arParams['KEY'];
 		}
 
@@ -404,12 +416,14 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		foreach ($result["ELEMENTS"] as &$row) {
-			if (!$arParams['ESCAPE']) {
-				// $row = htmlspecialcharsback($row);
-			}
 			$row = $this->FormatArrayKeysCase($row);
 			$row = $this->FormatListStructure($row);
 			$row = $this->FormatOutputValues($row);
+			if ($arParams['ESCAPE']) {
+				array_walk_recursive($row, function (&$value) {
+					$value = htmlspecialchars($value);
+				});
+			}
 		}
 
 		if ($arParams['LIMIT'] > 1) {
@@ -474,15 +488,12 @@ abstract class SCRUD extends Instanceable {
 	/**
 	 * Выбирает первый элемент по фильтру. Можно указать поля и сортировку.
 	 *
-	 * @param array|string|int $filter фильтр или ID элемента
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 * @param array|string $fields выбираемые поля
 	 * @param array $sort сортировка
 	 * @return array|false ассоциативный массив, представляющий собой элемент
 	 */
 	public function Read($filter = [], $fields = ["**"], $sort = []) {
-		if (!is_array($filter)) {
-			$filter = [reset($this->primary_keys) => $filter];
-		}
 		$arParams = [
 			"FILTER" => $filter,
 			"FIELDS" => $fields,
@@ -497,38 +508,35 @@ abstract class SCRUD extends Instanceable {
 	/**
 	 * Проверяет присутствует ли элемент с указанным идентификатором в таблице
 	 *
-	 * @param int $ID идентификатор элемента
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 * @return boolean true - если присутствует, false - если не присутствует
 	 */
-	public function Present($ID) {
-		return (bool)$this->Read([reset($this->primary_keys) => $ID], $this->primary_keys);
+	public function Present($filter) {
+		return (bool)$this->Read($filter, $this->keys);
 	}
 
 	/**
 	 * Выбирает список идентификаторов\значений указанной колонки.
 	 *
-	 * @param array|mixed $filter фильтр или ID элемента
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 * @param array $sort сортировка (не обязательно)
 	 * @param string $field символьный код выбираемой колонки (не обязательно, по умолчанию - идентификатор)
 	 * @return array массив идентификаторов элементов
 	 */
 	public function Select($filter = [], $sort = [], $field = null) {
-		if (!is_array($filter)) {
-			$filter = [reset($this->primary_keys) => $filter];
-		}
-		if (empty($field)) {
-			$field = reset($this->primary_keys);
+		if (is_null($field)) {
+			$field = $this->key();
 		}
 		$elements = $this->GetList([
-			"FILTER" => $filter,
-			"FIELDS" => [$field],
-			"SORT"   => $sort,
+			'FILTER' => $filter,
+			'FIELDS' => [$field],
+			'SORT'   => $sort,
 		]);
-		$keys = [];
-		foreach ($elements as $element) {
-			$keys[] = $element[$field];
+		$rows = [];
+		foreach ($elements as $key => $element) {
+			$rows[$key] = $element[$field];
 		}
-		return $keys;
+		return $rows;
 	}
 
 	public function Pick($filter = [], $sort = [], $field = null) {
@@ -638,24 +646,17 @@ abstract class SCRUD extends Instanceable {
 	/**
 	 * Изменяет значения указанных полей.
 	 *
-	 * @param int|array $ids идентификатор/идентификаторы изменяемых записей
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 * @param array $fields ассоциативный массив изменяемых полей
-	 * @return bool true - в случае успешного обновления полей, false - в случае если поля не были указаны
 	 * @throws Exception Нет информации для обновления
 	 * @throws Exception Поле ... не может быть пустым
 	 */
-	public function Update($ids = [], $fields = []) {
+	public function Update($filter = [], $fields = []) {
 
 		$fields = $this->ControlFields($fields);
 
 		if (empty($fields)) {
-			return false;
-		}
-		if (!is_array($ids)) {
-			$ids = [$ids];
-		}
-		if (empty($ids)) {
-			return false;
+			throw new Exception("No data to update");
 		}
 
 		$this->SQL = "UPDATE {$this->code} SET ";
@@ -667,28 +668,22 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 		if (empty($rows)) {
-			return false;
+			throw new Exception("No rows to update");
 		}
 		$this->SQL .= implode(",\r\n", $rows);
-		$primary = reset($this->primary_keys);
-		$this->SQL .= "\r\n WHERE {$primary} IN ('" . implode("', '", $ids) . "')";
+
+		$where = $this->_prepareWhere($filter);
+		$this->SQL .= "\r\n WHERE " . implode(' AND ', $where);
+
 		$this->Query($this->SQL);
-		return true;
 	}
 
 	/**
 	 * Удаляет строки из таблицы
 	 *
-	 * @param int|array $filter фильтр | идентификатор(ы)
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 */
 	public function Delete($filter = []) {
-		if (!is_array($filter)) {
-			$filter = [reset($this->primary_keys) => $filter];
-		}
-		// if array does not has string keys
-		if (count(array_filter(array_keys($filter), 'is_string')) === 0) {
-			$filter = [reset($this->primary_keys) => $filter];
-		}
 		$where = $this->_prepareWhere($filter);
 		$this->SQL = "DELETE FROM `{$this->code}` WHERE " . implode(' AND ', $where);
 		$this->Query($this->SQL);
@@ -800,15 +795,25 @@ abstract class SCRUD extends Instanceable {
 	 * -  %   - LIKE
 	 * -  ~   - LIKE
 	 *
-	 * @param array $filter ассоциативный массив фильтров
-	 * - ключ - условие и имя поля
-	 * - значение - значение или лист значений
+	 * @param mixed $filter ассоциатив фильтров | список идентификаторов | идентификатор
 	 * @return array массив строк, представляющих собой SQL-условия, которые следует объеденить операторами AND или OR
 	 * @throws Exception
 	 */
 	protected function _prepareWhere($filter) {
 		if (empty($filter)) {
 			return ['1'];
+		}
+		if (!is_array($filter)) {
+			// filter is identifier
+			$filter = [$this->key() => $filter];
+		}
+		// if array does not has string keys
+		if (count(array_filter(array_keys($filter), 'is_string')) === 0) {
+			// and if array does not has array values
+			if (count(array_filter($filter, 'is_array')) === 0) {
+				// filter is list of identifiers
+				$filter = [$this->key() => $filter];
+			}
 		}
 
 		$where = [];
