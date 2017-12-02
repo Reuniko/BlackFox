@@ -5,11 +5,12 @@ namespace System;
 class Users extends SCRUD {
 
 	public function Init() {
-		parent::Init();
 		$this->name = 'Пользователи';
-		$this->composition['SYSTEM']['FIELDS'] += [
-			'LOGIN'     => [
+		$this->structure += [
+			'ID'          => self::ID,
+			'LOGIN'       => [
 				'TYPE'     => 'STRING',
+				'GROUP'    => 'SYSTEM',
 				'NAME'     => 'Логин',
 				'NOT_NULL' => true,
 				'INDEX'    => true,
@@ -17,57 +18,66 @@ class Users extends SCRUD {
 				'JOIN'     => true,
 				'SHOW'     => true,
 			],
-			'PASSWORD'  => [
+			'PASSWORD'    => [
 				'TYPE'        => 'STRING',
+				'GROUP'       => 'SYSTEM',
 				'NAME'        => 'Пароль',
 				'DESCRIPTION' => 'В базе хранится sha1 хеш пароля',
 				'NOT_NULL'    => true,
 				'DISABLED'    => true,
 			],
-			'SALT'      => [
+			'SALT'        => [
 				'TYPE'     => 'STRING',
+				'GROUP'    => 'SYSTEM',
 				'NAME'     => 'Соль',
 				'NOT_NULL' => true,
 				'DISABLED' => true,
 			],
-			'LAST_AUTH' => [
-				'TYPE' => 'DATETIME',
-				'NAME' => 'Последнее время авторизации',
+			'LAST_AUTH'   => [
+				'TYPE'  => 'DATETIME',
+				'GROUP' => 'SYSTEM',
+				'NAME'  => 'Последнее время авторизации',
 			],
-		];
-		$this->composition['CONTENT']['FIELDS'] = [
 			'FIRST_NAME'  => [
-				'TYPE' => 'STRING',
-				'NAME' => 'Имя',
+				'TYPE'  => 'STRING',
+				'GROUP' => 'CONTENT',
+				'NAME'  => 'Имя',
 			],
 			'LAST_NAME'   => [
-				'TYPE' => 'STRING',
-				'NAME' => 'Фамилия',
+				'TYPE'  => 'STRING',
+				'GROUP' => 'CONTENT',
+				'NAME'  => 'Фамилия',
 			],
 			'MIDDLE_NAME' => [
-				'TYPE' => 'STRING',
-				'NAME' => 'Отчество',
+				'TYPE'  => 'STRING',
+				'GROUP' => 'CONTENT',
+				'NAME'  => 'Отчество',
 			],
 			'EMAIL'       => [
-				'TYPE' => 'STRING',
-				'NAME' => 'E-mail',
+				'TYPE'  => 'STRING',
+				'GROUP' => 'CONTENT',
+				'NAME'  => 'E-mail',
 			],
 			'PHONE'       => [
-				'TYPE' => 'STRING',
-				'NAME' => 'Телефон',
+				'TYPE'  => 'STRING',
+				'GROUP' => 'CONTENT',
+				'NAME'  => 'Телефон',
 			],
 			'AVATAR'      => [
-				'TYPE' => 'FILE',
-				'NAME' => 'Аватар',
-				'LINK' => '\\System\\Files',
+				'TYPE'  => 'FILE',
+				'GROUP' => 'CONTENT',
+				'NAME'  => 'Аватар',
+				'LINK'  => 'System\Files',
 			],
 			'BIRTH_DAY'   => [
-				'TYPE' => 'DATE',
-				'NAME' => 'День рождения',
+				'TYPE'  => 'DATE',
+				'GROUP' => 'CONTENT',
+				'NAME'  => 'День рождения',
 			],
 			'ABOUT'       => [
-				'TYPE' => 'TEXT',
-				'NAME' => 'О себе',
+				'TYPE'  => 'TEXT',
+				'GROUP' => 'CONTENT',
+				'NAME'  => 'О себе',
 			],
 		];
 	}
