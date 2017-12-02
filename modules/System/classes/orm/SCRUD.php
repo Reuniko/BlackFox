@@ -13,30 +13,15 @@ namespace System;
  * - Update - обновление записи
  * - Delete - удаление указанных записей
  *
- * Для того чтобы создать новый источник данных:
- * - создайте класс-наследник от SCRUD
- * - переопределите метод Init, определите в нем структуру данных $this->composition[]
- * - однократно запустите $this->Synchronize()
- * - при необходимости переопределите другие методы (например проверки целостности при создании записи)
- * - при необходимости добавьте дополнительный функционал, описывающий бизнес-логику работы с этими данными
+ * Чтобы создать новый источник данных нужно:
+ * - создать класс-наследник от SCRUD
+ * - переопределить метод Init, определить в нем структуру данных $this->structure
+ * - однократно запустить $this->Synchronize(), например в установщике модуля
+ * - при необходимости переопределить другие методы (например проверки целостности при создании или редактировании записи)
+ * - при необходимости добавить дополнительный функционал, описывающий бизнес-логику работы с данными
  */
 abstract class SCRUD extends Instanceable {
 
-	/** @var array доступные типы колонок */
-	public $TYPES = array(
-		'STRING'   => 'varchar(255)',
-		'NUMBER'   => 'int',
-		'LINK'     => 'int',
-		'FILE'     => 'int',
-		'FLOAT'    => 'float',
-		'TEXT'     => 'text',
-		'BOOL'     => 'enum("N","Y")',
-		'DATETIME' => 'datetime',
-		'TIME'     => 'time',
-		'DATE'     => 'date',
-		'ENUM'     => 'enum',
-		'SET'      => 'set',
-	);
 	/** @var string последний выполненный SQL-запрос (для отладки) */
 	public $SQL;
 	/** @var \System\Database коннектор базы данных */
@@ -47,16 +32,22 @@ abstract class SCRUD extends Instanceable {
 	/** @var string символьный код таблицы, формируется автоматически, возможно переопределить */
 	public $code;
 
-	/** @var array композиция групп полей и полей базы данных */
-	public $composition = array();
-	/** @var array массив полей базы данных, формируется автоматически */
-	public $structure = array();
-	/** @var array массив выюираемых полей базы данных, формируется автоматически */
-	public $selection = array();
+	/** @var array массив полей базы данных */
+	public $structure = [];
+	/** @var array массив групп полей базы данных */
+	public $groups = [];
+	/** @var array массив таблиц, связанных 1-к-1: [алиас => объект] */
+	public $annexes = [];
+
+	/** @var array композиция групп полей и полей базы данных, формируется автоматически на основе $this->structure и $this->groups */
+	public $composition = [];
+	/** @var array массив полей доступных для выборки, формируется автоматически на $this->annexes */
+	public $selection = [];
 	/** @var array массив первичных ключей, формируется автоматически */
-	public $primary_keys = array();
-	/** @var array массив связанных таблиц */
-	public $annexes = array();
+	public $primary_keys = [];
+	/** @var string код поля единственного первичного ключа, пустое если ключей несколько, формируется автоматически */
+	public $primary_key = null;
+
 
 	/**
 	 * Лист ассоциативных массивов, указывающий какие формировать дополнительные
@@ -67,7 +58,7 @@ abstract class SCRUD extends Instanceable {
 	 *
 	 * @var array
 	 */
-	public $externals = array();
+	public $externals = [];
 
 	/**
 	 * Лист ассоциативных массивов, указывающий какие формировать действия на
@@ -86,7 +77,7 @@ abstract class SCRUD extends Instanceable {
 	 *
 	 * @var array
 	 */
-	public $actions = array();
+	public $element_actions = [];
 
 	/**
 	 * Лист ассоциативных массивов, указывающий какие формировать действия на
@@ -98,7 +89,7 @@ abstract class SCRUD extends Instanceable {
 	 *
 	 * @var array
 	 */
-	public $group_actions = array();
+	public $section_actions = [];
 
 	/**
 	 * Идентификатор
@@ -106,6 +97,7 @@ abstract class SCRUD extends Instanceable {
 	const ID = [
 		'TYPE'           => 'NUMBER',
 		'NAME'           => 'ID',
+		'GROUP'          => 'SYSTEM',
 		'INDEX'          => true,
 		'PRIMARY'        => true,
 		'NOT_NULL'       => true,
@@ -124,59 +116,60 @@ abstract class SCRUD extends Instanceable {
 
 	/**
 	 * Обеспечивает целостность данных между структурными массивами:
-	 * - composition
 	 * - structure
-	 * - selection
+	 * - groups
+	 * - composition
 	 * - primary_keys
+	 * - primary_key
 	 */
 	public function ProvideIntegrity() {
 
-		$this->structure = [];
-		$this->selection = [];
+		$this->selection = $this->structure;
+		$this->composition = [];
 		$this->primary_keys = [];
+		$this->primary_key = null;
 
-		foreach ($this->composition as $group_code => $group) {
-			foreach ($group['FIELDS'] as $field_code => $field) {
-				$this->structure[$field_code] = $field;
-				$this->structure[$field_code]['GROUP'] = $group_code;
-				if ($field['PRIMARY']) {
-					$this->primary_keys[] = $field_code;
-				}
+		foreach ($this->structure as $code => $field) {
+			if ($field['PRIMARY']) {
+				$this->primary_keys[] = $code;
+			}
+			if (empty($field['GROUP'])) {
+				$this->structure[$code]['GROUP'] = 'OUTSIDE';
+				$this->groups['OUTSIDE'] = '-';
+				continue;
+			}
+			if (empty($this->groups[$field['GROUP']])) {
+				$this->groups[$field['GROUP']] = "[{$field['GROUP']}]";
 			}
 		}
 
-		$this->selection = $this->structure;
-
+		foreach ($this->groups as $group_code => $group_name) {
+			$this->composition[$group_code] = [
+				'NAME'   => $group_name,
+				'FIELDS' => [],
+			];
+			foreach ($this->structure as $code => $field) {
+				if ($field['GROUP'] === $group_code) {
+					$this->composition[$group_code]['FIELDS'][$code] = $field;
+				}
+			}
+		}
+		if (empty($this->primary_keys)) {
+			throw new Exception("Primary key required for " . static::class);
+		}
+		if (count($this->primary_keys) === 1) {
+			$this->primary_key = reset($this->primary_keys);
+		}
 	}
 
 	/**
-	 * Инициализатор объекта.
-	 * Объявляется в классе-наследнике.
-	 * Может использовать parent::Init().
+	 * Инициализатор объекта, объявляется в классе-наследнике.
 	 * Может использовать другие объекты для формирования структуры.
-	 * Должен переопределить собственные поля:
-	 * - name - имя сущности (ex: 'Подписки')
-	 * - composition - структура полей для ДБ и визуализации
+	 * Должен определить собственные поля: name, structure
+	 * Может определить собственные поля: groups, annexes, code
 	 */
 	public function Init() {
-		$this->name = 'Элементы класса ' . static::class;
-		$this->composition = [
-			'SYSTEM' => [
-				'NAME'   => 'Системные поля',
-				'FIELDS' => [
-					'ID' => [
-						'TYPE'           => 'NUMBER',
-						'NAME'           => 'ID',
-						'INDEX'          => true,
-						'PRIMARY'        => true,
-						'NOT_NULL'       => true,
-						'AUTO_INCREMENT' => true,
-						'DISABLED'       => true,
-						'JOIN'           => true,
-					],
-				],
-			],
-		];
+
 	}
 
 	/**
@@ -196,7 +189,7 @@ abstract class SCRUD extends Instanceable {
 
 		if (empty($tables)) {
 			$this->SQL = "CREATE TABLE IF NOT EXISTS `{$this->code}` \r\n";
-			$rows = array();
+			$rows = [];
 			foreach ($this->structure as $code => $field) {
 				$rows[] = FactoryType::I()->Get($field['TYPE'])->GetStructureString($code, $field);
 			}
@@ -211,7 +204,7 @@ abstract class SCRUD extends Instanceable {
 			$columns = $this->FormatArrayKeysCase($columns);
 			//Debug($columns, '$columns');
 			$this->SQL = "ALTER TABLE `{$this->code}` \r\n";
-			$rows = array();
+			$rows = [];
 			$last_after_code = '';
 			foreach ($this->structure as $code => $field) {
 				$structure_string = FactoryType::I()->Get($field['TYPE'])->GetStructureString($code, $field);
@@ -288,10 +281,10 @@ abstract class SCRUD extends Instanceable {
 	 * @return array массив строк для вставки между FROM ... JOINS
 	 */
 	public function _prepareAnnexes() {
-		$annexes_strings = array();
+		$annexes_strings = [];
 		if (!empty($this->annexes)) {
 			if (!is_array($this->annexes)) {
-				$this->annexes = array($this->annexes);
+				$this->annexes = [$this->annexes];
 			}
 			$primary = reset($this->primary_keys);
 			foreach ($this->annexes as $annex_alias => $annex) {
@@ -329,17 +322,17 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception
 	 * @return array - массив с ключами: ELEMENTS, TOTAL, PAGER
 	 */
-	public function Search($arParams = array()) {
+	public function Search($arParams = []) {
 
-		$arParams = $this->_matchParams($arParams, array(
-			"SORT"   => array('ID' => 'ASC'),
-			"FILTER" => array(),
-			"FIELDS" => array("**"),
+		$arParams = $this->_matchParams($arParams, [
+			"SORT"   => ['ID' => 'ASC'],
+			"FILTER" => [],
+			"FIELDS" => ["**"],
 			"LIMIT"  => 100,
 			"PAGE"   => 1,
 			"KEY"    => reset($this->primary_keys),
 			"ESCAPE" => true,
-		));
+		]);
 
 		$arParams["PAGE"] = max(1, intval($arParams["PAGE"]));
 
@@ -347,14 +340,14 @@ abstract class SCRUD extends Instanceable {
 
 		// $arParams["FIELDS"] в любом случае должен быть массивом
 		if (!is_array($arParams["FIELDS"])) {
-			$arParams["FIELDS"] = array($arParams["FIELDS"]);
+			$arParams["FIELDS"] = [$arParams["FIELDS"]];
 		}
 
 		// заменяет "*" на развернутую структуру полей без глубины
 		// заменяет "**" на развернутую структуру полей однократной глубины
 		// заменяет "***" на развернутую структуру полей бесконечной глубины
 		foreach ($arParams["FIELDS"] as $key => $field) {
-			if (in_array($field, array('*', '**', '***'))) {
+			if (in_array($field, ['*', '**', '***'])) {
 				unset($arParams["FIELDS"][$key]);
 				$field_list = [];
 				if ($field == "*") {
@@ -441,7 +434,7 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception
 	 * @return array список выбранных элементов
 	 */
-	public function GetList($arParams = array()) {
+	public function GetList($arParams = []) {
 		$this->_controlParams($arParams, [
 			'SORT',
 			'FILTER',
@@ -466,7 +459,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param array $keys лист допустимых параметров
 	 * @throws Exception Переданы некорректные параметры ...
 	 */
-	private function _controlParams($params = array(), $keys = array()) {
+	private function _controlParams($params = [], $keys = []) {
 		$errors = [];
 		foreach ($params as $key => $value) {
 			if (!in_array($key, $keys)) {
@@ -486,16 +479,16 @@ abstract class SCRUD extends Instanceable {
 	 * @param array $sort сортировка
 	 * @return array|false ассоциативный массив, представляющий собой элемент
 	 */
-	public function Read($filter = array(), $fields = array("**"), $sort = array()) {
+	public function Read($filter = [], $fields = ["**"], $sort = []) {
 		if (!is_array($filter)) {
-			$filter = array(reset($this->primary_keys) => $filter);
+			$filter = [reset($this->primary_keys) => $filter];
 		}
-		$arParams = array(
+		$arParams = [
 			"FILTER" => $filter,
 			"FIELDS" => $fields,
 			"SORT"   => $sort,
 			"LIMIT"  => 1,
-		);
+		];
 		$data = $this->Search($arParams);
 		$element = reset($data["ELEMENTS"]);
 		return $element;
@@ -508,7 +501,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return boolean true - если присутствует, false - если не присутствует
 	 */
 	public function Present($ID) {
-		return (bool)$this->Read(array(reset($this->primary_keys) => $ID), $this->primary_keys);
+		return (bool)$this->Read([reset($this->primary_keys) => $ID], $this->primary_keys);
 	}
 
 	/**
@@ -519,26 +512,26 @@ abstract class SCRUD extends Instanceable {
 	 * @param string $field символьный код выбираемой колонки (не обязательно, по умолчанию - идентификатор)
 	 * @return array массив идентификаторов элементов
 	 */
-	public function Select($filter = array(), $sort = array(), $field = null) {
+	public function Select($filter = [], $sort = [], $field = null) {
 		if (!is_array($filter)) {
-			$filter = array(reset($this->primary_keys) => $filter);
+			$filter = [reset($this->primary_keys) => $filter];
 		}
 		if (empty($field)) {
 			$field = reset($this->primary_keys);
 		}
-		$elements = $this->GetList(array(
+		$elements = $this->GetList([
 			"FILTER" => $filter,
-			"FIELDS" => array($field),
+			"FIELDS" => [$field],
 			"SORT"   => $sort,
-		));
-		$keys = array();
+		]);
+		$keys = [];
 		foreach ($elements as $element) {
 			$keys[] = $element[$field];
 		}
 		return $keys;
 	}
 
-	public function Pick($filter = array(), $sort = array(), $field = null) {
+	public function Pick($filter = [], $sort = [], $field = null) {
 		$data = $this->Select($filter, $sort, $field);
 		return reset($data);
 	}
@@ -601,12 +594,12 @@ abstract class SCRUD extends Instanceable {
 	 * @param array $fields поля
 	 * @return array поля
 	 */
-	public function ControlFields($fields = array()) {
+	public function ControlFields($fields = []) {
 		return $fields;
 	}
 
 	/**
-	 * Создает новую строку в таблице
+	 * Создает новую строку в таблице и возвращает ее идентификатор
 	 *
 	 * @param array $fields ассоциативный массив полей для новой строки
 	 * @return int идентификатор созданной записи
@@ -631,7 +624,7 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 
-		$rows = array();
+		$rows = [];
 		foreach ($this->structure as $code => $field) {
 			if (array_key_exists($code, $fields)) {
 				$rows[] = $this->_prepareSet($code, $fields[$code]);
@@ -644,8 +637,6 @@ abstract class SCRUD extends Instanceable {
 
 	/**
 	 * Изменяет значения указанных полей.
-	 * Автоматически подставляет актуальные значения в поля UPDATE_DATE и UPDATE_BY, если они не указаны.
-	 * Установите этим полям null для того чтобы SCRUD не изменял значения этих полей.
 	 *
 	 * @param int|array $ids идентификатор/идентификаторы изменяемых записей
 	 * @param array $fields ассоциативный массив изменяемых полей
@@ -653,7 +644,7 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception Нет информации для обновления
 	 * @throws Exception Поле ... не может быть пустым
 	 */
-	public function Update($ids = array(), $fields = array()) {
+	public function Update($ids = [], $fields = []) {
 
 		$fields = $this->ControlFields($fields);
 
@@ -661,7 +652,7 @@ abstract class SCRUD extends Instanceable {
 			return false;
 		}
 		if (!is_array($ids)) {
-			$ids = array($ids);
+			$ids = [$ids];
 		}
 		if (empty($ids)) {
 			return false;
@@ -669,7 +660,7 @@ abstract class SCRUD extends Instanceable {
 
 		$this->SQL = "UPDATE {$this->code} SET ";
 
-		$rows = array();
+		$rows = [];
 		foreach ($this->structure as $code => $field) {
 			if (array_key_exists($code, $fields)) {
 				$rows[] = $this->_prepareSet($code, $fields[$code]);
@@ -729,8 +720,8 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception
 	 */
 	protected function _prepareSelectAndJoin($fields, $prefix = "") {
-		$select = array();
-		$join = array();
+		$select = [];
+		$join = [];
 		foreach ($fields as $code => $content) {
 			if (!is_array($content)) {
 				$code = strtoupper($content);
@@ -779,7 +770,7 @@ abstract class SCRUD extends Instanceable {
 				$select[] = "{$table}.`{$code}` as `{$prefix}{$code}`";
 			}
 		}
-		return array($select, $join);
+		return [$select, $join];
 	}
 
 	/**
@@ -817,10 +808,10 @@ abstract class SCRUD extends Instanceable {
 	 */
 	protected function _prepareWhere($filter) {
 		if (empty($filter)) {
-			return array('1');
+			return ['1'];
 		}
 
-		$where = array();
+		$where = [];
 
 		foreach ($filter as $filter_key => $values) {
 			if ($values === '') {
@@ -854,7 +845,7 @@ abstract class SCRUD extends Instanceable {
 			// проверка значений
 			$null = false; // значения содержат NULL ?
 			if (!is_array($values)) {
-				$values = array($values);
+				$values = [$values];
 			}
 
 			if (count($values) === 0) {
@@ -870,7 +861,7 @@ abstract class SCRUD extends Instanceable {
 				}
 			}
 
-			$conditions = array();
+			$conditions = [];
 			if ($null) {
 				switch ($operator) {
 					case '!':
@@ -969,11 +960,11 @@ abstract class SCRUD extends Instanceable {
 				$table = $this->selection[$code]['TABLE'];
 			}
 		}
-		return array(
+		return [
 			"OBJECT" => $object,
 			"TABLE"  => $table,
 			"CODE"   => $code,
-		);
+		];
 	}
 
 	/**
@@ -983,7 +974,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return array Массив с ключами ORDER BY
 	 */
 	protected function _prepareOrder($array) {
-		$order = array();
+		$order = [];
 		foreach ($array as $field_path => $sort) {
 			$result = $this->_treatFieldPath($field_path);
 			$table = $result['TABLE'];
@@ -1049,7 +1040,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return array поля таблицы для подстановки в параметр FIELDS
 	 */
 	public function GetFieldList($medium = false, $full = false, $join = false) {
-		$list = array();
+		$list = [];
 		foreach ($this->selection as $code => $field) {
 
 			if ($medium) {
@@ -1082,7 +1073,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return array древовидный ассоциативный массив
 	 */
 	public function FormatListStructure($list, $separator = "__") {
-		$element = array();
+		$element = [];
 		foreach ($list as $code => $value) {
 			$codes = explode($separator, $code);
 			$link = &$element;
@@ -1181,8 +1172,8 @@ abstract class SCRUD extends Instanceable {
 	 * @param array $codes линейный массив символьных кодов полей
 	 * @return array структура
 	 */
-	public function ExtractStructure($codes = array()) {
-		$structure = array();
+	public function ExtractStructure($codes = []) {
+		$structure = [];
 		foreach ($codes as $code) {
 			if (isset($this->structure[$code])) {
 				$structure[$code] = $this->structure[$code];

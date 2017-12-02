@@ -1,12 +1,13 @@
 <?php
+
 namespace System;
 
 class Files extends SCRUD {
 
 	public function Init() {
-		parent::Init();
 		$this->name = 'Файлы';
-		$this->composition['SYSTEM']['FIELDS'] += [
+		$this->structure += [
+			'ID'          => self::ID,
 			'CREATE_DATE' => [
 				'TYPE' => 'DATETIME',
 				'NAME' => 'Дата создания',
@@ -14,7 +15,7 @@ class Files extends SCRUD {
 			'CREATE_BY'   => [
 				'TYPE' => 'LINK',
 				'NAME' => 'Кем создан',
-				'LINK' => '\\System\\Users',
+				'LINK' => 'System\Users',
 			],
 			'NAME'        => [
 				'TYPE' => 'STRING',

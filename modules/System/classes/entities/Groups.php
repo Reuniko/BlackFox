@@ -1,12 +1,13 @@
 <?php
+
 namespace System;
 
 class Groups extends SCRUD {
 
 	public function Init() {
-		parent::Init();
 		$this->name = 'Группы пользователей';
-		$this->composition['SYSTEM']['FIELDS'] += [
+		$this->structure += [
+			'ID'          => self::ID,
 			'CODE'        => [
 				'TYPE'     => 'STRING',
 				'NAME'     => 'Символьный код',
