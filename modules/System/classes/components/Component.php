@@ -127,6 +127,11 @@ abstract class Component {
 					case 'ARRAY':
 						$value = is_array($value) ? $value : [$value];
 						break;
+					case 'OBJECT':
+						if (!is_object($value)) {
+							throw new Exception("Component param '{$code}' expect object");
+						}
+						break;
 				}
 				$this->PARAMS[$code] = $value;
 				unset($PARAMS[$code]);
@@ -308,6 +313,7 @@ abstract class Component {
 		$view_file = $this->Path("{$this->view}.php");
 
 		ob_start();
+		debug($RESULT, $this->class . ' $RESULT');
 		require($view_file);
 		$content = ob_get_clean();
 
