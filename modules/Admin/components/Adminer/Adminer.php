@@ -16,7 +16,6 @@ class Adminer extends \System\Component {
 		parent::__construct();
 		$this->allow_ajax_request = true;
 		$this->allow_json_request = true;
-		$this->ControlUrl();
 	}
 
 	public function Init($PARAMS = []) {
@@ -31,6 +30,7 @@ class Adminer extends \System\Component {
 		} elseif (class_exists($PARAMS['SCRUD'])) {
 			$this->SCRUD = $PARAMS['SCRUD']::I();
 		}
+		$this->ControlUrl();
 
 		$this->ENGINE->TITLE = $this->SCRUD->name;
 	}
@@ -159,7 +159,7 @@ class Adminer extends \System\Component {
 		if ($_SERVER['REQUEST_METHOD'] === 'GET' && is_array($_GET['FILTER'])) {
 			$filter = array();
 			foreach ($_GET['FILTER'] as $key => $value) {
-				if (!empty($value)) {
+				if ($this->SCRUD->_hasInformation($value)) {
 					$filter[$key] = $value;
 				}
 			}

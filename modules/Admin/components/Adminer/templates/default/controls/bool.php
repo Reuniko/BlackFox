@@ -1,7 +1,7 @@
 <input
 	type="hidden"
 	name="FIELDS[<?= $code ?>]"
-	value="N"
+	value="0"
 />
 <input
 	type="checkbox"
@@ -9,7 +9,7 @@
 	id="<?= $code ?>"
 	name="FIELDS[<?= $code ?>]"
 	placeholder=""
-	value="Y"
-	<?= ($RESULT['DATA'][$code] === 'Y') ? 'checked' : '' ?>
+	value="1"
+	<?= ($RESULT['DATA'][$code]) ? 'checked' : '' ?>
 	<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 />
