@@ -1,2 +1,2 @@
-<? /** @var string $value */ ?>
-<?= ($value === 'Y') ? 'Да' : 'Нет' ?>
+<? /** @var bool $value */ ?>
+<?= ($value) ? 'Да' : 'Нет' ?>

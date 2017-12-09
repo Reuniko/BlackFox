@@ -560,7 +560,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param mixed $value значение
 	 * @return boolean флаг наличия информации
 	 */
-	private function _hasInformation($value) {
+	public function _hasInformation($value) {
 		if ($value === 0 || $value === '0' || $value === false) {
 			return true;
 		}
