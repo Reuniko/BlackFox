@@ -1194,4 +1194,8 @@ abstract class SCRUD extends Instanceable {
 		return "/admin/{$name}.php";
 	}
 
+	public function GetElementTitle($element = []) {
+		return $element['TITLE'] ?: 'ID-' . $element['ID'];
+	}
+
 }
