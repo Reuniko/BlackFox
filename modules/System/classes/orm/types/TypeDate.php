@@ -12,9 +12,9 @@ class TypeDate extends Type {
 
 	public function FormatInputValue($value, $info = []) {
 		if (is_numeric($value)) {
-			$value = date(\DateTime::ISO8601, $value);
+			$value = date('Y-m-d', $value);
 		} else {
-			$value = date(\DateTime::ISO8601, strtotime($value));
+			$value = date('Y-m-d', strtotime($value));
 		}
 		return $value;
 	}
