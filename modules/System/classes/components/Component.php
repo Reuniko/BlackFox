@@ -41,12 +41,12 @@ abstract class Component {
 	public $template_relative_folder;
 
 	public function __construct($template = 'default') {
-		// Do not remove local variable $ENGINE, it needs for phpStorm to detect $this->ENGINE as instance of class Engine
+		// Do not remove local variable $ENGINE, it needs for phpStorm to detect $this->ENGINE as instance of class
 		/** @var Engine $ENGINE */
 		$ENGINE = Engine::Instance();
 		$this->ENGINE = $ENGINE;
 
-		// Do not remove local variable $USER, it needs for phpStorm to detect $this->USER as instance of class Engine
+		// Do not remove local variable $USER, it needs for phpStorm to detect $this->USER as instance of class
 		/** @var User $USER */
 		$USER = User::I();
 		$this->USER = $USER;
