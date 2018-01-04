@@ -21,7 +21,7 @@ abstract class Component {
 	/** @var string get_called_class */
 	public $class = '...';
 	/** @var string шаблон - имя папки шаблона в подпапке /templates/ */
-	public $template = 'default';
+	public $template;
 	/** @var string отображение - имя php файла подключаемого в папке шаблона */
 	public $view = 'template';
 
@@ -35,9 +35,13 @@ abstract class Component {
 	public $allow_ajax_request = false;
 	public $allow_json_request = false;
 
+	/** @var string абсолютный путь к папке компонента */
 	public $component_absolute_folder;
+	/** @var string относительный путь к папке компонента */
 	public $component_relative_folder;
+	/** @var string абсолютный путь к папке шаблона */
 	public $template_absolute_folder;
+	/** @var string относительный путь к папке шаблона */
 	public $template_relative_folder;
 
 	public function __construct($template = 'default') {
@@ -69,10 +73,20 @@ abstract class Component {
 			$this->parents[$parent] = $this->ENGINE->GetCoreDir("modules/{$module}/components/{$component}");
 		}
 
-		// init template variables
-		$this->template = $template ?: $this->template;
+		$this->template = $this->SelectTemplateFolder($template);
 		$this->template_absolute_folder = $this->component_absolute_folder . '/templates/' . $this->template;
 		$this->template_relative_folder = $this->ENGINE->GetRelativePath($this->template_absolute_folder);
+	}
+
+	/**
+	 * Метод должен вычислить и вернуть путь <template> к папке шаблона относительно папки templates:
+	 * /<core|site>/modules/<module>/components/<component>/templates/<template>
+	 *
+	 * @param string $template
+	 * @return string
+	 */
+	public function SelectTemplateFolder($template) {
+		return $template ?: 'default';
 	}
 
 	public static function Run($PARAMS = [], $template = 'default') {
