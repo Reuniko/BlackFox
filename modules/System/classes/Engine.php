@@ -150,6 +150,9 @@ class Engine extends Instanceable {
 				continue;
 			}
 			$path_absolute = $_SERVER['DOCUMENT_ROOT'] . $header['PATH'];
+			if (!file_exists($path_absolute)) {
+				throw new Exception("Header not found: {$header['PATH']}");
+			}
 			$version = filemtime($path_absolute);
 			if ($header['TYPE'] === 'STYLE') {
 				$headers[] = "<link rel='stylesheet' href='{$header['PATH']}?{$version}'/>";
