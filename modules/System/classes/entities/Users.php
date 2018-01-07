@@ -24,14 +24,12 @@ class Users extends SCRUD {
 				'NAME'        => 'Пароль',
 				'DESCRIPTION' => 'В базе хранится sha1 хеш пароля',
 				'NOT_NULL'    => true,
-				'DISABLED'    => true,
 			],
 			'SALT'        => [
 				'TYPE'     => 'STRING',
 				'GROUP'    => 'SYSTEM',
 				'NAME'     => 'Соль',
 				'NOT_NULL' => true,
-				'DISABLED' => true,
 			],
 			'LAST_AUTH'   => [
 				'TYPE'  => 'DATETIME',
@@ -148,8 +146,8 @@ class Users extends SCRUD {
 			foreach ($ids as $ID) {
 				$this->SetPassword($ID, $fields['PASSWORD']);
 			}
-			unset($fields['PASSWORD']);
 		}
+		unset($fields['PASSWORD']);
 		return parent::Update($ids, $fields);
 	}
 

@@ -1,6 +1,4 @@
 <?php /** @var \Admin\Adminer $this */ ?>
-<?php $this->Debug($RESULT, '$RESULT'); ?>
-
 <div class="adminer">
 
 	<? require($this->Path('section_settings.php')); ?>
