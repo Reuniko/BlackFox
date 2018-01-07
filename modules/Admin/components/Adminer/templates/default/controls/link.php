@@ -41,7 +41,7 @@ if (is_array($RESULT['DATA'][$code])) {
 		[<a href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>" data-link-a="FIELDS[<?= $code ?>]"><?= $ID ?: '...' ?></a>]
 		<span data-link-span="FIELDS[<?= $code ?>]">
 			<? foreach ($Link->structure as $s_code => $s_field): ?>
-				<? if ($s_field['SHOW']): ?>
+				<? if ($s_field['SHOW'] and isset($RESULT['DATA'][$code][$s_code])): ?>
 					<?= $RESULT['DATA'][$code][$s_code] ?>
 				<? endif; ?>
 			<? endforeach; ?>

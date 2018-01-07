@@ -450,11 +450,15 @@ abstract class Component {
 	}
 
 	public function ManageHeaders() {
-		if (file_exists($this->template_absolute_folder . '/style.css')) {
-			$this->ENGINE->AddHeaderStyle($this->template_relative_folder . '/style.css');
+		try {
+			$style = $this->ENGINE->GetRelativePath($this->Path('style.css'));
+			$this->ENGINE->AddHeaderStyle($style);
+		} catch (\Exception $error) {
 		}
-		if (file_exists($this->template_absolute_folder . '/script.js')) {
-			$this->ENGINE->AddHeaderScript($this->template_relative_folder . '/script.js');
+		try {
+			$style = $this->ENGINE->GetRelativePath($this->Path('script.js'));
+			$this->ENGINE->AddHeaderScript($style);
+		} catch (\Exception $error) {
 		}
 	}
 

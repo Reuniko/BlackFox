@@ -1,4 +1,5 @@
 <?php
+
 namespace Admin;
 
 class Adminer extends \System\Component {
@@ -53,7 +54,7 @@ class Adminer extends \System\Component {
 		return null;
 	}
 
-	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $popup = null) {
+	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['**'], $popup = null) {
 		$this->view = 'section';
 		$this->RESULT['MODE'] = 'SECTION';
 		if (!empty($popup)) {
@@ -65,9 +66,9 @@ class Adminer extends \System\Component {
 		$this->RESULT['FIELDS'] = $this->SCRUD->structure;
 		$this->RESULT['DATA'] = $this->SCRUD->Search([
 			'FILTER' => $FILTER,
+			'FIELDS' => $FIELDS,
 			'PAGE'   => $PAGE,
 			'SORT'   => $SORT,
-			'FIELDS' => ['**'],
 		]);
 		$this->RESULT['PAGES'] = $this->GetPages(
 			$this->RESULT['DATA']['PAGER']['TOTAL'],

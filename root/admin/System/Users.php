@@ -1,2 +1,2 @@
 <?php
-Admin\Adminer::Run(['SCRUD' => '\System\Users']);
+Admin\AdminerUsers::Run(['SCRUD' => '\System\Users']);
