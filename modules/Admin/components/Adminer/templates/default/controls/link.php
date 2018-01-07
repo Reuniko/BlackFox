@@ -15,6 +15,7 @@ if (is_array($RESULT['DATA'][$code])) {
 		<button
 			type="button"
 			class="form-control"
+			<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 			onclick="window.open(
 				'<?= $url ?>?popup=FIELDS[<?= $code ?>]',
 				'',
