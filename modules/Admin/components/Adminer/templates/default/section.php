@@ -30,7 +30,9 @@
 
 	<table id="data" class="table table-bordered table-hover">
 		<tr>
-			<th class="sort" width="1%"><span></span></th>
+			<? if ($RESULT['MODE'] <> 'POPUP'): ?>
+				<th class="sort" width="1%"><span></span></th>
+			<? endif; ?>
 			<?
 			$get = $_GET;
 			unset($get['SORT']);
@@ -64,10 +66,24 @@
 			</tr>
 		<? endif; ?>
 		<? foreach ($RESULT['DATA']['ELEMENTS'] as $row): ?>
-			<tr ondblclick="window.location.href='?ID=<?= $row['ID'] ?>'">
-				<td>
-					<input type="checkbox" name="ELEMENT[]" value="<?= $row['ID'] ?>">
-				</td>
+			<?
+			$href = "?ID={$row['ID']}";
+			$ondblclick = "window.location.href='{$href}'";
+
+			if ($RESULT['MODE'] === 'POPUP') {
+				$script = "$(window.opener.document)
+						.find('[data-link-input=\'{$RESULT['POPUP']}\']').val('{$row['ID']}').end()
+						.find('[data-link-a=\'{$RESULT['POPUP']}\']').attr('href', '{$this->SCRUD->GetAdminUrl()}?ID={$row['ID']}').text('{$row['ID']}').end()
+						.find('[data-link-span=\'{$RESULT['POPUP']}\']').text('{$this->GetDisplayName($row)}').end()
+						;window.close();";
+				$href = "javascript:{$script}";
+				$ondblclick = $script;
+			}
+			?>
+			<tr ondblclick="<?= $ondblclick ?>">
+				<? if ($RESULT['MODE'] <> 'POPUP'): ?>
+					<td><input type="checkbox" name="ELEMENT[]" value="<?= $row['ID'] ?>"/></td>
+				<? endif; ?>
 				<? foreach ($RESULT['FIELDS'] as $code => $field): ?>
 					<td>
 						<div class="table-content table-content-<?= $this->SCRUD->structure[$code]['TYPE'] ?>">
@@ -83,28 +99,7 @@
 							$content = ob_get_clean();
 							?>
 							<? if ($this->SCRUD->structure[$code]['PRIMARY']): ?>
-								<? if ($RESULT['MODE'] === 'SECTION'): ?>
-									<a href="?ID=<?= $row[$code] ?>"><?= $content ?></a>
-								<? endif; ?>
-								<? if ($RESULT['MODE'] === 'POPUP'): ?>
-									<?
-									$display = [];
-									foreach ($this->SCRUD->structure as $structure_code => $structure_field) {
-										if ($structure_field['SHOW']) {
-											$display[] = $row[$structure_code];
-										}
-									}
-									$display = implode(' ', $display);
-									?>
-									<a href="javascript:
-	$(window.opener.document)
-	.find('[data-link-input=\'<?= $RESULT['POPUP'] ?>\']').val('<?= $row[$code] ?>').end()
-	.find('[data-link-a=\'<?= $RESULT['POPUP'] ?>\']').attr('href', '<?= $this->SCRUD->GetAdminUrl() ?>?ID=<?= $row[$code] ?>').text('<?= $row[$code] ?>').end()
-	.find('[data-link-span=\'<?= $RESULT['POPUP'] ?>\']').text('<?= $display ?>').end()
-	;
-	window.close();
-											"><?= $content ?></a>
-								<? endif; ?>
+								<a href="<?= $href ?>"><?= $content ?></a>
 							<? else: ?>
 								<?= $content ?>
 							<? endif; ?>

@@ -185,4 +185,15 @@ class Adminer extends \System\Component {
 		return $url;
 	}
 
+	public function GetDisplayName($row = []) {
+		$display = [];
+		foreach ($this->SCRUD->structure as $structure_code => $structure_field) {
+			if ($structure_field['SHOW']) {
+				$display[] = $row[$structure_code];
+			}
+		}
+		$display = implode(' ', $display);
+		return $display;
+	}
+
 }
