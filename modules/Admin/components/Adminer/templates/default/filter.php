@@ -11,10 +11,10 @@
 
 
 	<div class="panel panel-default">
-		<div class="panel-heading">
+		<div class="panel-heading" data-toggle="collapse" href="#filter" aria-expanded="false" aria-controls="collapseExample">
 			Фильтр
 		</div>
-		<div class="panel-body">
+		<div class="panel-body collapse" id="filter">
 			<? foreach ($this->SCRUD->structure as $code => $field): ?>
 				<div class="form-group">
 					<label
