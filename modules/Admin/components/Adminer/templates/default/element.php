@@ -1,4 +1,4 @@
-<?php /** @var \System\Component $this */ ?>
+<?php /** @var \Admin\Adminer $this */ ?>
 <?php $this->Debug($RESULT, '$RESULT'); ?>
 <?php $this->Debug($this->SCRUD->composition, 'composition'); ?>
 
@@ -13,6 +13,8 @@
 <form method="post" enctype="multipart/form-data" class="form-horizontal adminer">
 
 	<input type="hidden" name="ACTION" value="<?= $RESULT['MODE'] ?>"/>
+
+	<? @include($this->PathInclude('element_head.php')); ?>
 
 	<? foreach ($this->SCRUD->composition as $group_code => $group): ?>
 		<h3 class="group_header"><?= $group['NAME'] ?: "{{$group_code}}" ?></h3>
@@ -40,6 +42,8 @@
 			</div>
 		<? endforeach; ?>
 	<? endforeach; ?>
+
+	<? @include($this->PathInclude('element_foot.php')); ?>
 
 	<br/>
 
