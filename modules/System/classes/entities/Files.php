@@ -6,37 +6,44 @@ class Files extends SCRUD {
 
 	public function Init() {
 		$this->name = 'Файлы';
+		$this->groups = ['SYSTEM' => 'Файл'];
 		$this->structure += [
 			'ID'          => self::ID,
 			'CREATE_DATE' => [
-				'TYPE' => 'DATETIME',
-				'NAME' => 'Дата создания',
+				'TYPE'  => 'DATETIME',
+				'NAME'  => 'Дата создания',
+				'GROUP' => 'SYSTEM',
 			],
 			'CREATE_BY'   => [
-				'TYPE' => 'LINK',
-				'NAME' => 'Кем создан',
-				'LINK' => 'System\Users',
+				'TYPE'  => 'LINK',
+				'NAME'  => 'Кем создан',
+				'LINK'  => 'System\Users',
+				'GROUP' => 'SYSTEM',
 			],
 			'NAME'        => [
-				'TYPE' => 'STRING',
-				'NAME' => 'Имя файла',
-				'JOIN' => true,
-				'SHOW' => true,
+				'TYPE'  => 'STRING',
+				'NAME'  => 'Имя файла',
+				'JOIN'  => true,
+				'SHOW'  => true,
+				'GROUP' => 'SYSTEM',
 			],
 			'SIZE'        => [
-				'TYPE' => 'NUMBER',
-				'NAME' => 'Размер файла',
-				'JOIN' => true,
+				'TYPE'  => 'NUMBER',
+				'NAME'  => 'Размер файла',
+				'JOIN'  => true,
+				'GROUP' => 'SYSTEM',
 			],
 			'TYPE'        => [
-				'TYPE' => 'STRING',
-				'NAME' => 'Тип контента',
-				'JOIN' => true,
+				'TYPE'  => 'STRING',
+				'NAME'  => 'Тип контента',
+				'JOIN'  => true,
+				'GROUP' => 'SYSTEM',
 			],
 			'SRC'         => [
-				'TYPE' => 'STRING',
-				'NAME' => 'Путь к файлу',
-				'JOIN' => true,
+				'TYPE'  => 'STRING',
+				'NAME'  => 'Путь к файлу',
+				'JOIN'  => true,
+				'GROUP' => 'SYSTEM',
 			],
 		];
 	}

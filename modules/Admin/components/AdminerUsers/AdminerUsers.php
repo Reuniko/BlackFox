@@ -4,6 +4,11 @@ namespace Admin;
 
 class AdminerUsers extends Adminer {
 
+	public function Execute($PARAMS = []) {
+		$PARAMS['SCRUD'] = 'System\Users';
+		parent::Execute($PARAMS);
+	}
+
 	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['**'], $popup = null) {
 		unset($this->SCRUD->structure['SALT']);
 		unset($this->SCRUD->structure['PASSWORD']);

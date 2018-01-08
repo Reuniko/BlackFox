@@ -360,6 +360,14 @@ abstract class Component {
 		throw new Exception("View not found: '{$path}'");
 	}
 
+	public function PathInclude($path) {
+		try {
+			return $this->Path($path);
+		} catch (Exception $error) {
+			return null;
+		}
+	}
+
 	public function TemplateParentPath() {
 		$template_file = debug_backtrace()[0]['file'];
 		$template_file = str_replace('\\', '/', $template_file);
