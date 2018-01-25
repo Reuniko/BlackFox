@@ -24,7 +24,11 @@ class TypeSet extends Type {
 	}
 
 	public function FormatOutputValue($element, $code, $info) {
-		$element[$code] = explode(",", $element[$code]);
+		if (empty($element[$code])) {
+			$element[$code] = [];
+		} else {
+			$element[$code] = explode(",", $element[$code]);
+		}
 		$element["$code|VALUES"] = [];
 		foreach ($element["$code"] as $key) {
 			$element["$code|VALUES"][$key] = $info['VALUES'][$key];
