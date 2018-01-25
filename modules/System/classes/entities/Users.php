@@ -31,6 +31,13 @@ class Users extends SCRUD {
 				'NAME'     => 'Соль',
 				'NOT_NULL' => true,
 			],
+			'HASH'        => [
+				'TYPE'        => 'STRING',
+				'GROUP'       => 'SYSTEM',
+				'NAME'        => 'Хэш',
+				'NOT_NULL'    => true,
+				'DESCRIPTION' => 'Для восстановления пароля',
+			],
 			'LAST_AUTH'   => [
 				'TYPE'  => 'DATETIME',
 				'GROUP' => 'SYSTEM',
@@ -141,8 +148,8 @@ class Users extends SCRUD {
 
 
 	public function Update($ids = [], $fields = []) {
+		$ids = is_array($ids) ? $ids : [$ids];
 		if (!empty($fields['PASSWORD'])) {
-			$ids = is_array($ids) ? $ids : [$ids];
 			foreach ($ids as $ID) {
 				$this->SetPassword($ID, $fields['PASSWORD']);
 			}
@@ -168,6 +175,13 @@ class Users extends SCRUD {
 			'USER'  => $ID,
 			'GROUP' => $group_id,
 		]);
+	}
+
+	public function GetRecoveryString($ID) {
+		$string = sha1(random_bytes(32));
+		$hash = sha1($string);
+		$this->Update($ID, ['HASH' => $hash]);
+		return $string;
 	}
 
 }
