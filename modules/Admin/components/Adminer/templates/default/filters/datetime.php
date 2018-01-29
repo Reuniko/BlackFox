@@ -7,6 +7,7 @@
 			name="FILTER[><?= $code ?>]"
 			placeholder="от"
 			value="<?= $RESULT['FILTER']['>' . $code] ?>"
+			data-datetimepicker=""
 		>
 	</div>
 	<div class="col-xs-6">
@@ -17,6 +18,7 @@
 			name="FILTER[<<?= $code ?>]"
 			placeholder="до"
 			value="<?= $RESULT['FILTER']['<' . $code] ?>"
+			data-datetimepicker=""
 		>
 	</div>
 </div>
