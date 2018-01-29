@@ -6,4 +6,5 @@
 	placeholder=""
 	value="<?= $RESULT['DATA'][$code] ?>"
 	<?= ($field['DISABLED']) ? 'disabled' : '' ?>
+	data-datepicker=""
 >
