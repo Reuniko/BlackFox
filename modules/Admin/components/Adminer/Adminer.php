@@ -209,7 +209,7 @@ class Adminer extends \System\Component {
 		]);
 		if (empty($settings)) {
 			$settings = [
-				'FILTERS' => array_keys($this->SCRUD->structure),
+				'FILTERS' => [$this->SCRUD->key()],
 				'FIELDS'  => array_keys($this->SCRUD->structure),
 			];
 		}
