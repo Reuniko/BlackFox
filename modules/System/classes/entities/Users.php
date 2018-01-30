@@ -35,7 +35,6 @@ class Users extends SCRUD {
 				'TYPE'        => 'STRING',
 				'GROUP'       => 'SYSTEM',
 				'NAME'        => 'Хэш',
-				'NOT_NULL'    => true,
 				'DESCRIPTION' => 'Для восстановления пароля',
 			],
 			'LAST_AUTH'   => [
