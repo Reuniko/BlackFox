@@ -6,7 +6,7 @@
 	<? if ($RESULT['MODE'] === 'Create'): ?>
 		Добавление элемента
 	<? else: ?>
-		Редактирование элемента #<?= $RESULT['DATA']['ID'] ?>
+		Редактирование элемента №<?= $RESULT['DATA']['ID'] ?>
 	<? endif; ?>
 </h2>
 
@@ -75,11 +75,11 @@
 			href="?"
 		>
 			<i class="glyphicon glyphicon-ban-circle"></i>
-			Отменить
+			Вернуться
 		</a>
 
 		<button
-			class="btn btn-danger"
+			class="btn btn-danger pull-right"
 			type="submit"
 			name="ACTION"
 			value="Delete"
