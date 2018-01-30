@@ -28,4 +28,8 @@ return [
 		'NAME' => 'Файлы',
 		'LINK' => '/admin/System/Files.php',
 	],
+	'Admin_TableSettings'       => [
+		'NAME' => 'Настройки',
+		'LINK' => '/admin/Admin/TableSettings.php',
+	],
 ];

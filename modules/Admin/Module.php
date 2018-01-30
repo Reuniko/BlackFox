@@ -7,7 +7,7 @@ class Module extends \System\AModule {
 	public $version = '1.0';
 
 	public function Upgrade() {
-		// ...
+		TableSettings::I()->Synchronize();
 	}
 
 	public function Load() {

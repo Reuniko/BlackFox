@@ -22,8 +22,8 @@ class Adminer extends \System\Component {
 	public function Init($PARAMS = []) {
 		parent::Init($PARAMS);
 
-		if (!is_subclass_of($PARAMS['SCRUD'], '\\System\\SCRUD')) {
-			throw new Exception("Parameter SCRUD ({$PARAMS['SCRUD']}) must be the child of \\System\\SCRUD");
+		if (!is_subclass_of($PARAMS['SCRUD'], 'System\SCRUD')) {
+			throw new Exception("Parameter SCRUD ({$PARAMS['SCRUD']}) must be the child of System\\SCRUD");
 		}
 
 		if (is_object($PARAMS['SCRUD'])) {
@@ -48,6 +48,7 @@ class Adminer extends \System\Component {
 			'Create',
 			'Update',
 			'Delete',
+			'SaveTableSettings',
 		])) {
 			return $request['ACTION'];
 		}
@@ -197,6 +198,16 @@ class Adminer extends \System\Component {
 		}
 		$display = implode(' ', $display);
 		return $display;
+	}
+
+	public function SaveTableSettings($filters = [], $fields = []) {
+		\Admin\TableSettings::I()->Save(
+			$this->USER->ID,
+			get_class($this->SCRUD),
+			$filters,
+			$fields
+		);
+		$this->Redirect(null, 'Настройки сохранены');
 	}
 
 }
