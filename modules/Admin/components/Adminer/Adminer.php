@@ -105,17 +105,19 @@ class Adminer extends \System\Component {
 
 	public function Create($FIELDS = [], $REDIRECT = 'Stay') {
 		$ID = $this->SCRUD->Create($FIELDS);
-		$this->Redirect("?ID={$ID}", 'Create successful');
+		$link = ($REDIRECT === 'Stay') ? "?ID={$ID}" : "?";
+		$this->Redirect($link, "Создан элемент №{$ID}");
 	}
 
 	public function Update($ID, $FIELDS = [], $REDIRECT = 'Stay') {
 		$this->SCRUD->Update($ID, $FIELDS);
-		$this->Redirect(null, 'Update successful');
+		$link = ($REDIRECT === 'Stay') ? "?ID={$ID}" : "?";
+		$this->Redirect($link, "Обновлен элемент №{$ID}");
 	}
 
 	public function Delete($ID) {
 		$this->SCRUD->Delete($ID);
-		$this->Redirect('?', 'Delete successful');
+		$this->Redirect('?', "Удален элемент №{$ID}");
 	}
 
 	private function GetPages($total, $current, $limit) {
