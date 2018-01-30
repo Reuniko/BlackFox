@@ -9,7 +9,7 @@
 
 			<a
 				data-filter-settings=""
-				class="btn btn-default"
+				class="btn btn-default pull-right"
 				data-toggle="modal"
 				data-target="#section-settings"
 			>
