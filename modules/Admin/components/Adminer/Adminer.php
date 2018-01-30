@@ -64,7 +64,9 @@ class Adminer extends \System\Component {
 			$this->ENGINE->WRAPPER = 'frame';
 		}
 		$this->RESULT['FILTER'] = $FILTER;
-		$this->RESULT['FIELDS'] = $this->SCRUD->structure;
+		$this->RESULT['SETTINGS'] = $this->LoadTableSettings();
+		$this->RESULT['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractStructure($this->RESULT['SETTINGS']['FILTERS']);
+		$this->RESULT['STRUCTURE']['FIELDS'] = $this->SCRUD->ExtractStructure($this->RESULT['SETTINGS']['FIELDS']);
 		$this->RESULT['DATA'] = $this->SCRUD->Search([
 			'FILTER' => $FILTER,
 			'FIELDS' => $FIELDS,
@@ -198,6 +200,20 @@ class Adminer extends \System\Component {
 		}
 		$display = implode(' ', $display);
 		return $display;
+	}
+
+	public function LoadTableSettings() {
+		$settings = TableSettings::I()->Read([
+			'USER'   => $this->USER->ID,
+			'ENTITY' => get_class($this->SCRUD),
+		]);
+		if (empty($settings)) {
+			$settings = [
+				'FILTERS' => array_keys($this->SCRUD->structure),
+				'FIELDS'  => array_keys($this->SCRUD->structure),
+			];
+		}
+		return $settings;
 	}
 
 	public function SaveTableSettings($filters = [], $fields = []) {

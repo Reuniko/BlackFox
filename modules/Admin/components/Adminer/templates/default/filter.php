@@ -15,7 +15,7 @@
 			Фильтр
 		</div>
 		<div class="panel-body collapse" id="filter">
-			<? foreach ($this->SCRUD->structure as $code => $field): ?>
+			<? foreach ($RESULT['STRUCTURE']['FILTERS'] as $code => $field): ?>
 				<div class="form-group">
 					<label
 						class="col-sm-3 control-label"

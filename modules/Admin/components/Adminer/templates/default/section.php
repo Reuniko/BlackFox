@@ -36,7 +36,7 @@
 			unset($get['SORT']);
 			$url = $this->SanitizeUrl('?' . http_build_query($get));
 			?>
-			<? foreach ($RESULT['FIELDS'] as $structure_code => $field): ?>
+			<? foreach ($RESULT['STRUCTURE']['FIELDS'] as $structure_code => $field): ?>
 				<?
 				$direction = (($_GET['SORT'][$structure_code] === 'ASC') ? 'DESC' : 'ASC');
 				$sort_href = $url . "&SORT[{$structure_code}]={$direction}";
@@ -56,7 +56,7 @@
 		</tr>
 		<? if (empty($RESULT['DATA']['ELEMENTS'])): ?>
 			<tr>
-				<td colspan="<?= 1 + count($RESULT['FIELDS']) ?>">
+				<td colspan="<?= 1 + count($RESULT['STRUCTURE']['FIELDS']) ?>">
 					<center>
 						- нет данных -
 					</center>
@@ -82,7 +82,7 @@
 				<? if ($RESULT['MODE'] <> 'POPUP'): ?>
 					<td><input type="checkbox" name="ELEMENT[]" value="<?= $row['ID'] ?>"/></td>
 				<? endif; ?>
-				<? foreach ($RESULT['FIELDS'] as $code => $field): ?>
+				<? foreach ($RESULT['STRUCTURE']['FIELDS'] as $code => $field): ?>
 					<td>
 						<div class="table-content table-content-<?= $this->SCRUD->structure[$code]['TYPE'] ?>">
 							<?

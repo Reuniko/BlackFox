@@ -36,37 +36,21 @@
 						<div role="tabpanel" class="tab-pane active" id="settings-filter">
 							<h4>Порядок и отображение фильтров</h4>
 							<ul class="sortable" data-connected-sortable="settings-filter">
-								<? foreach ($this->SCRUD->structure as $code => $field): ?>
-									<li>
-										<label class="enum">
-											<input
-												type="checkbox"
-												name="FILTERS[]"
-												value="<?= $code ?>"
-												checked="checked"
-											/>
-											<span><?= $field['NAME'] ?></span>
-										</label>
-									</li>
-								<? endforeach; ?>
+								<?
+								$SELECTED = $RESULT['SETTINGS']['FILTERS'];
+								$NAME = 'FILTERS';
+								include('section_settings_list.php');
+								?>
 							</ul>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="settings-list">
 							<h4>Порядок и отображение колонок списка</h4>
 							<ul class="sortable" data-connected-sortable="settings-list">
-								<? foreach ($this->SCRUD->structure as $code => $field): ?>
-									<li>
-										<label class="enum">
-											<input
-												type="checkbox"
-												name="FIELDS[]"
-												value="<?= $code ?>"
-												checked="checked"
-											/>
-											<span><?= $field['NAME'] ?></span>
-										</label>
-									</li>
-								<? endforeach; ?>
+								<?
+								$SELECTED = $RESULT['SETTINGS']['FIELDS'];
+								$NAME = 'FIELDS';
+								include('section_settings_list.php');
+								?>
 							</ul>
 						</div>
 					</div>
