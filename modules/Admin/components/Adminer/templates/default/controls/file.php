@@ -2,8 +2,10 @@
 /** @var \Admin\Adminer $this */
 /** @var string $code */
 /** @var \System\SCRUD $Link */
+/** @var array $field */
 $Link = $this->SCRUD->structure[$code]['LINK']::I();
 $url = $Link->GetAdminUrl();
+$file = $RESULT['DATA'][$code];
 $ID = $RESULT['DATA'][$code]['ID'];
 ?>
 
@@ -22,29 +24,32 @@ $ID = $RESULT['DATA'][$code]['ID'];
 				id="<?= $code ?>"
 				name="FIELDS[<?= $code ?>]"
 				placeholder=""
-				value="<?= $RESULT['DATA'][$code] ?>"
 				<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 			>
 		</label>
 	</div>
 
-	<div class="btn-group">
+	<? if (!empty($file)): ?>
 
-	</div>
-
-	<? if (!empty($RESULT['DATA'][$code])): ?>
 		<div class="btn-group">
 			[<a href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>" data-link-a="FIELDS[<?= $code ?>]"><?= $RESULT['DATA'][$code]['ID'] ?: '...' ?></a>]
-			<a target="_blank" href="<?=$RESULT['DATA'][$code]['SRC']?>" style="color: green">
+			<a target="_blank" href="<?= $file['SRC'] ?>" style="color: green">
 				<span data-link-span="FIELDS[<?= $code ?>]">
 					<? foreach ($Link->structure as $s_code => $s_field): ?>
 						<? if ($s_field['SHOW']): ?>
-							<?= $RESULT['DATA'][$code][$s_code] ?>
+							<?= $file[$s_code] ?>
 						<? endif; ?>
 					<? endforeach; ?>
 				</span>
 			</a>
 		</div>
 	<? endif; ?>
-
 </div>
+
+<? if (substr($file['TYPE'], 0, 5) === 'image'): ?>
+	<div>
+		<a class="thumbnail" href="<?= $file['SRC'] ?>" target="_blank">
+			<img src="<?= $file['SRC'] ?>" style="max-height: 100px;"/>
+		</a>
+	</div>
+<? endif; ?>
