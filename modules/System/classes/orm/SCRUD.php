@@ -36,57 +36,10 @@ abstract class SCRUD extends Instanceable {
 	public $structure = [];
 	/** @var array массив групп полей базы данных */
 	public $groups = [];
-	/** @var array массив таблиц, связанных 1-к-1: [алиас => объект] */
-	public $annexes = [];
-
 	/** @var array композиция групп полей и полей базы данных, формируется автоматически на основе $this->structure и $this->groups */
 	public $composition = [];
-	/** @var array массив полей доступных для выборки, формируется автоматически на $this->annexes */
-	public $selection = [];
 	/** @var array массив первичных ключей, формируется автоматически */
 	public $keys = [];
-
-	/**
-	 * Лист ассоциативных массивов, указывающий какие формировать дополнительные
-	 * вкладки связанных элементов на странице просмотра/редактирования элемента
-	 * - NAME - имя вкладки (ex: "Купленные лиды")
-	 * - LINK - имя класса-наследника SCRUD (ex: CWLClientPrivate)
-	 * - TARGET - поле исходного объекта, по которому ищутся связанные элементы (ex: "LEAD")
-	 *
-	 * @var array
-	 */
-	public $externals = [];
-
-	/**
-	 * Лист ассоциативных массивов, указывающий какие формировать действия на
-	 * административной странице просмотра/редактирования элемента
-	 * - NAME - имя действия (ex: "Копировать тариф")
-	 * - DESCRIPTION - описание действия (ex: "Копирует тариф вместе с тарифной сеткой")
-	 * - PARAMS - параметры вызывающегося метода в виде ассоциативного массива, ключи которого
-	 * представляют собой название переменных, значения описывают структуру полей для визуализации в
-	 * административной части
-	 * - METHOD - название метода в классе, вызываемого при активации действия, обязательно должен
-	 * принимать на вход параметр $ID
-	 * - ANSWER - функция, обрабатывающая результат работы действия, принимает на вход один
-	 * параметр - результат работы действия, должна вернуть строку, описывающую результат работы
-	 * - NO_WARNING - не показывать предупреждение при совершении действия ?
-	 * - NEW_WINDOW - открывать результат в новом окне ?
-	 *
-	 * @var array
-	 */
-	public $element_actions = [];
-
-	/**
-	 * Лист ассоциативных массивов, указывающий какие формировать действия на
-	 * административной странице просмотра списка элементов
-	 * - NAME - имя действия (ex: "Деактивировать")
-	 * - DESCRIPTION - описание действия (ex: "Деактивирует выбранные элементы")
-	 * - METHOD - название метода в классе, вызываемого при активации действия, обязательно должен
-	 * принимать на вход параметр $IDs - идентификаторы обрабатываемых элементов
-	 *
-	 * @var array
-	 */
-	public $section_actions = [];
 
 	/**
 	 * Идентификатор
@@ -135,7 +88,6 @@ abstract class SCRUD extends Instanceable {
 	 */
 	public function ProvideIntegrity() {
 
-		$this->selection = $this->structure;
 		$this->composition = [];
 		$this->keys = [];
 
@@ -284,36 +236,6 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Анализирует массив объектов $this->annexes.
-	 *
-	 * @return array массив строк для вставки между FROM ... JOINS
-	 */
-	public function _prepareAnnexes() {
-		$annexes_strings = [];
-		if (!empty($this->annexes)) {
-			if (!is_array($this->annexes)) {
-				$this->annexes = [$this->annexes];
-			}
-			foreach ($this->annexes as $annex_alias => $annex) {
-				if (is_numeric($annex_alias)) {
-					$annex_alias = $annex->code;
-				}
-				$annexes_strings[] = "\r\n" .
-					" INNER JOIN {$annex->code}" .
-					" AS {$annex_alias}" .
-					" ON {$this->code}.{$this->key()} = {$annex_alias}.{$annex->key()}";
-				foreach ($annex->structure as $code => $field) {
-					if (!isset($this->selection[$code])) {
-						$this->selection[$code] = $field;
-						$this->selection[$code]['TABLE'] = $annex_alias;
-					}
-				}
-			}
-		}
-		return $annexes_strings;
-	}
-
-	/**
 	 * Формирует данные для вывода страницы элементов.
 	 * $arParams - массив вида:
 	 * - "SORT" => сортировка
@@ -347,8 +269,6 @@ abstract class SCRUD extends Instanceable {
 		$arParams = $this->_matchParams($arParams, $defParams);
 
 		$arParams["PAGE"] = max(1, intval($arParams["PAGE"]));
-
-		$joinAnnexes = $this->_prepareAnnexes();
 
 		// $arParams["FIELDS"] в любом случае должен быть массивом
 		if (!is_array($arParams["FIELDS"])) {
@@ -388,7 +308,6 @@ abstract class SCRUD extends Instanceable {
 		list($fields, $joinTables) = $this->_prepareSelectAndJoin($arParams['FIELDS']);
 		$this->SQL .= (!empty($fields)) ? implode(",\r\n", $fields) : '';
 		$this->SQL .= "\r\nFROM {$this->code}\r\n";
-		$this->SQL .= "\r\n" . implode("\r\n", $joinAnnexes);
 		$this->SQL .= "\r\n" . implode("\r\n", $joinTables);
 		$where = $this->_prepareWhere($arParams['FILTER']);
 		$this->SQL .= (!empty($where)) ? "\r\nWHERE " . implode(" \r\nAND ", $where) : '';
@@ -736,10 +655,10 @@ abstract class SCRUD extends Instanceable {
 				continue;
 			}
 
-			if (empty($this->selection[$code])) {
+			if (empty($this->structure[$code])) {
 				throw new Exception("Unknown field code: '{$code}' in table '{$this->code}'");
 			}
-			$field = $this->selection[$code];
+			$field = $this->structure[$code];
 
 			if (isset($field['TABLE'])) {
 				$table = $field['TABLE'];
@@ -944,7 +863,7 @@ abstract class SCRUD extends Instanceable {
 			/** @var self $object */
 			$object = null;
 			$table = '';
-			$structure = &$this->selection;
+			$structure = &$this->structure;
 			foreach ($path as $external) {
 				if (empty($structure[$external])) {
 					throw new Exception("Unknown external field code: '{$external}'");
@@ -961,9 +880,6 @@ abstract class SCRUD extends Instanceable {
 		} else {
 			$object = $this;
 			$table = $this->code;
-			if (!empty($this->selection[$code]['TABLE'])) {
-				$table = $this->selection[$code]['TABLE'];
-			}
 		}
 		return [
 			"OBJECT" => $object,
@@ -1005,10 +921,10 @@ abstract class SCRUD extends Instanceable {
 	 */
 	protected function _formatFieldValue($code, $value) {
 		$code = strtoupper($code);
-		if (!isset($this->selection[$code])) {
+		if (!isset($this->structure[$code])) {
 			throw new Exception("Неизвестный код поля: '{$code}'");
 		}
-		$info = $this->selection[$code];
+		$info = $this->structure[$code];
 
 		if (!$this->_hasInformation($value)) {
 			return null;
@@ -1046,7 +962,7 @@ abstract class SCRUD extends Instanceable {
 	 */
 	public function GetFieldList($medium = false, $full = false, $join = false) {
 		$list = [];
-		foreach ($this->selection as $code => $field) {
+		foreach ($this->structure as $code => $field) {
 
 			if ($medium) {
 				if ($field['LINK']) {
@@ -1103,7 +1019,7 @@ abstract class SCRUD extends Instanceable {
 			return $element;
 		}
 		foreach ($element as $code => $value) {
-			$info = $this->selection[$code];
+			$info = $this->structure[$code];
 			if (empty($info)) {
 				throw new Exception("Unknown field code '{$code}'");
 			}
