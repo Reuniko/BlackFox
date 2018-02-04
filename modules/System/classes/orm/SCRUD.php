@@ -83,8 +83,7 @@ abstract class SCRUD extends Instanceable {
 	 * - structure
 	 * - groups
 	 * - composition
-	 * - primary_keys
-	 * - primary_key
+	 * - keys
 	 */
 	public function ProvideIntegrity() {
 
@@ -143,8 +142,6 @@ abstract class SCRUD extends Instanceable {
 			throw new Exception("Synchronize of '{$this->code}' failed: structure is empty");
 		}
 		$tables = $this->Query("SHOW TABLES LIKE '{$this->code}'");
-		//Debug($tables, '$tables');
-		//Debug($this->structure, '$this->structure');
 		$this->structure = $this->FormatArrayKeysCase($this->structure);
 
 		if (empty($tables)) {
@@ -157,12 +154,10 @@ abstract class SCRUD extends Instanceable {
 				$rows[] = "PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
 			}
 			$this->SQL = $this->SQL . "(" . implode(",\r\n", $rows) . ");";
-			//Debug($SQL, '$SQL CREATE TABLE');
 			$this->Query($this->SQL);
 		} else {
 			$columns = $this->Query("SHOW FULL COLUMNS FROM " . $this->code, 'Field');
 			$columns = $this->FormatArrayKeysCase($columns);
-			//Debug($columns, '$columns');
 			$this->SQL = "ALTER TABLE `{$this->code}` \r\n";
 			$rows = [];
 			$last_after_code = '';
@@ -191,14 +186,10 @@ abstract class SCRUD extends Instanceable {
 				$rows[] = "DROP PRIMARY KEY, ADD PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
 			}
 			$this->SQL = $this->SQL . implode(",\r\n", $rows) . ";";
-			//Debug($this->SQL, '$SQL ALTER TABLE');
-			//Log($this->SQL, '$SQL ALTER TABLE');
 			$this->Query($this->SQL);
 		}
 
 		$indexes = $this->Query("SHOW INDEX FROM `{$this->code}`", 'Column_name');
-		// Debug($indexes, '$indexes');
-		// Log($indexes, '$indexes');
 		foreach ($this->structure as $code => $field) {
 			if (in_array($code, $this->keys)) {
 				continue;
@@ -1032,14 +1023,6 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * @return string время в формате ISO8601
-	 */
-	public static function Now() {
-		return date(\DateTime::ISO8601, time());
-	}
-
-
-	/**
 	 * Удаляет все данные из таблицы не затрагивая структуру.
 	 */
 	public function Truncate() {
@@ -1106,12 +1089,11 @@ abstract class SCRUD extends Instanceable {
 	public function GetAdminUrl() {
 		$name = get_called_class();
 		$name = str_replace('\\', '/', $name);
-		//$name = strtolower($name);
 		return "/admin/{$name}.php";
 	}
 
 	public function GetElementTitle($element = []) {
-		return $element['TITLE'] ?: 'ID-' . $element['ID'];
+		return $element['TITLE'] ?: $element['ID'] ?: '?';
 	}
 
 }
