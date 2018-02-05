@@ -81,3 +81,8 @@
 	background-color: #fff;
 	height: 37px;
 }
+
+.adminer .btn,
+.adminer .form-control {
+	border-radius: 0 !important;
+}

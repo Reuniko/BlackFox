@@ -1,5 +1,5 @@
-<div class="row">
-	<div class="col-xs-6">
+<div class="row no-gutters">
+	<div class="col-6">
 		<input
 			type="text"
 			class="form-control"
@@ -10,7 +10,7 @@
 			data-datepicker=""
 		>
 	</div>
-	<div class="col-xs-6">
+	<div class="col-6">
 		<input
 			type="text"
 			class="form-control"
