@@ -6,7 +6,7 @@ class TestScrudBase extends Test {
 		'GetInstance'      => 'Взятие инстанса класса "TestScrudBase"',
 		'Synchronize'      => 'Синхронизация структуры',
 		'Truncate'         => 'Удаление всех записей',
-		'CreateRandomRows' => 'Создание случайных записей',
+		'CreateRandomRows' => 'Создание 100 случайных записей',
 	];
 	/** @var SCRUD $SCRUD */
 	public $SCRUD = null;
