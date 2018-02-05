@@ -1,3 +1,9 @@
 body {
-	font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto', sans-serif;
+    background-image: url("img/body.png");
+}
+
+.header {
+    background-image: url("img/header.png");
+    border-bottom: 1px solid black;
 }

@@ -9,7 +9,7 @@
 
 <title><?= $this->TITLE ?></title>
 
-<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
 
 <script src="<?= $this->TEMPLATE_PATH ?>/js/jquery.min.js"></script>
 <script src="<?= $this->TEMPLATE_PATH ?>/js/jquery-ui.min.js"></script>
