@@ -22,7 +22,7 @@ if (is_array($RESULT['DATA'][$code])) {
 				'height=' + ((screen.height) - 100) + ',width=' + ((screen.width) - 20) + ''
 				);"
 		>
-			<i class="glyphicon glyphicon-search"></i>
+			<i class="fa fa-search"></i>
 		</button>
 	</div>
 	<div class="btn-group">

@@ -10,9 +10,9 @@
 	<? endforeach; ?>
 
 
-	<div class="panel panel-default">
+	<div class="card">
 		<div
-			class="panel-heading"
+			class="card-header"
 			<? /*
 			data-toggle="collapse"
 			href="#filter"
@@ -22,17 +22,17 @@
 		>
 			Фильтр
 		</div>
-		<div class="panel-body ~collapse" id="filter">
+		<div class="card-block" id="filter">
 			<? foreach ($RESULT['STRUCTURE']['FILTERS'] as $code => $field): ?>
-				<div class="form-group">
+				<div class="form-group row">
 					<label
-						class="col-sm-3 control-label"
+						class="col-3 col-form-label"
 						for="<?= $code ?>"
 						title="<?= $code ?>"
 					>
 						<?= $field['NAME'] ?>
 					</label>
-					<div class="col-sm-8">
+					<div class="col-8">
 						<?
 						try {
 							require($this->Path('filters/' . strtolower($field['TYPE']) . '.php'));
@@ -48,17 +48,15 @@
 				<button
 					class="btn btn-primary"
 					type="submit"
-					name=""
-					value=""
 				>
-					<i class="glyphicon glyphicon-filter"></i>
+					<i class="fa fa-filter"></i>
 					Фильтровать
 				</button>
 				<a
-					class="btn btn-default"
+					class="btn btn-secondary"
 					href="?"
 				>
-					<i class="glyphicon glyphicon-ban-circle"></i>
+					<i class="fa fa-ban"></i>
 					Отменить
 				</a>
 			</div>

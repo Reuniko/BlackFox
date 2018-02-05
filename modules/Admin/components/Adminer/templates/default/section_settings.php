@@ -4,27 +4,29 @@
 <div
 	id="section-settings"
 	class="modal fade"
+	tabindex="-1"
+	role="dialog"
 >
-	<div class="modal-dialog" role="document">
+	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<form method="post">
 				<div class="modal-header">
+					<h4 class="modal-title">Настройки отображения секции</h4>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
-					<h4 class="modal-title">Настройки отображения секции</h4>
 				</div>
 				<div class="modal-body">
 
-					<ul class="nav nav-tabs" role="tablist">
-						<li role="presentation" class="active">
-							<a href="#settings-filter" aria-controls="home" role="tab" data-toggle="tab">
+					<ul class="nav nav-tabs">
+						<li class="nav-item">
+							<a class="nav-link active" href="#settings-filter" aria-controls="home" role="tab" data-toggle="tab">
 								<i class="glyphicon glyphicon-filter"></i>
 								Фильтры
 							</a>
 						</li>
-						<li role="presentation">
-							<a href="#settings-list" aria-controls="profile" role="tab" data-toggle="tab">
+						<li class="nav-item">
+							<a class="nav-link" href="#settings-list" aria-controls="profile" role="tab" data-toggle="tab">
 								<i class="glyphicon glyphicon-th-list"></i>
 								Колонки списка
 							</a>
@@ -66,7 +68,7 @@
 						value="SaveTableSettings"
 					>Сохранить
 					</button>
-					<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
 				</div>
 			</form>
 		</div>
