@@ -19,9 +19,9 @@
 	<? foreach ($this->SCRUD->composition as $group_code => $group): ?>
 		<h3 class="group_header"><?= $group['NAME'] ?: "{{$group_code}}" ?></h3>
 		<? foreach ($group['FIELDS'] as $code => $field): ?>
-			<div class="form-group">
+			<div class="form-group row">
 				<label
-					class="col-sm-3 control-label"
+					class="col-sm-3 col-form-label text-right"
 					for="<?= $code ?>"
 					title="<?= $code ?>"
 				>
@@ -56,7 +56,7 @@
 			name="REDIRECT"
 			value="Return"
 		>
-			<i class="glyphicon glyphicon-ok"></i>
+			<i class="fa fa-save"></i>
 			Сохранить
 		</button>
 
@@ -66,15 +66,15 @@
 			name="REDIRECT"
 			value="Stay"
 		>
-			<i class="glyphicon glyphicon-ok"></i>
+			<i class="fa fa-save"></i>
 			Применить
 		</button>
 
 		<a
-			class="btn btn-default"
+			class="btn btn-secondary"
 			href="?"
 		>
-			<i class="glyphicon glyphicon-ban-circle"></i>
+			<i class="fa fa-ban"></i>
 			Вернуться
 		</a>
 
@@ -84,7 +84,7 @@
 			name="ACTION"
 			value="Delete"
 		>
-			<i class="glyphicon glyphicon-remove"></i>
+			<i class="fa fa-eraser"></i>
 			Удалить
 		</button>
 

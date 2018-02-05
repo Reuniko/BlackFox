@@ -1,12 +1,13 @@
 <?php /** @var \System\Component $this */ ?>
 <?php $this->Debug($RESULT, '$RESULT'); ?>
 
-<ul class="nav nav-sidebar">
+<div class="menu list-group">
 	<? foreach ($RESULT as $element): ?>
-		<li class="<?= $element['ACTIVE'] ? 'active' : '' ?>">
-			<a href="<?= $element['LINK'] ?>">
-				<?= $element['NAME'] ?>
-			</a>
-		</li>
+		<a
+			class="list-group-item p-2 <?= $element['ACTIVE'] ? 'active' : '' ?>"
+			href="<?= $element['LINK'] ?>"
+		>
+			<?= $element['NAME'] ?>
+		</a>
 	<? endforeach; ?>
-</ul>
+</div>

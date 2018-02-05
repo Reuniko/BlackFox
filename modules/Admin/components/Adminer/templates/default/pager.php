@@ -15,26 +15,32 @@ $base = http_build_query($get);
 	<span>Отображено <strong><?= $RESULT['DATA']['PAGER']['SELECTED'] ?></strong> элементов.</span>
 </div>
 
-<ul class="pagination">
+<nav>
+	<ul class="pagination">
 	<? foreach ($RESULT['PAGES'] as $page): ?>
 		<? if ($page['ACTIVE']): ?>
-			<li class="active">
-				<a>
+			<li class="page-item active">
+				<a class="page-link">
 					<?= $page["INDEX"] ?>
 				</a>
 			</li>
 		<? elseif ($page['...']): ?>
-			<li class="">
-				<a href="javascript:if(page = prompt('Введите номер страницы', '')){window.location='?<?= $base ?>&<?= $RESULT['VARIABLE'] ?>='+page}">
+			<li class="page-item">
+				<a
+					class="page-link"
+					href="javascript:if(page = prompt('Введите номер страницы', '')){window.location='?<?= $base ?>&<?= $RESULT['VARIABLE'] ?>='+page}">
 					<?= $page["INDEX"] ?>
 				</a>
 			</li>
 		<? else : ?>
-			<li class="">
-				<a href="?<?= http_build_query(array_merge($_GET, array($RESULT['VARIABLE'] => $page['INDEX']))) ?>">
+			<li class="page-item">
+				<a
+					class="page-link"
+					href="?<?= http_build_query(array_merge($_GET, array($RESULT['VARIABLE'] => $page['INDEX']))) ?>">
 					<?= $page["INDEX"] ?>
 				</a>
 			</li>
 		<? endif; ?>
 	<? endforeach; ?>
-</ul>
+	</ul>
+</nav>

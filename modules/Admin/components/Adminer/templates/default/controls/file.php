@@ -13,7 +13,7 @@ $ID = $RESULT['DATA'][$code]['ID'];
 
 	<div class="btn-group">
 		<label for="<?= $code ?>">
-			<span href="#" class="btn btn-default">
+			<span href="#" class="btn btn-secondary">
 				<i class="glyphicon glyphicon-picture"></i>
 				Выбрать файл
 			</span>

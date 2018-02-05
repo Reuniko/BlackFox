@@ -5,26 +5,23 @@
 	<? require($this->Path('filter.php')) ?>
 
 	<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
-		<div class="margin buttons">
+		<div class="my-2 buttons">
 
 			<a
-				data-filter-settings=""
-				class="btn btn-default pull-right"
+				class="btn btn-secondary float-right"
 				data-toggle="modal"
 				data-target="#section-settings"
 			>
-				<i class="glyphicon glyphicon-cog"></i>
+				<i class="fa fa-cog"></i>
 			</a>
 
 			<a class="btn btn-success" href="?NEW">
-				<i class="glyphicon glyphicon-plus"></i>
+				<i class="fa fa-plus"></i>
 				Создать
 			</a>
 
 		</div>
 	<? endif; ?>
-
-	<br/>
 
 	<table id="data" class="table table-bordered table-hover">
 		<tr>

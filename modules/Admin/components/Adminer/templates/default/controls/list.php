@@ -14,7 +14,7 @@ $value = (array)$value;
 		value=""
 	/>
 
-	<button class="btn btn-default" type="button" data-add="">
+	<button class="btn btn-secondary" type="button" data-add="">
 		<i class="glyphicon glyphicon-plus"></i>
 		Добавить
 	</button>
@@ -32,7 +32,7 @@ $value = (array)$value;
 			<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 		>
 		<div class="input-group-btn">
-			<button class="btn btn-default" type="button" data-delete="">
+			<button class="btn btn-secondary" type="button" data-delete="">
 				<i class="glyphicon glyphicon-trash"></i>
 			</button>
 		</div>
@@ -51,7 +51,7 @@ $value = (array)$value;
 				<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 			>
 			<div class="input-group-btn">
-				<button class="btn btn-default" type="button" data-delete="">
+				<button class="btn btn-secondary" type="button" data-delete="">
 					<i class="glyphicon glyphicon-trash"></i>
 				</button>
 			</div>
