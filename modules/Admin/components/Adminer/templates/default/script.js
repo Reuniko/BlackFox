@@ -41,4 +41,21 @@ $(function () {
         handle: '[data-sort]',
     });
 
+    $('[data-settings-select]').on('click', function () {
+        $('#' + $(this).data('settings-select')).find('[type=checkbox]').prop('checked', true);
+    });
+
+    $('[data-settings-unselect]').on('click', function () {
+        $('#' + $(this).data('settings-unselect')).find('[type=checkbox]').prop('checked', false);
+    });
+
+    $('[data-settings-sort]').on('click', function () {
+        var $container = $('#' + $(this).data('settings-sort'));
+        for (i = 0; i < $container.find('li').length; i++) {
+            $container.find('[data-order=' + i + ']').insertAfter(
+                $container.find('[data-order=' + (i - 1) + ']')
+            );
+        }
+    });
+
 });
