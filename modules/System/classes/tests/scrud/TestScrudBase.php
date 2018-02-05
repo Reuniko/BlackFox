@@ -3,7 +3,7 @@ namespace System;
 class TestScrudBase extends Test {
 	public $name = 'Базовые тесты SCRUD';
 	public $tests = [
-		'GetInstance'      => 'Взятие инстанса класса',
+		'GetInstance'      => 'Взятие инстанса класса "TestScrudBase"',
 		'Synchronize'      => 'Синхронизация структуры',
 		'Truncate'         => 'Удаление всех записей',
 		'CreateRandomRows' => 'Создание случайных записей',
