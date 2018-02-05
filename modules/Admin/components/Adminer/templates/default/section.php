@@ -38,7 +38,7 @@
 				$direction = (($_GET['SORT'][$structure_code] === 'ASC') ? 'DESC' : 'ASC');
 				$sort_href = $url . "&SORT[{$structure_code}]={$direction}";
 				?>
-				<th class="sort <?= isset($_GET['SORT'][$structure_code]) ? 'active' : '' ?>">
+				<th class="sort<?= isset($_GET['SORT'][$structure_code]) ? ' active' : '' ?>">
 					<a href="<?= $sort_href ?>">
 						<? if ($_GET['SORT'][$structure_code] === 'ASC'): ?>
 							<i class="glyphicon glyphicon-sort-by-attributes"></i>
