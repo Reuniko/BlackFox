@@ -14,7 +14,7 @@
 				<?= (in_array($value, $RESULT['DATA'][$code] ?: [])) ? 'checked' : '' ?>
 				<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 			>
-			<span><?= $display ?></span>
+			<span class="dashed"><?= $display ?></span>
 		</label>
 	</div>
 <? endforeach; ?>
