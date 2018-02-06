@@ -1,8 +1,9 @@
 .adminer table {
 	background-color: white;
 }
+
 .adminer table, .adminer table * {
-	border-color: rgba(0,0,0,.125);
+	border-color: rgba(0, 0, 0, .125);
 }
 
 .adminer .table-content {
@@ -21,15 +22,18 @@
 
 .adminer input[type=checkbox],
 .adminer input[type=radio] {
-	width: 16px;
-	height: 16px;
+	width: 2rem;
+	height: 2rem;
+	margin: 0;
+	padding: 0;
+	vertical-align: middle;
+	line-height: 2rem;
 }
 
-.adminer label > span,
-.adminer label > input[type=checkbox] {
+.adminer label > span {
 	font-weight: normal;
-	vertical-align: bottom;
-	line-height: 16px;
+	line-height: 2rem;
+	border-bottom: 1px dashed grey;
 }
 
 .adminer .group_header {

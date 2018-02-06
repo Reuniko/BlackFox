@@ -77,7 +77,7 @@
 			?>
 			<tr ondblclick="<?= $ondblclick ?>">
 				<? if ($RESULT['MODE'] <> 'POPUP'): ?>
-					<td><input type="checkbox" name="ELEMENT[]" value="<?= $row['ID'] ?>"/></td>
+					<td class="p-2"><input type="checkbox" name="ELEMENT[]" value="<?= $row['ID'] ?>"/></td>
 				<? endif; ?>
 				<? foreach ($RESULT['STRUCTURE']['FIELDS'] as $code => $field): ?>
 					<td>
