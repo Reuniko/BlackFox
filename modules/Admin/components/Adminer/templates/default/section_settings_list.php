@@ -25,7 +25,7 @@
 		<? $field = $this->SCRUD->structure[$code] ?>
 		<? unset($unselected[$code]) ?>
 		<li data-order="<?= array_search($code, array_keys($this->SCRUD->structure)) ?>">
-			<label class="enum">
+			<label class="m-0">
 				<input
 					type="checkbox"
 					name="<?= $NAME ?>[]"
@@ -38,7 +38,7 @@
 	<? endforeach; ?>
 	<? foreach ($unselected as $code => $field): ?>
 		<li data-order="<?= array_search($code, array_keys($this->SCRUD->structure)) ?>">
-			<label class="enum">
+			<label class="m-0">
 				<input
 					type="checkbox"
 					name="<?= $NAME ?>[]"
