@@ -4,8 +4,8 @@
 	value="0"
 />
 <input
+	style="margin: 0.4rem 0"
 	type="checkbox"
-	class=""
 	id="<?= $code ?>"
 	name="FIELDS[<?= $code ?>]"
 	placeholder=""

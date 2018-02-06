@@ -22,17 +22,12 @@
 
 .adminer input[type=checkbox],
 .adminer input[type=radio] {
-	width: 2rem;
-	height: 2rem;
-	margin: 0;
-	padding: 0;
+	width: 1.2rem;
+	height: 1.2rem;
 	vertical-align: middle;
-	line-height: 2rem;
 }
 
-.adminer label > span {
-	font-weight: normal;
-	line-height: 2rem;
+.adminer .dashed {
 	border-bottom: 1px dashed grey;
 }
 
