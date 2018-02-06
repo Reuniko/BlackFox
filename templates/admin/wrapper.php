@@ -12,14 +12,14 @@
 	<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
-	<a class="navbar-brand" href="/">Site</a>
+	<a class="btn btn-secondary" href="/">Назад к сайту</a>
 
 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
 		<ul class="navbar-nav mr-auto">
 		</ul>
 		<form class="form-inline my-2 my-lg-0">
-			<input class="form-control mr-sm-2" type="text" placeholder="Search">
-			<button class="btn btn-success my-2 my-sm-0" type="submit">Search</button>
+			<input class="form-control mr-sm-2" type="text" placeholder="">
+			<button class="btn btn-success my-2 my-sm-0" type="submit">Поиск</button>
 		</form>
 	</div>
 </nav>
