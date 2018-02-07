@@ -4,12 +4,19 @@ namespace Admin;
 
 class Menu extends \System\Component {
 	public function Work() {
-		$url = parse_url($_SERVER['REQUEST_URI']);
 		$this->RESULT = require($this->ENGINE->SearchAncestorFile($this->ENGINE->url['path'], '.menu.php'));
 		$url = parse_url($_SERVER['REQUEST_URI']);
-		foreach ($this->RESULT as &$element) {
-			if ($element['LINK'] === $url['path']) {
-				$element['ACTIVE'] = true;
+		foreach ($this->RESULT as &$element1) {
+			if ($element1['LINK'] == $url['path']) {
+				$element1['ACTIVE'] = true;
+			}
+			if (is_array($element1['CHILDREN'])) {
+				foreach ($element1['CHILDREN'] as &$element2) {
+					if ($element2['LINK'] == $url['path']) {
+						$element1['ACTIVE'] = true;
+						$element2['ACTIVE'] = true;
+					}
+				}
 			}
 		}
 		return $this->RESULT;

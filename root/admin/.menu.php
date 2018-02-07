@@ -1,22 +1,39 @@
 <?php
 return [
-	'root'              => [
+	'root'                => [
 		'NAME' => 'Рабочий стол',
 		'LINK' => '/admin/index.php',
 	],
-	'~upgrade'          => [
+	'~upgrade'            => [
 		'NAME' => '~upgrade',
 		'LINK' => '/admin/_upgrade.php',
 	],
-	'System_Modules'       => [
+	'Test0'               => [
+		'NAME'     => 'Test0',
+		'CHILDREN' => [
+			'Test1' => [
+				'NAME' => '/admin/Test1/',
+				'LINK' => '/admin/Test1/',
+			],
+			'Test2' => [
+				'NAME' => '/admin/Test2/',
+				'LINK' => '/admin/Test2/',
+			],
+			'Test3' => [
+				'NAME' => '/admin/Test3/',
+				'LINK' => '/admin/Test3/',
+			],
+		],
+	],
+	'System_Modules'      => [
 		'NAME' => 'Модули',
 		'LINK' => '/admin/System/Modules.php',
 	],
-	'System_Users'       => [
+	'System_Users'        => [
 		'NAME' => 'Пользователи',
 		'LINK' => '/admin/System/Users.php',
 	],
-	'System_Groups'      => [
+	'System_Groups'       => [
 		'NAME' => 'Группы',
 		'LINK' => '/admin/System/Groups.php',
 	],
@@ -24,11 +41,11 @@ return [
 		'NAME' => 'Пользователи в группах',
 		'LINK' => '/admin/System/Users2Groups.php',
 	],
-	'System_Files'       => [
+	'System_Files'        => [
 		'NAME' => 'Файлы',
 		'LINK' => '/admin/System/Files.php',
 	],
-	'Admin_TableSettings'       => [
+	'Admin_TableSettings' => [
 		'NAME' => 'Настройки',
 		'LINK' => '/admin/Admin/TableSettings.php',
 	],

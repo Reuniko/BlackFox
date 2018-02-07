@@ -1,0 +1,14 @@
+.menu .list-group-item {
+	border-radius: 0;
+	background-color: transparent;
+	border: none;
+	border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.menu .list-group-item.level1.active {
+	background-color: #0275d8;
+}
+
+.menu .list-group-item.level2.active {
+	background-color: #4797d8;
+}
