@@ -1,9 +1,9 @@
 <?php /** @var \System\Component $this */ ?>
 <?php $this->Debug($RESULT, '$RESULT'); ?>
-<script src="<?= $this->template_relative_folder ?>/script.js"></script>
-<link rel='stylesheet' href="<?= $this->template_relative_folder ?>/style.css"/>
+	<script src="<?= $this->template_relative_folder ?>/script.js"></script>
+	<link rel='stylesheet' href="<?= $this->template_relative_folder ?>/style.css"/>
 
-<h2 class="menu-title">Меню</h2>
+	<h2 class="menu-title collapse">Меню</h2>
 
 <? function BuildDefaultMenuRecursive($item) { ?>
 	<li>
@@ -37,8 +37,11 @@
 	</li>
 <? } ?>
 
-<ul class="menu" data-menu="">
-	<? foreach ($RESULT as $item): ?>
-		<? BuildDefaultMenuRecursive($item); ?>
-	<? endforeach; ?>
-</ul>
+<? foreach ($RESULT as $category): ?>
+	<h4 class="menu-title"><?= $category['NAME'] ?></h4>
+	<ul class="menu" data-menu="">
+		<? foreach ($category['CHILDREN'] as $item): ?>
+			<? BuildDefaultMenuRecursive($item); ?>
+		<? endforeach; ?>
+	</ul>
+<? endforeach; ?>
