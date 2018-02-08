@@ -3,26 +3,36 @@
 namespace Admin;
 
 class Menu extends \System\Component {
-	public function Work() {
-		$this->RESULT = require($this->ENGINE->SearchAncestorFile($this->ENGINE->url['path'], '.menu.php'));
-		$url = parse_url($_SERVER['REQUEST_URI']);
-		foreach ($this->RESULT as &$element1) {
-			if ($element1['LINK'] == $url['path']) {
-				$element1['ACTIVE'] = true;
-			}
-			if (is_array($element1['CHILDREN'])) {
-				foreach ($element1['CHILDREN'] as &$element2) {
-					if ($element2['LINK'] == $url['path']) {
-						$element1['ACTIVE'] = true;
-						$element2['ACTIVE'] = true;
-					}
-				}
-			}
-		}
-		return $this->RESULT;
-	}
+
+	private $path;
 
 	public function SelectMethodForAction($request = array()) {
 		return 'Work';
 	}
+
+	public function Work() {
+		$this->RESULT = require($this->ENGINE->SearchAncestorFile($this->ENGINE->url['path'], '.menu.php'));
+		$this->path = parse_url($_SERVER['REQUEST_URI'])['path'];
+
+		foreach ($this->RESULT as &$item) {
+			$this->SearchItemRecursive($item);
+		}
+
+		return $this->RESULT;
+	}
+
+	private function SearchItemRecursive(&$item) {
+		if ($item['LINK'] === $this->path) {
+			$item['ACTIVE'] = true;
+			$item['CURRENT'] = true;
+		}
+		if (is_array($item['CHILDREN'])) {
+			foreach ($item['CHILDREN'] as &$child) {
+				$item['ACTIVE'] |= $this->SearchItemRecursive($child);
+			}
+		}
+		return $item['ACTIVE'];
+	}
+
+
 }
