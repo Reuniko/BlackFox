@@ -3,7 +3,7 @@
 <?
 $icons = [
 	'category' => 'fa fa-caret-right',
-	'item'     => 'fa fa-stop fa-vs',
+	'item'     => 'fa fa-dot',
 ];
 ?>
 
