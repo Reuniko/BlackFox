@@ -1,16 +1,16 @@
 <?php /** @var \System\Component $this */ ?>
 <?php $this->Debug($RESULT, '$RESULT'); ?>
-	<script src="<?= $this->template_relative_folder ?>/script.js"></script>
-	<link rel='stylesheet' href="<?= $this->template_relative_folder ?>/style.css"/>
+<script src="<?= $this->template_relative_folder ?>/script.js"></script>
+<link rel='stylesheet' href="<?= $this->template_relative_folder ?>/style.css"/>
 
-	<h2 class="menu-title collapse">Меню</h2>
+<h2 class="menu-title collapse">Меню</h2>
 
 <? function BuildDefaultMenuRecursive($item) { ?>
 	<li data-menu-item="">
 		<div class="item <?= $item['ACTIVE'] ? 'active' : '' ?> <?= $item['CURRENT'] ? 'current' : '' ?>">
 
 			<? if ($item['CHILDREN']): ?>
-				<i class="menu-point menu-point-category <?= $item['ACTIVE'] ? 'fa-rotate-90' : '' ?>" data-menu-expander=""></i>
+				<i class="menu-point menu-point-category <?= $item['ACTIVE'] ? 'rotate-90' : 'rotate-0' ?>" data-menu-expander=""></i>
 			<? else: ?>
 				<i class="menu-point menu-point-item"></i>
 			<? endif; ?>

@@ -41,6 +41,23 @@
 	background-color: rgba(255, 255, 255, 0.5);
 }
 
+.menu .rotate-0,
+.menu .rotate-90 {
+	-webkit-transition: all 0.2s ease-in;
+	-moz-transition: all 0.2s ease-in;
+	-ms-transition: all 0.2s ease-in;
+	-o-transition: all 0.2s ease-in;
+	transition: all 0.2s ease-in;
+}
+
+.menu .rotate-0 {
+	transform: rotate(0deg);
+}
+
+.menu .rotate-90 {
+	transform: rotate(90deg);
+}
+
 .menu .menu-point {
 	height: 16px;
 	width: 16px;
