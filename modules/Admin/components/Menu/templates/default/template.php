@@ -1,16 +1,9 @@
 <?php /** @var \System\Component $this */ ?>
 <?php $this->Debug($RESULT, '$RESULT'); ?>
-<?
-$icons = [
-	'category' => 'fa fa-caret-right',
-	'item'     => 'fa fa-dot',
-];
-?>
+<script src="<?= $this->template_relative_folder ?>/script.js"></script>
+<link rel='stylesheet' href="<?= $this->template_relative_folder ?>/style.css"/>
 
-<script><? include('script.js') ?></script>
-<style><? include('style.css') ?></style>
-
-<h2 class="text-center m-2">Меню</h2>
+<h2 class="menu-title">Меню</h2>
 
 <ul class="menu" data-menu="">
 	<? foreach ($RESULT as $id1 => $element1): ?>
@@ -24,9 +17,9 @@ $icons = [
 			>
 				<span>
 					<? if ($element1['CHILDREN']): ?>
-						<i class="fa-level <?= $icons['category'] ?> <?= $element1['ACTIVE'] ? 'fa-rotate-90' : '' ?>" data-menu-rotator=""></i>
+						<i class="icon icon-category <?= $element1['ACTIVE'] ? 'fa-rotate-90' : '' ?>" data-menu-rotator=""></i>
 					<? else: ?>
-						<i class="fa-level <?= $icons['item'] ?>"></i>
+						<i class="icon icon-item"></i>
 					<? endif; ?>
 					<?= $element1['NAME'] ?>
 				</span>
@@ -40,7 +33,7 @@ $icons = [
 								href="<?= $element2['LINK'] ?>"
 							>
 								<span>
-									<i class="fa-level <?= $icons['item'] ?>"></i>
+									<i class="icon icon-item"></i>
 									<?= $element2['NAME'] ?>
 								</span>
 							</a>
