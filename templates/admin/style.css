@@ -10,6 +10,6 @@ body {
 
 .sidebar {
     border-right: 1px solid rgba(0,0,0,.125);
-    background-color: #f7f7f9;
     min-height: calc(100vh - 55px);
+	background-image: url('img/sidebar.png');
 }
