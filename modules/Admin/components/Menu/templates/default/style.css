@@ -29,10 +29,16 @@ ul.menu {
 }
 
 .menu .fa-level {
+	padding: 0.25rem;
+	color: rgba(0, 0, 0, .50);
+}
+
+.menu .fa-dot {
+	font-size: 0.33em;
+	vertical-align: 0.2rem;
 	color: rgba(0, 0, 0, .25);
 }
 
-.menu .fa-vs {
-	font-size: 0.33em;
-	vertical-align: middle;
+.menu .fa-dot:before {
+	content: "\f04d";
 }
