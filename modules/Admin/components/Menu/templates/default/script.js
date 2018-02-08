@@ -1,6 +1,6 @@
 $(function () {
-	$('[data-menu-category]').click(function () {
-		$(this).siblings('[data-menu-children]').slideToggle();
-		$(this).find('[data-menu-rotator]').toggleClass('fa-rotate-90');
+	$('[data-menu-expander]').click(function () {
+		$(this).closest('[data-menu-item]').find('[data-menu-children]').toggle();
+		$(this).toggleClass('fa-rotate-90');
 	});
 });

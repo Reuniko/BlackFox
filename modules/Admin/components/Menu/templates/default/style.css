@@ -4,34 +4,36 @@
 	background-color: rgba(1, 1, 1, 0.1);
 }
 
-ul.menu, ul.menu ul {
+.menu, .menu ul {
 	list-style-type: none;
 	padding-left: 1rem;
 	font-size: 0.9rem;
 }
 
-ul.menu {
+.menu {
 	padding-left: 0;
 }
 
-.menu a {
-	display: block;
+.menu .item {
+	display: flex;
+	align-items: center;
+}
+
+.menu .item a {
+	text-decoration: none !important;
+	color: black;
+	width: 100%;
 	padding: 0.25rem;
 	white-space: nowrap;
 	overflow: hidden;
 }
 
-.menu .item {
-	text-decoration: none !important;
-	color: black;
-}
-
 .menu .item.active {
-	background-color: rgba(127, 127, 127, 0.1);
+	background-color: rgba(0, 0, 0, 0.00);
 }
 
 .menu .item.current {
-	background-color: rgba(127, 127, 127, 0.25);
+	background-color: rgba(0, 0, 0, 0.15);
 }
 
 .menu .item:hover {
@@ -39,22 +41,20 @@ ul.menu {
 	background-color: rgba(255, 255, 255, 0.5);
 }
 
-.menu li > a > span {
-	display: flex;
-	align-items: center;
-}
-
-.menu .icon-item,
-.menu .icon-category {
-	display: inline-block;
+.menu .menu-point {
 	height: 16px;
 	width: 16px;
+	opacity: 0.5;
 }
 
-.menu .icon-item {
+.menu .menu-point-item {
 	background-image: url('img/item.png');
 }
 
-.menu .icon-category {
+.menu .menu-point-category {
 	background-image: url('img/category.png');
+}
+
+.menu .menu-point-category:hover {
+	opacity: 1;
 }

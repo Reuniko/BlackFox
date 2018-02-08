@@ -6,27 +6,25 @@
 	<h2 class="menu-title collapse">Меню</h2>
 
 <? function BuildDefaultMenuRecursive($item) { ?>
-	<li>
-		<a
-			class="
-					item
-					<?= $item['ACTIVE'] ? 'active' : '' ?>
-					<?= $item['CURRENT'] ? 'current' : '' ?>
-					"
-			href="<?= $item['LINK'] ?: '#' ?>"
+	<li data-menu-item="">
+		<div class="item <?= $item['ACTIVE'] ? 'active' : '' ?> <?= $item['CURRENT'] ? 'current' : '' ?>">
+
 			<? if ($item['CHILDREN']): ?>
-				data-menu-category=""
+				<i class="menu-point menu-point-category <?= $item['ACTIVE'] ? 'fa-rotate-90' : '' ?>" data-menu-expander=""></i>
+			<? else: ?>
+				<i class="menu-point menu-point-item"></i>
 			<? endif; ?>
-		>
-				<span>
-					<? if ($item['CHILDREN']): ?>
-						<i class="icon icon-category <?= $item['ACTIVE'] ? 'fa-rotate-90' : '' ?>" data-menu-rotator=""></i>
-					<? else: ?>
-						<i class="icon icon-item"></i>
-					<? endif; ?>
-					<?= $item['NAME'] ?>
-				</span>
-		</a>
+
+			<a
+				href="<?= $item['LINK'] ?: '#' ?>"
+				<? if ($item['CHILDREN']): ?>
+					data-menu-category=""
+				<? endif; ?>
+			>
+				<?= $item['NAME'] ?>
+			</a>
+
+		</div>
 		<? if ($item['CHILDREN']): ?>
 			<ul data-menu-children="" class="<?= $item['ACTIVE'] ? '' : 'collapse' ?>">
 				<? foreach ($item['CHILDREN'] as $child): ?>
