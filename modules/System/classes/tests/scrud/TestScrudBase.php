@@ -7,6 +7,7 @@ class TestScrudBase extends Test {
 		'Synchronize'      => 'Синхронизация структуры',
 		'Truncate'         => 'Удаление всех записей',
 		'CreateRandomRows' => 'Создание 100 случайных записей',
+		'CreateBadRow'     => 'Попытка создания некорректной записи',
 	];
 	/** @var SCRUD $SCRUD */
 	public $SCRUD = null;
@@ -45,7 +46,18 @@ class TestScrudBase extends Test {
 				'FILE'     => null,
 			]);
 		}
-		return $R;
+		return $i;
+	}
+
+	public function CreateBadRow() {
+		try {
+			$this->SCRUD->Create([
+				'ENUM' => 'BAD_VALUE',
+			]);
+		} catch (Exception $error) {
+			return $error->getMessage();
+		}
+		throw new Exception("Ожидалась ошибка при попытке вставить в поле типа ENUM неизвестное значение");
 	}
 }
 
