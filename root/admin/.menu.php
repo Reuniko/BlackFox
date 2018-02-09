@@ -1,41 +1,15 @@
 <?php
 return [
-	'SYSTEM' => [
+	'System' => [
 		'NAME'     => 'Система',
 		'CHILDREN' => [
-			'root'                => [
-				'NAME' => 'Рабочий стол',
-				'LINK' => '/admin/index.php',
-			],
-			'~upgrade'            => [
-				'NAME' => '~upgrade',
-				'LINK' => '/admin/_upgrade.php',
-			],
-			'Test0'               => [
-				'NAME'     => 'Test0',
-				'LINK'     => '/admin/Test0/',
+			'panel'               => [
+				'NAME'     => 'Панель управления',
+				'LINK'     => '/admin/',
 				'CHILDREN' => [
-					'Test1' => [
-						'NAME' => '/admin/Test1/',
-						'LINK' => '/admin/Test1/',
-					],
-					'Test2' => [
-						'NAME' => '/admin/Test2/',
-						'LINK' => '/admin/Test2/',
-					],
-					'Test3' => [
-						'NAME'     => '/admin/Test3/',
-						'LINK'     => '/admin/Test3/',
-						'CHILDREN' => [
-							'Test4' => [
-								'NAME' => '/admin/Test4/',
-								'LINK' => '/admin/Test4/',
-							],
-							'Test5' => [
-								'NAME' => '/admin/Test5/',
-								'LINK' => '/admin/Test5/',
-							],
-						],
+					'~upgrade' => [
+						'NAME' => '~upgrade',
+						'LINK' => '/admin/_upgrade.php',
 					],
 				],
 			],
@@ -62,6 +36,15 @@ return [
 			'Admin_TableSettings' => [
 				'NAME' => 'Настройки',
 				'LINK' => '/admin/Admin/TableSettings.php',
+			],
+			'System_Tests'        => [
+				'NAME'     => 'Тесты',
+				'CHILDREN' => [
+					'SCRUD' => [
+						'NAME' => 'SCRUD',
+						'LINK' => '/admin/System/tests/SCRUD.php',
+					],
+				],
 			],
 		]
 	],
