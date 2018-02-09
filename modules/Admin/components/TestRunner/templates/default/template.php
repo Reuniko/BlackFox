@@ -14,9 +14,13 @@
 	</form>
 
 	<?
-	$status_to_class = [
+	$status2alert = [
 		'SUCCESS' => 'alert-success',
 		'FAILURE' => 'alert-danger',
+	];
+	$status2icon = [
+		'SUCCESS' => 'fa fa-check',
+		'FAILURE' => 'fa fa-times',
 	];
 	?>
 
@@ -29,16 +33,23 @@
 			<? if (!empty($test['RESULTS'])): ?>
 				<div class="card-block">
 					<? foreach ($test['RESULTS'] as $test_method_name => $test_method_result): ?>
-						<? // debug($test_method_result) ?>
-						<div class="alert alert-sm <?= $status_to_class[$test_method_result['STATUS']] ?>">
-							<strong><?= $test_method_result['NAME'] ?></strong>
-							<? if (!empty($test_method_result['ERROR'])): ?>
-								<hr/>
-								<?= $test_method_result['ERROR']; ?>
-							<? endif; ?>
-							<? if (!empty($test_method_result['RESULT'])): ?>
-								<? debug($test_method_result['RESULT']); ?>
-							<? endif; ?>
+						<div class="row">
+							<div class="col">
+								<div class="alert alert-sm alert-info">
+									<?= $test_method_result['NAME'] ?>
+								</div>
+							</div>
+							<div class="col">
+								<div class="alert alert-sm <?= $status2alert[$test_method_result['STATUS']] ?>">
+									<i class="<?= $status2icon[$test_method_result['STATUS']] ?>"></i>
+									<? if (!empty($test_method_result['ERROR'])): ?>
+										<?= $test_method_result['ERROR']; ?>
+									<? elseif (!empty($test_method_result['RESULT'])): ?>
+										<?= $test_method_result['RESULT'] ?>
+									<? else: ?>
+									<? endif; ?>
+								</div>
+							</div>
 						</div>
 					<? endforeach; ?>
 				</div>
