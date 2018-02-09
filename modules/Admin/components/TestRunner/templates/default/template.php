@@ -2,18 +2,16 @@
 <?php /** @var array $RESULT */ ?>
 <div class="TestRunner">
 
-	<form method="post">
+	<form method="post" class="mb-2">
 		<button
 			type="submit"
 			class="btn btn-primary"
 			name="ACTION"
 			value="RunAll"
 		>
-			Run all tests
+			Запустить все тесты
 		</button>
 	</form>
-
-	<hr/>
 
 	<?
 	$status_to_class = [
@@ -24,7 +22,8 @@
 
 	<? foreach ($RESULT as $test_class_name => $test): ?>
 		<div class="card">
-			<div class="card-header" title="<?= $test_class_name ?>">
+			<div class="card-header">
+				<span class="float-right"><?= $test_class_name ?></span>
 				<?= $test['NAME'] ?>
 			</div>
 			<? if (!empty($test['RESULTS'])): ?>
