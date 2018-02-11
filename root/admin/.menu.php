@@ -17,6 +17,10 @@ return [
 				'NAME' => 'Модули',
 				'LINK' => '/admin/System/Modules.php',
 			],
+			'Content_Pages'       => [
+				'NAME' => 'Контент',
+				'LINK' => '/admin/Content/Pages.php',
+			],
 			'System_Users'        => [
 				'NAME' => 'Пользователи',
 				'LINK' => '/admin/System/Users.php',
@@ -46,6 +50,6 @@ return [
 					],
 				],
 			],
-		]
+		],
 	],
 ];

@@ -198,6 +198,14 @@ class Engine extends Instanceable {
 				}
 			}
 
+			// запрос на контент в бд
+			// TODO выделить в динамическое подключение модулей
+			$page = \Content\Pages::I()->Read(['URL' => $this->url['path']]);
+			if ($page) {
+				echo $page['CONTENT'];
+				return;
+			}
+
 			// запрос на неизвестный адрес
 			require($this->SearchAncestorFile($this->url['path'], '.controller.php'));
 
@@ -387,6 +395,15 @@ class Engine extends Instanceable {
 			}
 
 			$this->RegisterModuleClasses($module['ID']);
+		}
+	}
+
+	public function UpgradeActiveModules() {
+		$namespaces = Modules::I()->Select();
+		foreach ($namespaces as $namespace) {
+			$module = "{$namespace}\\Module";
+			/* @var \System\AModule $module */
+			$module::I()->Upgrade();
 		}
 	}
 
