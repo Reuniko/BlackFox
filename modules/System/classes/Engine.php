@@ -198,18 +198,22 @@ class Engine extends Instanceable {
 				}
 			}
 
-			// запрос на контент в бд
-			if (isset($this->modules['Content'])) {
-				$page = \Content\Pages::I()->Read(['URL' => $this->url['path']]);
-				if ($page) {
-					$this->TITLE = $page['TITLE'];
-					echo htmlspecialchars_decode($page['CONTENT']);
-					return;
-				}
+			// запрос на контроллер
+			$path_to_controller = $this->SearchAncestorFile($this->url['path'], '.controller.php');
+			if ($path_to_controller) {
+				require($path_to_controller);
+				return;
 			}
 
-			// запрос на неизвестный адрес
-			require($this->SearchAncestorFile($this->url['path'], '.controller.php'));
+			// запрос на контент в бд
+			$page = Content::I()->Read(['URL' => $this->url['path']]);
+			if ($page) {
+				$this->TITLE = $page['TITLE'];
+				echo htmlspecialchars_decode($page['CONTENT']);
+				return;
+			}
+
+			throw new ExceptionPageNotFound();
 
 		} catch (ExceptionSQL $exception) {
 			$message = 'SQL QUERY ERROR: ' . $exception->getMessage();
@@ -415,7 +419,7 @@ class Engine extends Instanceable {
 	 * @param string $uri относительный путь к директории
 	 * @param string $filename имя искомого файла
 	 * @return string абсолютный путь к искомому файлу (если файл найден)
-	 * @throws Exception файл не найден
+	 * @throws Exception
 	 */
 	public function SearchAncestorFile($uri, $filename) {
 		if (empty($filename)) {
@@ -440,7 +444,7 @@ class Engine extends Instanceable {
 				}
 			}
 		}
-		throw new ExceptionPageNotFound("Found no '{$filename}' in '{$uri}'");
+		return null;
 	}
 
 	/**

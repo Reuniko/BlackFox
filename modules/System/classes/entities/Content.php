@@ -1,8 +1,8 @@
 <?php
 
-namespace Content;
+namespace System;
 
-class Pages extends \System\SCRUD {
+class Content extends \System\SCRUD {
 
 	public function Init() {
 		$this->name = 'Контентные страницы';
