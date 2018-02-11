@@ -12,5 +12,6 @@ class Module extends \System\AModule {
 		Files::I()->Synchronize();
 		Groups::I()->Synchronize();
 		Users2Groups::I()->Synchronize();
+		Content::I()->Synchronize();
 	}
 }

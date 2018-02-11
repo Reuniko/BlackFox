@@ -17,9 +17,9 @@ return [
 				'NAME' => 'Модули',
 				'LINK' => '/admin/System/Modules.php',
 			],
-			'Content_Pages'       => [
+			'System_Content'       => [
 				'NAME' => 'Контент',
-				'LINK' => '/admin/Content/Pages.php',
+				'LINK' => '/admin/System/Content.php',
 			],
 			'System_Users'        => [
 				'NAME' => 'Пользователи',
