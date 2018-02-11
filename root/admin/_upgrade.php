@@ -1,6 +1,5 @@
 <?php
 /* @var \System\Engine $this */
-\System\Module::Instance()->Upgrade();
-\Admin\Module::Instance()->Upgrade();
+$this->UpgradeActiveModules();
 ?>
 <div class="alert alert-info">Апгрейд завершен</div>
