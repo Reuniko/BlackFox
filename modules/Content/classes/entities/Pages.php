@@ -10,13 +10,17 @@ class Pages extends \System\SCRUD {
 			'ID'      => self::ID,
 			'URL'     => [
 				'TYPE'     => 'STRING',
-				'NAME'     => 'Адрес страницы',
+				'NAME'     => 'Адрес',
 				'NOT_NULL' => true,
 				'INDEX'    => true,
 			],
+			'TITLE'   => [
+				'TYPE' => 'STRING',
+				'NAME' => 'Заголовок',
+			],
 			'CONTENT' => [
 				'TYPE'    => 'TEXT',
-				'NAME'    => 'Содержимое страницы',
+				'NAME'    => 'Содержимое',
 				'WYSIWYG' => true,
 			],
 		];

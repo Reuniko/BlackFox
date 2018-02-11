@@ -202,7 +202,8 @@ class Engine extends Instanceable {
 			if (isset($this->modules['Content'])) {
 				$page = \Content\Pages::I()->Read(['URL' => $this->url['path']]);
 				if ($page) {
-					echo $page['CONTENT'];
+					$this->TITLE = $page['TITLE'];
+					echo htmlspecialchars_decode($page['CONTENT']);
 					return;
 				}
 			}
