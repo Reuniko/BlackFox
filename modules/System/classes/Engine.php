@@ -6,6 +6,7 @@ class Engine extends Instanceable {
 	public $config = [];
 	public $cores = [];
 	public $roots = [];
+	public $modules = [];
 	public $classes = [];
 	public $url = [];
 
@@ -174,7 +175,6 @@ class Engine extends Instanceable {
 	}
 
 	public function ShowContent() {
-
 		try {
 
 			// Check access
@@ -199,11 +199,12 @@ class Engine extends Instanceable {
 			}
 
 			// запрос на контент в бд
-			// TODO выделить в динамическое подключение модулей
-			$page = \Content\Pages::I()->Read(['URL' => $this->url['path']]);
-			if ($page) {
-				echo $page['CONTENT'];
-				return;
+			if (isset($this->modules['Content'])) {
+				$page = \Content\Pages::I()->Read(['URL' => $this->url['path']]);
+				if ($page) {
+					echo $page['CONTENT'];
+					return;
+				}
 			}
 
 			// запрос на неизвестный адрес
@@ -380,14 +381,14 @@ class Engine extends Instanceable {
 	public function LoadModules() {
 
 		try {
-			$modules = Modules::I()->GetList();
+			$this->modules = Modules::I()->GetList();
 		} catch (\Exception $error) {
 			Modules::I()->Synchronize();
 			Modules::I()->Create(['ID' => 'System']);
-			$modules = Modules::I()->GetList();
+			$this->modules = Modules::I()->GetList();
 		}
 
-		foreach ($modules as $module) {
+		foreach ($this->modules as $module) {
 			$class = $module['ID'];
 			if ($class === 'System') {
 				// already registered
