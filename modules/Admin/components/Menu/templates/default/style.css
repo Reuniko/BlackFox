@@ -19,13 +19,15 @@
 	align-items: center;
 }
 
-.menu .item a {
+.menu .item a,
+.menu .item span {
 	text-decoration: none !important;
 	color: black;
 	width: 100%;
 	padding: 0.25rem;
 	white-space: nowrap;
 	overflow: hidden;
+	cursor: pointer;
 }
 
 .menu .item.active {
@@ -70,6 +72,7 @@
 
 .menu .menu-point-category {
 	background-image: url('img/category.png');
+	cursor: pointer;
 }
 
 .menu .menu-point-category:hover {
