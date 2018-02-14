@@ -1,26 +1,25 @@
 <?php
 namespace System;
+
 class TestScrudBase extends Test {
+
 	public $name = 'Базовые тесты SCRUD';
-	public $tests = [
-		'GetInstance'      => 'Взятие инстанса класса "TestScrudBase"',
-		'Synchronize'      => 'Синхронизация структуры',
-		'Truncate'         => 'Удаление всех записей',
-		'CreateRandomRows' => 'Создание 100 случайных записей',
-		'CreateBadRow'     => 'Попытка создания некорректной записи',
-	];
+
 	/** @var SCRUD $SCRUD */
 	public $SCRUD = null;
 
-	public function GetInstance() {
+	/** Взятие инстанса класса "TestScrudBase" */
+	public function TestGetInstance() {
 		$this->SCRUD = TestScrudTableSimple::I();
 	}
 
-	public function Synchronize() {
+	/** Синхронизация структуры */
+	public function TestSynchronize() {
 		$this->SCRUD->Synchronize();
 	}
 
-	public function Truncate() {
+	/** Удаление всех записей */
+	public function TestTruncate() {
 		$this->SCRUD->Truncate();
 		$rows = $this->SCRUD->GetList();
 		if (!empty($rows)) {
@@ -28,7 +27,8 @@ class TestScrudBase extends Test {
 		}
 	}
 
-	public function CreateRandomRows() {
+	/** Создание 100 случайных записей */
+	public function TestCreateRandomRows() {
 		$R = [];
 		for ($i = 0; $i < 100; $i++) {
 			$R[] = $this->SCRUD->Create([
@@ -49,7 +49,8 @@ class TestScrudBase extends Test {
 		return $i;
 	}
 
-	public function CreateBadRow() {
+	/** Попытка создания некорректной записи с полем типа ENUM */
+	public function TestCreateBadRow() {
 		try {
 			$this->SCRUD->Create([
 				'ENUM' => 'BAD_VALUE',
@@ -58,6 +59,18 @@ class TestScrudBase extends Test {
 			return $error->getMessage();
 		}
 		throw new Exception("Ожидалась ошибка при попытке вставить в поле типа ENUM неизвестное значение");
+	}
+
+	/** Попытка некорректного обновления поля типа ENUM */
+	public function TestUpdateBadRow() {
+		try {
+			$this->SCRUD->Update(1, [
+				'ENUM' => 'BAD_VALUE',
+			]);
+		} catch (Exception $error) {
+			return $error->getMessage();
+		}
+		throw new Exception("Ожидалась ошибка при попытке обновить в поле типа ENUM неизвестное значение");
 	}
 }
 
