@@ -37,15 +37,23 @@
 				<?
 				$direction = (($_GET['SORT'][$structure_code] === 'ASC') ? 'DESC' : 'ASC');
 				$sort_href = $url . "&SORT[{$structure_code}]={$direction}";
+				$is_numeric = in_array($field['TYPE'], [
+					'NUMBER',
+					'FLOAT',
+					'LINK',
+				]);
+				$icon_class = $is_numeric ? 'numeric' : 'alpha';
 				?>
 				<th class="sort<?= isset($_GET['SORT'][$structure_code]) ? ' active' : '' ?>">
 					<a href="<?= $sort_href ?>">
-						<? if ($_GET['SORT'][$structure_code] === 'ASC'): ?>
-							<i class="glyphicon glyphicon-sort-by-attributes"></i>
-						<? endif; ?>
-						<? if ($_GET['SORT'][$structure_code] === 'DESC'): ?>
-							<i class="glyphicon glyphicon-sort-by-attributes-alt"></i>
-						<? endif; ?>
+						<div class="sort-icon">
+							<? if ($_GET['SORT'][$structure_code] === 'ASC'): ?>
+								<i class="fa fa-sort-<?= $icon_class ?>-down"></i>
+							<? endif; ?>
+							<? if ($_GET['SORT'][$structure_code] === 'DESC'): ?>
+								<i class="fa fa-sort-<?= $icon_class ?>-up"></i>
+							<? endif; ?>
+						</div>
 						<?= $field['NAME'] ?>
 					</a>
 				</th>
