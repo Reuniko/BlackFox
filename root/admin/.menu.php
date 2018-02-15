@@ -17,7 +17,7 @@ return [
 				'NAME' => 'Модули',
 				'LINK' => '/admin/System/Modules.php',
 			],
-			'System_Content'       => [
+			'System_Content'      => [
 				'NAME' => 'Контент',
 				'LINK' => '/admin/System/Content.php',
 			],
@@ -45,8 +45,14 @@ return [
 				'NAME'     => 'Тесты',
 				'CHILDREN' => [
 					'SCRUD' => [
-						'NAME' => 'SCRUD',
-						'LINK' => '/admin/System/tests/SCRUD.php',
+						'NAME'     => 'SCRUD',
+						'LINK'     => '/admin/System/tests/SCRUD.php',
+						'CHILDREN' => [
+							'TestScrudTableSimple' => [
+								'NAME' => 'TestScrudTableSimple',
+								'LINK' => '/admin/System/tests/TestScrudTableSimple.php',
+							],
+						],
 					],
 				],
 			],
