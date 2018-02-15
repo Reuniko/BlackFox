@@ -29,7 +29,11 @@ if ($RESULT['MODE'] === 'Create') {
 				<? @include($this->PathInclude('element_head.php')); ?>
 
 				<? foreach ($this->SCRUD->composition as $group_code => $group): ?>
-					<h3 class="group_header"><?= $group['NAME'] ?: "{{$group_code}}" ?></h3>
+					<? if (!empty($group['FIELDS'])): ?>
+						<? if (count($this->SCRUD->composition) > 1): ?>
+							<h3 class="group_header" title="<?= $group_code ?>"><?= $group['NAME'] ?></h3>
+						<? endif; ?>
+					<? endif; ?>
 					<? foreach ($group['FIELDS'] as $code => $field): ?>
 						<div class="form-group row">
 							<label
