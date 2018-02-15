@@ -6,8 +6,12 @@ class Users extends SCRUD {
 
 	public function Init() {
 		$this->name = 'Пользователи';
+		$this->groups = [
+			'SYSTEM'  => 'Система',
+			'CONTENT' => 'Контент',
+		];
 		$this->structure += [
-			'ID'          => self::ID,
+			'ID'          => self::ID + ['GROUP' => 'SYSTEM'],
 			'LOGIN'       => [
 				'TYPE'     => 'STRING',
 				'GROUP'    => 'SYSTEM',

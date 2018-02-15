@@ -47,7 +47,6 @@ abstract class SCRUD extends Instanceable {
 	const ID = [
 		'TYPE'           => 'NUMBER',
 		'NAME'           => 'ID',
-		'GROUP'          => 'SYSTEM',
 		'INDEX'          => true,
 		'PRIMARY'        => true,
 		'NOT_NULL'       => true,
@@ -96,7 +95,7 @@ abstract class SCRUD extends Instanceable {
 			}
 			if (empty($field['GROUP'])) {
 				$this->structure[$code]['GROUP'] = 'OUTSIDE';
-				$this->groups['OUTSIDE'] = '-';
+				$this->groups['OUTSIDE'] = $this->groups['OUTSIDE'] ?: '-';
 				continue;
 			}
 			if (empty($this->groups[$field['GROUP']])) {
