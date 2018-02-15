@@ -76,8 +76,8 @@
 			if ($RESULT['MODE'] === 'POPUP') {
 				$script = "$(window.opener.document)
 						.find('[data-link-input=\'{$RESULT['POPUP']}\']').val('{$row['ID']}').end()
-						.find('[data-link-a=\'{$RESULT['POPUP']}\']').attr('href', '{$this->SCRUD->GetAdminUrl()}?ID={$row['ID']}').text('{$row['ID']}').end()
-						.find('[data-link-span=\'{$RESULT['POPUP']}\']').text('{$this->GetDisplayName($row)}').end()
+						.find('[data-link-a=\'{$RESULT['POPUP']}\']').attr('href', '{$this->SCRUD->GetAdminUrl()}?ID={$row['ID']}').end()
+						.find('[data-link-span=\'{$RESULT['POPUP']}\']').val('{$this->GetDisplayName($row)}').end()
 						;window.close();";
 				$href = "javascript:{$script}";
 				$ondblclick = $script;
