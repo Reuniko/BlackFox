@@ -93,3 +93,10 @@
 .adminer .form-control {
 	border-radius: 0 !important;
 }
+
+.adminer .sort-icon {
+	width: 1.5rem;
+	text-align: center;
+	float: right;
+	background-color: white;
+}
