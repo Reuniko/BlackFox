@@ -23,26 +23,26 @@ class Files extends SCRUD {
 			'NAME'        => [
 				'TYPE'  => 'STRING',
 				'NAME'  => 'Имя файла',
-				'JOIN'  => true,
+				'VITAL' => true,
 				'SHOW'  => true,
 				'GROUP' => 'SYSTEM',
 			],
 			'SIZE'        => [
 				'TYPE'  => 'NUMBER',
 				'NAME'  => 'Размер файла',
-				'JOIN'  => true,
+				'VITAL' => true,
 				'GROUP' => 'SYSTEM',
 			],
 			'TYPE'        => [
 				'TYPE'  => 'STRING',
 				'NAME'  => 'Тип контента',
-				'JOIN'  => true,
+				'VITAL' => true,
 				'GROUP' => 'SYSTEM',
 			],
 			'SRC'         => [
 				'TYPE'  => 'STRING',
 				'NAME'  => 'Путь к файлу',
-				'JOIN'  => true,
+				'VITAL' => true,
 				'GROUP' => 'SYSTEM',
 			],
 		];

@@ -15,7 +15,7 @@ class Modules extends SCRUD {
 				'NOT_NULL'       => true,
 				'AUTO_INCREMENT' => false,
 				'DISABLED'       => false,
-				'JOIN'           => true,
+				'VITAL'          => true,
 			],
 			'NAME'        => [
 				'TYPE' => 'STRING',
