@@ -19,7 +19,7 @@ class Users extends SCRUD {
 				'NOT_NULL' => true,
 				'INDEX'    => true,
 				'UNIQUE'   => true,
-				'JOIN'     => true,
+				'VITAL'    => true,
 				'SHOW'     => true,
 			],
 			'PASSWORD'    => [

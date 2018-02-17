@@ -946,7 +946,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param bool $medium Выбрать связанные поля?
 	 * @param bool $full Выбрать все возможные поля?
 	 * @param bool $join Указывает на то, что метод используется для сбора полей в
-	 * присоединяемую таблицу (собираются не все поля, а лишь те, у которых JOIN == true)
+	 * присоединяемую таблицу (собираются не все поля, а лишь те, у которых VITAL == true)
 	 *
 	 * @return array поля таблицы для подстановки в параметр FIELDS
 	 */
@@ -965,7 +965,7 @@ abstract class SCRUD extends Instanceable {
 				}
 			}
 
-			if (!$join || $field['JOIN']) {
+			if (!$join || $field['VITAL']) {
 				$list[$code] = $code;
 				continue;
 			}
