@@ -2,13 +2,14 @@
 <?php /** @var array $RESULT */ ?>
 <div class="TestRunner">
 
-	<form method="post" class="mb-2">
+	<form method="get" class="mb-2">
 		<button
 			type="submit"
 			class="btn btn-primary"
 			name="ACTION"
 			value="RunAll"
 		>
+			<i class="fa fa-play"></i>
 			Запустить все тесты
 		</button>
 	</form>
@@ -25,8 +26,23 @@
 	?>
 
 	<? foreach ($RESULT as $test_class_name => $test): ?>
-		<div class="card">
+		<div class="card mb-2">
 			<div class="card-header">
+
+				<form method="get" class="d-inline">
+					<button
+						type="submit"
+						class="btn btn-sm btn-secondary"
+						name="ACTION"
+						value="RunOne"
+					><i class="fa fa-play"></i></button>
+					<input
+						type="hidden"
+						name="TEST_CLASS_NAME"
+						value="<?= $test_class_name ?>"
+					/>
+				</form>
+
 				<span class="float-right"><?= $test_class_name ?></span>
 				<?= $test['NAME'] ?>
 			</div>

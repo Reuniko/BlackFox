@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 
 class TestScrudTableSimple extends SCRUD {
@@ -20,10 +21,10 @@ class TestScrudTableSimple extends SCRUD {
 				'NAME' => 'Float',
 			],
 			'STRING'   => [
-				'TYPE' => 'STRING',
-				'NAME' => 'String',
-				'JOIN' => true,
-				'SHOW' => true,
+				'TYPE'  => 'STRING',
+				'NAME'  => 'String',
+				'VITAL' => true,
+				'SHOW'  => true,
 			],
 			'LINK'     => [
 				'TYPE' => 'LINK',

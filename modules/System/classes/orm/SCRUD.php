@@ -52,7 +52,7 @@ abstract class SCRUD extends Instanceable {
 		'NOT_NULL'       => true,
 		'AUTO_INCREMENT' => true,
 		'DISABLED'       => true,
-		'JOIN'           => true,
+		'VITAL'          => true,
 	];
 
 
@@ -972,6 +972,69 @@ abstract class SCRUD extends Instanceable {
 
 		}
 		return $list;
+	}
+
+	/**
+	 * Возвращает экземпляр класса SCRUD, на который ссылается поле
+	 *
+	 * @param array $info массив, описывающий поле (с ключем LINK)
+	 * @return SCRUD экземпляр
+	 * @throws ExceptionNotAllowed
+	 */
+	private function GetLink($info) {
+		if (!class_exists($info['LINK'])) {
+			throw new ExceptionNotAllowed("You must set class name to LINK info of field '{$info['NAME']}'");
+		}
+		$parents = class_parents($info['LINK']);
+		if (!in_array('System\SCRUD', $parents)) {
+			throw new ExceptionNotAllowed("You must set class (child of SCRUD) name to LINK info of field '{$info['NAME']}'");
+		}
+		/** @var SCRUD $Link */
+		$Link = $info['LINK']::I();
+		return $Link;
+	}
+
+
+	public function ExplainFields($fields) {
+		$output = [];
+		foreach ($fields as $key => $value) {
+			if (is_numeric($key) and is_array($value)) {
+				throw new ExceptionNotAllowed("Fields: Numeric key with array value");
+			}
+			$o_key = is_numeric($key) ? $value : $key;
+
+			if (is_array($value)) {
+				$output[$o_key] = $this->GetLink($this->structure[$key])->ExplainFields($value);
+				continue;
+			}
+
+			// if (!is_array($value)):
+			$first_symbol = substr($value, 0, 1);
+			if (!in_array($first_symbol, ['*', '@'])) {
+				$output[$o_key] = $value;
+				continue;
+			}
+
+			// if (in_array($first_symbol, ['*', '@'])):
+			$last_symbols = substr($value, 1);
+			foreach ($this->structure as $code => $info) {
+				if ($first_symbol === '@' and !$info['VITAL']) {
+					continue;
+				}
+				if (!in_array($info['TYPE'], ['LINK', 'OUTER', 'INNER', 'MULTI'])) {
+					$output[$code] = $code;
+					continue;
+				}
+				if (empty($last_symbols)) {
+					$output[$code] = $code;
+					continue;
+				}
+
+				$output[$code] = $this->GetLink($info)->ExplainFields([$last_symbols]);
+				continue;
+			}
+		}
+		return $output;
 	}
 
 	/**

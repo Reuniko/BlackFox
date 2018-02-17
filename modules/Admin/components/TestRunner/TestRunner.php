@@ -1,4 +1,5 @@
 <?php
+
 namespace Admin;
 class TestRunner extends \System\Component {
 	public $options = [
@@ -36,6 +37,17 @@ class TestRunner extends \System\Component {
 			$R[$test_class_name]['NAME'] = $Test->name;
 			$R[$test_class_name]['RESULTS'] = $Test->RunAll();
 		}
+		return $R;
+	}
+
+	public function RunOne($test_class_name) {
+		$R = [];
+		/** @var \System\Test $Test */
+		foreach ($this->tests as $name => $Test) {
+			$R[$name]['NAME'] = $Test->name;
+		}
+		$Test = $this->tests[$test_class_name];
+		$R[$test_class_name]['RESULTS'] = $Test->RunAll();
 		return $R;
 	}
 }

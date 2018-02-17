@@ -3,7 +3,7 @@ namespace System;
 
 class TestScrudBase extends Test {
 
-	public $name = 'Базовые тесты SCRUD';
+	public $name = 'Тест SCRUD: базовые методы';
 
 	/** @var SCRUD $SCRUD */
 	public $SCRUD = null;
