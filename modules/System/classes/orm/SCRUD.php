@@ -124,7 +124,7 @@ abstract class SCRUD extends Instanceable {
 	 * Инициализатор объекта, объявляется в классе-наследнике.
 	 * Может использовать другие объекты для формирования структуры.
 	 * Должен определить собственные поля: name, structure
-	 * Может определить собственные поля: groups, annexes, code
+	 * Может определить собственные поля: groups, code
 	 */
 	public function Init() {
 
@@ -451,6 +451,11 @@ abstract class SCRUD extends Instanceable {
 	public function Pick($filter = [], $sort = [], $field = null) {
 		$data = $this->Select($filter, $sort, $field);
 		return reset($data);
+	}
+
+	public function Count($filter = []) {
+		$data = $this->Select($filter);
+		return count($data);
 	}
 
 	/**
