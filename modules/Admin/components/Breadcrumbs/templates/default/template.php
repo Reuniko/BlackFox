@@ -2,6 +2,7 @@
 <?php /** @var array $RESULT */ ?>
 
 <ol class="breadcrumb">
+
 	<? function BuildDefaultBreadcrumbsRecursive($item) { ?>
 		<? if ($item['ACTIVE']): ?>
 			<li class="breadcrumb-item">
@@ -19,7 +20,14 @@
 			<? endforeach; ?>
 		<? endif; ?>
 	<? } ?>
-	<? foreach ($RESULT as $category): ?>
+
+	<? foreach ($RESULT['MENU'] as $category): ?>
 		<? BuildDefaultBreadcrumbsRecursive($category); ?>
+	<? endforeach; ?>
+
+	<? foreach ($RESULT['BREADCRUMBS'] as $breadcrumb): ?>
+		<li class="breadcrumb-item">
+			<a href="<?= $breadcrumb['LINK'] ?>"><?= $breadcrumb['NAME'] ?></a>
+		</li>
 	<? endforeach; ?>
 </ol>

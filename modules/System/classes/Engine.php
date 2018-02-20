@@ -18,6 +18,7 @@ class Engine extends Instanceable {
 	public $HEADER = "";
 	public $HEADERS = [];
 	public $CONTENT = "";
+	public $BREADCRUMBS = [];
 
 	public $SECTION = [];
 	public $TEMPLATE = "";
@@ -480,5 +481,22 @@ class Engine extends Instanceable {
 		}
 		$relative_path = str_replace($root_path, '', $absolute_path);
 		return $relative_path;
+	}
+
+	/**
+	 * Добавляет хлебную крошку в конец цепочки.
+	 * Если ссылка не указана, берет ссылку на текущий запрос (REQUEST_URI).
+	 *
+	 * @param string $name имя хлебной крошки
+	 * @param string $link ссылка хлебной крошки
+	 */
+	public function AddBreadcrumb($name, $link = null) {
+		if ($link === null) {
+			$link = $_SERVER['REQUEST_URI'];
+		}
+		$this->BREADCRUMBS[] = [
+			'NAME' => $name,
+			'LINK' => $link,
+		];
 	}
 }

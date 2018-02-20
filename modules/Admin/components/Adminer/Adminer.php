@@ -96,12 +96,14 @@ class Adminer extends \System\Component {
 		if ($ID === 0) {
 			$this->RESULT['MODE'] = 'Create';
 			$this->RESULT['DATA'] = $FIELDS + $this->GetDefaultValues();
+			$this->ENGINE->AddBreadcrumb("Добавление элемента");
 		} else {
 			$this->RESULT['MODE'] = 'Update';
 			$this->RESULT['DATA'] = $FIELDS + $this->SCRUD->Read($ID);
 			if (empty($this->RESULT['DATA'])) {
 				throw new Exception("Элемент не найден");
 			}
+			$this->ENGINE->AddBreadcrumb("Редактирование элемента №{$ID}");
 		}
 		return $this->RESULT;
 	}
