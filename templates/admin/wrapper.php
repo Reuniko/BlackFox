@@ -2,8 +2,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<? require('_header.php'); ?>
-	<?= $this->GetHeader(); ?>
+	<? require('_header.php') ?>
+	<?= $this->GetHeader() ?>
 	<link href="<?= $this->TEMPLATE_PATH ?>/style.css?<?= filemtime($_SERVER['DOCUMENT_ROOT'] . $this->TEMPLATE_PATH . '/style.css') ?>" rel="stylesheet">
 </head>
 <body>
@@ -27,11 +27,12 @@
 <main role="main" class="container-fluid p-0">
 	<div class="row no-gutters">
 		<div class="col-sm-3 col-md-2 sidebar">
-			<? \Admin\Menu::Run(); ?>
+			<? \Admin\Menu::Run() ?>
 		</div>
 		<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main p-3">
+			<? \Admin\Breadcrumbs::Run() ?>
 			<h1 class="page-header"><?= $this->TITLE ?></h1>
-			<?= $this->CONTENT; ?>
+			<?= $this->CONTENT ?>
 		</div>
 	</div>
 </main>

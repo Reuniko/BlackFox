@@ -2,6 +2,7 @@
 return [
 	'System' => [
 		'NAME'     => 'Система',
+		'LINK'     => '/admin/System/',
 		'CHILDREN' => [
 			'panel'               => [
 				'NAME'     => 'Панель управления',
