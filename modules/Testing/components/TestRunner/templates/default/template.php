@@ -1,4 +1,4 @@
-<?php /** @var \Admin\TestRunner $this */ ?>
+<?php /** @var \Testing\TestRunner $this */ ?>
 <?php /** @var array $RESULT */ ?>
 <div class="TestRunner">
 
