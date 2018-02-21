@@ -82,7 +82,15 @@ class TestScrudExplainFields extends Test {
 			'DATE'     => 'DATE',
 			'ENUM'     => 'ENUM',
 			'SET'      => 'SET',
-			'FILE'     => 'FILE',
+			'FILE'     => [
+				'ID'          => 'ID',
+				'CREATE_DATE' => 'CREATE_DATE',
+				'CREATE_BY'   => 'CREATE_BY',
+				'NAME'        => 'NAME',
+				'SIZE'        => 'SIZE',
+				'TYPE'        => 'TYPE',
+				'SRC'         => 'SRC',
+			],
 		);
 		if ($fields <> $awaits) {
 			throw new Exception($fields);
@@ -109,7 +117,13 @@ class TestScrudExplainFields extends Test {
 			'DATE'     => 'DATE',
 			'ENUM'     => 'ENUM',
 			'SET'      => 'SET',
-			'FILE'     => 'FILE',
+			'FILE'     => [
+				'ID'   => 'ID',
+				'NAME' => 'NAME',
+				'SIZE' => 'SIZE',
+				'TYPE' => 'TYPE',
+				'SRC'  => 'SRC',
+			],
 		);
 		if ($fields <> $awaits) {
 			throw new Exception($fields);

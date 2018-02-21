@@ -9,7 +9,7 @@ class AdminerUsers extends Adminer {
 		parent::Execute($PARAMS);
 	}
 
-	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['**'], $popup = null) {
+	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@'], $popup = null) {
 		unset($this->SCRUD->structure['SALT']);
 		unset($this->SCRUD->structure['PASSWORD']);
 		return parent::Section($FILTER, $PAGE, $SORT, $FIELDS, $popup);

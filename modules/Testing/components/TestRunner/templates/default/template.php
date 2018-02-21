@@ -59,9 +59,17 @@
 								<div class="alert alert-sm <?= $status2alert[$test_method_result['STATUS']] ?>">
 									<i class="<?= $status2icon[$test_method_result['STATUS']] ?>"></i>
 									<? if (!empty($test_method_result['ERROR'])): ?>
-										<?= $test_method_result['ERROR']; ?>
+										<? if (is_array($test_method_result['ERROR'])): ?>
+											<pre><?= print_r($test_method_result['ERROR'], true) ?></pre>
+										<? else: ?>
+											<?= $test_method_result['ERROR']; ?>
+										<? endif; ?>
 									<? elseif (!empty($test_method_result['RESULT'])): ?>
-										<?= $test_method_result['RESULT'] ?>
+										<? if (is_array($test_method_result['RESULT'])): ?>
+											<pre><?= print_r($test_method_result['RESULT'], true) ?></pre>
+										<? else: ?>
+											<?= $test_method_result['RESULT']; ?>
+										<? endif; ?>
 									<? else: ?>
 									<? endif; ?>
 								</div>
