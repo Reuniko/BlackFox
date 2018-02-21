@@ -1,17 +1,17 @@
 <?php
 
-namespace System;
+namespace Testing;
 
 class TestScrudExplainFields extends Test {
 	public $name = 'Тест SCRUD: метод ExplainFields';
 
-	/** @var SCRUD $SCRUD */
+	/** @var \System\SCRUD $SCRUD */
 	public $SCRUD = null;
 	public $limit = 100;
 
 	/** Взятие инстанса класса "TestScrudBase" */
 	public function TestGetInstance() {
-		$this->SCRUD = TestScrudTableSimple::I();
+		$this->SCRUD = Table1::I();
 	}
 
 	/** * - все поля 1 уровня */

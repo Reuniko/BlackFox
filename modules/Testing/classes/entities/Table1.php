@@ -1,11 +1,11 @@
 <?php
 
-namespace System;
+namespace Testing;
 
-class TestScrudTableSimple extends SCRUD {
+class Table1 extends \System\SCRUD {
 
 	public function Init() {
-		$this->name = 'Простая таблица для тестирования';
+		$this->name = 'Таблица для тестирования №1';
 		$this->structure = [
 			'ID'       => self::ID,
 			'BOOL'     => [
@@ -29,7 +29,7 @@ class TestScrudTableSimple extends SCRUD {
 			'LINK'     => [
 				'TYPE' => 'LINK',
 				'NAME' => 'Link to self',
-				'LINK' => 'System\TestScrudTableSimple',
+				'LINK' => 'Testing\Table1',
 			],
 			'TEXT'     => [
 				'TYPE' => 'TEXT',
