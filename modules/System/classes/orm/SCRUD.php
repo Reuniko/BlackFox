@@ -249,11 +249,10 @@ abstract class SCRUD extends Instanceable {
 	 * @return array - массив с ключами: ELEMENTS, TOTAL, PAGER
 	 */
 	public function Search($arParams = []) {
-
 		$defParams = [
 			'SORT'   => ['ID' => 'DESC'],
 			'FILTER' => [],
-			'FIELDS' => ['**'],
+			'FIELDS' => ['*@'],
 			'LIMIT'  => 100,
 			'PAGE'   => 1,
 			'ESCAPE' => true,
@@ -268,34 +267,11 @@ abstract class SCRUD extends Instanceable {
 
 		$arParams["PAGE"] = max(1, intval($arParams["PAGE"]));
 
-		// $arParams["FIELDS"] в любом случае должен быть массивом
-		if (!is_array($arParams["FIELDS"])) {
-			$arParams["FIELDS"] = [$arParams["FIELDS"]];
-		}
-
-		// заменяет "*" на развернутую структуру полей без глубины
-		// заменяет "**" на развернутую структуру полей однократной глубины
-		// заменяет "***" на развернутую структуру полей бесконечной глубины
-		foreach ($arParams["FIELDS"] as $key => $field) {
-			if (in_array($field, ['*', '**', '***'])) {
-				unset($arParams["FIELDS"][$key]);
-				$field_list = [];
-				if ($field == "*") {
-					$field_list = $this->GetFieldList();
-				} elseif ($field == "**") {
-					$field_list = $this->GetFieldList(true);
-				} elseif ($field == "***") {
-					$field_list = $this->GetFieldList(true, true);
-				}
-				$arParams["FIELDS"] = array_merge($field_list, $arParams["FIELDS"]);
-				//Debug($arParams["FIELDS"], 'SEARCH * $arParams["FIELDS"]');
-				break;
-			}
-		}
+		$arParams['FIELDS'] = $this->ExplainFields($arParams['FIELDS']);
 
 		// если программист забыл указать KEY в полях
 		if (!empty($arParams['KEY']) and !in_array($arParams['KEY'], $arParams['FIELDS'])) {
-			$arParams['FIELDS'][] = $arParams['KEY'];
+			$arParams['FIELDS'][$arParams['KEY']] = $arParams['KEY'];
 		}
 
 		$this->SQL = 'SELECT ';
@@ -410,7 +386,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param array $sort сортировка
 	 * @return array|false ассоциативный массив, представляющий собой элемент
 	 */
-	public function Read($filter = [], $fields = ["**"], $sort = []) {
+	public function Read($filter = [], $fields = ['*@'], $sort = []) {
 		$arParams = [
 			"FILTER" => $filter,
 			"FIELDS" => $fields,
@@ -1034,7 +1010,7 @@ abstract class SCRUD extends Instanceable {
 				if ($first_symbol === '@' and !$info['VITAL']) {
 					continue;
 				}
-				if (!in_array($info['TYPE'], ['LINK', 'OUTER', 'INNER', 'MULTI'])) {
+				if (!isset($info['LINK'])) {
 					$output[$code] = $code;
 					continue;
 				}

@@ -43,6 +43,12 @@ class Test extends \System\Instanceable {
 					'STATUS' => 'SUCCESS',
 					'RESULT' => $result,
 				];
+			} catch (Exception $error) {
+				$this->results[$test] = [
+					'NAME'   => $display,
+					'STATUS' => 'FAILURE',
+					'ERROR'  => $error->getArray(),
+				];
 			} catch (\Exception $error) {
 				$this->results[$test] = [
 					'NAME'   => $display,

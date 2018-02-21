@@ -55,7 +55,7 @@ class Adminer extends \System\Component {
 		return null;
 	}
 
-	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['**'], $popup = null) {
+	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@'], $popup = null) {
 		$this->view = 'section';
 		$this->RESULT['MODE'] = 'SECTION';
 		if (!empty($popup)) {

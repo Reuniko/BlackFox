@@ -1,6 +1,6 @@
 <?php
 namespace Testing;
 
-class Exception extends \Exception {
+class Exception extends \System\Exception {
 
 }
