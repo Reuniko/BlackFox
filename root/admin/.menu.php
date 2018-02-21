@@ -1,6 +1,6 @@
 <?php
 return [
-	'System' => [
+	'System'  => [
 		'NAME'     => 'Система',
 		'LINK'     => '/admin/System/',
 		'CHILDREN' => [
@@ -42,20 +42,19 @@ return [
 				'NAME' => 'Настройки',
 				'LINK' => '/admin/Admin/TableSettings.php',
 			],
-			'System_Tests'        => [
-				'NAME'     => 'Тесты',
-				'CHILDREN' => [
-					'SCRUD' => [
-						'NAME'     => 'SCRUD',
-						'LINK'     => '/admin/System/tests/SCRUD.php',
-						'CHILDREN' => [
-							'TestScrudTableSimple' => [
-								'NAME' => 'TestScrudTableSimple',
-								'LINK' => '/admin/System/tests/TestScrudTableSimple.php',
-							],
-						],
-					],
-				],
+		],
+	],
+	'Testing' => [
+		'NAME'     => 'Тесты',
+		'LINK'     => '/admin/Testing',
+		'CHILDREN' => [
+			'TestScrudTableSimple' => [
+				'NAME' => 'Таблица для тестирования №1',
+				'LINK' => '/admin/Testing/Table1.php',
+			],
+			'SCRUD'                => [
+				'NAME' => 'Тестирование SCRUD',
+				'LINK' => '/admin/Testing/SCRUD.php',
 			],
 		],
 	],

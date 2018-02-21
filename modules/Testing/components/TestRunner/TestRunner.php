@@ -1,6 +1,7 @@
 <?php
 
-namespace Admin;
+namespace Testing;
+
 class TestRunner extends \System\Component {
 	public $options = [
 		'TESTS' => [
@@ -14,8 +15,8 @@ class TestRunner extends \System\Component {
 	public function Init($PARAMS = []) {
 		parent::Init($PARAMS);
 		foreach ($this->PARAMS['TESTS'] as $test_class_name) {
-			if (!is_subclass_of($test_class_name, 'System\Test')) {
-				throw new Exception("'$test_class_name' must be the child of System\\Test");
+			if (!is_subclass_of($test_class_name, 'Testing\Test')) {
+				throw new Exception("'$test_class_name' must be the child of Testing\\Test");
 			}
 			$this->tests[$test_class_name] = $test_class_name::I();
 		}
@@ -24,7 +25,7 @@ class TestRunner extends \System\Component {
 	public function Work() {
 		$R = [];
 		foreach ($this->tests as $test_class_name => $Test) {
-			/** @var \System\Test $Test */
+			/** @var Test $Test */
 			$R[$test_class_name]['NAME'] = $Test->name;
 		}
 		return $R;
@@ -33,7 +34,7 @@ class TestRunner extends \System\Component {
 	public function RunAll() {
 		$R = [];
 		foreach ($this->tests as $test_class_name => $Test) {
-			/** @var \System\Test $Test */
+			/** @var Test $Test */
 			$R[$test_class_name]['NAME'] = $Test->name;
 			$R[$test_class_name]['RESULTS'] = $Test->RunAll();
 		}
@@ -42,7 +43,7 @@ class TestRunner extends \System\Component {
 
 	public function RunOne($test_class_name) {
 		$R = [];
-		/** @var \System\Test $Test */
+		/** @var Test $Test */
 		foreach ($this->tests as $name => $Test) {
 			$R[$name]['NAME'] = $Test->name;
 		}

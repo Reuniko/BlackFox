@@ -1,17 +1,17 @@
 <?php
-namespace System;
+
+namespace Testing;
 
 class TestScrudBase extends Test {
-
 	public $name = 'Тест SCRUD: базовые методы';
 
-	/** @var SCRUD $SCRUD */
+	/** @var \System\SCRUD $SCRUD */
 	public $SCRUD = null;
 	public $limit = 100;
 
 	/** Взятие инстанса класса "TestScrudBase" */
 	public function TestGetInstance() {
-		$this->SCRUD = TestScrudTableSimple::I();
+		$this->SCRUD = Table1::I();
 	}
 
 	/** Синхронизация структуры */
@@ -54,7 +54,7 @@ class TestScrudBase extends Test {
 	public function TestCreateBadRow() {
 		try {
 			$this->SCRUD->Create(['ENUM' => 'BAD_VALUE']);
-		} catch (Exception $error) {
+		} catch (\Exception $error) {
 			return $error->getMessage();
 		}
 		throw new Exception("Ожидалась ошибка при попытке вставить в поле типа ENUM неизвестное значение");
@@ -64,7 +64,7 @@ class TestScrudBase extends Test {
 	public function TestUpdateBadRow() {
 		try {
 			$this->SCRUD->Update(1, ['ENUM' => 'BAD_VALUE']);
-		} catch (Exception $error) {
+		} catch (\Exception $error) {
 			return $error->getMessage();
 		}
 		throw new Exception("Ожидалась ошибка при попытке обновить в поле типа ENUM неизвестное значение");

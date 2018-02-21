@@ -1,7 +1,8 @@
 <?php
-namespace System;
 
-class Test extends Instanceable {
+namespace Testing;
+
+class Test extends \System\Instanceable {
 
 	/** @var string имя набора тестов */
 	public $name = 'Unknown tests';
