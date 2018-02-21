@@ -3,22 +3,23 @@
 namespace System;
 
 class TypeEnum extends Type {
-	public $name = 'Enum';
-	public $code = 'ENUM';
+	public static $name = 'Enum';
+	public static $code = 'ENUM';
 
-	public function GetStructureStringType($info = []) {
-		return 'enum' . '("' . implode('", "', array_keys($info['VALUES'])) . '")';
+	public function GetStructureStringType() {
+		return 'enum' . '("' . implode('", "', array_keys($this->info['VALUES'])) . '")';
 	}
 
-	public function FormatInputValue($value, $info = []) {
-		if (!isset($info['VALUES'][$value])) {
-			throw new ExceptionType("Unknown enum value '{$value}' for field '{$info['NAME']}'");
+	public function FormatInputValue($value) {
+		if (!isset($this->info['VALUES'][$value])) {
+			throw new ExceptionType("Unknown enum value '{$value}' for field '{$this->info['NAME']}'");
 		}
 		return $value;
 	}
 
-	public function FormatOutputValue($element, $code, $info) {
-		$element["$code|VALUE"] = $info['VALUES'][$element[$code]];
+	public function FormatOutputValue($element) {
+		$code = $this->info['CODE'];
+		$element["$code|VALUE"] = $this->info['VALUES'][$element[$code]];
 		return $element;
 	}
 }

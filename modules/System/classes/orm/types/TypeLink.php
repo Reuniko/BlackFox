@@ -3,20 +3,21 @@
 namespace System;
 
 class TypeLink extends Type {
-	public $name = 'Link';
-	public $code = 'LINK';
+	public static $name = 'Link';
+	public static $code = 'LINK';
 
-	public function GetStructureStringType($info = []) {
+	public function GetStructureStringType() {
 		return 'int';
 	}
 
-	public function FormatInputValue($value, $info = []) {
+	public function FormatInputValue($value) {
 		return (int)$value;
 	}
 
-	public function FormatOutputValue($element, $code, $info) {
+	public function FormatOutputValue($element) {
 		/** @var SCRUD $link */
-		$link = $info["LINK"];
+		$link = $this->info["LINK"];
+		$code = $this->info["CODE"];
 		if (!in_array('System\SCRUD', class_parents($link))) {
 			throw new ExceptionType("Field '{$code}': link '{$link}' must be SCRUD child ");
 		}

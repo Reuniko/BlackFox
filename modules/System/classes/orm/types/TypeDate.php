@@ -3,14 +3,14 @@
 namespace System;
 
 class TypeDate extends Type {
-	public $name = 'Date';
-	public $code = 'DATE';
+	public static $name = 'Date';
+	public static $code = 'DATE';
 
-	public function GetStructureStringType($info = []) {
+	public function GetStructureStringType() {
 		return 'date';
 	}
 
-	public function FormatInputValue($value, $info = []) {
+	public function FormatInputValue($value) {
 		if (is_numeric($value)) {
 			$value = date('Y-m-d', $value);
 		} else {
@@ -19,8 +19,9 @@ class TypeDate extends Type {
 		return $value;
 	}
 
-	public function FormatOutputValue($element, $code, $info) {
+	public function FormatOutputValue($element) {
+		$code = $this->info['CODE'];
 		$element[$code . '|TIMESTAMP'] = strtotime($element[$code]);
-		return parent::FormatOutputValue($element, $code, $info);
+		return $element;
 	}
 }

@@ -34,6 +34,8 @@ abstract class SCRUD extends Instanceable {
 
 	/** @var array массив полей базы данных */
 	public $structure = [];
+	/** @var Type[] массив полей базы данных */
+	public $types = [];
 	/** @var array массив групп полей базы данных */
 	public $groups = [];
 	/** @var array композиция групп полей и полей базы данных, формируется автоматически на основе $this->structure и $this->groups */
@@ -80,6 +82,7 @@ abstract class SCRUD extends Instanceable {
 	/**
 	 * Обеспечивает целостность данных между структурными массивами:
 	 * - structure
+	 * - types
 	 * - groups
 	 * - composition
 	 * - keys
@@ -118,6 +121,11 @@ abstract class SCRUD extends Instanceable {
 		if (empty($this->keys)) {
 			throw new Exception("Primary keys required for " . static::class);
 		}
+
+		foreach ($this->structure as $code => &$info) {
+			$info['CODE'] = $code;
+			$this->types[$code] = FactoryType::I()->Get($info);
+		}
 	}
 
 	/**
@@ -147,7 +155,7 @@ abstract class SCRUD extends Instanceable {
 			$this->SQL = "CREATE TABLE IF NOT EXISTS `{$this->code}` \r\n";
 			$rows = [];
 			foreach ($this->structure as $code => $field) {
-				$rows[] = FactoryType::I()->Get($field['TYPE'])->GetStructureString($code, $field);
+				$rows = $this->types[$code]->GetStructureString();
 			}
 			if (!empty($this->keys)) {
 				$rows[] = "PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
@@ -161,7 +169,7 @@ abstract class SCRUD extends Instanceable {
 			$rows = [];
 			$last_after_code = '';
 			foreach ($this->structure as $code => $field) {
-				$structure_string = FactoryType::I()->Get($field['TYPE'])->GetStructureString($code, $field);
+				$structure_string = $this->types[$code]->GetStructureString();
 				if ($strict && !empty($last_after_code)) {
 					$structure_string .= " AFTER {$last_after_code}";
 				}
@@ -925,7 +933,7 @@ abstract class SCRUD extends Instanceable {
 			return null;
 		}
 
-		$value = FactoryType::I()->Get($info['TYPE'])->FormatInputValue($value, $info);
+		$value = $this->types[$code]->FormatInputValue($value);
 
 		$value = $this->DB->Escape($value);
 		return $value;
@@ -1082,9 +1090,7 @@ abstract class SCRUD extends Instanceable {
 				throw new Exception("Unknown field code '{$code}'");
 			}
 
-			$Type = FactoryType::I()->Get($info['TYPE']);
-			$info = $Type->ProvideInfoIntegrity($info);
-			$element = $Type->FormatOutputValue($element, $code, $info);
+			$element = $this->types[$code]->FormatOutputValue($element);
 		}
 		return $element;
 	}

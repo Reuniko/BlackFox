@@ -3,14 +3,14 @@
 namespace System;
 
 class TypeNumber extends Type {
-	public $name = 'Number';
-	public $code = 'NUMBER';
+	public static $name = 'Number';
+	public static $code = 'NUMBER';
 
-	public function GetStructureStringType($info = []) {
+	public function GetStructureStringType() {
 		return 'int';
 	}
 
-	public function FormatInputValue($value, $info = []) {
+	public function FormatInputValue($value) {
 		return (int)$value;
 	}
 }
