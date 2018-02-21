@@ -3,14 +3,14 @@
 namespace System;
 
 class TypeFloat extends Type {
-	public $name = 'Float';
-	public $code = 'FLOAT';
+	public static $name = 'Float';
+	public static $code = 'FLOAT';
 
-	public function GetStructureStringType($info = []) {
+	public function GetStructureStringType() {
 		return 'float';
 	}
 
-	public function FormatInputValue($value, $info = []) {
+	public function FormatInputValue($value) {
 		return (float)$value;
 	}
 }

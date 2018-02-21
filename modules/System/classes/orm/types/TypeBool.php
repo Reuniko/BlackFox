@@ -3,10 +3,10 @@
 namespace System;
 
 class TypeBool extends Type {
-	public $name = 'Bool';
-	public $code = 'BOOL';
+	public static $name = 'Bool';
+	public static $code = 'BOOL';
 
-	public function GetStructureStringType($info = []) {
+	public function GetStructureStringType() {
 		return 'bool';
 	}
 

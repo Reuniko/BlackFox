@@ -3,10 +3,10 @@
 namespace System;
 
 class TypeFile extends TypeLink {
-	public $name = 'File';
-	public $code = 'FILE';
+	public static $name = 'File';
+	public static $code = 'FILE';
 
-	public function GetStructureStringType($info = []) {
+	public function GetStructureStringType() {
 		return 'int';
 	}
 
@@ -15,9 +15,9 @@ class TypeFile extends TypeLink {
 		return $info;
 	}
 
-	public function FormatInputValue($value, $info = []) {
+	public function FormatInputValue($value) {
 		if (is_array($value)) {
-			$value = $info['LINK']::I()->Create($value);
+			$value = $this->info['LINK']::I()->Create($value);
 		}
 		return (int)$value;
 	}

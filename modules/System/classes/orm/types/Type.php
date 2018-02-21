@@ -7,21 +7,29 @@ namespace System;
  *
  * Parent for all data types for using in database.
  */
-abstract class Type extends Instanceable {
-	public $name;
-	public $code;
+abstract class Type {
+	public static $name;
+	public static $code;
+	public $info;
 
-	abstract function GetStructureStringType($info = []);
+	public function __construct($info) {
+		$this->info = $this->ProvideInfoIntegrity($info);
+	}
 
 	public function ProvideInfoIntegrity($info = []) {
 		return $info;
 	}
 
-	public function GetStructureString($code, $info = []) {
+	abstract function GetStructureStringType();
+
+
+	public function GetStructureString() {
+		$code = $this->info['CODE'];
+		$info = $this->info;
 
 		$info = $this->ProvideInfoIntegrity($info);
 
-		$type = $this->GetStructureStringType($info);
+		$type = $this->GetStructureStringType();
 
 		$null = ($info["NOT_NULL"]) ? "NOT NULL" : "NULL";
 
@@ -47,10 +55,10 @@ abstract class Type extends Instanceable {
 	 * No escape required.
 	 *
 	 * @param mixed $value input value from user
-	 * @param array $info type info
+	 * @internal array $info type info
 	 * @return string input value for database
 	 */
-	public function FormatInputValue($value, $info = []) {
+	public function FormatInputValue($value) {
 		return $value;
 	}
 
@@ -61,11 +69,10 @@ abstract class Type extends Instanceable {
 	 * The element is passed entirely to provide a possibility of adding specific keys.
 	 *
 	 * @param array $element output element
-	 * @param string $code symbolic code of specific field needs to be formatted
-	 * @param array $info type info
+	 * @internal array $info type info
 	 * @return array output element with formatted value|values
 	 */
-	public function FormatOutputValue($element, $code, $info) {
+	public function FormatOutputValue($element) {
 		return $element;
 	}
 }

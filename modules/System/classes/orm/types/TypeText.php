@@ -3,10 +3,10 @@
 namespace System;
 
 class TypeText extends Type {
-	public $name = 'Text';
-	public $code = 'TEXT';
+	public static $name = 'Text';
+	public static $code = 'TEXT';
 
-	public function GetStructureStringType($info = []) {
+	public function GetStructureStringType() {
 		return 'text';
 	}
 }
