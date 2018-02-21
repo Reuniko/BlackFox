@@ -627,13 +627,6 @@ abstract class SCRUD extends Instanceable {
 			}
 			unset($content);
 
-			if ($code === '*') {
-				list($addSelect, $addJoin) = $this->_prepareSelectAndJoin($this->GetFieldList(), $prefix);
-				$select = array_merge($select, $addSelect);
-				$join = array_merge($join, $addJoin);
-				continue;
-			}
-
 			if (empty($this->structure[$code])) {
 				throw new Exception("Unknown field code: '{$code}' in table '{$this->code}'");
 			}
@@ -647,7 +640,7 @@ abstract class SCRUD extends Instanceable {
 
 			if ($field['LINK'] and $is_external) {
 				/** @var self $external */
-				$external = $field['LINK']::Instance();
+				$external = $field['LINK']::I();
 				if (!in_array(self::class, class_parents($external))) {
 					throw new Exception("External class '{$field['LINK']}' specified in the field '{$code}' is not child of " . self::class);
 				}
@@ -924,43 +917,6 @@ abstract class SCRUD extends Instanceable {
 	 */
 	public function FormatArrayKeysCase($input) {
 		return array_change_key_case($input, CASE_UPPER);
-	}
-
-	/**
-	 * Выбирает все поля таблицы для подстановки в параметр FIELDS метода Search
-	 * GetFieldList() - вернет структуру без полей связанных элементов
-	 * GetFieldList(true) - вернет структуру с минимумом полей связанных элементов
-	 * GetFieldList(true, true) - вернет структуру с максимумом полей связанных элементов
-	 *
-	 * @param bool $medium Выбрать связанные поля?
-	 * @param bool $full Выбрать все возможные поля?
-	 * @param bool $join Указывает на то, что метод используется для сбора полей в
-	 * присоединяемую таблицу (собираются не все поля, а лишь те, у которых VITAL == true)
-	 *
-	 * @return array поля таблицы для подстановки в параметр FIELDS
-	 */
-	public function GetFieldList($medium = false, $full = false, $join = false) {
-		$list = [];
-		foreach ($this->structure as $code => $field) {
-
-			if ($medium) {
-				if ($field['LINK']) {
-					if (class_exists($field["LINK"])) {
-						/** @var self $link */
-						$link = $field["LINK"];
-						$list[$code] = $link::I()->GetFieldList($full, $full, true);
-						continue;
-					}
-				}
-			}
-
-			if (!$join || $field['VITAL']) {
-				$list[$code] = $code;
-				continue;
-			}
-
-		}
-		return $list;
 	}
 
 	/**
