@@ -155,7 +155,11 @@ abstract class SCRUD extends Instanceable {
 			$this->SQL = "CREATE TABLE IF NOT EXISTS `{$this->code}` \r\n";
 			$rows = [];
 			foreach ($this->structure as $code => $field) {
-				$rows = $this->types[$code]->GetStructureString();
+				try {
+					$rows[] = $this->types[$code]->GetStructureString();
+				} catch (\Exception $error) {
+					continue;
+				}
 			}
 			if (!empty($this->keys)) {
 				$rows[] = "PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
@@ -169,7 +173,11 @@ abstract class SCRUD extends Instanceable {
 			$rows = [];
 			$last_after_code = '';
 			foreach ($this->structure as $code => $field) {
-				$structure_string = $this->types[$code]->GetStructureString();
+				try {
+					$structure_string = $this->types[$code]->GetStructureString();
+				} catch (\Exception $error) {
+					continue;
+				}
 				if ($strict && !empty($last_after_code)) {
 					$structure_string .= " AFTER {$last_after_code}";
 				}
@@ -632,6 +640,7 @@ abstract class SCRUD extends Instanceable {
 			}
 			$field = $this->structure[$code];
 
+			// TODO remove this block
 			if (isset($field['TABLE'])) {
 				$table = $field['TABLE'];
 			} else {
@@ -869,10 +878,12 @@ abstract class SCRUD extends Instanceable {
 	protected function _prepareOrder($array) {
 		$order = [];
 		foreach ($array as $field_path => $sort) {
+			if ('RAND()' === $field_path) {
+				$order[] = "RAND() {$sort}";
+				continue;
+			}
 			$result = $this->_treatFieldPath($field_path);
-			$table = $result['TABLE'];
-			$code = $result['CODE'];
-			$order[] = "{$table}.`{$code}` {$sort}";
+			$order[] = "{$result['TABLE']}.`{$result['CODE']}` {$sort}";
 		}
 		return $order;
 	}

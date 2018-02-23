@@ -6,3 +6,8 @@
 .TestRunner hr {
 	margin: 8px;
 }
+
+.TestRunner .limit {
+	max-height: 300px;
+	overflow-y: auto;
+}
