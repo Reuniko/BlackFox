@@ -56,7 +56,7 @@
 								</div>
 							</div>
 							<div class="col">
-								<div class="alert alert-sm <?= $status2alert[$test_method_result['STATUS']] ?>">
+								<div class="alert alert-sm <?= $status2alert[$test_method_result['STATUS']] ?> limit">
 									<i class="<?= $status2icon[$test_method_result['STATUS']] ?>"></i>
 									<? if (!empty($test_method_result['ERROR'])): ?>
 										<? if (is_array($test_method_result['ERROR'])): ?>
