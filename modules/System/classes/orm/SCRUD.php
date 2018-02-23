@@ -327,6 +327,8 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 
+		$result['ELEMENTS'] = $this->HookExternalFields($arParams['FIELDS'], $result['ELEMENTS']);
+
 		if ($arParams['LIMIT'] > 1) {
 			$result["PAGER"]["SELECTED"] = count($result["ELEMENTS"]);
 		}
@@ -1086,6 +1088,71 @@ abstract class SCRUD extends Instanceable {
 
 	public function GetElementTitle($element = []) {
 		return $element['TITLE'] ?: $element['ID'] ?: '?';
+	}
+
+	/**
+	 * Подцепляет значения мульти-полей (TYPE = I, M)
+	 *
+	 * @param array $fields
+	 * @param array $elements
+	 * @return mixed
+	 */
+	private function HookExternalFields($fields, $elements) {
+		foreach ($fields as $code => $content) {
+			if (!is_array($content)) {
+				$code = strtoupper($content);
+				$subfields = null;
+			} else {
+				$code = strtoupper($code);
+				$subfields = $content;
+			}
+			unset($content); // don't use it
+			$Type = $this->types[$code];
+
+			$elements = $Type->HookExternalField($elements, $subfields);
+
+			continue;
+
+			// TODO clean, make one more type
+
+			if (in_array($info['TYPE'], ['I', 'M'])) {
+				foreach ($elements as $id => $element) {
+					$elements[$id][$code] = [];
+				}
+				/** @var SCRUD $Link */
+				$Link = $info['LINK']::I();
+				$link_key_to_source = $Link->GetFieldCodeByLink('\\' . get_class($this));
+
+				/*
+				if ($info['TYPE'] === 'I') {
+					$data = $Link->GetList([
+						'FILTER' => [$link_key_to_source => $ids],
+						'FIELDS' => $subfields ?: ['*'],
+					]);
+					foreach ($data as $associative) {
+						$elements[$associative[$link_key_to_source]][$code][$associative[reset($Link->primary)]] = $associative;
+					}
+				}
+				*/
+
+				if ($info['TYPE'] === 'M') {
+					$link_key_to_target = $info['TARGET'];
+					$data = $Link->GetList([
+						'GROUP'  => [$link_key_to_source, $link_key_to_target],
+						'FILTER' => [$link_key_to_source => $ids],
+						'FIELDS' => [
+							reset($Link->primary),
+							$link_key_to_source,
+							$link_key_to_target => $subfields ?: ['*'],
+						],
+					]);
+					foreach ($data as $associative) {
+						$elements[$associative[$link_key_to_source]][$code][$associative[reset($Link->primary)]] = $associative[$link_key_to_target];
+					}
+				}
+			}
+		}
+		return $elements;
 	}
 
 }
