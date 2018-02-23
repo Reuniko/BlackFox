@@ -54,6 +54,7 @@ class TestScrudInner extends Test {
 
 	public function TestGetClasses() {
 		$data = $this->Classes->Read(1);
+		return $data;
 	}
 
 }

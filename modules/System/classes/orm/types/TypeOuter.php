@@ -24,4 +24,25 @@ class TypeOuter extends Type {
 		$element[$code] = $link::I()->FormatOutputValues($element[$code]);
 		return $element;
 	}
+
+	public function PrepareSelectAndJoinByField($table, $prefix, $subfields) {
+		if (empty($subfields)) {
+			return parent::PrepareSelectAndJoinByField($table, $prefix, null);
+		}
+
+		$select = [];
+		$join = [];
+		$code = $this->info['CODE'];
+
+		/** @var SCRUD $Link */
+		$Link = $this->info['LINK']::I();
+		$external_prefix = $prefix . $code . "__";
+		$raw_link_code = $external_prefix . $Link->code;
+
+		$join[$raw_link_code] = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}.{$code} = {$raw_link_code}.{$Link->key()}";
+		list($add_select, $add_join) = $Link->PrepareSelectAndJoinByFields($subfields, $external_prefix);
+		$select += $add_select;
+		$join += $add_join;
+		return ['SELECT' => $select, 'JOIN' => $join];
+	}
 }
