@@ -647,7 +647,7 @@ abstract class SCRUD extends Instanceable {
 
 				$external_prefix = $prefix . strtoupper($code) . "__";
 
-				$join[] = "LEFT JOIN {$external->code} AS {$external_prefix}{$external->code} ON {$table}.{$code} = {$external_prefix}{$external->code}.ID";
+				$join[] = "LEFT JOIN {$external->code} AS {$external_prefix}{$external->code} ON {$table}.{$code} = {$external_prefix}{$external->code}.{$external->key()}";
 
 				list($addSelect, $addJoin) = $external->_prepareSelectAndJoin($subfields, $external_prefix);
 				$select = array_merge($select, $addSelect);
@@ -840,10 +840,10 @@ abstract class SCRUD extends Instanceable {
 				if (empty($structure[$external])) {
 					throw new Exception("Unknown external field code: '{$external}'");
 				}
-				if (empty($structure[$external]["LINK"])) {
+				if (empty($structure[$external]['LINK'])) {
 					throw new Exception("Field is not external: '{$external}'");
 				}
-				$object = $structure[$external]["LINK"]::Instance();
+				$object = $structure[$external]['LINK']::Instance();
 				$table .= $external . "__";
 				$structure = &$object->structure;
 			}

@@ -2,7 +2,7 @@
 
 namespace System;
 
-class TypeFile extends TypeLink {
+class TypeFile extends TypeOuter {
 	public static $name = 'File';
 	public static $code = 'FILE';
 

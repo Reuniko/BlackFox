@@ -27,7 +27,7 @@ class Table1 extends \System\SCRUD {
 				'SHOW'  => true,
 			],
 			'LINK'     => [
-				'TYPE' => 'LINK',
+				'TYPE' => 'OUTER',
 				'NAME' => 'Link to self',
 				'LINK' => 'Testing\Table1',
 			],
