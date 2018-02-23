@@ -35,7 +35,9 @@ class TypeInner extends Type {
 			'FIELDS' => $subfields ?: ['*'],
 		]);
 		foreach ($data as $associative) {
-			$elements[$associative[$link_key_to_source]][$code][$associative[$Link->key()]] = $associative;
+			$ID = $associative[$link_key_to_source];
+			unset($associative[$link_key_to_source]); // remove looking back identifier
+			$elements[$ID][$code][$associative[$Link->key()]] = $associative;
 		}
 
 		return $elements;
