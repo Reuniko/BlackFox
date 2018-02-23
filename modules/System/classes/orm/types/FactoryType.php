@@ -25,6 +25,8 @@ class FactoryType extends Instanceable {
 	 */
 	public function Get(array $info) {
 		if (!isset($this->types[$info['TYPE']])) {
+			debug(debug_backtrace());
+			debug($info, '$info');
 			throw new ExceptionType("Class for type '{$info['TYPE']}' not found");
 		}
 		/** @var Type $class */
