@@ -287,7 +287,7 @@ abstract class SCRUD extends Instanceable {
 			$this->SQL .= 'SQL_CALC_FOUND_ROWS ';
 		}
 
-		list($fields, $joinTables) = $this->_prepareSelectAndJoin($arParams['FIELDS']);
+		list($fields, $joinTables) = $this->PrepareSelectAndJoinByFields($arParams['FIELDS']);
 		$this->SQL .= (!empty($fields)) ? implode(",\r\n", $fields) : '';
 		$this->SQL .= "\r\nFROM {$this->code}\r\n";
 		$this->SQL .= "\r\n" . implode("\r\n", $joinTables);
@@ -616,21 +616,19 @@ abstract class SCRUD extends Instanceable {
 	 * Создает массивы для выборки и джоинов
 	 *
 	 * @param array $fields поля для выборки
-	 * @param string $prefix какой добавить префикс
+	 * @param string $prefix префикс
 	 * @return array массив из двух элементов: 1 - Часть выражения после Select, 2 - Часть выражений LEFT JOIN
 	 * @throws Exception
 	 */
-	protected function _prepareSelectAndJoin($fields, $prefix = "") {
+	public function PrepareSelectAndJoinByFields($fields, $prefix = "") {
 		$select = [];
 		$join = [];
 		foreach ($fields as $code => $content) {
 			if (!is_array($content)) {
 				$code = strtoupper($content);
-				$is_external = false;
-				$subfields = false;
+				$subfields = null;
 			} else {
 				$code = strtoupper($code);
-				$is_external = true;
 				$subfields = $content;
 			}
 			unset($content);
@@ -638,32 +636,10 @@ abstract class SCRUD extends Instanceable {
 			if (empty($this->structure[$code])) {
 				throw new Exception("Unknown field code: '{$code}' in table '{$this->code}'");
 			}
-			$field = $this->structure[$code];
-
-			// TODO remove this block
-			if (isset($field['TABLE'])) {
-				$table = $field['TABLE'];
-			} else {
-				$table = $prefix . $this->code;
-			}
-
-			if ($field['LINK'] and $is_external) {
-				/** @var self $external */
-				$external = $field['LINK']::I();
-				if (!in_array(self::class, class_parents($external))) {
-					throw new Exception("External class '{$field['LINK']}' specified in the field '{$code}' is not child of " . self::class);
-				}
-
-				$external_prefix = $prefix . strtoupper($code) . "__";
-
-				$join[] = "LEFT JOIN {$external->code} AS {$external_prefix}{$external->code} ON {$table}.{$code} = {$external_prefix}{$external->code}.{$external->key()}";
-
-				list($addSelect, $addJoin) = $external->_prepareSelectAndJoin($subfields, $external_prefix);
-				$select = array_merge($select, $addSelect);
-				$join = array_merge($join, $addJoin);
-			} else {
-				$select[] = "{$table}.`{$code}` as `{$prefix}{$code}`";
-			}
+			$Type = $this->types[$code];
+			$result = $Type->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
+			$select += (array)$result['SELECT'];
+			$join += (array)$result['JOIN'];
 		}
 		return [$select, $join];
 	}

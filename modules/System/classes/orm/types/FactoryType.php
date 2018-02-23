@@ -10,8 +10,7 @@ class FactoryType extends Instanceable {
 		foreach (Engine::I()->classes as $class_name => $class_path) {
 			if (in_array('System\Type', class_parents($class_name))) {
 				/** @var Type $class_name */
-				$code = $class_name::$code;
-				$this->types[$code] = $class_name;
+				$this->types[$class_name::$code] = $class_name;
 			}
 		}
 	}
@@ -25,8 +24,6 @@ class FactoryType extends Instanceable {
 	 */
 	public function Get(array $info) {
 		if (!isset($this->types[$info['TYPE']])) {
-			debug(debug_backtrace());
-			debug($info, '$info');
 			throw new ExceptionType("Class for type '{$info['TYPE']}' not found");
 		}
 		/** @var Type $class */
