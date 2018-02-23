@@ -96,4 +96,8 @@ abstract class Type {
 		$select["{$prefix}{$code}"] = "{$prefix}{$table}.`{$code}` as `{$prefix}{$code}`";
 		return ['SELECT' => $select];
 	}
+
+	public function HookExternalField($elements, $subfields) {
+		return $elements;
+	}
 }

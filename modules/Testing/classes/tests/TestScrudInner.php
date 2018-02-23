@@ -53,7 +53,11 @@ class TestScrudInner extends Test {
 	}
 
 	public function TestGetClasses() {
-		$data = $this->Classes->Read(1);
+		$data = $this->Classes->Read(2, [
+			'ID',
+			'TITLE',
+			'STUDENTS' => ['*@'],
+		]);
 		return $data;
 	}
 
