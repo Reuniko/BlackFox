@@ -9,6 +9,10 @@ class TestScrudInner extends Test {
 	public $Grades = null;
 	/** @var Students $Students */
 	public $Students = null;
+	/** @var Rooms $Rooms */
+	public $Rooms = null;
+	/** @var Timetable $Timetable */
+	public $Timetable = null;
 
 	public function __construct() {
 		parent::__construct();
@@ -22,9 +26,19 @@ class TestScrudInner extends Test {
 		$this->Students->Synchronize();
 		$this->Students->Truncate();
 		$this->Students->Fill();
+
+		$this->Rooms = Rooms::I();
+		$this->Rooms->Synchronize();
+		$this->Rooms->Truncate();
+		$this->Rooms->Fill();
+
+		$this->Timetable = Timetable::I();
+		$this->Timetable->Synchronize();
+		$this->Timetable->Truncate();
+		$this->Timetable->Fill();
 	}
 
-	public function TestReadStudents() {
+	public function TestReadStudent() {
 		$student = $this->Students->Read(rand(100, 200));
 		if (array_keys($student) <> ['ID', 'FIRST_NAME', 'LAST_NAME', 'GRADE']) {
 			throw new Exception(['Wrong structure of $student', $student]);
@@ -35,7 +49,7 @@ class TestScrudInner extends Test {
 		//return $student;
 	}
 
-	public function TestReadGrades() {
+	public function TestReadGrade() {
 		$grade = $this->Grades->Read(rand(1, 20));
 		if (array_keys($grade) <> ['ID', 'TITLE', 'STUDENTS']) {
 			throw new Exception(['Wrong structure of $grade', $grade]);
@@ -46,7 +60,7 @@ class TestScrudInner extends Test {
 		//return $grade;
 	}
 
-	public function TestReadGradesS1A() {
+	public function TestReadGradeStudents1A() {
 		$grade = $this->Grades->Read(rand(1, 20), [
 			'ID',
 			'TITLE',
