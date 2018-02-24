@@ -5,60 +5,60 @@ namespace Testing;
 class TestScrudInner extends Test {
 	public $name = 'Тест SCRUD: внешние связи';
 
-	/** @var \System\SCRUD $Classes */
-	public $Classes = null;
-	/** @var \System\SCRUD $Students */
+	/** @var Grades $Grades */
+	public $Grades = null;
+	/** @var Students $Students */
 	public $Students = null;
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->Classes = Classes::I();
-		$this->Classes->Synchronize();
-		//$this->Classes->Truncate();
-		//$this->FillClasses();
+		$this->Grades = Grades::I();
+		$this->Grades->Synchronize();
+		$this->Grades->Truncate();
+		$this->Grades->Fill();
 
 		$this->Students = Students::I();
 		$this->Students->Synchronize();
-		// $this->Students->Truncate();
-		// $this->FillStudents();
+		$this->Students->Truncate();
+		$this->Students->Fill();
 	}
 
-	public function FillClasses() {
-		foreach (['A', 'B', 'C'] as $class_letter) {
-			foreach ([1, 2, 3, 4, 5, 7, 8, 9, 10, 11] as $class_number) {
-				$this->Classes->Create(['TITLE' => $class_number . $class_letter]);
-			}
+	public function TestReadStudents() {
+		$student = $this->Students->Read(rand(100, 200));
+		if (array_keys($student) <> ['ID', 'FIRST_NAME', 'LAST_NAME', 'GRADE']) {
+			throw new Exception(['Wrong structure of $student', $student]);
 		}
-	}
-
-	public function FillStudents() {
-		$names = file(__DIR__ . '/data/names.txt', FILE_IGNORE_NEW_LINES);
-		$lasts = ['J', 'G', 'V', 'X', 'Z'];
-		for ($i = 0; $i < 800; $i++) {
-			$this->Students->Create([
-				'FIRST_NAME' => $names[array_rand($names)],
-				'LAST_NAME'  => $lasts[array_rand($lasts)] . '.',
-				'CLASS'      => $this->Classes->Pick([], ['RAND()' => 'ASC']),
-			]);
+		if (array_keys($student['GRADE']) <> ['ID', 'TITLE']) {
+			throw new Exception(['Wrong structure of $student[CLASS]', $student['GRADE']]);
 		}
+		//return $student;
 	}
 
-	public function TestGetStudents() {
-		$students = $this->Students->GetList([
-			'SORT'  => ['RAND()' => 'ASC'],
-			'LIMIT' => 3,
-		]);
-		return $students;
+	public function TestReadGrades() {
+		$grade = $this->Grades->Read(rand(1, 20));
+		if (array_keys($grade) <> ['ID', 'TITLE', 'STUDENTS']) {
+			throw new Exception(['Wrong structure of $grade', $grade]);
+		}
+		if (array_keys(reset($grade['STUDENTS'])) <> ['ID', 'FIRST_NAME']) {
+			throw new Exception(['Wrong structure of $grade->STUDENTS', reset($grade['STUDENTS'])]);
+		}
+		//return $grade;
 	}
 
-	public function TestGetClasses() {
-		$data = $this->Classes->Read(2, [
+	public function TestReadGradesS1A() {
+		$grade = $this->Grades->Read(rand(1, 20), [
 			'ID',
 			'TITLE',
-			'STUDENTS' => ['*@'],
+			'STUDENTS' => ['*'],
 		]);
-		return $data;
+		if (array_keys($grade) <> ['ID', 'TITLE', 'STUDENTS']) {
+			throw new Exception(['Wrong structure of $grade', $grade]);
+		}
+		if (array_keys(reset($grade['STUDENTS'])) <> ['ID', 'FIRST_NAME', 'LAST_NAME']) {
+			throw new Exception(['Wrong structure of $grade->STUDENTS', reset($grade['STUDENTS'])]);
+		}
+		//return $grade;
 	}
 
 }
