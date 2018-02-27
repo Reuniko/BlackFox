@@ -12,6 +12,8 @@ class Rooms extends \System\SCRUD {
 				'TYPE'     => 'STRING',
 				'NAME'     => 'Номер аудитории',
 				'NOT_NULL' => true,
+				'VITAL'    => true,
+				'SHOW'     => true,
 			],
 		];
 	}

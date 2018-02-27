@@ -10,11 +10,13 @@ class Timetable extends \System\SCRUD {
 			'GRADE'    => [
 				'TYPE'     => 'OUTER',
 				'NAME'     => 'Класс',
+				'LINK'     => 'Testing\Grades',
 				'NOT_NULL' => true,
 			],
 			'ROOM'     => [
 				'TYPE'     => 'OUTER',
 				'NAME'     => 'Аудитория',
+				'LINK'     => 'Testing\Rooms',
 				'NOT_NULL' => true,
 			],
 			'START'    => [

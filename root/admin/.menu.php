@@ -52,7 +52,7 @@ return [
 				'NAME'     => 'Таблицы',
 				'CHILDREN' => [
 					'Table1' => [
-						'NAME' => 'Таблица для тестирования №1',
+						'NAME' => 'Table1',
 						'LINK' => '/admin/Testing/Table1.php',
 					],
 					'Grades' => [
