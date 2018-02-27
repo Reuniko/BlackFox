@@ -11,7 +11,30 @@ class TypeInner extends Type {
 	}
 
 	public function PrepareSelectAndJoinByField($table, $prefix, $subfields) {
+		// этот метод отвечает только за FIELDS, которые поддтягиваются отдельно в методе hook
 		return [];
+	}
+
+	public function PrepareSelectAndJoinByFilter($table, $prefix, $subfields) {
+		// TODO integrate PrepareSelectAndJoinByFilter, doc
+		if (empty($subfields)) {
+			return [];
+		}
+
+		$select = [];
+		$join = [];
+		$code = $this->info['CODE'];
+
+		/** @var SCRUD $Link */
+		$Link = $this->info['LINK']::I();
+		$external_prefix = $prefix . $code . "__";
+		$raw_link_code = $external_prefix . $Link->code;
+
+		$join[$raw_link_code] = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}.ID = {$raw_link_code}.{$this->info['FIELD']}";
+		list($add_select, $add_join) = $Link->PrepareSelectAndJoinByFields($subfields, $external_prefix);
+		$select += $add_select;
+		$join += $add_join;
+		return ['SELECT' => $select, 'JOIN' => $join];
 	}
 
 	public function HookExternalField($elements, $subfields) {
