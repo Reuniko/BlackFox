@@ -19,23 +19,23 @@ class TestScrudInner extends Test {
 
 		$this->Grades = Grades::I();
 		$this->Grades->Synchronize();
-		$this->Grades->Truncate();
-		$this->Grades->Fill();
+		//$this->Grades->Truncate();
+		//$this->Grades->Fill();
 
 		$this->Students = Students::I();
 		$this->Students->Synchronize();
-		$this->Students->Truncate();
-		$this->Students->Fill();
+		//$this->Students->Truncate();
+		//$this->Students->Fill();
 
 		$this->Rooms = Rooms::I();
 		$this->Rooms->Synchronize();
-		$this->Rooms->Truncate();
-		$this->Rooms->Fill();
+		//$this->Rooms->Truncate();
+		//$this->Rooms->Fill();
 
 		$this->Timetable = Timetable::I();
 		$this->Timetable->Synchronize();
-		$this->Timetable->Truncate();
-		$this->Timetable->Fill();
+		//$this->Timetable->Truncate();
+		//$this->Timetable->Fill();
 	}
 
 	public function TestReadStudent() {
@@ -51,7 +51,7 @@ class TestScrudInner extends Test {
 
 	public function TestReadGrade() {
 		$grade = $this->Grades->Read(rand(1, 20));
-		if (array_keys($grade) <> ['ID', 'TITLE', 'STUDENTS']) {
+		if (array_keys($grade) <> ['ID', 'TITLE', 'STUDENTS', 'TIMETABLES']) {
 			throw new Exception(['Wrong structure of $grade', $grade]);
 		}
 		if (array_keys(reset($grade['STUDENTS'])) <> ['ID', 'FIRST_NAME']) {
@@ -73,6 +73,23 @@ class TestScrudInner extends Test {
 			throw new Exception(['Wrong structure of $grade->STUDENTS', reset($grade['STUDENTS'])]);
 		}
 		//return $grade;
+	}
+
+	public function TestReadStudentTimetable() {
+		// TODO timetable connect
+		$fields = [
+			'ID',
+			'FIRST_NAME',
+			'LAST_NAME',
+			'GRADE' => [
+				'ID',
+				'TITLE',
+				'TIMETABLES' => ['*'],
+			],
+		];
+		// $fields = $this->Students->ExplainFields($fields);
+		$student = $this->Students->Read(rand(1, 20), $fields);
+		return $student;
 	}
 
 }
