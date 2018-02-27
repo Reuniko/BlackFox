@@ -10,13 +10,13 @@ class Students extends \System\SCRUD {
 			'ID'         => self::ID,
 			'FIRST_NAME' => [
 				'TYPE'  => 'STRING',
-				'NAME'  => 'String',
+				'NAME'  => 'First name',
 				'VITAL' => true,
 				'SHOW'  => true,
 			],
 			'LAST_NAME'  => [
 				'TYPE' => 'STRING',
-				'NAME' => 'String',
+				'NAME' => 'Last name',
 			],
 			'GRADE'      => [
 				'TYPE' => 'OUTER',

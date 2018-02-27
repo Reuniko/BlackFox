@@ -10,7 +10,7 @@ class Grades extends \System\SCRUD {
 			'ID'       => self::ID,
 			'TITLE'    => [
 				'TYPE'  => 'STRING',
-				'NAME'  => 'String',
+				'NAME'  => 'Title',
 				'VITAL' => true,
 				'SHOW'  => true,
 			],
@@ -18,6 +18,12 @@ class Grades extends \System\SCRUD {
 				'NAME'  => 'Students',
 				'TYPE'  => 'INNER',
 				'LINK'  => 'Testing\Students',
+				'FIELD' => 'GRADE',
+			],
+			'TIMETABLES' => [
+				'NAME'  => 'Timetables',
+				'TYPE'  => 'INNER',
+				'LINK'  => 'Testing\Timetable',
 				'FIELD' => 'GRADE',
 			],
 		];

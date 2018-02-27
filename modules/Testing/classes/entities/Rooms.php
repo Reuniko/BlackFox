@@ -10,7 +10,7 @@ class Rooms extends \System\SCRUD {
 			'ID'    => self::ID,
 			'TITLE' => [
 				'TYPE'     => 'STRING',
-				'NAME'     => 'Номер аудитории',
+				'NAME'     => 'A. Number',
 				'NOT_NULL' => true,
 				'VITAL'    => true,
 				'SHOW'     => true,

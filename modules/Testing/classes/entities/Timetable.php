@@ -23,6 +23,7 @@ class Timetable extends \System\SCRUD {
 				'TYPE'     => 'DATETIME',
 				'NAME'     => 'Время начала занятий',
 				'NOT_NULL' => true,
+				'VITAL'    => true,
 			],
 			'DURATION' => [
 				'TYPE'     => 'NUMBER',
