@@ -24,6 +24,8 @@ abstract class SCRUD extends Instanceable {
 
 	/** @var string последний выполненный SQL-запрос (для отладки) */
 	public $SQL;
+	/** @var string части от последнего SQL-запроса (для отладки) */
+	public $parts;
 	/** @var \System\Database коннектор базы данных */
 	protected $DB;
 
@@ -241,6 +243,19 @@ abstract class SCRUD extends Instanceable {
 		}
 	}
 
+	public function CompileSQLSelect(array $parts) {
+		$SQL = [];
+		$SQL[] = 'SELECT';
+		if ($parts['LIMIT']) $SQL[] = 'SQL_CALC_FOUND_ROWS';
+		$SQL[] = implode(",\r\n", $parts['SELECT']);
+		$SQL[] = "FROM {$this->code}";
+		$SQL[] = implode("\r\n", $parts['JOIN']);
+		if ($parts['WHERE']) $SQL[] = "WHERE " . implode("\r\nAND ", $parts['WHERE']);
+		if ($parts['ORDER']) $SQL[] = "ORDER BY " . implode(", ", $parts['ORDER']);
+		if ($parts['LIMIT']) $SQL[] = "LIMIT {$parts['LIMIT']['FROM']}, {$parts['LIMIT']['COUNT']}";
+		return implode("\r\n", $SQL);
+	}
+
 	/**
 	 * Формирует данные для вывода страницы элементов.
 	 * $arParams - массив вида:
@@ -277,44 +292,35 @@ abstract class SCRUD extends Instanceable {
 
 		$arParams['FIELDS'] = $this->ExplainFields($arParams['FIELDS']);
 
-		// если программист забыл указать KEY в полях
+		// если в полях нет ключевого поля - добавить его в начало
 		if (!empty($arParams['KEY']) and !in_array($arParams['KEY'], $arParams['FIELDS'])) {
 			$arParams['FIELDS'][$arParams['KEY']] = $arParams['KEY'];
 		}
 
-		$this->SQL = 'SELECT ';
-		if ($arParams['LIMIT'] > 1) {
-			$this->SQL .= 'SQL_CALC_FOUND_ROWS ';
-		}
-
-		list($fields, $joinTables) = $this->PrepareSelectAndJoinByFields($arParams['FIELDS']);
-		$this->SQL .= (!empty($fields)) ? implode(",\r\n", $fields) : '';
-		$this->SQL .= "\r\nFROM {$this->code}\r\n";
-		$this->SQL .= "\r\n" . implode("\r\n", $joinTables);
-		$where = $this->_prepareWhere($arParams['FILTER']);
-		$this->SQL .= (!empty($where)) ? "\r\nWHERE " . implode(" \r\nAND ", $where) : '';
-		$order = $this->_prepareOrder($arParams['SORT']);
-		$this->SQL .= (!empty($order)) ? "\r\nORDER BY " . implode(',', $order) : '';
-
+		// compile parts
+		$this->parts = [
+			'SELECT' => [],
+			'JOIN'   => [],
+			'WHERE'  => [],
+			'ORDER'  => [],
+			'GROUP'  => [],
+			'LIMIT'  => [],
+		];
+		$answer = $this->PrepareSelectAndJoinByFields($arParams['FIELDS']);
+		$this->parts['SELECT'] += $answer['SELECT'];
+		$this->parts['JOIN'] += $answer['JOIN'];
+		$this->parts['WHERE'] += $this->_prepareWhere($arParams['FILTER']);
+		$this->parts['ORDER'] += $this->_prepareOrder($arParams['SORT']);
 		if ($arParams['LIMIT'] > 0) {
-			$from = ($arParams['PAGE'] - 1) * $arParams['LIMIT'];
-			$this->SQL .= "\r\nLIMIT {$from}, {$arParams['LIMIT']}";
+			$this->parts['LIMIT'] = [
+				'FROM'  => ($arParams['PAGE'] - 1) * $arParams['LIMIT'],
+				'COUNT' => $arParams['LIMIT'],
+			];
 		}
+
+		$this->SQL = $this->CompileSQLSelect($this->parts);
 
 		$result["ELEMENTS"] = $this->Query($this->SQL, $arParams['KEY']);
-
-		if ($arParams['LIMIT'] > 0) {
-			// Битрикс предлагает следующий способ пагинации:
-			// $CDBResult->NavStart($arParams['LIMIT'], false, $arParams['PAGE']);
-			// проблема в том, что при таком подходе запросы в базу идут без LIMIT-а, а лишь потом
-			// обрезаются нужным образом - это вызывает большие издержки на массивных таблицах
-		}
-
-		if ($arParams['LIMIT'] > 1) {
-			$result["PAGER"]["TOTAL"] = (int)reset(reset($this->Query('SELECT FOUND_ROWS() as TOTAL;')));
-			$result["PAGER"]["CURRENT"] = $arParams["PAGE"];
-			$result["PAGER"]["LIMIT"] = $arParams["LIMIT"];
-		}
 
 		foreach ($result["ELEMENTS"] as &$row) {
 			$row = $this->FormatArrayKeysCase($row);
@@ -330,9 +336,11 @@ abstract class SCRUD extends Instanceable {
 		$result['ELEMENTS'] = $this->HookExternalFields($arParams['FIELDS'], $result['ELEMENTS']);
 
 		if ($arParams['LIMIT'] > 1) {
-			$result["PAGER"]["SELECTED"] = count($result["ELEMENTS"]);
+			$result['PAGER']['TOTAL'] = (int)reset(reset($this->Query('SELECT FOUND_ROWS() as TOTAL;')));
+			$result['PAGER']['CURRENT'] = $arParams['PAGE'];
+			$result['PAGER']['LIMIT'] = $arParams['LIMIT'];
+			$result['PAGER']['SELECTED'] = count($result['ELEMENTS']);
 		}
-
 
 		return $result;
 	}
@@ -619,7 +627,9 @@ abstract class SCRUD extends Instanceable {
 	 *
 	 * @param array $fields поля для выборки
 	 * @param string $prefix префикс
-	 * @return array массив из двух элементов: 1 - Часть выражения после Select, 2 - Часть выражений LEFT JOIN
+	 * @return array массив из двух элементов:
+	 * - SELECT - []
+	 * - JOIN - []
 	 * @throws Exception
 	 */
 	public function PrepareSelectAndJoinByFields($fields, $prefix = "") {
@@ -643,7 +653,10 @@ abstract class SCRUD extends Instanceable {
 			$select += (array)$result['SELECT'];
 			$join += (array)$result['JOIN'];
 		}
-		return [$select, $join];
+		return [
+			'SELECT' => $select,
+			'JOIN'   => $join,
+		];
 	}
 
 	/**
