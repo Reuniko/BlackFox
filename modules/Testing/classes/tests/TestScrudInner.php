@@ -75,21 +75,37 @@ class TestScrudInner extends Test {
 		//return $grade;
 	}
 
-	public function TestReadStudentTimetable() {
-		// TODO timetable connect
-		$fields = [
-			'ID',
-			'FIRST_NAME',
-			'LAST_NAME',
-			'GRADE' => [
-				'ID',
-				'TITLE',
-				'TIMETABLES' => ['*'],
-			],
-		];
-		// $fields = $this->Students->ExplainFields($fields);
-		$student = $this->Students->Read(rand(1, 20), $fields);
-		return $student;
+	public function TestFilterStudentsByGrades() {
+		$students = $this->Students->GetList([
+			'FILTER' => ['GRADE.TITLE' => '9B'],
+		]);
+		foreach ($students as $student) {
+			if ($student['GRADE']['TITLE'] <> '9B') {
+				throw new Exception(['Wrong student', $student]);
+			}
+		}
+		//return $students;
+	}
+
+	public function TestFilterStudentsByGradesWithCustomFields() {
+		$students = $this->Students->GetList([
+			'FILTER' => ['GRADE.TITLE' => '9B'],
+			'FIELDS' => ['ID', 'FIRST_NAME'],
+		]);
+		foreach ($students as $student) {
+			if ($student['GRADE']['TITLE'] <> '9B') {
+				throw new Exception(['Wrong student', $student]);
+			}
+		}
+		//return $students;
+	}
+
+	public function TestFilterGradesByRooms() {
+		$grades = $this->Grades->GetList([
+			'FILTER' => ['TIMETABLES.ROOM.TITLE' => 'R-304'],
+		]);
+		debug($this->Grades->SQL);
+		return $grades;
 	}
 
 }
