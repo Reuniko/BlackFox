@@ -825,38 +825,50 @@ abstract class SCRUD extends Instanceable {
 	 * - OBJECT - объект-наследник SCRUD для обработки поля
 	 * - TABLE - псевдоним для таблицы (AS)
 	 * - CODE - код поля
+	 * - JOIN - TODO
 	 * @throws Exception Unknown external field code
 	 * @throws Exception Field is not external
 	 */
 	protected function _treatFieldPath($field_path) {
 		$path = explode(".", $field_path); // EXTERNAL_FIELD.EXTERNAL_FIELD.FIELD
 		$code = array_pop($path); // FIELD
-		if (!empty($path)) {
-			/** @var self $object */
-			$object = null;
-			$table = '';
-			$structure = &$this->structure;
-			foreach ($path as $external) {
-				if (empty($structure[$external])) {
-					throw new Exception("Unknown external field code: '{$external}'");
-				}
-				if (empty($structure[$external]['LINK'])) {
-					throw new Exception("Field is not external: '{$external}'");
-				}
-				$object = $structure[$external]['LINK']::Instance();
-				$table .= $external . "__";
-				$structure = &$object->structure;
-			}
-			$table = $table . $object->code;
-			unset($structure);
-		} else {
-			$object = $this;
-			$table = $this->code;
+		if (empty($path)) {
+			return [
+				'OBJECT' => $this,
+				'TABLE'  => $this->code,
+				'CODE'   => $code,
+				'JOIN'   => [],
+			];
 		}
+		// if (!empty($path)):
+		/** @var self $object */
+		/** @var Type $Type */
+		$object = null;
+		$table = '';
+		$join = [];
+		$structure = &$this->structure;
+		//$types = &$this->types;
+		foreach ($path as $external) {
+			$info = $structure[$external];
+			//$Type = $types[$external];
+			if (empty($info)) {
+				throw new Exception("Unknown external field code: '{$external}'");
+			}
+			if (empty($info['LINK'])) {
+				throw new Exception("Field is not external: '{$external}'");
+			}
+			$object = $info['LINK']::I();
+			$table .= $external . "__";
+			$structure = &$object->structure;
+			//$types = &$object->types;
+		}
+		$table = $table . $object->code;
+		unset($structure);
 		return [
-			"OBJECT" => $object,
-			"TABLE"  => $table,
-			"CODE"   => $code,
+			'OBJECT' => $object,
+			'TABLE'  => $table,
+			'CODE'   => $code,
+			'JOIN'   => $join,
 		];
 	}
 
