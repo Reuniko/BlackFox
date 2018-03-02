@@ -36,7 +36,11 @@ class TypeOuter extends Type {
 		$raw_link_code = $external_prefix . $Link->code;
 
 		$RESULT = $Link->PrepareSelectAndJoinByFields($subfields, $external_prefix);
-		$RESULT['JOIN'][$raw_link_code] = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}.{$code} = {$raw_link_code}.{$Link->key()}";
+		$join = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}.{$code} = {$raw_link_code}.{$Link->key()}";
+		$RESULT['JOIN'] = array_merge(
+			[$raw_link_code => $join],
+			$RESULT['JOIN']
+		);
 		return $RESULT;
 	}
 }
