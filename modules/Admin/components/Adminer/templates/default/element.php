@@ -37,7 +37,7 @@ if ($RESULT['MODE'] === 'Create') {
 					<? foreach ($group['FIELDS'] as $code => $field): ?>
 						<div class="form-group row">
 							<label
-								class="col-sm-3 col-form-label text-right"
+								class="col-sm-3 col-form-label text-right <?= ($field['NOT_NULL']) ? 'mandatory' : '' ?>"
 								for="<?= $code ?>"
 								title="<?= $code ?>"
 							>
