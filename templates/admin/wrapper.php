@@ -29,7 +29,7 @@
 		<div class="col-sm-3 col-md-2 sidebar">
 			<? \Admin\Menu::Run() ?>
 		</div>
-		<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main p-3">
+		<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main px-3">
 			<? \Admin\Breadcrumbs::Run() ?>
 			<h1 class="page-header"><?= $this->TITLE ?></h1>
 			<?= $this->CONTENT ?>

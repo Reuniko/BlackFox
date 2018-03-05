@@ -1,8 +1,9 @@
 <?php /** @var \System\Component $this */ ?>
 <?php /** @var array $RESULT */ ?>
 
-<ol class="breadcrumb">
+<link rel='stylesheet' href="<?= $this->template_relative_folder ?>/style.css"/>
 
+<ol class="breadcrumb">
 	<? function BuildDefaultBreadcrumbsRecursive($item) { ?>
 		<? if ($item['ACTIVE']): ?>
 			<li class="breadcrumb-item">

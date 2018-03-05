@@ -46,14 +46,16 @@
 				?>
 				<th class="sort<?= isset($_GET['SORT'][$structure_code]) ? ' active' : '' ?>">
 					<a href="<?= $sort_href ?>">
-						<div class="sort-icon">
-							<? if ($_GET['SORT'][$structure_code] === 'ASC'): ?>
-								<i class="fa fa-sort-<?= $icon_class ?>-down"></i>
-							<? endif; ?>
-							<? if ($_GET['SORT'][$structure_code] === 'DESC'): ?>
-								<i class="fa fa-sort-<?= $icon_class ?>-up"></i>
-							<? endif; ?>
-						</div>
+						<? if ($_GET['SORT'][$structure_code]): ?>
+							<div class="sort-icon">
+								<? if ($_GET['SORT'][$structure_code] === 'ASC'): ?>
+									<i class="fa fa-sort-<?= $icon_class ?>-down"></i>
+								<? endif; ?>
+								<? if ($_GET['SORT'][$structure_code] === 'DESC'): ?>
+									<i class="fa fa-sort-<?= $icon_class ?>-up"></i>
+								<? endif; ?>
+							</div>
+						<? endif; ?>
 						<?= $field['NAME'] ?>
 					</a>
 				</th>
