@@ -113,3 +113,8 @@
 	padding: 8px;
 	background-color: #f5f5f5;
 }
+
+.adminer .mandatory:after {
+	color: red;
+	content: '*';
+}
