@@ -48,11 +48,33 @@ return [
 		'NAME'     => 'Тесты',
 		'LINK'     => '/admin/Testing',
 		'CHILDREN' => [
-			'TestScrudTableSimple' => [
-				'NAME' => 'Таблица для тестирования №1',
-				'LINK' => '/admin/Testing/Table1.php',
+			'Tables' => [
+				'NAME'     => 'Таблицы',
+				'CHILDREN' => [
+					'Table1' => [
+						'NAME' => 'Table1',
+						'LINK' => '/admin/Testing/Table1.php',
+					],
+					'Grades' => [
+						'NAME' => 'Grades',
+						'LINK' => '/admin/Testing/Grades.php',
+					],
+					'Rooms' => [
+						'NAME' => 'Rooms',
+						'LINK' => '/admin/Testing/Rooms.php',
+					],
+					'Students' => [
+						'NAME' => 'Students',
+						'LINK' => '/admin/Testing/Students.php',
+					],
+					'Timetable' => [
+						'NAME' => 'Timetable',
+						'LINK' => '/admin/Testing/Timetable.php',
+					],
+				],
 			],
-			'SCRUD'                => [
+
+			'SCRUD' => [
 				'NAME' => 'Тестирование SCRUD',
 				'LINK' => '/admin/Testing/SCRUD.php',
 			],

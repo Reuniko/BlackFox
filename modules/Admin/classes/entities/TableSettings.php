@@ -9,22 +9,22 @@ class TableSettings extends \System\SCRUD {
 		$this->structure = [
 			'ID'      => self::ID,
 			'USER'    => [
+				'TYPE' => 'OUTER',
 				'NAME' => 'Пользователь',
-				'TYPE' => 'LINK',
 				'LINK' => 'System\Users',
 			],
 			'ENTITY'  => [
-				'NAME'     => 'Сущность',
 				'TYPE'     => 'STRING',
+				'NAME'     => 'Сущность',
 				'NOT_NULL' => true,
 			],
 			'FILTERS' => [
-				'NAME' => 'Набор фильтров',
 				'TYPE' => 'LIST',
+				'NAME' => 'Набор фильтров',
 			],
 			'FIELDS'  => [
-				'NAME' => 'Набор полей',
 				'TYPE' => 'LIST',
+				'NAME' => 'Набор полей',
 			],
 		];
 	}

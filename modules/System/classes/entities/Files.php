@@ -15,7 +15,7 @@ class Files extends SCRUD {
 				'GROUP' => 'SYSTEM',
 			],
 			'CREATE_BY'   => [
-				'TYPE'  => 'LINK',
+				'TYPE'  => 'OUTER',
 				'NAME'  => 'Кем создан',
 				'LINK'  => 'System\Users',
 				'GROUP' => 'SYSTEM',
