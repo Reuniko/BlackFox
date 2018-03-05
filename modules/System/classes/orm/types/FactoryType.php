@@ -10,8 +10,7 @@ class FactoryType extends Instanceable {
 		foreach (Engine::I()->classes as $class_name => $class_path) {
 			if (in_array('System\Type', class_parents($class_name))) {
 				/** @var Type $class_name */
-				$code = $class_name::$code;
-				$this->types[$code] = $class_name;
+				$this->types[$class_name::$code] = $class_name;
 			}
 		}
 	}

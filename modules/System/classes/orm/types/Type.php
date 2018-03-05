@@ -8,11 +8,14 @@ namespace System;
  * Parent for all data types for using in database.
  */
 abstract class Type {
+	/** @var string */
 	public static $name;
+	/** @var string */
 	public static $code;
+	/** @var array */
 	public $info;
 
-	public function __construct($info) {
+	public function __construct(array $info) {
 		$this->info = $this->ProvideInfoIntegrity($info);
 	}
 
@@ -74,5 +77,27 @@ abstract class Type {
 	 */
 	public function FormatOutputValue($element) {
 		return $element;
+	}
+
+	/**
+	 * This method must generate and return array with keys:
+	 * - SELECT - array of SQL parts for SELECT section
+	 * - JOIN - array of SQL parts for JOIN section
+	 *
+	 * Генерирует и возвращает массивы строк, являющихся частями для SQL запроса.
+	 *
+	 * @param string $table code of targeted table
+	 * @param string $prefix required prefix
+	 * @param array|null $subfields may contain array of required subfields
+	 * @return array
+	 */
+	public function PrepareSelectAndJoinByField($table, $prefix, $subfields) {
+		$code = $this->info['CODE'];
+		$select["{$prefix}{$code}"] = "{$prefix}{$table}.`{$code}` as `{$prefix}{$code}`";
+		return ['SELECT' => $select];
+	}
+
+	public function HookExternalField($elements, $subfields) {
+		return $elements;
 	}
 }

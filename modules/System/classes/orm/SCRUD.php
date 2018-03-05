@@ -24,6 +24,8 @@ abstract class SCRUD extends Instanceable {
 
 	/** @var string последний выполненный SQL-запрос (для отладки) */
 	public $SQL;
+	/** @var string части от последнего SQL-запроса (для отладки) */
+	public $parts;
 	/** @var \System\Database коннектор базы данных */
 	protected $DB;
 
@@ -155,7 +157,11 @@ abstract class SCRUD extends Instanceable {
 			$this->SQL = "CREATE TABLE IF NOT EXISTS `{$this->code}` \r\n";
 			$rows = [];
 			foreach ($this->structure as $code => $field) {
-				$rows = $this->types[$code]->GetStructureString();
+				try {
+					$rows[] = $this->types[$code]->GetStructureString();
+				} catch (\Exception $error) {
+					continue;
+				}
 			}
 			if (!empty($this->keys)) {
 				$rows[] = "PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
@@ -169,7 +175,11 @@ abstract class SCRUD extends Instanceable {
 			$rows = [];
 			$last_after_code = '';
 			foreach ($this->structure as $code => $field) {
-				$structure_string = $this->types[$code]->GetStructureString();
+				try {
+					$structure_string = $this->types[$code]->GetStructureString();
+				} catch (\Exception $error) {
+					continue;
+				}
 				if ($strict && !empty($last_after_code)) {
 					$structure_string .= " AFTER {$last_after_code}";
 				}
@@ -233,6 +243,19 @@ abstract class SCRUD extends Instanceable {
 		}
 	}
 
+	public function CompileSQLSelect(array $parts) {
+		$SQL = [];
+		$SQL[] = 'SELECT';
+		if ($parts['LIMIT']) $SQL[] = 'SQL_CALC_FOUND_ROWS';
+		$SQL[] = implode(",\r\n", $parts['SELECT']);
+		$SQL[] = "FROM {$this->code}";
+		$SQL[] = implode("\r\n", $parts['JOIN']);
+		if ($parts['WHERE']) $SQL[] = "WHERE " . implode("\r\nAND ", $parts['WHERE']);
+		if ($parts['ORDER']) $SQL[] = "ORDER BY " . implode(", ", $parts['ORDER']);
+		if ($parts['LIMIT']) $SQL[] = "LIMIT {$parts['LIMIT']['FROM']}, {$parts['LIMIT']['COUNT']}";
+		return implode("\r\n", $SQL);
+	}
+
 	/**
 	 * Формирует данные для вывода страницы элементов.
 	 * $arParams - массив вида:
@@ -269,44 +292,35 @@ abstract class SCRUD extends Instanceable {
 
 		$arParams['FIELDS'] = $this->ExplainFields($arParams['FIELDS']);
 
-		// если программист забыл указать KEY в полях
+		// если в полях нет ключевого поля - добавить его в начало
 		if (!empty($arParams['KEY']) and !in_array($arParams['KEY'], $arParams['FIELDS'])) {
 			$arParams['FIELDS'][$arParams['KEY']] = $arParams['KEY'];
 		}
 
-		$this->SQL = 'SELECT ';
-		if ($arParams['LIMIT'] > 1) {
-			$this->SQL .= 'SQL_CALC_FOUND_ROWS ';
-		}
-
-		list($fields, $joinTables) = $this->_prepareSelectAndJoin($arParams['FIELDS']);
-		$this->SQL .= (!empty($fields)) ? implode(",\r\n", $fields) : '';
-		$this->SQL .= "\r\nFROM {$this->code}\r\n";
-		$this->SQL .= "\r\n" . implode("\r\n", $joinTables);
-		$where = $this->_prepareWhere($arParams['FILTER']);
-		$this->SQL .= (!empty($where)) ? "\r\nWHERE " . implode(" \r\nAND ", $where) : '';
-		$order = $this->_prepareOrder($arParams['SORT']);
-		$this->SQL .= (!empty($order)) ? "\r\nORDER BY " . implode(',', $order) : '';
-
+		// compile parts
+		$this->parts = [
+			'SELECT' => [],
+			'JOIN'   => [],
+			'WHERE'  => [],
+			'ORDER'  => [],
+			'GROUP'  => [],
+			'LIMIT'  => [],
+		];
+		$answer = $this->PrepareSelectAndJoinByFields($arParams['FIELDS']);
+		$this->parts['SELECT'] += $answer['SELECT'];
+		$this->parts['JOIN'] += $answer['JOIN'];
+		$this->parts['WHERE'] += $this->_prepareWhere($arParams['FILTER']);
+		$this->parts['ORDER'] += $this->_prepareOrder($arParams['SORT']);
 		if ($arParams['LIMIT'] > 0) {
-			$from = ($arParams['PAGE'] - 1) * $arParams['LIMIT'];
-			$this->SQL .= "\r\nLIMIT {$from}, {$arParams['LIMIT']}";
+			$this->parts['LIMIT'] = [
+				'FROM'  => ($arParams['PAGE'] - 1) * $arParams['LIMIT'],
+				'COUNT' => $arParams['LIMIT'],
+			];
 		}
+
+		$this->SQL = $this->CompileSQLSelect($this->parts);
 
 		$result["ELEMENTS"] = $this->Query($this->SQL, $arParams['KEY']);
-
-		if ($arParams['LIMIT'] > 0) {
-			// Битрикс предлагает следующий способ пагинации:
-			// $CDBResult->NavStart($arParams['LIMIT'], false, $arParams['PAGE']);
-			// проблема в том, что при таком подходе запросы в базу идут без LIMIT-а, а лишь потом
-			// обрезаются нужным образом - это вызывает большие издержки на массивных таблицах
-		}
-
-		if ($arParams['LIMIT'] > 1) {
-			$result["PAGER"]["TOTAL"] = (int)reset(reset($this->Query('SELECT FOUND_ROWS() as TOTAL;')));
-			$result["PAGER"]["CURRENT"] = $arParams["PAGE"];
-			$result["PAGER"]["LIMIT"] = $arParams["LIMIT"];
-		}
 
 		foreach ($result["ELEMENTS"] as &$row) {
 			$row = $this->FormatArrayKeysCase($row);
@@ -319,10 +333,14 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 
-		if ($arParams['LIMIT'] > 1) {
-			$result["PAGER"]["SELECTED"] = count($result["ELEMENTS"]);
-		}
+		$result['ELEMENTS'] = $this->HookExternalFields($arParams['FIELDS'], $result['ELEMENTS']);
 
+		if ($arParams['LIMIT'] > 1) {
+			$result['PAGER']['TOTAL'] = (int)reset(reset($this->Query('SELECT FOUND_ROWS() as TOTAL;')));
+			$result['PAGER']['CURRENT'] = $arParams['PAGE'];
+			$result['PAGER']['LIMIT'] = $arParams['LIMIT'];
+			$result['PAGER']['SELECTED'] = count($result['ELEMENTS']);
+		}
 
 		return $result;
 	}
@@ -608,21 +626,21 @@ abstract class SCRUD extends Instanceable {
 	 * Создает массивы для выборки и джоинов
 	 *
 	 * @param array $fields поля для выборки
-	 * @param string $prefix какой добавить префикс
-	 * @return array массив из двух элементов: 1 - Часть выражения после Select, 2 - Часть выражений LEFT JOIN
+	 * @param string $prefix префикс
+	 * @return array массив из двух элементов:
+	 * - SELECT - []
+	 * - JOIN - []
 	 * @throws Exception
 	 */
-	protected function _prepareSelectAndJoin($fields, $prefix = "") {
+	public function PrepareSelectAndJoinByFields($fields, $prefix = "") {
 		$select = [];
 		$join = [];
 		foreach ($fields as $code => $content) {
 			if (!is_array($content)) {
 				$code = strtoupper($content);
-				$is_external = false;
-				$subfields = false;
+				$subfields = null;
 			} else {
 				$code = strtoupper($code);
-				$is_external = true;
 				$subfields = $content;
 			}
 			unset($content);
@@ -630,33 +648,15 @@ abstract class SCRUD extends Instanceable {
 			if (empty($this->structure[$code])) {
 				throw new Exception("Unknown field code: '{$code}' in table '{$this->code}'");
 			}
-			$field = $this->structure[$code];
-
-			if (isset($field['TABLE'])) {
-				$table = $field['TABLE'];
-			} else {
-				$table = $prefix . $this->code;
-			}
-
-			if ($field['LINK'] and $is_external) {
-				/** @var self $external */
-				$external = $field['LINK']::I();
-				if (!in_array(self::class, class_parents($external))) {
-					throw new Exception("External class '{$field['LINK']}' specified in the field '{$code}' is not child of " . self::class);
-				}
-
-				$external_prefix = $prefix . strtoupper($code) . "__";
-
-				$join[] = "LEFT JOIN {$external->code} AS {$external_prefix}{$external->code} ON {$table}.{$code} = {$external_prefix}{$external->code}.ID";
-
-				list($addSelect, $addJoin) = $external->_prepareSelectAndJoin($subfields, $external_prefix);
-				$select = array_merge($select, $addSelect);
-				$join = array_merge($join, $addJoin);
-			} else {
-				$select[] = "{$table}.`{$code}` as `{$prefix}{$code}`";
-			}
+			$Type = $this->types[$code];
+			$result = $Type->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
+			$select += (array)$result['SELECT'];
+			$join += (array)$result['JOIN'];
 		}
-		return [$select, $join];
+		return [
+			'SELECT' => $select,
+			'JOIN'   => $join,
+		];
 	}
 
 	/**
@@ -825,38 +825,50 @@ abstract class SCRUD extends Instanceable {
 	 * - OBJECT - объект-наследник SCRUD для обработки поля
 	 * - TABLE - псевдоним для таблицы (AS)
 	 * - CODE - код поля
+	 * - JOIN - TODO
 	 * @throws Exception Unknown external field code
 	 * @throws Exception Field is not external
 	 */
 	protected function _treatFieldPath($field_path) {
 		$path = explode(".", $field_path); // EXTERNAL_FIELD.EXTERNAL_FIELD.FIELD
 		$code = array_pop($path); // FIELD
-		if (!empty($path)) {
-			/** @var self $object */
-			$object = null;
-			$table = '';
-			$structure = &$this->structure;
-			foreach ($path as $external) {
-				if (empty($structure[$external])) {
-					throw new Exception("Unknown external field code: '{$external}'");
-				}
-				if (empty($structure[$external]["LINK"])) {
-					throw new Exception("Field is not external: '{$external}'");
-				}
-				$object = $structure[$external]["LINK"]::Instance();
-				$table .= $external . "__";
-				$structure = &$object->structure;
-			}
-			$table = $table . $object->code;
-			unset($structure);
-		} else {
-			$object = $this;
-			$table = $this->code;
+		if (empty($path)) {
+			return [
+				'OBJECT' => $this,
+				'TABLE'  => $this->code,
+				'CODE'   => $code,
+				'JOIN'   => [],
+			];
 		}
+		// if (!empty($path)):
+		/** @var self $object */
+		/** @var Type $Type */
+		$object = null;
+		$table = '';
+		$join = [];
+		$structure = &$this->structure;
+		//$types = &$this->types;
+		foreach ($path as $external) {
+			$info = $structure[$external];
+			//$Type = $types[$external];
+			if (empty($info)) {
+				throw new Exception("Unknown external field code: '{$external}'");
+			}
+			if (empty($info['LINK'])) {
+				throw new Exception("Field is not external: '{$external}'");
+			}
+			$object = $info['LINK']::I();
+			$table .= $external . "__";
+			$structure = &$object->structure;
+			//$types = &$object->types;
+		}
+		$table = $table . $object->code;
+		unset($structure);
 		return [
-			"OBJECT" => $object,
-			"TABLE"  => $table,
-			"CODE"   => $code,
+			'OBJECT' => $object,
+			'TABLE'  => $table,
+			'CODE'   => $code,
+			'JOIN'   => $join,
 		];
 	}
 
@@ -869,10 +881,12 @@ abstract class SCRUD extends Instanceable {
 	protected function _prepareOrder($array) {
 		$order = [];
 		foreach ($array as $field_path => $sort) {
+			if ('RAND()' === $field_path) {
+				$order[] = "RAND() {$sort}";
+				continue;
+			}
 			$result = $this->_treatFieldPath($field_path);
-			$table = $result['TABLE'];
-			$code = $result['CODE'];
-			$order[] = "{$table}.`{$code}` {$sort}";
+			$order[] = "{$result['TABLE']}.`{$result['CODE']}` {$sort}";
 		}
 		return $order;
 	}
@@ -1099,6 +1113,71 @@ abstract class SCRUD extends Instanceable {
 
 	public function GetElementTitle($element = []) {
 		return $element['TITLE'] ?: $element['ID'] ?: '?';
+	}
+
+	/**
+	 * Подцепляет значения мульти-полей (TYPE = I, M)
+	 *
+	 * @param array $fields
+	 * @param array $elements
+	 * @return mixed
+	 */
+	private function HookExternalFields($fields, $elements) {
+		foreach ($fields as $code => $content) {
+			if (!is_array($content)) {
+				$code = strtoupper($content);
+				$subfields = null;
+			} else {
+				$code = strtoupper($code);
+				$subfields = $content;
+			}
+			unset($content); // don't use it
+			$Type = $this->types[$code];
+
+			$elements = $Type->HookExternalField($elements, $subfields);
+
+			continue;
+
+			// TODO clean, make one more type
+
+			if (in_array($info['TYPE'], ['I', 'M'])) {
+				foreach ($elements as $id => $element) {
+					$elements[$id][$code] = [];
+				}
+				/** @var SCRUD $Link */
+				$Link = $info['LINK']::I();
+				$link_key_to_source = $Link->GetFieldCodeByLink('\\' . get_class($this));
+
+				/*
+				if ($info['TYPE'] === 'I') {
+					$data = $Link->GetList([
+						'FILTER' => [$link_key_to_source => $ids],
+						'FIELDS' => $subfields ?: ['*'],
+					]);
+					foreach ($data as $associative) {
+						$elements[$associative[$link_key_to_source]][$code][$associative[reset($Link->primary)]] = $associative;
+					}
+				}
+				*/
+
+				if ($info['TYPE'] === 'M') {
+					$link_key_to_target = $info['TARGET'];
+					$data = $Link->GetList([
+						'GROUP'  => [$link_key_to_source, $link_key_to_target],
+						'FILTER' => [$link_key_to_source => $ids],
+						'FIELDS' => [
+							reset($Link->primary),
+							$link_key_to_source,
+							$link_key_to_target => $subfields ?: ['*'],
+						],
+					]);
+					foreach ($data as $associative) {
+						$elements[$associative[$link_key_to_source]][$code][$associative[reset($Link->primary)]] = $associative[$link_key_to_target];
+					}
+				}
+			}
+		}
+		return $elements;
 	}
 
 }

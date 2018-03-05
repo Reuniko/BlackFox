@@ -7,13 +7,13 @@ class Users2Groups extends SCRUD {
 		$this->structure = [
 			'ID'    => self::ID,
 			'USER'  => [
-				'TYPE' => 'LINK',
-				'LINK' => '\\System\\Users',
+				'TYPE' => 'OUTER',
+				'LINK' => 'System\Users',
 				'NAME' => 'Пользователь',
 			],
 			'GROUP' => [
-				'TYPE' => 'LINK',
-				'LINK' => '\\System\\Groups',
+				'TYPE' => 'OUTER',
+				'LINK' => 'System\Groups',
 				'NAME' => 'Группа',
 			],
 		];
