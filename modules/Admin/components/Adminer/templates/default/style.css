@@ -1,3 +1,8 @@
+.adminer,
+.adminer .btn {
+	font-size: 0.9rem;
+}
+
 .adminer table {
 	background-color: white;
 }
@@ -33,10 +38,11 @@
 
 .adminer .group_header {
 	display: block;
-	border: 1px solid #DDD;
+	border: 1px solid #CCC;
 	padding: 5px;
-	background-color: white;
+	background-color: #DDD;
 	text-align: center;
+	font-size: 1.2rem;
 }
 
 .adminer .sort {
@@ -48,7 +54,7 @@
 }
 
 .adminer .sort.active {
-	background: #b3ffff;
+	background: #DDD;
 }
 
 .adminer .sort a,
@@ -61,7 +67,7 @@
 
 .adminer .sort a:hover {
 	text-decoration: none;
-	background: #66ffff;
+	background: #CCC;
 }
 
 .adminer .sortable {
@@ -95,9 +101,9 @@
 }
 
 .adminer .sort-icon {
+	display: inline-block;
 	width: 1.5rem;
 	text-align: center;
-	float: right;
 	background-color: white;
 }
 
