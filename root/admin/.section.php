@@ -3,6 +3,7 @@ return [
 	'NAME'     => 'Административная часть',
 	'TEMPLATE' => 'admin',
 	'ACCESS'   => [
-		'A' => 'R',
+		'*'    => false,
+		'root' => true,
 	],
 ];
