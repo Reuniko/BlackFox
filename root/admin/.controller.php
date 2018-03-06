@@ -23,6 +23,10 @@ if (is_subclass_of($Class, "System\\SCRUD")) {
 	\Admin\Adminer::Run(['SCRUD' => $Class]);
 	return;
 }
+if (is_subclass_of($Class, "System\\Component")) {
+	$Class::Run();
+	return;
+}
 
 
 return $this->Show404();
