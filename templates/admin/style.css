@@ -18,3 +18,32 @@ body {
     color: #444;
     font-size: 2.0rem;
 }
+
+.dl-horizontal dt {
+    float: left;
+    width: 35%;
+    overflow: hidden;
+    clear: left;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dl-horizontal dd {
+    margin-left: 40%;
+}
+
+.dl-horizontal dd:after {
+    content: '\00A0';
+}
+
+.separator {
+    border-bottom: 1px solid rgba(0,0,0,.1);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+.separator:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
