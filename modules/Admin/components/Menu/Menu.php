@@ -4,7 +4,7 @@ namespace Admin;
 
 class Menu extends \System\Component {
 
-	private $path;
+	protected $path;
 
 	public function SelectMethodForAction($request = array()) {
 		return 'Work';
@@ -14,7 +14,7 @@ class Menu extends \System\Component {
 		$this->RESULT = [];
 		foreach ($this->ENGINE->modules as $module => $info) {
 			try {
-				$menu = require($this->ENGINE->GetCoreFile("modules/" . strtolower($module) . "/.menu.php"));
+				$menu = require($this->ENGINE->GetCoreFile("modules/{$module}/.menu.php"));
 			} catch (\Exception $error) {
 				continue;
 			}
@@ -29,7 +29,7 @@ class Menu extends \System\Component {
 		return $this->RESULT;
 	}
 
-	private function SearchItemRecursive(&$item) {
+	protected function SearchItemRecursive(&$item) {
 		if ($item['LINK'] === $this->path) {
 			$item['ACTIVE'] = true;
 			$item['CURRENT'] = true;
