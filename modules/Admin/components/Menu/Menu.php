@@ -11,7 +11,15 @@ class Menu extends \System\Component {
 	}
 
 	public function Work() {
-		$this->RESULT = require($this->ENGINE->SearchAncestorFile($this->ENGINE->url['path'], '.menu.php'));
+		$this->RESULT = [];
+		foreach ($this->ENGINE->modules as $module => $info) {
+			try {
+				$menu = require($this->ENGINE->GetCoreFile("modules/" . strtolower($module) . "/.menu.php"));
+			} catch (\Exception $error) {
+				continue;
+			}
+			$this->RESULT = array_merge($this->RESULT, $menu);
+		}
 		$this->path = parse_url($_SERVER['REQUEST_URI'])['path'];
 
 		foreach ($this->RESULT as &$item) {
