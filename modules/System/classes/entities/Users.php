@@ -42,9 +42,10 @@ class Users extends SCRUD {
 				'DESCRIPTION' => 'Для восстановления пароля',
 			],
 			'LAST_AUTH'   => [
-				'TYPE'  => 'DATETIME',
-				'GROUP' => 'SYSTEM',
-				'NAME'  => 'Последнее время авторизации',
+				'TYPE'     => 'DATETIME',
+				'GROUP'    => 'SYSTEM',
+				'NAME'     => 'Последнее время авторизации',
+				'DISABLED' => true,
 			],
 			'FIRST_NAME'  => [
 				'TYPE'  => 'STRING',
