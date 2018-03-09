@@ -48,6 +48,27 @@ class Files extends SCRUD {
 		];
 	}
 
+	public function GetNewSrc($full_name) {
+		$extension = end(explode('.', $full_name));
+		if (empty($extension)) {
+			throw new Exception("File must have extension");
+		}
+
+		$dir = '';
+		$src = '';
+		while (true) {
+			$name = sha1(time() . $full_name) . '.' . $extension;
+			$dir = '/upload/' . substr($name, 0, 3);
+			$src = $dir . '/' . $name;
+			if (file_exists($_SERVER['DOCUMENT_ROOT'] . $src)) {
+				continue;
+			}
+			break;
+		}
+		mkdir($_SERVER['DOCUMENT_ROOT'] . $dir);
+		return $src;
+	}
+
 	public function Create($fields = []) {
 		if (isset($fields['tmp_name'])) {
 
@@ -55,24 +76,8 @@ class Files extends SCRUD {
 				return null;
 			}
 
-			$file_ext = end(explode('.', $fields['name']));
-			if (empty($file_ext)) {
-				throw new Exception("File must have extension");
-			}
+			$src = $this->GetNewSrc($fields['name']);
 
-			$dir = '';
-			$src = '';
-			while (true) {
-				$file_name = sha1(time() . $fields['name']) . '.' . $file_ext;
-				$dir = '/upload/' . substr($file_name, 0, 3);
-				$src = $dir . '/' . $file_name;
-				if (file_exists($_SERVER['DOCUMENT_ROOT'] . $src)) {
-					continue;
-				}
-				break;
-			}
-
-			mkdir($_SERVER['DOCUMENT_ROOT'] . $dir);
 			move_uploaded_file($fields['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $src);
 			$file = [
 				'CREATE_DATE' => time(),
@@ -90,5 +95,18 @@ class Files extends SCRUD {
 
 	public function Update($ids = array(), $fields = array()) {
 		throw new ExceptionNotAllowed();
+	}
+
+	public function CreateFromContent($name, $content) {
+		$src = $this->GetNewSrc($name);
+		$path = $_SERVER['DOCUMENT_ROOT'] . $src;
+		file_put_contents($path, $content);
+		return $this->Create([
+			'CREATE_DATE' => time(),
+			'NAME'        => $name,
+			'SIZE'        => filesize($path),
+			'TYPE'        => filetype($path),
+			'SRC'         => $src,
+		]);
 	}
 }
