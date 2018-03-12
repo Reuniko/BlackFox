@@ -29,6 +29,10 @@ class Modules extends SCRUD {
 				'TYPE' => 'STRING',
 				'NAME' => 'Версия',
 			],
+			'SORT'        => [
+				'TYPE' => 'NUMBER',
+				'NAME' => 'Сортировка',
+			],
 		];
 	}
 
