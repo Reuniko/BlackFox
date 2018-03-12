@@ -297,6 +297,13 @@ class Engine extends Instanceable {
 		$component_class_name::Run($params, $template);
 	}
 
+	/**
+	 * Ищет все классы модуля и регистрирует их в движке, заполняя массив $this->classes:
+	 * - ключ - имя класса (вместе с неймспейсом)
+	 * - значение - путь к файлу
+	 *
+	 * @param string $module_name символьный код модуля
+	 */
 	public function RegisterModuleClasses($module_name) {
 		$this->classes["{$module_name}\\Module"] = $this->GetCoreFile("modules/{$module_name}/Module.php");
 		foreach ($this->cores as $core) {
@@ -387,11 +394,11 @@ class Engine extends Instanceable {
 	public function LoadModules() {
 
 		try {
-			$this->modules = Modules::I()->GetList();
+			$this->modules = Modules::I()->GetList(['SORT' => ['SORT' => 'ASC']]);
 		} catch (\Exception $error) {
 			Modules::I()->Synchronize();
 			Modules::I()->Create(['ID' => 'System']);
-			$this->modules = Modules::I()->GetList();
+			$this->modules = Modules::I()->GetList(['SORT' => ['SORT' => 'ASC']]);
 		}
 
 		foreach ($this->modules as $module) {
@@ -400,7 +407,6 @@ class Engine extends Instanceable {
 				// already registered
 				continue;
 			}
-
 			$this->RegisterModuleClasses($module['ID']);
 		}
 	}
