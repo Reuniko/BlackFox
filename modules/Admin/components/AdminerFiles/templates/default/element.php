@@ -4,7 +4,7 @@
 	<? require $this->TemplateParentPath(); ?>
 <? else: ?>
 	<form method="post" enctype="multipart/form-data">
-		<label class="btn btn-secondary btn-file">
+		<label class="btn btn-secondary btn-file m-0">
 			<span>Выбрать файл</span>
 			<input type="file" name="FIELDS" style="display: none;">
 		</label>
