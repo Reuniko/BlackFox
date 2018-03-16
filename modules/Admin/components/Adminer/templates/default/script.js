@@ -58,4 +58,9 @@ $(function () {
         }
     });
 
+    $('[data-wysiwyg]').each(function () {
+        CKEDITOR.config.allowedContent = true;
+        CKEDITOR.replace($(this).attr('id'));
+    });
+
 });

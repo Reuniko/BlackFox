@@ -9,8 +9,7 @@
 	name="FIELDS[<?= $code ?>]"
 	<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 	rows="10"
+	<? if ($field['WYSIWYG']): ?>
+		data-wysiwyg=""
+	<? endif; ?>
 ><?= $RESULT['DATA'][$code] ?></textarea>
-
-<? if ($field['WYSIWYG']): ?>
-	<script>CKEDITOR.replace('<?= $code ?>');</script>
-<? endif; ?>
