@@ -90,10 +90,8 @@ class TestScrudInner extends Test {
 	public function TestFilterStudentsByGradesWithCustomFields() {
 		$students = $this->Students->GetList([
 			'FILTER' => ['GRADE.TITLE' => '9B'],
-			'FIELDS' => ['ID', 'FIRST_NAME', 'GRADE' => ['TITLE']],
+			'FIELDS' => ['ID', 'FIRST_NAME'],
 		]);
-		// TODO remove field 'GRADE' => ['TITLE']
-		debug($this->Students->SQL);
 		foreach ($students as $student) {
 			if ($student['GRADE']['TITLE'] <> '9B') {
 				throw new Exception(['Wrong student', $student]);
@@ -106,7 +104,6 @@ class TestScrudInner extends Test {
 		$grades = $this->Grades->GetList([
 			'FILTER' => ['TIMETABLES.ROOM.TITLE' => 'R-304'],
 		]);
-		debug($this->Grades->SQL);
 		return $grades;
 	}
 
