@@ -69,4 +69,18 @@ class TypeInner extends Type {
 
 		return $elements;
 	}
+
+	public function GenerateJoinStatements(SCRUD $Current, $prefix) {
+		// debug($this->info, '$this->info');
+		/** @var SCRUD $Target */
+		$Target = $this->info['LINK']::I();
+
+		$current_alias = $prefix . $Current->code;
+		$current_key = $Current->key();
+		$target_alias = $this->info['CODE'] . '__' . $Target->code;
+		$target_key = $this->info['FIELD'];
+
+		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}.{$current_key} = {$target_alias}.{$target_key}";
+		return [$target_alias => $statement];
+	}
 }

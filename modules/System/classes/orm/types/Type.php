@@ -102,4 +102,8 @@ abstract class Type {
 	public function HookExternalField($elements, $subfields) {
 		return $elements;
 	}
+
+	public function GenerateJoinStatements(SCRUD $Current, $prefix) {
+		return [];
+	}
 }
