@@ -15,13 +15,13 @@ class TypeOuter extends Type {
 	}
 
 	public function FormatOutputValue($element) {
-		/** @var SCRUD $link */
-		$link = $this->info['LINK'];
+		/** @var SCRUD $Link */
+		$Link = $this->info['LINK'];
 		$code = $this->info['CODE'];
-		if (!in_array('System\SCRUD', class_parents($link))) {
-			throw new ExceptionType("Field '{$code}': link '{$link}' must be SCRUD child ");
+		if (!in_array('System\SCRUD', class_parents($Link))) {
+			throw new ExceptionType("Field '{$code}': link '{$Link}' must be SCRUD child ");
 		}
-		$element[$code] = $link::I()->FormatOutputValues($element[$code]);
+		$element[$code] = $Link::I()->FormatOutputValues($element[$code]);
 		return $element;
 	}
 
