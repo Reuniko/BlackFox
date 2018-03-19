@@ -87,17 +87,18 @@ class TestScrudInner extends Test {
 		//return $students;
 	}
 
-	public function TestFilterStudentsByGradesWithCustomFields() {
+	public function TestFilterStudentsByGradesWithoutFilterField() {
 		$students = $this->Students->GetList([
 			'FILTER' => ['GRADE.TITLE' => '9B'],
 			'FIELDS' => ['ID', 'FIRST_NAME'],
 		]);
 		foreach ($students as $student) {
-			if ($student['GRADE']['TITLE'] <> '9B') {
+			$data = $this->Students->Read($student['ID'], ['GRADE' => ['TITLE']]);
+			if ($data['GRADE']['TITLE'] <> '9B') {
 				throw new Exception(['Wrong student', $student]);
 			}
 		}
-		return $students;
+		// return $students;
 	}
 
 	public function TestFilterGradesByRooms() {

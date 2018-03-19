@@ -306,10 +306,15 @@ abstract class SCRUD extends Instanceable {
 			'GROUP'  => [],
 			'LIMIT'  => [],
 		];
+
 		$answer = $this->PrepareSelectAndJoinByFields($arParams['FIELDS']);
 		$this->parts['SELECT'] += $answer['SELECT'];
 		$this->parts['JOIN'] += $answer['JOIN'];
-		$this->parts['WHERE'] += $this->_prepareWhere($arParams['FILTER']);
+
+		$answer = $this->PrepareWhereAndJoinByFilter($arParams['FILTER']);
+		$this->parts['WHERE'] += $answer['WHERE'];
+		$this->parts['JOIN'] += $answer['JOIN'];
+
 		$this->parts['ORDER'] += $this->_prepareOrder($arParams['SORT']);
 		if ($arParams['LIMIT'] > 0) {
 			$this->parts['LIMIT'] = [
@@ -588,7 +593,7 @@ abstract class SCRUD extends Instanceable {
 		}
 		$this->SQL .= implode(",\r\n", $rows);
 
-		$where = $this->_prepareWhere($filter);
+		list($where, $join) = $this->PrepareWhereAndJoinByFilter($filter);
 		$this->SQL .= "\r\n WHERE " . implode(' AND ', $where);
 
 		$this->Query($this->SQL);
@@ -600,7 +605,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 */
 	public function Delete($filter = []) {
-		$where = $this->_prepareWhere($filter);
+		list($where, $join) = $this->PrepareWhereAndJoinByFilter($filter);
 		$this->SQL = "DELETE FROM `{$this->code}` WHERE " . implode(' AND ', $where);
 		$this->Query($this->SQL);
 	}
@@ -687,12 +692,17 @@ abstract class SCRUD extends Instanceable {
 	 * -  ~   - LIKE
 	 *
 	 * @param mixed $filter ассоциатив фильтров | список идентификаторов | идентификатор
-	 * @return array массив строк, представляющих собой SQL-условия, которые следует объеденить операторами AND или OR
+	 * @return array :
+	 * - WHERE - массив строк, представляющих собой SQL-условия, которые следует объеденить операторами AND или OR
+	 * - JOIN - массив строк для JOIN -- TODO
 	 * @throws Exception
 	 */
-	protected function _prepareWhere($filter) {
+	public function PrepareWhereAndJoinByFilter($filter) {
 		if (empty($filter)) {
-			return ['1'];
+			return [
+				'WHERE' => [],
+				'JOIN'  => [],
+			];
 		}
 		if (!is_array($filter)) {
 			// filter is identifier
@@ -708,6 +718,7 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		$where = [];
+		$join = [];
 
 		foreach ($filter as $filter_key => $values) {
 			if ($values === '') {
@@ -728,7 +739,7 @@ abstract class SCRUD extends Instanceable {
 					}
 					unset($values['LOGIC']);
 				}
-				$where[] = '(' . implode(" {$logic} ", $this->_prepareWhere($values)) . ')';
+				$where[] = '(' . implode(" {$logic} ", $this->PrepareWhereAndJoinByFilter($values)) . ')';
 				continue;
 			}
 
@@ -746,20 +757,18 @@ abstract class SCRUD extends Instanceable {
 			$object = $result['OBJECT'];
 			$table = $result['TABLE'];
 			$code = $result['CODE'];
+			$join += $result['JOIN'];
 
-			// проверка значений
-			$null = false; // значения содержат NULL ?
-			if (!is_array($values)) {
-				$values = [$values];
-			}
+			$values = is_array($values) ? $values : [$values];
+			$values_have_null = false;
 
 			if (count($values) === 0) {
-				$null = true;
+				$values_have_null = true;
 			}
 
 			foreach ($values as $key => $value) {
 				if (is_null($value)) {
-					$null = true;
+					$values_have_null = true;
 					unset($values[$key]);
 				} else {
 					$values[$key] = $object->_formatFieldValue($code, $values[$key]);
@@ -767,7 +776,7 @@ abstract class SCRUD extends Instanceable {
 			}
 
 			$conditions = [];
-			if ($null) {
+			if ($values_have_null) {
 				switch ($operator) {
 					case '!':
 					case '<>':
@@ -778,7 +787,7 @@ abstract class SCRUD extends Instanceable {
 						break;
 				}
 			}
-			if (count($values) == 1) {
+			if (count($values) === 1) {
 				$value = reset($values);
 				switch ($operator) {
 					case '>>':
@@ -805,12 +814,14 @@ abstract class SCRUD extends Instanceable {
 						$conditions['='] = '="' . $value . '"';
 						break;
 				}
-			} elseif (count($values) > 1) {
+			}
+			if (count($values) > 1) {
 				if (!empty($values)) {
 					$conditions[] = ' IN ("' . implode('", "', $values) . '")';
 				}
 			}
 
+			// TODO extract this block to TypeDateTime
 			foreach ($conditions as $key => $condition) {
 				if (($key === '%') && ($this->structure[$code]['TYPE'] === 'DATETIME')) {
 					$data = date('Y-m-d', strtotime($value));
@@ -823,7 +834,10 @@ abstract class SCRUD extends Instanceable {
 			$conditions = "(" . implode(' OR ', $conditions) . ")";
 			$where[] = $conditions;
 		}
-		return $where;
+		return [
+			'WHERE' => $where,
+			'JOIN'  => $join,
+		];
 	}
 
 	/**
@@ -852,32 +866,34 @@ abstract class SCRUD extends Instanceable {
 			];
 		}
 		// if (!empty($path)):
-		/** @var self $object */
+		/** @var self $Object */
 		/** @var Type $Type */
-		$object = null;
-		$table = '';
+		$Object = $this;
+		$prefix = '';
 		$join = [];
-		$structure = &$this->structure;
-		//$types = &$this->types;
+
 		foreach ($path as $external) {
+			$structure = &$Object->structure;
+			$types = &$Object->types;
 			$info = $structure[$external];
-			//$Type = $types[$external];
+			$Type = $types[$external];
+
 			if (empty($info)) {
 				throw new Exception("Unknown external field code: '{$external}'");
 			}
 			if (empty($info['LINK'])) {
 				throw new Exception("Field is not external: '{$external}'");
 			}
-			$object = $info['LINK']::I();
-			$table .= $external . "__";
-			$structure = &$object->structure;
-			//$types = &$object->types;
+
+			$join += $Type->GenerateJoinStatements($Object, $prefix);
+
+			// for next iteration
+			$prefix .= $external . "__";
+			$Object = $info['LINK']::I();
 		}
-		$table = $table . $object->code;
-		unset($structure);
 		return [
-			'OBJECT' => $object,
-			'TABLE'  => $table,
+			'OBJECT' => $Object,
+			'TABLE'  => $prefix . $Object->code,
 			'CODE'   => $code,
 			'JOIN'   => $join,
 		];
