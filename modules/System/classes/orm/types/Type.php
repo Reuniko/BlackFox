@@ -85,6 +85,8 @@ abstract class Type {
 	 * - JOIN - array of SQL parts for JOIN section
 	 *
 	 * Генерирует и возвращает массивы строк, являющихся частями для SQL запроса.
+	 * - SELECT - массив SQL частей для секции SELECT
+	 * - JOIN - массив SQL частей для секции JOIN
 	 *
 	 * @param string $table code of targeted table
 	 * @param string $prefix required prefix

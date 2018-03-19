@@ -827,14 +827,16 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Обрабатывает путь к полю. Вычисляет объект для обработки поля, псевдоним таблицы и код поля.
-	 *
-	 * @param string $field_path мнемонический путь к полю, например: 'EXTERNAL_FIELD.EXTERNAL_FIELD.FIELD'
-	 * @return array Структура с ключами:
+	 * Обрабатывает путь к полю.
+	 * Вычисляет объект для обработки поля, псевдоним таблицы и код поля.
+	 * Возвращает структуру с ключами:
 	 * - OBJECT - объект-наследник SCRUD для обработки поля
-	 * - TABLE - псевдоним для таблицы (AS)
+	 * - TABLE - псевдоним для таблицы (alias)
 	 * - CODE - код поля
 	 * - JOIN - TODO
+	 *
+	 * @param string $field_path мнемонический путь к полю, например: 'EXTERNAL_FIELD.EXTERNAL_FIELD.FIELD'
+	 * @return array
 	 * @throws Exception Unknown external field code
 	 * @throws Exception Field is not external
 	 */
@@ -1125,11 +1127,13 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Подцепляет значения мульти-полей (TYPE = I, M)
+	 * Для всех полей в выборке запускает метод HookExternalField.
+	 * Это позволяет типу поля подцеплять внешние данные к элементам выборки (если это требуется).
+	 * Например тип TypeInner подцепляет все внешние элементы, ссылающиеся на выбранные элементы.
 	 *
-	 * @param array $fields
-	 * @param array $elements
-	 * @return mixed
+	 * @param array $fields древовидный массив, описывающий выбираемые поля
+	 * @param array $elements элементы выборки
+	 * @return array элементы выборки, дополненные внешними данными
 	 */
 	private function HookExternalFields($fields, $elements) {
 		foreach ($fields as $code => $content) {
@@ -1140,51 +1144,7 @@ abstract class SCRUD extends Instanceable {
 				$code = strtoupper($code);
 				$subfields = $content;
 			}
-			unset($content); // don't use it
-			$Type = $this->types[$code];
-
-			$elements = $Type->HookExternalField($elements, $subfields);
-
-			continue;
-
-			// TODO clean, make one more type
-
-			if (in_array($info['TYPE'], ['I', 'M'])) {
-				foreach ($elements as $id => $element) {
-					$elements[$id][$code] = [];
-				}
-				/** @var SCRUD $Link */
-				$Link = $info['LINK']::I();
-				$link_key_to_source = $Link->GetFieldCodeByLink('\\' . get_class($this));
-
-				/*
-				if ($info['TYPE'] === 'I') {
-					$data = $Link->GetList([
-						'FILTER' => [$link_key_to_source => $ids],
-						'FIELDS' => $subfields ?: ['*'],
-					]);
-					foreach ($data as $associative) {
-						$elements[$associative[$link_key_to_source]][$code][$associative[reset($Link->primary)]] = $associative;
-					}
-				}
-				*/
-
-				if ($info['TYPE'] === 'M') {
-					$link_key_to_target = $info['TARGET'];
-					$data = $Link->GetList([
-						'GROUP'  => [$link_key_to_source, $link_key_to_target],
-						'FILTER' => [$link_key_to_source => $ids],
-						'FIELDS' => [
-							reset($Link->primary),
-							$link_key_to_source,
-							$link_key_to_target => $subfields ?: ['*'],
-						],
-					]);
-					foreach ($data as $associative) {
-						$elements[$associative[$link_key_to_source]][$code][$associative[reset($Link->primary)]] = $associative[$link_key_to_target];
-					}
-				}
-			}
+			$elements = $this->types[$code]->HookExternalField($elements, $subfields);
 		}
 		return $elements;
 	}

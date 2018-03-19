@@ -11,7 +11,7 @@ class TypeInner extends Type {
 	}
 
 	public function PrepareSelectAndJoinByField($table, $prefix, $subfields) {
-		// этот метод отвечает только за FIELDS, которые подтягиваются отдельно в методе hook
+		// этот метод отвечает только за FIELDS, которые подтягиваются отдельно в методе HookExternalField
 		return [];
 	}
 
@@ -59,7 +59,7 @@ class TypeInner extends Type {
 
 		$data = $Link->GetList([
 			'FILTER' => [$link_key_to_source => $ids],
-			'FIELDS' => $subfields ?: ['*'],
+			'FIELDS' => $subfields,
 		]);
 		foreach ($data as $associative) {
 			$ID = $associative[$link_key_to_source];
