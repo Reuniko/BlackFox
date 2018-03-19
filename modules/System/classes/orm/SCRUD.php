@@ -593,8 +593,8 @@ abstract class SCRUD extends Instanceable {
 		}
 		$this->SQL .= implode(",\r\n", $rows);
 
-		list($where, $join) = $this->PrepareWhereAndJoinByFilter($filter);
-		$this->SQL .= "\r\n WHERE " . implode(' AND ', $where);
+		$answer = $this->PrepareWhereAndJoinByFilter($filter);
+		$this->SQL .= "\r\n WHERE " . implode(' AND ', $answer['WHERE']);
 
 		$this->Query($this->SQL);
 	}
@@ -605,8 +605,8 @@ abstract class SCRUD extends Instanceable {
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 */
 	public function Delete($filter = []) {
-		list($where, $join) = $this->PrepareWhereAndJoinByFilter($filter);
-		$this->SQL = "DELETE FROM `{$this->code}` WHERE " . implode(' AND ', $where);
+		$answer = $this->PrepareWhereAndJoinByFilter($filter);
+		$this->SQL = "DELETE FROM `{$this->code}` WHERE " . implode(' AND ', $answer['WHERE']);
 		$this->Query($this->SQL);
 	}
 
