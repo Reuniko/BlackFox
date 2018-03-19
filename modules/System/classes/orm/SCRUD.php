@@ -715,11 +715,20 @@ abstract class SCRUD extends Instanceable {
 			}
 
 			// вложенные операторы AND и OR
-			if ($filter_key === 'AND' || $filter_key === 'OR') {
+			if ($filter_key === 'AND' || $filter_key === 'OR' || is_numeric($filter_key)) {
 				if (!is_array($values)) {
 					throw new Exception("При использовании в фильтре вложенных операторов AND и OR значение должно быть массивом условий");
 				}
-				$where[] = '(' . implode(" \n\r{$filter_key} ", $this->_prepareWhere($values)) . ')';
+				if (!is_numeric($filter_key)) {
+					$logic = $filter_key;
+				} else {
+					$logic = $values['LOGIC'];
+					if (!in_array($logic, ['AND', 'OR'])) {
+						throw new Exception("При использовании в фильтре цифрового ключа значение-массив должно содержать ключ LOGIC = AND|OR");
+					}
+					unset($values['LOGIC']);
+				}
+				$where[] = '(' . implode(" {$logic} ", $this->_prepareWhere($values)) . ')';
 				continue;
 			}
 
