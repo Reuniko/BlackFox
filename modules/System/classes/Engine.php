@@ -110,6 +110,7 @@ class Engine extends Instanceable {
 		$this->ShowContent();
 		$this->CONTENT = ob_get_clean();
 
+		ob_start();
 		// Launch wrapper if it needs
 		if ((!empty($this->TEMPLATE) and !empty($this->WRAPPER))) {
 			// input: $this-> CONTENT, TITLE, TEMPLATE_PATH
@@ -117,6 +118,7 @@ class Engine extends Instanceable {
 		} else {
 			echo $this->CONTENT;
 		}
+		echo ob_get_clean();
 
 	}
 
