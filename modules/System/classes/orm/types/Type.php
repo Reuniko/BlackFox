@@ -103,6 +103,13 @@ abstract class Type {
 		return $elements;
 	}
 
+	/**
+	 * Предоставляет типу возможность присоединить внешние таблицы при обращении к полю из фильтра
+	 *
+	 * @param SCRUD $Current объект текущей таблицы
+	 * @param string $prefix префикс
+	 * @return array ассоциатив: ['уникальный алиас присоединяемой таблицы' => 'SQL-строка, описывающая присоединяемую таблицу', ...]
+	 */
 	public function GenerateJoinStatements(SCRUD $Current, $prefix) {
 		return [];
 	}
