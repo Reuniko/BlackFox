@@ -77,7 +77,7 @@ class TypeInner extends Type {
 
 		$current_alias = $prefix . $Current->code;
 		$current_key = $Current->key();
-		$target_alias = $this->info['CODE'] . '__' . $Target->code;
+		$target_alias = $prefix . $this->info['CODE'] . '__' . $Target->code;
 		$target_key = $this->info['FIELD'];
 
 		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}.{$current_key} = {$target_alias}.{$target_key}";

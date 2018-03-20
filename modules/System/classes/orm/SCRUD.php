@@ -694,7 +694,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param mixed $filter ассоциатив фильтров | список идентификаторов | идентификатор
 	 * @return array :
 	 * - WHERE - массив строк, представляющих собой SQL-условия, которые следует объеденить операторами AND или OR
-	 * - JOIN - массив строк для JOIN -- TODO
+	 * - JOIN - ассоциативный массив уникальных SQL-строк, описывающий присоединяемые таблицы
 	 * @throws Exception
 	 */
 	public function PrepareWhereAndJoinByFilter($filter) {
@@ -847,7 +847,7 @@ abstract class SCRUD extends Instanceable {
 	 * - OBJECT - объект-наследник SCRUD для обработки поля
 	 * - TABLE - псевдоним для таблицы (alias)
 	 * - CODE - код поля
-	 * - JOIN - TODO
+	 * - JOIN - ассоциативный массив уникальных SQL-строк, описывающий присоединяемые таблицы
 	 *
 	 * @param string $field_path мнемонический путь к полю, например: 'EXTERNAL_FIELD.EXTERNAL_FIELD.FIELD'
 	 * @return array
