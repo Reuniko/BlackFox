@@ -6,6 +6,13 @@ class TypeInner extends Type {
 	public static $name = 'Inner';
 	public static $code = 'INNER';
 
+	public function ProvideInfoIntegrity($info = []) {
+		if (empty($info['FIELD'])) {
+			throw new Exception("Для поля '{$info['CODE']}' типа INNER необходимо указать инфо FIELD");
+		}
+		return parent::ProvideInfoIntegrity($info);
+	}
+
 	public function GetStructureStringType() {
 		throw new ExceptionType("No structure required");
 	}
