@@ -15,6 +15,9 @@ class Engine extends Instanceable {
 	public $USER;
 
 	public $TITLE = "";
+	public $KEYWORDS = "";
+	public $DESCRIPTION = "";
+
 	public $HEADER = "";
 	public $HEADERS = [];
 	public $CONTENT = "";
@@ -211,7 +214,13 @@ class Engine extends Instanceable {
 			// запрос на контент в бд
 			$page = Content::I()->Read(['URL' => $this->url['path']]);
 			if ($page) {
+				if (!empty($page['REDIRECT'])) {
+					header("Location: {$page['REDIRECT']}");
+					die();
+				}
 				$this->TITLE = $page['TITLE'];
+				$this->KEYWORDS = $page['KEYWORDS'];
+				$this->DESCRIPTION = $page['DESCRIPTION'];
 				echo htmlspecialchars_decode($page['CONTENT']);
 				return;
 			}
