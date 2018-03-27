@@ -967,7 +967,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return SCRUD экземпляр
 	 * @throws ExceptionNotAllowed
 	 */
-	private function GetLink($info) {
+	private function GetLink(array $info) {
 		if (!class_exists($info['LINK'])) {
 			throw new ExceptionNotAllowed("You must set class name to LINK info of field '{$info['NAME']}'");
 		}
@@ -985,11 +985,14 @@ abstract class SCRUD extends Instanceable {
 		$output = [];
 		foreach ($fields as $key => $value) {
 			if (is_numeric($key) and is_array($value)) {
-				throw new ExceptionNotAllowed("Fields: Numeric key with array value");
+				throw new ExceptionNotAllowed("{$this->name}->ExplainFields: Numeric key '{$key}' with array value");
 			}
 			$o_key = is_numeric($key) ? $value : $key;
 
 			if (is_array($value)) {
+				if (!isset($this->structure[$key])) {
+					throw new Exception("{$this->name}->ExplainFields: Unknown field with code '{$key}'");
+				}
 				$output[$o_key] = $this->GetLink($this->structure[$key])->ExplainFields($value);
 				continue;
 			}
