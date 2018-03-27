@@ -188,4 +188,8 @@ class Users extends SCRUD {
 		return $string;
 	}
 
+	public function GetElementTitle($element = []) {
+		return $element['LOGIN'];
+	}
+
 }
