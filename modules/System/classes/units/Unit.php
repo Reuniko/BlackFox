@@ -5,9 +5,9 @@ namespace System;
 abstract class Unit {
 
 	/** @var string Наименование */
-	public $name = '...';
+	public $name;
 	/** @var string Описание */
-	public $description = '...';
+	public $description;
 	/** @var array Ассоциативный массив, описывающий возможные параметры */
 	public $options = [];
 
@@ -58,6 +58,7 @@ abstract class Unit {
 		// TODO cache all below:
 
 		$this->class = get_called_class();
+		$this->name = $this->name ?: $this->class;
 		list($module, $unit) = explode('\\', $this->class);
 		$this->parents[$this->class] = $this->ENGINE->GetCoreDir("modules/{$module}/units/{$unit}");
 		$this->unit_absolute_folder = $this->parents[$this->class];
@@ -173,59 +174,66 @@ abstract class Unit {
 	}
 
 	/**
-	 * Analyzes the $request, matches the required method for action.
+	 * Analyzes the $request, matches the required methods for actions.
 	 * May setup required view ($this->view).
 	 *
 	 * @param array $request user input
-	 * @return string name of the method
+	 * @return string|array names of methods
 	 */
-	public function SelectMethodForAction($request = []) {
-		return $request['ACTION'] ?: $request['action'];
+	public function GetActions(array $request = []) {
+		$actions = [];
+		if ($request['ACTION'] or $request['action']) {
+			$actions[] = $request['ACTION'] ?: $request['action'];
+		}
+		$actions[] = 'Work';
+		return $actions;
 	}
 
 	/**
-	 * Analyzes the $request, matches the required method for view.
-	 * May setup required view ($this->view).
+	 * Контролирует поток управления юнита:
+	 * - запрашивает массив действий ($this->GetActions)
+	 * - разбивает массив действий на две части: все действия кроме финального + финальное действие
+	 * - последовательно выполняет все действия кроме финального:
+	 * 	- успех - агрегирует ответ
+	 * 	- ошибка - ловит ошибку и отправляет ее в $this->Error
+	 * 	- редирект - прекращает выполнение
+	 * - выполняет финальное действие:
+	 * 	- успех - агрегирует ответ
+	 * 	- ошибка - не ловит ошибку, позволяя ей всплыть на уровень выше
+	 * 	- редирект - прекращает выполнение
 	 *
-	 * @param array $request user input
-	 * @return string name of the method
-	 */
-	public function SelectMethodForView($request = []) {
-		return 'Work';
-	}
-
-	public function Work() {
-		throw new Exception("Действие 'Work' в компоненте '{$this->class}' не переопределено");
-	}
-
-	/**
-	 * Selects the necessary methods (for action, for view)
-	 * and returns the combined result of their launch:
-	 * 1) Invoke method for action - catch any exceptions, add them to result if necessary
-	 * 2) Invoke method for view - return result
+	 * Все действия кроме финального:
+	 * - могут пытаться изменить внутреннее состояние модели
+	 * - могут подготавливать дополнительные данные для отображения
+	 *
+	 * Финальное действие:
+	 * - не пытается изменить внутреннее состояние модели
+	 * - подготавливает основные данные для отображения
 	 *
 	 * @param array $request user request
 	 * @return array result data
 	 * @throws Exception
 	 */
-	public function Controller($request = []) {
-		$error_result = [];
+	public function Controller(array $request = []) {
 
-		$method = $this->SelectMethodForAction($request);
-		if (!empty($method)) {
+		$actions = (array)$this->GetActions($request);
+		$actions = array_filter($actions, 'strlen');
+		if (empty($actions)) {
+			throw new Exception("Unit '{$this->name}', controller can't find any actions");
+		}
+		$final_action = array_pop($actions);
+		$result = [];
+
+		foreach ($actions as $action) {
 			try {
-				return (array)$this->Invoke($method, $request);
-			} catch (\Exception $error) {
-				$error_result = (array)$this->Error($error->getMessage(), $method, $request);
+				$result += (array)$this->Invoke($action, $request);
+			} catch (Exception $error) {
+				$result += $this->Error($error->getMessage(), $action, $request);
 			}
 		}
 
-		$method = $this->SelectMethodForView($request);
-		if (!empty($method)) {
-			return (array)$this->Invoke($method, $request) + $error_result;
-		}
-
-		throw new Exception("Не удалось определить требуемое действие");
+		$result += (array)$this->Invoke($final_action, $request);
+		return $result;
 	}
 
 	/**
@@ -240,13 +248,13 @@ abstract class Unit {
 	 */
 	private function Invoke($method, $request) {
 		if (!method_exists($this, $method)) {
-			throw new Exception("Неизвестный метод - '{$method}'");
+			throw new Exception("Unit '{$this->name}', unknown method - '{$method}'");
 		}
 		//$this->Debug($action, 'Invoke $action');
 		//$this->Debug($request, 'Invoke $request');
 		$reflection = new \ReflectionMethod($this, $method);
 		if (!$reflection->isPublic()) {
-			throw new Exception("Метод '{$method}' запрещено вызывать из контроллера публичной части");
+			throw new Exception("Unit '{$this->name}', method '{$method}' is not public");
 		}
 
 		$request = array_change_key_case($request);
