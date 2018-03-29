@@ -21,9 +21,9 @@ abstract class Unit {
 	/** @var string get_called_class */
 	public $class = '...';
 	/** @var string шаблон - имя папки шаблона в подпапке /templates/ */
-	public $template;
+	public $template = 'default';
 	/** @var string отображение - имя php файла подключаемого в папке шаблона */
-	public $view = 'template';
+	public $view = 'default';
 
 	/** @var array параметры вызова */
 	public $PARAMS = [];
@@ -86,7 +86,7 @@ abstract class Unit {
 	 * @return string
 	 */
 	public function SelectTemplateFolder($template) {
-		return $template ?: 'default';
+		return $template;
 	}
 
 	public static function Run($PARAMS = [], $template = 'default') {
