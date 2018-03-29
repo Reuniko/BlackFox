@@ -4,6 +4,15 @@ namespace System;
 
 abstract class UnitSection extends Unit {
 
+	public function GetActions($request = []) {
+		$actions = [];
+		if ($request['ACTION'] or $request['action']) {
+			$actions[] = $request['ACTION'] ?: $request['action'];
+		}
+		$actions[] = $this->SelectMethodForView($request);
+		return $actions;
+	}
+
 	public function SelectMethodForView($request = []) {
 		if (isset($request['EDIT'])) {
 			$this->view = 'form';
@@ -41,13 +50,11 @@ abstract class UnitSection extends Unit {
 	 * Контроллирует доступ, кидает исключения.
 	 *
 	 * @param $ID
-	 * @param array $fields
 	 * @return array
 	 * @throws \Exception
 	 */
-	public function Element($ID, $fields = []) {
+	public function Element($ID) {
 		$this->Debug($ID, 'Element $ID');
-		$this->Debug($fields, 'Element $fields');
 		return [];
 	}
 

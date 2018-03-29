@@ -36,23 +36,11 @@ class Adminer extends \System\Unit {
 		$this->ENGINE->TITLE = $this->SCRUD->name;
 	}
 
-	public function SelectMethodForView($request = []) {
-		if (!empty($request['ID']) or isset($request['NEW'])) {
-			return 'Element';
-		}
-		return 'Section';
-	}
-
-	public function SelectMethodForAction($request = array()) {
-		if (in_array($request['ACTION'], [
-			'Create',
-			'Update',
-			'Delete',
-			'SaveTableSettings',
-		])) {
-			return $request['ACTION'];
-		}
-		return null;
+	public function GetActions($request = []) {
+		$actions = [];
+		$actions[] = $request['ACTION'];;
+		$actions[] = (!empty($request['ID']) or isset($request['NEW'])) ? 'Element' : 'Section';
+		return $actions;
 	}
 
 	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@'], $popup = null) {
