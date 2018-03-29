@@ -6,7 +6,7 @@ class Menu extends \System\Unit {
 
 	protected $path;
 
-	public function SelectMethodForAction($request = array()) {
+	public function GetActions(array $request = []) {
 		return 'Work';
 	}
 
