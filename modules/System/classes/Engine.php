@@ -85,9 +85,7 @@ class Engine extends Instanceable {
 
 	public function ShowAuthForm($message = null) {
 		$this->WRAPPER = 'frame';
-		$this->Component('System', 'Authorization', '', [
-			'MESSAGE' => $message,
-		]);
+		\System\Authorization::Run(['MESSAGE' => $message]);
 	}
 
 	public function Work() {
@@ -280,35 +278,6 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Запускает компонент.
-	 *
-	 * @param string $module символьный код модуля
-	 * @param string $component символьный код компонента
-	 * @param string $template символьный код шаблона
-	 * @param array $params массив параметров компонента
-	 * @throws Exception
-	 * @deprecated use Component::Run() instead
-	 */
-	public function Component($module, $component, $template = 'default', $params = []) {
-
-		if (!is_string($module)) {
-			throw new Exception("Символьный код модуля должен быть строкой");
-		}
-		if (!is_string($component)) {
-			throw new Exception("Символьный код компонента должен быть строкой");
-		}
-		if (!is_string($template)) {
-			throw new Exception("Символьный код шаблона должен быть строкой");
-		}
-		$component_class_name = "$module\\$component";
-		if (!class_exists($component_class_name)) {
-			throw new Exception("Component not found: {$component_class_name}");
-		}
-		/** @var Component $component_class_name */
-		$component_class_name::Run($params, $template);
-	}
-
-	/**
 	 * Ищет все классы модуля и регистрирует их в движке, заполняя массив $this->classes:
 	 * - ключ - имя класса (вместе с неймспейсом)
 	 * - значение - путь к файлу
@@ -320,7 +289,7 @@ class Engine extends Instanceable {
 		foreach ($this->cores as $core) {
 			$files = [];
 			$files += $this->ScanDirectoryRecursive("{$core}/modules/{$module_name}/classes");
-			$files += $this->ScanDirectoryRecursive("{$core}/modules/{$module_name}/components", 1);
+			$files += $this->ScanDirectoryRecursive("{$core}/modules/{$module_name}/units", 1);
 			foreach ($files as $path => $file) {
 				if ($file['extension'] === 'php') {
 					$this->classes[$module_name . '\\' . $file['filename']] = $path;
@@ -413,10 +382,8 @@ class Engine extends Instanceable {
 		}
 
 		foreach ($this->modules as $module) {
-			$class = $module['ID'];
-			if ($class === 'System') {
-				// already registered
-				continue;
+			if ($module['ID'] === 'System') {
+				continue; // already registered
 			}
 			$this->RegisterModuleClasses($module['ID']);
 		}
