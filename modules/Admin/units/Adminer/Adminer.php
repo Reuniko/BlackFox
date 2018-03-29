@@ -38,7 +38,7 @@ class Adminer extends \System\Unit {
 
 	public function GetActions(array $request = []) {
 		$actions = [];
-		$actions[] = $request['ACTION'];;
+		$actions[] = $request['ACTION'];
 		$actions[] = (!empty($request['ID']) or isset($request['NEW'])) ? 'Element' : 'Section';
 		return $actions;
 	}
