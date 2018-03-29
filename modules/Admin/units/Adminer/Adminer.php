@@ -36,7 +36,7 @@ class Adminer extends \System\Unit {
 		$this->ENGINE->TITLE = $this->SCRUD->name;
 	}
 
-	public function GetActions($request = []) {
+	public function GetActions(array $request = []) {
 		$actions = [];
 		$actions[] = $request['ACTION'];;
 		$actions[] = (!empty($request['ID']) or isset($request['NEW'])) ? 'Element' : 'Section';

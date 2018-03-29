@@ -4,7 +4,7 @@ namespace System;
 
 abstract class UnitSection extends Unit {
 
-	public function GetActions($request = []) {
+	public function GetActions(array $request = []) {
 		$actions = [];
 		if ($request['ACTION'] or $request['action']) {
 			$actions[] = $request['ACTION'] ?: $request['action'];
