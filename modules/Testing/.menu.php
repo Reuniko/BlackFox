@@ -1,5 +1,5 @@
 <?php
-/** @var \System\Component $this */
+/** @var \System\Unit $this */
 return [
 	'Testing' => [
 		'NAME'     => 'Тесты',
