@@ -23,7 +23,7 @@ if (is_subclass_of($Class, "System\\SCRUD")) {
 	\Admin\Adminer::Run(['SCRUD' => $Class]);
 	return;
 }
-if (is_subclass_of($Class, "System\\Component")) {
+if (is_subclass_of($Class, "System\\Unit")) {
 	$Class::Run();
 	return;
 }
