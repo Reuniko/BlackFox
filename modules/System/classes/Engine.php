@@ -123,6 +123,11 @@ class Engine extends Instanceable {
 
 	}
 
+	public function SetTemplate($template) {
+		$this->TEMPLATE = $template;
+		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
+	}
+
 	public function AddHeaderStyle($path) {
 		$this->HEADERS[$path] = [
 			'TYPE' => 'STYLE',
