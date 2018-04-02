@@ -22,7 +22,7 @@
 
 <script src="<?= $this->TEMPLATE_PATH ?>/lib/ckeditor/ckeditor.js"></script>
 
-<script src="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/flatpickr.js"></script>
+<script src="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/flatpickr.min.js"></script>
 <script src="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/l10n/ru.js"></script>
 <link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/flatpickr.min.css">
 
