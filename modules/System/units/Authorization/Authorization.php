@@ -35,15 +35,11 @@ class Authorization extends \System\Unit {
 		$this->allow_json_request = true;
 	}
 
-	public function SelectMethodForView($request = []) {
-		return 'Form';
-	}
-
-	public function SelectMethodForAction($request = []) {
+	public function GetActions(array $request = []) {
 		if ($request['ACTION'] === 'Login') {
-			return 'Login';
+			return ['Login', 'Form'];
 		}
-		return false;
+		return ['Form'];
 	}
 
 	public function Form($login = null, $password = null) {
