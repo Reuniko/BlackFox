@@ -20,6 +20,22 @@ class Utility extends Instanceable {
 		return date($format, $date);
 	}
 
+	public static function strftime($date, $format = '%e %h %G, %H:%M') {
+		if (empty($date)) {
+			return '';
+		}
+		if (!is_numeric($date)) {
+			$date = strtotime($date);
+		}
+		$answer = strftime($format, $date);
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			$format = iconv('utf-8', 'cp1251', $format);
+			$answer = strftime($format, $date);
+			$answer = iconv('cp1251', 'utf-8', $answer);
+		}
+		return $answer;
+	}
+
 	/**
 	 * Форматирует имя пользователя
 	 *
