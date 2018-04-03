@@ -6,8 +6,12 @@ return [
 		'LINK'     => '/admin/Admin/',
 		'CHILDREN' => [
 			'Admin_TableSettings' => [
-				'NAME' => 'Настройки',
+				'NAME' => 'Настройки таблиц',
 				'LINK' => '/admin/Admin/TableSettings.php',
+			],
+			'Admin_PHPConsole' => [
+				'NAME' => 'PHP консоль',
+				'LINK' => '/admin/Admin/PHPConsole.php',
 			],
 		],
 	],
