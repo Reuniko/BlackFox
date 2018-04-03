@@ -1,3 +1,4 @@
+<? $this->TITLE = 'PHP консоль'; ?>
 <form method="post">
 	<div class="form-group">
 		<textarea
