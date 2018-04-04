@@ -620,7 +620,7 @@ abstract class SCRUD extends Instanceable {
 	 */
 	protected function _matchParams($arParams, $defParams) {
 		foreach ($defParams as $key => $param) {
-			if (isset($arParams[$key])) {
+			if (array_key_exists($key, $arParams)) {
 				$defParams[$key] = $arParams[$key];
 			}
 		}
@@ -698,7 +698,10 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception
 	 */
 	public function PrepareWhereAndJoinByFilter($filter) {
-		if (empty($filter)) {
+		if (!is_array($filter) and empty($filter)) {
+			throw new ExceptionNotAllowed("Empty non-array filter, ID missed?");
+		}
+		if (is_array($filter) and empty($filter)) {
 			return [
 				'WHERE' => [],
 				'JOIN'  => [],
