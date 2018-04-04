@@ -198,11 +198,11 @@ abstract class Unit {
 	 * - запрашивает массив действий ($this->GetActions)
 	 * - разбивает массив действий на две части: все действия кроме финального + финальное действие
 	 * - последовательно выполняет все действия кроме финального:
-	 *    - успех - агрегирует ответ
+	 *    - успех - агрегирует ответ: массив - в результат, строку - в успешные сообщения
 	 *    - ошибка - ловит ошибку и отправляет ее в $this->Error
 	 *    - редирект - прекращает выполнение
 	 * - выполняет финальное действие:
-	 *    - успех - агрегирует ответ
+	 *    - успех - агрегирует ответ в результат
 	 *    - ошибка - не ловит ошибку, позволяя ей всплыть на уровень выше
 	 *    - редирект - прекращает выполнение
 	 *
@@ -230,7 +230,12 @@ abstract class Unit {
 
 		foreach ($actions as $action) {
 			try {
-				$result += (array)$this->Invoke($action, $request);
+				$answer = $this->Invoke($action, $request);
+				if (is_array($answer)) {
+					$result += $answer;
+				} else {
+					$this->MESSAGES[] = ['TYPE' => 'SUCCESS', 'TEXT' => $answer];
+				}
 			} catch (Exception $error) {
 				$result += $this->Error($error->getMessage(), $action, $request);
 			}
@@ -296,8 +301,8 @@ abstract class Unit {
 		//$this->Debug($action, 'Error $action');
 		//$this->Debug($request, 'Error $request');
 		$this->MESSAGES[] = [
-			'TYPE'    => 'ERROR',
-			'MESSAGE' => $message,
+			'TYPE' => 'ERROR',
+			'TEXT' => $message,
 		];
 		return [];
 	}
@@ -407,7 +412,7 @@ abstract class Unit {
 			'DANGER'  => 'danger',
 		];
 		foreach ($this->MESSAGES as $message) {
-			echo "<div class='alert alert-{$types[$message['TYPE']]}'>{$message['MESSAGE']}</div>";
+			echo "<div class='alert alert-{$types[$message['TYPE']]}'>{$message['TEXT']}</div>";
 		}
 		$this->MESSAGES = [];
 	}
@@ -457,14 +462,14 @@ abstract class Unit {
 		header('Location: ' . ($url ?: $_SERVER['REQUEST_URI']));
 		if (!empty($message_text)) {
 			$_SESSION['MESSAGES'][$this->class][] = [
-				'TYPE'    => $message_type,
-				'MESSAGE' => $message_text,
+				'TYPE' => $message_type,
+				'TEXT' => $message_text,
 			];
 		}
 		echo json_encode([
-			'URL'     => $url,
-			'TYPE'    => $message_type,
-			'MESSAGE' => $message_text,
+			'URL'  => $url,
+			'TYPE' => $message_type,
+			'TEXT' => $message_text,
 		]);
 		die();
 	}

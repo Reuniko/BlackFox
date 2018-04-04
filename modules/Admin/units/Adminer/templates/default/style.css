@@ -124,3 +124,7 @@
 	color: red;
 	content: '*';
 }
+
+.adminer .red {
+	color: red;
+}
