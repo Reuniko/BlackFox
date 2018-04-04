@@ -87,10 +87,11 @@ class Adminer extends \System\Unit {
 			$this->ENGINE->AddBreadcrumb("Добавление элемента");
 		} else {
 			$this->RESULT['MODE'] = 'Update';
-			$this->RESULT['DATA'] = $FIELDS + $this->SCRUD->Read($ID);
+			$this->RESULT['DATA'] = $this->SCRUD->Read($ID);
 			if (empty($this->RESULT['DATA'])) {
 				throw new Exception("Элемент не найден");
 			}
+			$this->RESULT['DATA'] = $FIELDS + $this->RESULT['DATA'];
 			$this->ENGINE->AddBreadcrumb("Редактирование элемента №{$ID}");
 		}
 		return $this->RESULT;
