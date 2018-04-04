@@ -99,6 +99,7 @@ if ($RESULT['MODE'] === 'Create') {
 						type="submit"
 						name="ACTION"
 						value="Delete"
+						data-confirm="Подтвердите удаление"
 					>
 						<i class="fa fa-eraser"></i>
 						Удалить
