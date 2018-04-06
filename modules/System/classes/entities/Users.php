@@ -88,6 +88,11 @@ class Users extends SCRUD {
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'О себе',
 			],
+			'GROUPS'      => [
+				'TYPE'  => 'INNER',
+				'LINK'  => 'System\Users2Groups',
+				'FIELD' => 'USER',
+			],
 		];
 	}
 
