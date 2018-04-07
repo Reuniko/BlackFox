@@ -99,14 +99,23 @@ class Adminer extends \System\Unit {
 
 	public function Create($FIELDS = [], $REDIRECT = 'Stay') {
 		$ID = $this->SCRUD->Create($FIELDS);
-		$link = ($REDIRECT === 'Stay') ? "?ID={$ID}" : "?";
-		$this->Redirect($link, "Создан элемент №{$ID}");
+		$link = $this->GetLinkForRedirect($ID, $REDIRECT);
+		$this->Redirect($link, "Создан элемент <a href='?ID={$ID}'>№{$ID}</a>");
 	}
 
 	public function Update($ID, $FIELDS = [], $REDIRECT = 'Stay') {
 		$this->SCRUD->Update($ID, $FIELDS);
-		$link = ($REDIRECT === 'Stay') ? "?ID={$ID}" : "?";
-		$this->Redirect($link, "Обновлен элемент №{$ID}");
+		$link = $this->GetLinkForRedirect($ID, $REDIRECT);
+		$this->Redirect($link, "Обновлен элемент <a href='?ID={$ID}'>№{$ID}</a>");
+	}
+
+	private function GetLinkForRedirect($ID, $REDIRECT) {
+		$variants = [
+			'Stay'   => "?ID={$ID}",
+			'Return' => "?",
+			'New'    => "?NEW",
+		];
+		return $variants[$REDIRECT];
 	}
 
 	public function Delete($ID) {
