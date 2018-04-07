@@ -86,6 +86,16 @@ if ($RESULT['MODE'] === 'Create') {
 						Применить
 					</button>
 
+					<button
+						class="btn btn-info"
+						type="submit"
+						name="REDIRECT"
+						value="New"
+					>
+						<i class="fa fa-save"></i>
+						Сохранить и продолжить
+					</button>
+
 					<a
 						class="btn btn-secondary"
 						href="?"
