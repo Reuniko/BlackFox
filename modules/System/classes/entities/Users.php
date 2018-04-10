@@ -170,7 +170,7 @@ class Users extends SCRUD {
 	public function AddGroup($ID, $group) {
 		$ID = (int)$ID;
 		if (empty($ID)) {
-			throw new Exception("ID required");
+			throw new Exception("User ID required");
 		}
 		if (is_string($group)) {
 			$group_id = Groups::I()->Pick(['CODE' => $group]);
@@ -178,7 +178,7 @@ class Users extends SCRUD {
 			$group_id = (int)$group;
 		}
 		if (empty($group_id)) {
-			throw new Exception("Group ID required");
+			throw new Exception("Group ID/CODE required");
 		}
 		Users2Groups::I()->Create([
 			'USER'  => $ID,
