@@ -19,4 +19,16 @@ class Users2Groups extends SCRUD {
 		];
 	}
 
+	public function Create($fields = []) {
+		// TODO make double primary for SCRUD
+		$element = $this->Read([
+			'USER'  => $fields['USER'],
+			'GROUP' => $fields['GROUP'],
+		]);
+		if (!empty($element)) {
+			return $element['ID'];
+		} else {
+			return parent::Create($fields);
+		}
+	}
 }
