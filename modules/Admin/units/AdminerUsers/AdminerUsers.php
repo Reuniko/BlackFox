@@ -21,4 +21,9 @@ class AdminerUsers extends Adminer {
 		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['HASH']);
 		return parent::Element($ID, $FIELDS);
 	}
+
+	public function Login($ID) {
+		\System\User::I()->Login($ID);
+		$this->Redirect('/');
+	}
 }
