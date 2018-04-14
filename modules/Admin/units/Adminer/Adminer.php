@@ -43,7 +43,7 @@ class Adminer extends \System\Unit {
 		return $actions;
 	}
 
-	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@'], $popup = null) {
+	public function Section($FILTER = [], $PAGE = 1, $SORT = [], $FIELDS = ['*@'], $popup = null) {
 		$this->view = 'section';
 		$this->RESULT['MODE'] = 'SECTION';
 		if (!empty($popup)) {

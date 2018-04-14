@@ -5,6 +5,10 @@ return [
 		'NAME'     => 'Админка',
 		'LINK'     => '/admin/Admin/',
 		'CHILDREN' => [
+			'Admin_Tables' => [
+				'NAME' => 'Таблицы',
+				'LINK' => '/admin/Admin/Tables.php',
+			],
 			'Admin_TableSettings' => [
 				'NAME' => 'Настройки таблиц',
 				'LINK' => '/admin/Admin/TableSettings.php',
