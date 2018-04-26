@@ -1,7 +1,2 @@
 <?
-require('link.php');
-
-
-
-
-
+require('outer.php');
