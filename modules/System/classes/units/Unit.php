@@ -337,10 +337,9 @@ abstract class Unit {
 			return null;
 		}
 
-		$view_file = $this->Path("{$this->view}.php");
-
 		ob_start();
 		debug($RESULT, $this->class . ' $RESULT');
+		$view_file = $this->Path("{$this->view}.php");
 		require($view_file);
 		$content = ob_get_clean();
 
