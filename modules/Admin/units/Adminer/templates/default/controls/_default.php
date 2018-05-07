@@ -20,5 +20,6 @@
 		<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 		data-tooltip="not implemented"
 		data-tooltip-placement="top"
+		disabled="disabled"
 	>
 <? endif; ?>

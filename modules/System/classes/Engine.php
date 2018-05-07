@@ -92,7 +92,8 @@ class Engine extends Instanceable {
 
 		// Load section info
 		$this->url = parse_url($_SERVER['REQUEST_URI']);
-		$this->SECTION = require($this->SearchAncestorFile($this->url['path'], '.section.php'));
+		$path_to_section_config = $this->SearchAncestorFile($this->url['path'], '.section.php');
+		$this->SECTION = !empty($path_to_section_config) ? require($path_to_section_config) : [];
 		$this->TEMPLATE = isset($this->SECTION['TEMPLATE']) ? $this->SECTION['TEMPLATE'] : $this->config['template'];
 		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
 		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
