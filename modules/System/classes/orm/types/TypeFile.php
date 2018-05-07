@@ -11,7 +11,9 @@ class TypeFile extends TypeOuter {
 	}
 
 	public function ProvideInfoIntegrity($info = []) {
-		$info['LINK'] = $info['LINK'] ?: '\System\Files';
+		if (empty($info['LINK'])) {
+			$info['LINK'] = 'System\Files';
+		}
 		return $info;
 	}
 

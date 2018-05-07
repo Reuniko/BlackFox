@@ -124,6 +124,20 @@ abstract class SCRUD extends Instanceable {
 			throw new Exception("Primary keys required for " . static::class);
 		}
 
+		// Auto-completion of LINK attributes without namespaces
+		foreach ($this->structure as $code => &$info) {
+			if (!empty($info['LINK']) && !class_exists($info['LINK'])) {
+				$link_namespace = (new \ReflectionClass($this))->getNamespaceName();
+				$link = $link_namespace . '\\' . $info['LINK'];
+				if (class_exists($link)) {
+					$info['LINK'] = $link;
+				} else {
+					throw new Exception("Valid class name required for LINK of field '{$code}' of class " . static::class);
+				}
+			}
+		}
+
+		// Initialisation of $this->types
 		foreach ($this->structure as $code => &$info) {
 			$info['CODE'] = $code;
 			$this->types[$code] = FactoryType::I()->Get($info);
