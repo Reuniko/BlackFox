@@ -3,7 +3,7 @@
 /** @var string $code */
 /** @var \System\SCRUD $Link */
 /** @var array $field */
-$Link = $this->SCRUD->structure[$code]['LINK']::I();
+$Link = $this->SCRUD->types[$code]->info['LINK']::I();
 $url = $Link->GetAdminUrl();
 $file = $RESULT['DATA'][$code];
 $ID = $RESULT['DATA'][$code]['ID'];

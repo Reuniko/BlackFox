@@ -8,11 +8,12 @@ namespace System;
  * Parent for all data types for using in database.
  */
 abstract class Type {
-	/** @var string */
+	/** @var string Displayed name of the type */
 	public static $name;
-	/** @var string */
+	/** @var string Mnemonic code of the type */
 	public static $code;
-	/** @var array */
+
+	/** @var array Settings of specific field */
 	public $info;
 
 	public function __construct(array $info) {
