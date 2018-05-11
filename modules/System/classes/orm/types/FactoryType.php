@@ -7,6 +7,7 @@ class FactoryType extends Instanceable {
 	public $types = [];
 
 	public function __construct() {
+		// TODO Cache the result
 		foreach (Engine::I()->classes as $class_name => $class_path) {
 			if (in_array('System\Type', class_parents($class_name))) {
 				/** @var Type $class_name */
