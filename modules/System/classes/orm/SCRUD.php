@@ -265,6 +265,7 @@ abstract class SCRUD extends Instanceable {
 		$SQL[] = "FROM {$this->code}";
 		$SQL[] = implode("\r\n", $parts['JOIN']);
 		if ($parts['WHERE']) $SQL[] = "WHERE " . implode("\r\nAND ", $parts['WHERE']);
+		if ($parts['GROUP']) $SQL[] = "GROUP BY " . implode(", ", $parts['GROUP']);
 		if ($parts['ORDER']) $SQL[] = "ORDER BY " . implode(", ", $parts['ORDER']);
 		if ($parts['LIMIT']) $SQL[] = "LIMIT {$parts['LIMIT']['FROM']}, {$parts['LIMIT']['COUNT']}";
 		return implode("\r\n", $SQL);
@@ -273,13 +274,14 @@ abstract class SCRUD extends Instanceable {
 	/**
 	 * Формирует данные для вывода страницы элементов.
 	 * $arParams - массив вида:
-	 * - "SORT" => сортировка
-	 * - "FILTER" => фильтр
-	 * - "FIELDS" => выбираемые поля
-	 * - "LIMIT" => количество элементов на странице (по умолчанию — 100)
-	 * - "PAGE" => номер страницы (по умолчанию — 1)
-	 * - "KEY" => по какому полю нумеровать элементы (укажите FALSE чтобы нумеровать автоматически с помощью [] )
-	 * - "ESCAPE" => автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию TRUE)
+	 * - 'SORT' -- сортировка
+	 * - 'FILTER' -- фильтр
+	 * - 'FIELDS' -- выбираемые поля
+	 * - 'LIMIT' -- количество элементов на странице (по умолчанию — 100)
+	 * - 'PAGE' -- номер страницы (по умолчанию — 1)
+	 * - 'KEY' -- по какому полю нумеровать элементы (укажите FALSE чтобы нумеровать автоматически с помощью [] )
+	 * - 'ESCAPE' -- автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию TRUE)
+	 * - 'GROUP' -- группировка
 	 *
 	 * @param array $arParams
 	 * @throws Exception
@@ -287,15 +289,18 @@ abstract class SCRUD extends Instanceable {
 	 */
 	public function Search($arParams = []) {
 		$defParams = [
-			'SORT'   => ['ID' => 'DESC'],
+			'SORT'   => [],
 			'FILTER' => [],
 			'FIELDS' => ['*@'],
 			'LIMIT'  => 100,
 			'PAGE'   => 1,
 			'ESCAPE' => true,
+			'GROUP'  => [],
 		];
 		try {
 			$defParams['KEY'] = $this->key();
+			$defParams['GROUP'] = [$this->key()];
+			$defParams['SORT'] = [$this->key() => 'DESC'];
 		} catch (Exception $error) {
 			$defParams['KEY'] = null;
 		}
@@ -329,6 +334,8 @@ abstract class SCRUD extends Instanceable {
 		$this->parts['WHERE'] += $answer['WHERE'];
 		$this->parts['JOIN'] += $answer['JOIN'];
 
+		$this->parts['GROUP'] += $this->_prepareGroup($arParams['GROUP']);
+
 		$this->parts['ORDER'] += $this->_prepareOrder($arParams['SORT']);
 		if ($arParams['LIMIT'] > 0) {
 			$this->parts['LIMIT'] = [
@@ -352,14 +359,14 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 
-		$result['ELEMENTS'] = $this->HookExternalFields($arParams['FIELDS'], $result['ELEMENTS']);
-
 		if ($arParams['LIMIT'] > 1) {
 			$result['PAGER']['TOTAL'] = (int)reset(reset($this->Query('SELECT FOUND_ROWS() as TOTAL;')));
 			$result['PAGER']['CURRENT'] = $arParams['PAGE'];
 			$result['PAGER']['LIMIT'] = $arParams['LIMIT'];
 			$result['PAGER']['SELECTED'] = count($result['ELEMENTS']);
 		}
+
+		$result['ELEMENTS'] = $this->HookExternalFields($arParams['FIELDS'], $result['ELEMENTS']);
 
 		return $result;
 	}
@@ -933,6 +940,21 @@ abstract class SCRUD extends Instanceable {
 			$order[] = "{$result['TABLE']}.`{$result['CODE']}` {$sort}";
 		}
 		return $order;
+	}
+
+	/**
+	 * Подготавливает часть SQL запроса GROUP BY
+	 *
+	 * @param array $array Массив фильтра GROUP
+	 * @return array Массив с ключами GROUP BY
+	 */
+	protected function _prepareGroup($array) {
+		$answer = [];
+		foreach ($array as $field_path) {
+			$result = $this->_treatFieldPath($field_path);
+			$answer[] = "{$result['TABLE']}.`{$result['CODE']}`";
+		}
+		return $answer;
 	}
 
 	/**
