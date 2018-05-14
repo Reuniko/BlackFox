@@ -185,6 +185,11 @@ abstract class Unit {
 		if ($request['ACTION'] or $request['action']) {
 			$actions[] = $request['ACTION'] ?: $request['action'];
 		}
+		if ($request['VIEW'] or $request['view']) {
+			$actions[] = $request['VIEW'] ?: $request['view'];
+			$this->view = $request['VIEW'] ?: $request['view'];
+			return $actions;
+		}
 		$actions[] = 'Work';
 		return $actions;
 	}
