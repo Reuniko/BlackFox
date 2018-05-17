@@ -7,10 +7,12 @@ class TypeFloat extends Type {
 	public static $code = 'FLOAT';
 
 	public function GetStructureStringType() {
-		return 'float';
+		$length = $this->info['LENGTH'] ?: 13;
+		$decimals = $this->info['DECIMALS'] ?: 2;
+		return "float({$length},{$decimals})";
 	}
 
 	public function FormatInputValue($value) {
-		return (float)$value;
+		return str_replace(',', '.', (float)$value);
 	}
 }

@@ -749,6 +749,12 @@ abstract class SCRUD extends Instanceable {
 				continue;
 			}
 
+			// кастомные произвольные условия
+			if (is_numeric($filter_key) and is_string($values)) {
+				$where[] = $values;
+				continue;
+			}
+
 			// вложенные операторы AND и OR
 			if ($filter_key === 'AND' || $filter_key === 'OR' || is_numeric($filter_key)) {
 				if (!is_array($values)) {
