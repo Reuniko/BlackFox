@@ -763,7 +763,9 @@ abstract class SCRUD extends Instanceable {
 					}
 					unset($values['LOGIC']);
 				}
-				$where[] = '(' . implode(" {$logic} ", $this->PrepareWhereAndJoinByFilter($values)) . ')';
+				$answer = $this->PrepareWhereAndJoinByFilter($values);
+				$where[] = '(' . implode(" {$logic} ", $answer['WHERE']) . ')';
+				$join += $answer['JOIN'];
 				continue;
 			}
 
