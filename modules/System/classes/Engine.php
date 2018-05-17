@@ -10,8 +10,9 @@ class Engine extends Instanceable {
 	public $classes = [];
 	public $url = [];
 
+	/** @var Database $DB */
 	public $DB;
-	/** @var User */
+	/** @var User $USER */
 	public $USER;
 
 	public $TITLE = "";
@@ -52,7 +53,9 @@ class Engine extends Instanceable {
 		$this->RegisterModuleClasses('System');
 
 		// Init database connector
-		$this->DB = Database::InstanceDefault($this->config['database']);
+		/** @var Database $DB */
+		$DB = Database::InstanceDefault($this->config['database']);
+		$this->DB = $DB;
 	}
 
 	/**
