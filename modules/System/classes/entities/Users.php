@@ -11,8 +11,8 @@ class Users extends SCRUD {
 			'CONTENT' => 'Контент',
 		];
 		$this->structure += [
-			'ID'            => self::ID + ['GROUP' => 'SYSTEM'],
-			'LOGIN'         => [
+			'ID'              => self::ID + ['GROUP' => 'SYSTEM'],
+			'LOGIN'           => [
 				'TYPE'     => 'STRING',
 				'GROUP'    => 'SYSTEM',
 				'NAME'     => 'Логин',
@@ -22,26 +22,26 @@ class Users extends SCRUD {
 				'VITAL'    => true,
 				'SHOW'     => true,
 			],
-			'PASSWORD'      => [
+			'PASSWORD'        => [
 				'TYPE'        => 'STRING',
 				'GROUP'       => 'SYSTEM',
 				'NAME'        => 'Пароль',
 				'DESCRIPTION' => 'В базе хранится sha1 хеш пароля',
 				'NOT_NULL'    => true,
 			],
-			'SALT'          => [
+			'SALT'            => [
 				'TYPE'     => 'STRING',
 				'GROUP'    => 'SYSTEM',
 				'NAME'     => 'Соль',
 				'NOT_NULL' => true,
 			],
-			'HASH'          => [
+			'HASH'            => [
 				'TYPE'        => 'STRING',
 				'GROUP'       => 'SYSTEM',
 				'NAME'        => 'Хэш',
 				'DESCRIPTION' => 'Для восстановления пароля',
 			],
-			'LAST_AUTH'     => [
+			'LAST_AUTH'       => [
 				'TYPE'     => 'DATETIME',
 				'GROUP'    => 'SYSTEM',
 				'NAME'     => 'Последнее время авторизации',
@@ -53,48 +53,51 @@ class Users extends SCRUD {
 				'NAME'     => 'Время регистрации',
 				'DISABLED' => true,
 			],
-			'FIRST_NAME'    => [
+			'FIRST_NAME'      => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'Имя',
+				'VITAL' => true,
 			],
-			'LAST_NAME'     => [
+			'LAST_NAME'       => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'Фамилия',
+				'VITAL' => true,
 			],
-			'MIDDLE_NAME'   => [
+			'MIDDLE_NAME'     => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'Отчество',
 			],
-			'EMAIL'         => [
+			'EMAIL'           => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'E-mail',
+				'VITAL' => true,
 			],
-			'PHONE'         => [
+			'PHONE'           => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'Телефон',
 			],
-			'AVATAR'        => [
+			'AVATAR'          => [
 				'TYPE'  => 'FILE',
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'Аватар',
 				'LINK'  => 'System\Files',
 			],
-			'BIRTH_DAY'     => [
+			'BIRTH_DAY'       => [
 				'TYPE'  => 'DATE',
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'День рождения',
 			],
-			'ABOUT'         => [
+			'ABOUT'           => [
 				'TYPE'  => 'TEXT',
 				'GROUP' => 'CONTENT',
 				'NAME'  => 'О себе',
 			],
-			'GROUPS'        => [
+			'GROUPS'          => [
 				'TYPE'  => 'INNER',
 				'LINK'  => 'System\Users2Groups',
 				'FIELD' => 'USER',
