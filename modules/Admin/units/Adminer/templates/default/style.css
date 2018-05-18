@@ -128,3 +128,9 @@
 .adminer .red {
 	color: red;
 }
+
+.adminer iframe.external {
+	border: none;
+	width: 100%;
+	min-height: 600px;
+}

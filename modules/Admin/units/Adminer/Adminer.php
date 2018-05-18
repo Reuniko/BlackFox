@@ -6,6 +6,7 @@ class Adminer extends \System\Unit {
 
 	/** @var \System\SCRUD */
 	public $SCRUD;
+	public $frame = false;
 
 	public $options = [
 		'SCRUD' => [
@@ -17,6 +18,11 @@ class Adminer extends \System\Unit {
 		parent::__construct();
 		$this->allow_ajax_request = true;
 		$this->allow_json_request = true;
+
+		if (isset($_REQUEST['FRAME'])) {
+			$this->frame = true;
+			$this->ENGINE->WRAPPER = 'frame';
+		}
 	}
 
 	public function Init($PARAMS = []) {
@@ -43,30 +49,45 @@ class Adminer extends \System\Unit {
 		return $actions;
 	}
 
-	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@'], $popup = null) {
+	public function Section(
+		$FILTER = [],
+		$PAGE = 1,
+		$SORT = ['ID' => 'DESC'],
+		$FIELDS = ['*@'],
+		$popup = null
+	) {
 		$this->view = 'section';
-		$this->RESULT['MODE'] = 'SECTION';
+		$R['MODE'] = 'SECTION';
+
+		// TODO replace popups with ajax
 		if (!empty($popup)) {
-			$this->RESULT['MODE'] = 'POPUP';
-			$this->RESULT['POPUP'] = $popup;
+			$R['MODE'] = 'POPUP';
+			$R['POPUP'] = $popup;
 			$this->ENGINE->WRAPPER = 'frame';
 		}
-		$this->RESULT['FILTER'] = $FILTER;
-		$this->RESULT['SETTINGS'] = $this->LoadTableSettings();
-		$this->RESULT['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractStructure($this->RESULT['SETTINGS']['FILTERS']);
-		$this->RESULT['STRUCTURE']['FIELDS'] = $this->SCRUD->ExtractStructure($this->RESULT['SETTINGS']['FIELDS']);
-		$this->RESULT['DATA'] = $this->SCRUD->Search([
+
+		$R['FILTER'] = $FILTER;
+		$R['SETTINGS'] = $this->LoadTableSettings();
+		$R['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractStructure($R['SETTINGS']['FILTERS']);
+		$R['STRUCTURE']['FIELDS'] = $this->SCRUD->ExtractStructure($R['SETTINGS']['FIELDS']);
+
+		// unset column if frame-mode
+		if ($this->frame) {
+			unset($R['STRUCTURE']['FIELDS'][$_GET['FRAME']]);
+		}
+
+		$R['DATA'] = $this->SCRUD->Search([
 			'FILTER' => $FILTER,
 			'FIELDS' => $FIELDS,
 			'PAGE'   => $PAGE,
 			'SORT'   => $SORT,
 		]);
-		$this->RESULT['PAGES'] = $this->GetPages(
-			$this->RESULT['DATA']['PAGER']['TOTAL'],
-			$this->RESULT['DATA']['PAGER']['CURRENT'],
-			$this->RESULT['DATA']['PAGER']['LIMIT']
+		$R['PAGES'] = $this->GetPages(
+			$R['DATA']['PAGER']['TOTAL'],
+			$R['DATA']['PAGER']['CURRENT'],
+			$R['DATA']['PAGER']['LIMIT']
 		);
-		return $this->RESULT;
+		return $R;
 	}
 
 	public function GetDefaultValues() {
@@ -79,22 +100,44 @@ class Adminer extends \System\Unit {
 		return $values;
 	}
 
-	public function Element($ID = 0, $FIELDS = []) {
+	public function GetBackLink() {
+		$back = [
+			'FILTER' => $_GET['FILTER'],
+			'PAGE'   => $_GET['PAGE'],
+			'SORT'   => $_GET['SORT'],
+			'FRAME'  => $_GET['FRAME']
+		];
+		$back = array_filter($back, function ($element) {
+			return !empty($element);
+		});
+		$link = '?' . http_build_query($back);
+		return $link;
+	}
+
+	public function Element($ID = 0, $FILTER = []) {
 		$this->view = 'element';
+
+		$R['BACK'] = $this->GetBackLink();
+		if ($R['BACK'] <> '?') {
+			$this->ENGINE->AddBreadcrumb("...", $R['BACK']);
+		}
+
 		if ($ID === 0) {
-			$this->RESULT['MODE'] = 'Create';
-			$this->RESULT['DATA'] = $FIELDS + $this->GetDefaultValues();
+			$R['MODE'] = 'Create';
+			$R['DATA'] = $FILTER + $this->GetDefaultValues();
 			$this->ENGINE->AddBreadcrumb("Добавление элемента");
+			$R['TABS'] = $this->GetTabsOfCreate();
 		} else {
-			$this->RESULT['MODE'] = 'Update';
-			$this->RESULT['DATA'] = $this->SCRUD->Read($ID);
-			if (empty($this->RESULT['DATA'])) {
+			$R['MODE'] = 'Update';
+			$R['DATA'] = $this->SCRUD->Read($ID);
+			if (empty($R['DATA'])) {
 				throw new Exception("Элемент не найден");
 			}
-			$this->RESULT['DATA'] = $FIELDS + $this->RESULT['DATA'];
+			$R['DATA'] = $FILTER + $R['DATA'];
 			$this->ENGINE->AddBreadcrumb("Редактирование элемента №{$ID}");
+			$R['TABS'] = $this->GetTabsOfUpdate();
 		}
-		return $this->RESULT;
+		return $R;
 	}
 
 	public function Create($FIELDS = [], $REDIRECT = 'Stay') {
@@ -111,16 +154,16 @@ class Adminer extends \System\Unit {
 
 	private function GetLinkForRedirect($ID, $REDIRECT) {
 		$variants = [
-			'Stay'   => "?ID={$ID}",
-			'Return' => "?",
-			'New'    => "?NEW",
+			'Stay' => '?' . http_build_query(array_merge($_GET, ['ID' => $ID])),
+			'Back' => $this->GetBackLink(),
+			'New'  => "?NEW",
 		];
 		return $variants[$REDIRECT];
 	}
 
 	public function Delete($ID) {
 		$this->SCRUD->Delete($ID);
-		$this->Redirect('?', "Удален элемент №{$ID}");
+		$this->Redirect($this->GetBackLink(), "Удален элемент №{$ID}");
 	}
 
 	private function GetPages($total, $current, $limit) {
@@ -226,4 +269,34 @@ class Adminer extends \System\Unit {
 		$this->Redirect(null, 'Настройки сохранены');
 	}
 
-}
+	public function GetTabsOfCreate() {
+		$tabs = [
+			'main' => [
+				'NAME'   => 'Элемент',
+				'VIEW'   => 'element_tab_main',
+				'ACTIVE' => true,
+			],
+		];
+		return $tabs;
+	}
+
+	public function GetTabsOfUpdate() {
+		$tabs = [
+			'element' => [
+				'NAME'   => 'Элемент',
+				'VIEW'   => 'element_tab_main',
+				'ACTIVE' => true,
+			],
+		];
+		foreach ($this->SCRUD->structure as $code => $info) {
+			if ($info['TYPE'] === 'INNER') {
+				$tabs[$code] = [
+					'NAME' => $info['NAME'],
+					'VIEW' => 'element_tab_external',
+				];
+			}
+		}
+		return $tabs;
+	}
+
+} 

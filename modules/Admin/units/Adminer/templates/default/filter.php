@@ -13,7 +13,7 @@
 	<? if (!empty($RESULT['STRUCTURE']['FILTERS'])): ?>
 		<div class="card">
 			<div class="card-header">Фильтр</div>
-			<div class="card-block" id="filter">
+			<div class="card-body" id="filter">
 				<? foreach ($RESULT['STRUCTURE']['FILTERS'] as $code => $field): ?>
 					<div class="form-group row">
 						<label

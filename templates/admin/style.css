@@ -1,49 +1,55 @@
 body {
-    font-family: 'Roboto', sans-serif;
-    background-image: url("img/body.png");
+	font-family: 'Roboto', sans-serif;
+	background: #f5f5f5 url("img/body.png");
+}
+
+body.frame {
+	background-image: none;
+	padding: 1rem;
 }
 
 .header {
-    background-image: url("img/header.png");
-    border-bottom: 1px solid rgba(0,0,0,.125);
+	background-image: url("img/header.png");
+	border-bottom: 1px solid rgba(0, 0, 0, .125);
 }
 
 .sidebar {
-    border-right: 1px solid rgba(0,0,0,.125);
-    min-height: calc(100vh - 55px);
+	border-right: 1px solid rgba(0, 0, 0, .125);
+	min-height: calc(100vh - 55px);
 	background-image: url('img/sidebar.png');
 }
 
 .page-header {
-    color: #444;
-    font-size: 2.0rem;
+	color: #444;
+	font-size: 2.0rem;
 }
 
 .dl-horizontal dt {
-    float: left;
-    width: 35%;
-    overflow: hidden;
-    clear: left;
-    text-align: right;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+	float: left;
+	width: 35%;
+	overflow: hidden;
+	clear: left;
+	text-align: right;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .dl-horizontal dd {
-    margin-left: 40%;
+	margin-left: 40%;
 }
 
 .dl-horizontal dd:after {
-    content: '\00A0';
+	content: '\00A0';
 }
 
 .separator {
-    border-bottom: 1px solid rgba(0,0,0,.1);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+	border-bottom: 1px solid rgba(0, 0, 0, .1);
+	padding-bottom: 1rem;
+	margin-bottom: 1rem;
 }
+
 .separator:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-    margin-bottom: 0;
+	border-bottom: none;
+	padding-bottom: 0;
+	margin-bottom: 0;
 }

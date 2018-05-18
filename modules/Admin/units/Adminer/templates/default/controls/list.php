@@ -20,8 +20,10 @@ $value = (array)$value;
 	</button>
 
 	<div class="input-group" data-template="" style="display: none;">
-		<div class="input-group-addon" data-sort="">
-			<i class="fa fa-arrows-alt"></i>
+		<div class="input-group-prepend" data-sort="">
+			<span class="input-group-text">
+				<i class="fa fa-arrows-alt"></i>
+			</span>
 		</div>
 		<input
 			type="text"
@@ -31,7 +33,7 @@ $value = (array)$value;
 			disabled="disabled"
 			<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 		>
-		<div class="input-group-btn">
+		<div class="input-group-append">
 			<button class="btn btn-secondary" type="button" data-delete="">
 				<i class="fa fa-trash"></i>
 			</button>
@@ -40,8 +42,10 @@ $value = (array)$value;
 
 	<? foreach ($value as $key => $element): ?>
 		<div class="input-group" data-element="">
-			<div class="input-group-addon" data-sort="">
-				<i class="fa fa-arrows-alt"></i>
+			<div class="input-group-prepend" data-sort="">
+				<span class="input-group-text">
+					<i class="fa fa-arrows-alt"></i>
+				</span>
 			</div>
 			<input
 				type="text"
@@ -50,7 +54,7 @@ $value = (array)$value;
 				value="<?= $element ?>"
 				<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 			>
-			<div class="input-group-btn">
+			<div class="input-group-append">
 				<button class="btn btn-secondary" type="button" data-delete="">
 					<i class="fa fa-trash"></i>
 				</button>
