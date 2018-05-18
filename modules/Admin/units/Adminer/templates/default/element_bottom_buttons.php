@@ -1,8 +1,10 @@
+<?php /** @var \Admin\Adminer $this */ ?>
+<?php /** @var array $RESULT */ ?>
 <button
 	class="btn btn-primary"
 	type="submit"
 	name="REDIRECT"
-	value="Return"
+	value="Back"
 >
 	<i class="fa fa-save"></i>
 	Сохранить
@@ -17,6 +19,14 @@
 	<i class="fa fa-save"></i>
 	Применить
 </button>
+
+<a
+	href="<?= $RESULT['BACK'] ?>"
+	class="btn btn-secondary"
+>
+	<i class="fa fa-ban"></i>
+	Отмена
+</a>
 
 <button
 	class="btn btn-danger float-right"

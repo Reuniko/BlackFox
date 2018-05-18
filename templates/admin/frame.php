@@ -4,10 +4,9 @@
 <head>
 	<? require('_header.php'); ?>
 	<?= $this->GetHeader(); ?>
+	<link href="<?= $this->TEMPLATE_PATH ?>/style.css?<?= filemtime($_SERVER['DOCUMENT_ROOT'] . $this->TEMPLATE_PATH . '/style.css') ?>" rel="stylesheet">
 </head>
-<body>
-<div class="container-fluid">
-	<?= $this->CONTENT; ?>
-</div>
+<body class="frame">
+<?= $this->CONTENT; ?>
 </body>
 </html>

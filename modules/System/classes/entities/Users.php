@@ -99,6 +99,7 @@ class Users extends SCRUD {
 			],
 			'GROUPS'          => [
 				'TYPE'  => 'INNER',
+				'NAME'  => 'Группы',
 				'LINK'  => 'System\Users2Groups',
 				'FIELD' => 'USER',
 			],

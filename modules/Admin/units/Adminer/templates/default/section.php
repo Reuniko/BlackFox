@@ -2,7 +2,9 @@
 <div class="adminer">
 
 	<? require($this->Path('section_settings.php')); ?>
-	<? require($this->Path('filter.php')) ?>
+	<? if (!$this->frame): ?>
+		<? require($this->Path('filter.php')) ?>
+	<? endif; ?>
 
 	<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
 		<div class="my-2 buttons">
@@ -15,7 +17,7 @@
 				<i class="fa fa-cog"></i>
 			</a>
 
-			<a class="btn btn-success" href="?NEW">
+			<a class="btn btn-success" href="?NEW&<?= http_build_query($_GET) ?>">
 				<i class="fa fa-plus"></i>
 				Создать
 			</a>
@@ -72,7 +74,8 @@
 		<? endif; ?>
 		<? foreach ($RESULT['DATA']['ELEMENTS'] as $row): ?>
 			<?
-			$href = "?ID={$row['ID']}";
+			// $href = "?ID={$row['ID']}";
+			$href = '?' . http_build_query(array_merge($_GET, ['ID' => $row['ID']]));
 			$ondblclick = "window.location.href='{$href}'";
 
 			if ($RESULT['MODE'] === 'POPUP') {
