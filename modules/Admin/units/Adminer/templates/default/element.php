@@ -55,6 +55,14 @@ if ($RESULT['MODE'] === 'Create') {
 								}
 								?>
 							</div>
+							<div class="col-sm-1 col-form-label">
+								<? if ($field['DESCRIPTION']): ?>
+									<i
+										class="far fa-question-circle"
+										title="<?= $field['DESCRIPTION'] ?>"
+									></i>
+								<? endif; ?>
+							</div>
 						</div>
 					<? endforeach; ?>
 				<? endforeach; ?>
