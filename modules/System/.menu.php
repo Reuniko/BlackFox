@@ -8,7 +8,7 @@ return [
 		'CHILDREN' => [
 			'panel'               => [
 				'NAME'     => 'Панель управления',
-				'LINK'     => '/admin/',
+				'LINK'     => '/admin/System/Panel.php',
 				'CHILDREN' => [
 					'~upgrade' => [
 						'NAME' => '~upgrade',
