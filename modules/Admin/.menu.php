@@ -4,12 +4,13 @@ return [
 	'Admin' => [
 		'NAME'     => 'Админка',
 		'LINK'     => '/admin/Admin/',
+		'EXPANDER' => true,
 		'CHILDREN' => [
 			'Admin_TableSettings' => [
 				'NAME' => 'Настройки таблиц',
 				'LINK' => '/admin/Admin/TableSettings.php',
 			],
-			'Admin_PHPConsole' => [
+			'Admin_PHPConsole'    => [
 				'NAME' => 'PHP консоль',
 				'LINK' => '/admin/Admin/PHPConsole.php',
 			],

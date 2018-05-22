@@ -1,17 +1,23 @@
-.menu-title {
-	padding: 0.25rem;
-	text-align: center;
-	background-color: rgba(1, 1, 1, 0.1);
-}
-
 .menu, .menu ul {
 	list-style-type: none;
-	padding-left: 1rem;
 	font-size: 0.9rem;
 }
 
 .menu {
 	padding-left: 0;
+}
+
+.menu ul {
+	padding-left: 1rem;
+}
+
+.menu .item.level-1 {
+	padding: 0.25rem;
+	text-align: center;
+	background-color: rgba(1, 1, 1, 0.1);
+	font-weight: 500;
+	font-size: 125%;
+	margin-bottom: 1px;
 }
 
 .menu .item {
@@ -37,10 +43,6 @@
 	z-index: 3;
 	overflow: visible;
 	position: relative;
-}
-
-.menu .item.active {
-	background-color: rgba(0, 0, 0, 0.00);
 }
 
 .menu .item.current {

@@ -4,6 +4,7 @@ return [
 	'System' => [
 		'NAME'     => 'Система',
 		'LINK'     => '/admin/System/',
+		'EXPANDER' => true,
 		'CHILDREN' => [
 			'panel'               => [
 				'NAME'     => 'Панель управления',
