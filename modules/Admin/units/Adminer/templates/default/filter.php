@@ -17,13 +17,13 @@
 				<? foreach ($RESULT['STRUCTURE']['FILTERS'] as $code => $field): ?>
 					<div class="form-group row">
 						<label
-							class="col-3 col-form-label text-right"
+							class="col-sm-3 col-form-label sm-text-right"
 							for="<?= $code ?>"
 							title="<?= $code ?>"
 						>
 							<?= $field['NAME'] ?>
 						</label>
-						<div class="col-8">
+						<div class="col-sm-8">
 							<?
 							try {
 								require($this->Path('filters/' . strtolower($field['TYPE']) . '.php'));
@@ -34,22 +34,27 @@
 						</div>
 					</div>
 				<? endforeach; ?>
+				<div class="form-group row">
+					<div class="col-sm-8 offset-sm-3">
 
-				<div class="buttons">
-					<button
-						class="btn btn-primary"
-						type="submit"
-					>
-						<i class="fa fa-filter"></i>
-						Фильтровать
-					</button>
-					<a
-						class="btn btn-secondary"
-						href="?"
-					>
-						<i class="fa fa-ban"></i>
-						Отменить
-					</a>
+						<div class="buttons">
+							<button
+								class="btn btn-primary"
+								type="submit"
+							>
+								<i class="fa fa-filter"></i>
+								Фильтровать
+							</button>
+							<a
+								class="btn btn-secondary"
+								href="?"
+							>
+								<i class="fa fa-ban"></i>
+								Отменить
+							</a>
+						</div>
+
+					</div>
 				</div>
 
 			</div>
