@@ -47,7 +47,7 @@
 
 	<? @include($this->PathInclude('element_foot.php')); ?>
 
-	<br/>
+	<hr/>
 
 	<div class="buttons">
 		<? @include($this->PathInclude('element_bottom_buttons.php')); ?>

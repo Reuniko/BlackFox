@@ -7,7 +7,7 @@
 	value="Back"
 >
 	<i class="fa fa-save"></i>
-	Сохранить
+	<span class="d-none d-md-inline-block">Сохранить</span>
 </button>
 
 <button
@@ -16,8 +16,8 @@
 	name="REDIRECT"
 	value="Stay"
 >
-	<i class="fa fa-save"></i>
-	Применить
+	<i class="fa fa-check"></i>
+	<span class="d-none d-md-inline-block">Применить</span>
 </button>
 
 <a
@@ -25,7 +25,7 @@
 	class="btn btn-secondary"
 >
 	<i class="fa fa-ban"></i>
-	Отмена
+	<span class="d-none d-md-inline-block">Отмена</span>
 </a>
 
 <button
@@ -35,6 +35,6 @@
 	value="Delete"
 	data-confirm="Подтвердите удаление"
 >
-	<i class="fa fa-eraser"></i>
-	Удалить
+	<i class="fa fa-trash"></i>
+	<span class="d-none d-md-inline-block">Удалить</span>
 </button>
