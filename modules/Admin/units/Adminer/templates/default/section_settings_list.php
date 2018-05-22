@@ -3,16 +3,16 @@
 <? /** @var array $SELECTED */ ?>
 <? /** @var string $NAME */ ?>
 
-<div class="btn-group mb-2">
-	<button type="button" class="btn btn-secondary" data-settings-select="settings-<?= $NAME ?>">
+<div class="mb-2 text-center">
+	<button type="button" class="btn btn-outline-secondary" data-settings-select="settings-<?= $NAME ?>">
 		<i class="fa fa-check"></i>
 		Выбрать все
 	</button>
-	<button type="button" class="btn btn-secondary" data-settings-unselect="settings-<?= $NAME ?>">
+	<button type="button" class="btn btn-outline-secondary" data-settings-unselect="settings-<?= $NAME ?>">
 		<i class="fa fa-times"></i>
 		Снять все
 	</button>
-	<button type="button" class="btn btn-secondary" data-settings-sort="settings-<?= $NAME ?>">
+	<button type="button" class="btn btn-outline-secondary" data-settings-sort="settings-<?= $NAME ?>">
 		<i class="fa fa-sort"></i>
 		Сортировать
 	</button>

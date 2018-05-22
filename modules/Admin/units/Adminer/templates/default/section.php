@@ -10,7 +10,7 @@
 		<div class="my-2 buttons">
 
 			<a
-				class="btn btn-secondary float-right"
+				class="btn btn-light float-right"
 				data-toggle="modal"
 				data-target="#section-settings"
 			>
