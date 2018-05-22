@@ -4,6 +4,7 @@ return [
 	'Testing' => [
 		'NAME'     => 'Тесты',
 		'LINK'     => '/admin/Testing',
+		'EXPANDER' => true,
 		'CHILDREN' => [
 			'Tables' => [
 				'NAME'     => 'Таблицы',
