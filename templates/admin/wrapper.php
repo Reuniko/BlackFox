@@ -8,28 +8,41 @@
 </head>
 <body>
 
-<nav class="header navbar navbar-toggleable-md navbar-light bg-faded">
-	<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon"></span>
+<nav class="header p-2">
+	<button
+		class="btn btn-info d-inline-block d-md-none"
+		data-toggle-sidebar=""
+	>
+		<i class="fa fa-bars"></i>
+		<span class="d-none d-md-inline-block">Меню</span>
 	</button>
-	<a class="btn btn-secondary" href="/">Назад к сайту</a>
 
-	<div class="collapse navbar-collapse" id="navbarSupportedContent">
-		<ul class="navbar-nav mr-auto">
-		</ul>
-		<form class="form-inline my-2 my-lg-0">
-			<input class="form-control mr-sm-2" type="text" placeholder="">
-			<button class="btn btn-success my-2 my-sm-0" type="submit">Поиск</button>
-		</form>
+	<a class="btn btn-secondary" href="/">
+		<i class="fa fa-desktop"></i>
+		<span class="d-none d-md-inline-block">Сайт</span>
+	</a>
+
+	<div class="float-right">
+
+		<a class="btn btn-secondary" href="/admin/System/Users.php?ID=<?= \System\User::I()->ID ?>">
+			<i class="fa fa-user"></i>
+			<span class="d-none d-md-inline-block"><?= \System\User::I()->FIELDS['LOGIN'] ?></span>
+		</a>
+
+		<a class="btn btn-secondary" href="/admin/logout.php">
+			<i class="fa fa-sign-out-alt"></i>
+			<span class="d-none d-md-inline-block">Выход</span>
+		</a>
+
 	</div>
 </nav>
 
 <main role="main" class="container-fluid p-0">
 	<div class="row no-gutters">
-		<div class="col-sm-3 col-md-2 sidebar">
+		<div class="sidebar col-12 col-sm-2" id="sidebar">
 			<? \Admin\Menu::Run() ?>
 		</div>
-		<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main px-3">
+		<div class="main col-12 col-sm-10 px-3">
 			<? \Admin\Breadcrumbs::Run() ?>
 			<h1 class="page-header"><?= $this->TITLE ?></h1>
 			<?= $this->CONTENT ?>
