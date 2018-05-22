@@ -13,9 +13,16 @@ $(function () {
 		allowInput: true
 	});
 
-	if ($(window).width() < 576) {
+	if ($(window).width() < 768) {
 		$('#sidebar').hide();
 	}
+	$(window).on('resize', function () {
+		if ($(window).width() < 768) {
+			$('#sidebar').hide();
+		} else {
+			$('#sidebar').show();
+		}
+	});
 
 	$('[data-toggle-sidebar]').click(function () {
 		$('#sidebar').toggle();

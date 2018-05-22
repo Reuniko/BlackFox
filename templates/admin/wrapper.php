@@ -39,10 +39,10 @@
 
 <main role="main" class="container-fluid p-0">
 	<div class="row no-gutters">
-		<div class="sidebar col-12 col-sm-2" id="sidebar">
+		<div class="sidebar col-12 col-md-2" id="sidebar">
 			<? \Admin\Menu::Run() ?>
 		</div>
-		<div class="main col-12 col-sm-10 px-3">
+		<div class="main col-12 col-md-10 px-3">
 			<? \Admin\Breadcrumbs::Run() ?>
 			<h1 class="page-header"><?= $this->TITLE ?></h1>
 			<?= $this->CONTENT ?>
