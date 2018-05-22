@@ -12,4 +12,13 @@ $(function () {
 		dateFormat: "Y-m-d",
 		allowInput: true
 	});
+
+	if ($(window).width() < 576) {
+		$('#sidebar').hide();
+	}
+
+	$('[data-toggle-sidebar]').click(function () {
+		$('#sidebar').toggle();
+	})
 });
+
