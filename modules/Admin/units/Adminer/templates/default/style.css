@@ -134,3 +134,9 @@
 	width: 100%;
 	min-height: 600px;
 }
+
+@media (min-width: 576px) {
+	.adminer .sm-text-right {
+		text-align: right;
+	}
+}

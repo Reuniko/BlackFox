@@ -14,7 +14,7 @@
 		<? foreach ($group['FIELDS'] as $code => $field): ?>
 			<div class="form-group row">
 				<label
-					class="col-sm-3 col-form-label text-right <?= ($field['NOT_NULL']) ? 'mandatory' : '' ?>"
+					class="col-sm-3 col-form-label sm-text-right <?= ($field['NOT_NULL']) ? 'mandatory' : '' ?>"
 					for="<?= $code ?>"
 					title="<?= $code ?>"
 				>
@@ -32,7 +32,7 @@
 					}
 					?>
 				</div>
-				<div class="col-sm-1 col-form-label">
+				<div class="col-sm-1 col-form-label d-none d-sm-inline-block">
 					<? if ($field['DESCRIPTION']): ?>
 						<i
 							class="far fa-question-circle"
