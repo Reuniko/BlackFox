@@ -42,7 +42,7 @@
 		<div class="sidebar col-12 col-md-2" id="sidebar">
 			<? \Admin\Menu::Run() ?>
 		</div>
-		<div class="main col-12 col-md-10 px-3">
+		<div class="main col-12 col-md-10 p-1 p-sm-2">
 			<? \Admin\Breadcrumbs::Run() ?>
 			<h1 class="page-header"><?= $this->TITLE ?></h1>
 			<?= $this->CONTENT ?>

@@ -6,15 +6,15 @@
 <div class="mb-2 text-center">
 	<button type="button" class="btn btn-outline-secondary" data-settings-select="settings-<?= $NAME ?>">
 		<i class="fa fa-check"></i>
-		Выбрать все
+		<span class="d-none d-md-inline-block">Выбрать все</span>
 	</button>
 	<button type="button" class="btn btn-outline-secondary" data-settings-unselect="settings-<?= $NAME ?>">
 		<i class="fa fa-times"></i>
-		Снять все
+		<span class="d-none d-md-inline-block">Снять все</span>
 	</button>
 	<button type="button" class="btn btn-outline-secondary" data-settings-sort="settings-<?= $NAME ?>">
 		<i class="fa fa-sort"></i>
-		Сортировать
+		<span class="d-none d-md-inline-block">Сортировать</span>
 	</button>
 </div>
 
