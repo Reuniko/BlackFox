@@ -7,7 +7,7 @@
 	tabindex="-1"
 	role="dialog"
 >
-	<div class="modal-dialog modal-lg" role="document" style="min-width: 893px;">
+	<div class="modal-dialog modal-lg" role="document" style="max-width: 815px; width: 95%;">
 		<div class="modal-content">
 			<form method="post">
 				<div class="modal-header">
@@ -20,7 +20,7 @@
 
 					<!-- Tab panes -->
 					<div class="row">
-						<div class="col">
+						<div class="col-sm-6">
 							<h4>Фильтры</h4>
 							<?
 							$SELECTED = $RESULT['SETTINGS']['FILTERS'];
@@ -29,7 +29,7 @@
 							?>
 
 						</div>
-						<div class="col">
+						<div class="col-sm-6">
 							<h4>Колонки</h4>
 							<?
 							$SELECTED = $RESULT['SETTINGS']['FIELDS'];

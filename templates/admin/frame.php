@@ -6,7 +6,7 @@
 	<?= $this->GetHeader(); ?>
 	<link href="<?= $this->TEMPLATE_PATH ?>/style.css?<?= filemtime($_SERVER['DOCUMENT_ROOT'] . $this->TEMPLATE_PATH . '/style.css') ?>" rel="stylesheet">
 </head>
-<body class="frame">
+<body class="frame p-1 p-sm-2">
 <?= $this->CONTENT; ?>
 </body>
 </html>
