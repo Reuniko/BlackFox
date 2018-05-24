@@ -35,7 +35,7 @@
 
 		</div>
 		<? if ($item['CHILDREN']): ?>
-			<ul data-menu-children="" class="<?= $item['ACTIVE'] ? '' : 'collapse' ?>">
+			<ul data-menu-children="" class="level-<?= $level ?> <?= $item['ACTIVE'] ? '' : 'collapse' ?>">
 				<? foreach ($item['CHILDREN'] as $child): ?>
 					<? BuildDefaultMenuRecursive($child, $level + 1); ?>
 				<? endforeach; ?>
