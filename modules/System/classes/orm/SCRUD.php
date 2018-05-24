@@ -567,7 +567,7 @@ abstract class SCRUD extends Instanceable {
 		$this->SQL = "INSERT INTO {$this->code} SET ";
 
 		foreach ($this->structure as $code => $field) {
-			if ($field['NOT_NULL'] && !($field['AUTO_INCREMENT'] || $field['DEFAULT'])) {
+			if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT'])) {
 				if (!$this->_hasInformation($fields[$code])) {
 					throw new Exception("Не указано обязательное поле '{$field['NAME']}' [{$code}]");
 				}
