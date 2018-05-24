@@ -25,7 +25,7 @@
 		</div>
 	<? endif; ?>
 
-	<table id="data" class="table table-bordered table-hover table-responsive">
+	<table id="data" class="table table-bordered table-hover table-responsive-sm">
 		<tr>
 			<? if ($RESULT['MODE'] <> 'POPUP'): ?>
 				<th class="sort" width="1%"><span></span></th>
