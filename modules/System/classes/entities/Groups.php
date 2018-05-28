@@ -13,6 +13,7 @@ class Groups extends SCRUD {
 				'NAME'     => 'Символьный код',
 				'NOT_NULL' => true,
 				'INDEX'    => true,
+				'VITAL'    => true,
 			],
 			'NAME'        => [
 				'TYPE'     => 'STRING',
@@ -20,7 +21,6 @@ class Groups extends SCRUD {
 				'NOT_NULL' => true,
 				'INDEX'    => true,
 				'VITAL'    => true,
-				'SHOW'     => true,
 			],
 			'DESCRIPTION' => [
 				'TYPE' => 'TEXT',
@@ -29,4 +29,7 @@ class Groups extends SCRUD {
 		];
 	}
 
+	public function GetElementTitle($element = []) {
+		return "{$element['NAME']} [{$element['CODE']}]";
+	}
 }
