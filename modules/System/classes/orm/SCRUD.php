@@ -275,7 +275,8 @@ abstract class SCRUD extends Instanceable {
 	 * Формирует данные для вывода страницы элементов.
 	 * $arParams - массив вида:
 	 * - 'SORT' -- сортировка
-	 * - 'FILTER' -- фильтр
+	 * - 'FILTER' -- пользовательский фильтр (можно передавать небезопасные данные)
+	 * - 'CONDITIONS' -- произвольные SQL условия для фильтрации
 	 * - 'FIELDS' -- выбираемые поля
 	 * - 'LIMIT' -- количество элементов на странице (по умолчанию — 100)
 	 * - 'PAGE' -- номер страницы (по умолчанию — 1)
@@ -289,13 +290,14 @@ abstract class SCRUD extends Instanceable {
 	 */
 	public function Search($arParams = []) {
 		$defParams = [
-			'SORT'   => [],
-			'FILTER' => [],
-			'FIELDS' => ['*@'],
-			'LIMIT'  => 100,
-			'PAGE'   => 1,
-			'ESCAPE' => true,
-			'GROUP'  => [],
+			'SORT'       => [],
+			'FILTER'     => [],
+			'CONDITIONS' => [],
+			'FIELDS'     => ['*@'],
+			'LIMIT'      => 100,
+			'PAGE'       => 1,
+			'ESCAPE'     => true,
+			'GROUP'      => [],
 		];
 		try {
 			$defParams['KEY'] = $this->key();
@@ -333,6 +335,9 @@ abstract class SCRUD extends Instanceable {
 		$answer = $this->PrepareWhereAndJoinByFilter($arParams['FILTER']);
 		$this->parts['WHERE'] += $answer['WHERE'];
 		$this->parts['JOIN'] += $answer['JOIN'];
+
+		$arParams['CONDITIONS'] = is_array($arParams['CONDITIONS']) ? $arParams['CONDITIONS'] : [$arParams['CONDITIONS']];
+		$this->parts['WHERE'] += $arParams['CONDITIONS'];
 
 		$this->parts['GROUP'] += $this->_prepareGroup($arParams['GROUP']);
 
@@ -389,6 +394,7 @@ abstract class SCRUD extends Instanceable {
 		$this->_controlParams($arParams, [
 			'SORT',
 			'FILTER',
+			'CONDITIONS',
 			'FIELDS',
 			'LIMIT',
 			'PAGE',
@@ -749,12 +755,6 @@ abstract class SCRUD extends Instanceable {
 				continue;
 			}
 
-			// кастомные произвольные условия
-			if (is_numeric($filter_key) and is_string($values)) {
-				$where[] = $values;
-				continue;
-			}
-
 			// вложенные операторы AND и OR
 			if ($filter_key === 'AND' || $filter_key === 'OR' || is_numeric($filter_key)) {
 				if (!is_array($values)) {
@@ -770,7 +770,9 @@ abstract class SCRUD extends Instanceable {
 					unset($values['LOGIC']);
 				}
 				$answer = $this->PrepareWhereAndJoinByFilter($values);
-				$where[] = '(' . implode(" {$logic} ", $answer['WHERE']) . ')';
+				if (!empty($answer['WHERE'])) {
+					$where[] = '(' . implode(" {$logic} ", $answer['WHERE']) . ')';
+				}
 				$join += $answer['JOIN'];
 				continue;
 			}
