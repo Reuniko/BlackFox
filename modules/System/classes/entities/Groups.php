@@ -30,6 +30,6 @@ class Groups extends SCRUD {
 	}
 
 	public function GetElementTitle($element = []) {
-		return "{$element['NAME']} [{$element['CODE']}]";
+		return "{$element['NAME']} ({$element['CODE']})";
 	}
 }
