@@ -133,7 +133,6 @@ class Adminer extends \System\Unit {
 			if (empty($R['DATA'])) {
 				throw new Exception("Элемент не найден");
 			}
-			$R['DATA'] = $FILTER + $R['DATA'];
 			$this->ENGINE->AddBreadcrumb("Редактирование элемента №{$ID}");
 			$R['TABS'] = $this->GetTabsOfUpdate();
 		}

@@ -59,7 +59,7 @@ if (is_array($RESULT['DATA'][$code])) {
 				class="form-control"
 				disabled="disabled"
 				data-link-span="FIELDS[<?= $code ?>]"
-				value="<?= $Link->GetElementTitle($RESULT['DATA'][$code]) ?>"
+				value="<?= is_array($RESULT['DATA'][$code]) ? $Link->GetElementTitle($RESULT['DATA'][$code]) : '' ?>"
 			>
 		</div>
 	</div>
