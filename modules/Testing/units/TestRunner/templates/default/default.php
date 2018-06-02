@@ -47,7 +47,7 @@
 				<?= $test['NAME'] ?>
 			</div>
 			<? if (!empty($test['RESULTS'])): ?>
-				<div class="card-block">
+				<div class="card-body">
 					<? foreach ($test['RESULTS'] as $test_method_name => $test_method_result): ?>
 						<div class="row">
 							<div class="col">

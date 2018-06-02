@@ -58,9 +58,14 @@ class TypeInner extends Type {
 		/** @var SCRUD $Link */
 		$Link = $this->info['LINK']::I();
 		$link_key_to_source = $this->info['FIELD'];
+		try {
+			$link_key_primary = $Link->key();
+		} catch (\Exception $error) {
+			$link_key_primary = $link_key_to_source;
+		}
 
 		if (empty($subfields)) {
-			$subfields = [$Link->key()];
+			$subfields = [$link_key_primary];
 		}
 		$subfields[$link_key_to_source] = $link_key_to_source;
 
@@ -71,7 +76,7 @@ class TypeInner extends Type {
 		foreach ($data as $associative) {
 			$ID = $associative[$link_key_to_source];
 			unset($associative[$link_key_to_source]); // remove looking back identifier
-			$elements[$ID][$code][$associative[$Link->key()]] = $associative;
+			$elements[$ID][$code][$associative[$link_key_primary]] = $associative;
 		}
 
 		return $elements;

@@ -434,14 +434,16 @@ abstract class SCRUD extends Instanceable {
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 * @param array|string $fields выбираемые поля
 	 * @param array $sort сортировка
+	 * @param bool $escape автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию TRUE)
 	 * @return array|false ассоциативный массив, представляющий собой элемент
 	 */
-	public function Read($filter = [], $fields = ['*@'], $sort = []) {
+	public function Read($filter = [], $fields = ['*@'], $sort = [], $escape = false) {
 		$arParams = [
 			"FILTER" => $filter,
 			"FIELDS" => $fields,
 			"SORT"   => $sort,
 			"LIMIT"  => 1,
+			"ESCAPE" => $escape,
 		];
 		$data = $this->Search($arParams);
 		$element = reset($data["ELEMENTS"]);

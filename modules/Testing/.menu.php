@@ -35,6 +35,10 @@ return [
 				'NAME' => 'Тестирование SCRUD',
 				'LINK' => '/admin/Testing/SCRUD.php',
 			],
+			'CACHE'  => [
+				'NAME' => 'Тестирование кеша',
+				'LINK' => '/admin/Testing/Cache.php',
+			],
 		],
 	],
 ];
