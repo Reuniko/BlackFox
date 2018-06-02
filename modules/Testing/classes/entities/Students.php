@@ -26,6 +26,10 @@ class Students extends \System\SCRUD {
 		];
 	}
 
+	public function GetElementTitle($element = []) {
+		return $element['FIRST_NAME'];
+	}
+
 	public function Fill() {
 		$names = file(__DIR__ . '/data/names.txt', FILE_IGNORE_NEW_LINES);
 		$lasts = ['J', 'G', 'V', 'X', 'Z'];
