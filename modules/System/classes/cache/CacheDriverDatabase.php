@@ -86,6 +86,7 @@ class CacheDriverDatabase extends Cache {
 		$keys = $this->TAGS->Select(['TAG' => $tags], [], 'KEY');
 		$this->DATA->Delete(['KEY' => $keys]);
 		$this->TAGS->Delete(['TAG' => $tags]);
+		$this->TAGS->Delete(['KEY' => $keys]);
 	}
 
 	public function Wipe() {

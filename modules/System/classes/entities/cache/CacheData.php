@@ -5,7 +5,7 @@ namespace System;
 class CacheData extends SCRUD {
 	public $name = 'Данные кеша';
 	public $structure = [
-		'KEY'    => [
+		'KEY'     => [
 			'TYPE'     => 'STRING',
 			'NAME'     => 'KEY',
 			'INDEX'    => true,
@@ -14,7 +14,7 @@ class CacheData extends SCRUD {
 			'DISABLED' => true,
 			'VITAL'    => true,
 		],
-		'TYPE'   => [
+		'TYPE'    => [
 			'NAME'     => 'TYPE',
 			'TYPE'     => 'ENUM',
 			'NOT_NULL' => true,
@@ -27,19 +27,30 @@ class CacheData extends SCRUD {
 				'object'  => 'object',
 			],
 		],
-		'VALUE'  => [
+		'VALUE'   => [
 			'TYPE' => 'TEXT',
 			'NAME' => 'VALUE',
 		],
-		'EXPIRE' => [
+		'CREATED' => [
+			'TYPE'     => 'DATETIME',
+			'NAME'     => 'CREATED',
+			'NOT_NULL' => true,
+		],
+		'EXPIRE'  => [
 			'TYPE' => 'DATETIME',
 			'NAME' => 'EXPIRE',
 		],
-		'TAGS'   => [
+		'TAGS'    => [
 			'TYPE'  => 'INNER',
 			'NAME'  => 'TAGS',
 			'LINK'  => 'CacheTags',
 			'FIELD' => 'KEY',
 		],
 	];
+
+	public function Create($fields) {
+		$fields['CREATED'] = time();
+		return parent::Create($fields);
+	}
+
 }
