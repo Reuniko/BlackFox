@@ -58,12 +58,16 @@ class CacheDriverDatabase extends Cache {
 	}
 
 	public function Set(string $key, $value, int $ttl = null, array $tags = []) {
-		$this->DATA->Create([
-			'KEY'    => $key,
-			'TYPE'   => gettype($value),
-			'VALUE'  => $this->PackValue($value),
-			'EXPIRE' => $ttl ? time() + $ttl : null,
-		]);
+		try {
+			$this->DATA->Create([
+				'KEY'    => $key,
+				'TYPE'   => gettype($value),
+				'VALUE'  => $this->PackValue($value),
+				'EXPIRE' => $ttl ? time() + $ttl : null,
+			]);
+		} catch (Exception $error) {
+			throw new ExceptionCache("Key exist: '{$key}'");
+		}
 		foreach ($tags as $tag) {
 			$this->TAGS->Create([
 				'KEY' => $key,
@@ -79,7 +83,8 @@ class CacheDriverDatabase extends Cache {
 
 	public function Strike($tags) {
 		$tags = is_array($tags) ? $tags : [$tags];
-		$this->DATA->Delete(['TAGS' => $tags]);
+		$keys = $this->TAGS->Select(['TAG' => $tags], [], 'KEY');
+		$this->DATA->Delete(['KEY' => $keys]);
 		$this->TAGS->Delete(['TAG' => $tags]);
 	}
 
