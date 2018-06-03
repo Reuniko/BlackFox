@@ -62,13 +62,12 @@ class TestCache extends Test {
 	}
 
 	public function TestSetAndGetObject() {
-		$value = new \System\User();
+		$random_user_id = \System\Users::I()->Read([], ['ID'], ['RAND()' => 'ASC'])['ID'];
+		$value = new \System\User($random_user_id);
 		$this->CACHE->Set('test_object', $value);
 		$result = $this->CACHE->Get('test_object');
-		debug($value, '$value');
-		debug($result, '$result');
 		if ($result == $value) {
-			return 'OK';
+			return $result->ID;
 		}
 		throw new Exception($result);
 	}
