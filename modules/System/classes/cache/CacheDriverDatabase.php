@@ -49,15 +49,28 @@ class CacheDriverDatabase extends Cache {
 		throw new ExceptionCache("Unknown type for cache: '{$type}'");
 	}
 
-	public function Get(string $key) {
+	public function Get($key) {
 		if (empty($key)) {
 			throw new ExceptionCache("Empty key passed");
 		}
-		$data = $this->DATA->Read($key, ['KEY', 'VALUE', 'TYPE'], [], false);
-		if (empty($data)) {
-			throw new ExceptionCache("Value for key '{$key}' not found");
+		$keys = is_array($key) ? $key : [$key];
+		$data = $this->DATA->GetList([
+			'FILTER' => ['KEY' => $keys],
+			'FIELDS' => ['KEY', 'VALUE', 'TYPE'],
+			'ESCAPE' => false,
+		]);
+		$answer = [];
+		foreach ($keys as $key_i) {
+			if (empty($data[$key_i])) {
+				throw new ExceptionCache("Value for key '{$key_i}' not found");
+			}
+			$answer[$key_i] = $this->UnpackValue($data[$key_i]['VALUE'], $data[$key_i]['TYPE']);
 		}
-		return $this->UnpackValue($data['VALUE'], $data['TYPE']);
+		if (is_array($key)) {
+			return $answer;
+		} else {
+			return reset($answer);
+		}
 	}
 
 	public function Put(string $key, $value, int $ttl = null, array $tags = []) {

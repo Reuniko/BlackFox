@@ -21,6 +21,52 @@ class TestCache extends Test {
 		throw new Exception("non_exising_key exist: {$value}");
 	}
 
+	public function TestPutAndGetSingle() {
+		$this->CACHE->Put('test_single', 'single');
+		$value = $this->CACHE->Get('test_single');
+		if ($value === 'single') {
+			return 'OK';
+		}
+		throw new Exception($value);
+	}
+
+	public function TestPutAndGetMultiple() {
+		$this->CACHE->Put('test_multiple_1', 'multiple_1');
+		$this->CACHE->Put('test_multiple_2', 'multiple_2');
+		$this->CACHE->Put('test_multiple_3', 'multiple_3');
+		$value = $this->CACHE->Get([
+			'test_multiple_1',
+			'test_multiple_2',
+			'test_multiple_3',
+		]);
+		$awaiting = [
+			'test_multiple_1' => 'multiple_1',
+			'test_multiple_2' => 'multiple_2',
+			'test_multiple_3' => 'multiple_3',
+		];
+		if ($value === $awaiting) {
+			return 'OK';
+		}
+		throw new Exception($value);
+	}
+
+	public function TestPutAndGetMissedMultiple() {
+		$this->CACHE->Set('test_multiple_1', 'multiple_1');
+		$this->CACHE->Set('test_multiple_2', 'multiple_2');
+		$this->CACHE->Set('test_multiple_3', 'multiple_3');
+		try {
+			$value = $this->CACHE->Get([
+				'test_multiple_1',
+				'test_multiple_2',
+				'test_multiple_3',
+				'test_multiple_4',
+			]);
+		} catch (\System\ExceptionCache $error) {
+			return $error->GetMessage();
+		}
+		throw new Exception('No exception trowed for key "test_multiple_4"');
+	}
+
 	public function TestPutAndGetBoolean() {
 		$value = rand(0, 1) ? true : false;
 		$this->CACHE->Put('test_boolean', $value);
@@ -84,7 +130,7 @@ class TestCache extends Test {
 		} catch (\System\ExceptionCache $error) {
 		}
 		$value = $this->CACHE->Get('test_number_5');
-		return 'OK';
+		return 'OK: ' . $value;
 	}
 
 }
