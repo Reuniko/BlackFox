@@ -66,11 +66,7 @@ class CacheDriverDatabase extends Cache {
 			}
 			$answer[$key_i] = $this->UnpackValue($data[$key_i]['VALUE'], $data[$key_i]['TYPE']);
 		}
-		if (is_array($key)) {
-			return $answer;
-		} else {
-			return reset($answer);
-		}
+		return is_array($key) ? $answer : reset($answer);
 	}
 
 	public function Put(string $key, $value, int $ttl = null, array $tags = []) {
