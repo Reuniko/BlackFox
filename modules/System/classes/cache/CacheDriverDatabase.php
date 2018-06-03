@@ -60,7 +60,7 @@ class CacheDriverDatabase extends Cache {
 		return $this->UnpackValue($data['VALUE'], $data['TYPE']);
 	}
 
-	public function Set(string $key, $value, int $ttl = null, array $tags = []) {
+	public function Put(string $key, $value, int $ttl = null, array $tags = []) {
 		try {
 			$this->DATA->Create([
 				'KEY'    => $key,
