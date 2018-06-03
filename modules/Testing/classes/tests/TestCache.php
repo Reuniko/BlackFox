@@ -9,7 +9,7 @@ class TestCache extends Test {
 	public function __construct() {
 		parent::__construct();
 		$this->CACHE = \System\Cache::I();
-		$this->CACHE->Wipe();
+		$this->CACHE->Clear();
 	}
 
 	public function TestGetNonExistingKey() {
