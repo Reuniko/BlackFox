@@ -59,9 +59,11 @@ class Database extends Instanceable {
 	}
 
 	public function Escape($data) {
-		//debug($data, 'ESC in');
-		//debug(mysqli_real_escape_string($this->link, $data), 'ESC out');
-		return mysqli_real_escape_string($this->link, $data);
+		//debug($data, 'Escape $data', 'log');
+		$answer = mysqli_real_escape_string($this->link, $data);
+		//$answer = str_replace('\0', ' ', $answer);
+		//debug($answer, 'Escape $answer', 'log');
+		return $answer;
 	}
 
 	public function StartTransaction() {
