@@ -50,6 +50,9 @@ class CacheDriverDatabase extends Cache {
 	}
 
 	public function Get(string $key) {
+		if (empty($key)) {
+			throw new ExceptionCache("Empty key passed");
+		}
 		$data = $this->DATA->Read($key, ['KEY', 'VALUE', 'TYPE'], [], false);
 		if (empty($data)) {
 			throw new ExceptionCache("Value for key '{$key}' not found");
