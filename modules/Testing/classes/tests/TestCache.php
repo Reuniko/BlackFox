@@ -52,7 +52,7 @@ class TestCache extends Test {
 	}
 
 	public function TestSetAndGetArray() {
-		$value = [1, 2, 's', 'XXX' => [1, 2, '3']];
+		$value = [1, 2, 's', 'XXX' => [1, 2, '3', '*', ' * instanced']];
 		$this->CACHE->Set('test_array', $value);
 		$result = $this->CACHE->Get('test_array');
 		if ($result === $value) {
@@ -62,11 +62,13 @@ class TestCache extends Test {
 	}
 
 	public function TestSetAndGetObject() {
-		$value = new \System\Cache();
+		$value = new \System\User();
 		$this->CACHE->Set('test_object', $value);
 		$result = $this->CACHE->Get('test_object');
-		if ($result === $value) {
-			return $result;
+		debug($value, '$value');
+		debug($result, '$result');
+		if ($result == $value) {
+			return 'OK';
 		}
 		throw new Exception($result);
 	}
