@@ -14,11 +14,11 @@ class TestCache extends Test {
 
 	public function TestGetNonExistingKey() {
 		try {
-			$this->CACHE->Get('non_exising_key');
+			$value = $this->CACHE->Get('non_exising_key');
 		} catch (\System\ExceptionCache $error) {
 			return $error->GetMessage();
 		}
-		throw new Exception("non_exising_key exist ~_~");
+		throw new Exception("non_exising_key exist: {$value}");
 	}
 
 	public function TestSetAndGetBoolean() {
@@ -56,7 +56,7 @@ class TestCache extends Test {
 		$this->CACHE->Set('test_array', $value);
 		$result = $this->CACHE->Get('test_array');
 		if ($result === $value) {
-			return $result;
+			return 'OK';
 		}
 		throw new Exception($result);
 	}
@@ -70,6 +70,21 @@ class TestCache extends Test {
 			return $result->ID;
 		}
 		throw new Exception($result);
+	}
+
+	public function TestTagsStrikeOddAndEvenNumbers() {
+		foreach (array_fill(1, 20, 0) as $index => $value) {
+			$tag = ($index % 2) ? 'test_number_odd' : 'test_number_even';
+			$this->CACHE->Replace("test_number_{$index}", $index, null, [$tag, 'test_numbers']);
+		}
+		$this->CACHE->Strike('test_number_even');
+		try {
+			$this->CACHE->Get('test_number_6');
+			throw new Exception("Key 'test_number_6' exist after strike on tag 'test_number_even'");
+		} catch (\System\ExceptionCache $error) {
+		}
+		$value = $this->CACHE->Get('test_number_5');
+		return 'OK';
 	}
 
 }

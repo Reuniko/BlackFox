@@ -2,25 +2,33 @@
 
 namespace System;
 
+/**
+ * Class Cache
+ *
+ * Base cache driver needs to be replaced with any working child
+ *
+ * @package System
+ */
 class Cache extends Instanceable {
 
 	public function Get(string $key) {
-		throw new ExceptionCache('Base cache driver needs to be replaced with any working child');
+		throw new ExceptionCache("Value for key '{$key}' not found");
 	}
 
 	public function Set(string $key, $value, int $ttl = null, array $tags = []) {
-		throw new ExceptionCache('Base cache driver needs to be replaced with any working child');
 	}
 
 	public function Clean(string $key) {
-		throw new ExceptionCache('Base cache driver needs to be replaced with any working child');
+	}
+
+	public function Replace(string $key, $value, int $ttl = null, array $tags = []) {
+		$this->Clean($key);
+		$this->Set($key, $value, $ttl, $tags);
 	}
 
 	public function Strike($tags) {
-		throw new ExceptionCache('Base cache driver needs to be replaced with any working child');
 	}
 
 	public function Wipe() {
-		throw new ExceptionCache('Base cache driver needs to be replaced with any working child');
 	}
 }
