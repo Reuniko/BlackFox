@@ -79,7 +79,7 @@ class CacheDriverDatabase extends Cache {
 		}
 	}
 
-	public function Clean(string $key) {
+	public function Delete(string $key) {
 		$this->DATA->Delete(['KEY' => $key]);
 		$this->TAGS->Delete(['KEY' => $key]);
 	}
@@ -92,7 +92,7 @@ class CacheDriverDatabase extends Cache {
 		$this->TAGS->Delete(['KEY' => $keys]);
 	}
 
-	public function Wipe() {
+	public function Clear() {
 		$this->DATA->Truncate();
 		$this->TAGS->Truncate();
 	}

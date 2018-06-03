@@ -41,7 +41,7 @@ class Cache extends Instanceable {
 	 *
 	 * @param string $key key
 	 */
-	public function Clean(string $key) {
+	public function Delete(string $key) {
 	}
 
 	/**
@@ -53,7 +53,7 @@ class Cache extends Instanceable {
 	 * @param array $tags tags (optional)
 	 */
 	public function Replace(string $key, $value, int $ttl = null, array $tags = []) {
-		$this->Clean($key);
+		$this->Delete($key);
 		$this->Set($key, $value, $ttl, $tags);
 	}
 
@@ -68,6 +68,6 @@ class Cache extends Instanceable {
 	/**
 	 * Method cleans all cache completely.
 	 */
-	public function Wipe() {
+	public function Clear() {
 	}
 }
