@@ -10,14 +10,15 @@ namespace System;
 class Cache extends Instanceable {
 
 	/**
-	 * Method tries to get cached value by it's key:
+	 * Method tries to get cached value(s) by it's\their's key(s):
 	 * - if key+value has been found - returns the value in original type
 	 * - if no such key+value exist - throws ExceptionCache
 	 *
-	 * @param string $key key of the value
+	 * @param string|array $key key(s)
+	 * @return mixed value(s)
 	 * @throws ExceptionCache "Value for key '...' not found"
 	 */
-	public function Get(string $key) {
+	public function Get($key) {
 		throw new ExceptionCache("Value for key '{$key}' not found");
 	}
 
