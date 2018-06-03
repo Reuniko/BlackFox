@@ -32,7 +32,7 @@ class Cache extends Instanceable {
 	 * @param array $tags tags (optional)
 	 * @throws ExceptionCache "Key already exist: '{$key}'"
 	 */
-	public function Set(string $key, $value, int $ttl = null, array $tags = []) {
+	public function Put(string $key, $value, int $ttl = null, array $tags = []) {
 	}
 
 	/**
@@ -52,9 +52,9 @@ class Cache extends Instanceable {
 	 * @param int|null $ttl time to live (optional)
 	 * @param array $tags tags (optional)
 	 */
-	public function Replace(string $key, $value, int $ttl = null, array $tags = []) {
+	public function Set(string $key, $value, int $ttl = null, array $tags = []) {
 		$this->Delete($key);
-		$this->Set($key, $value, $ttl, $tags);
+		$this->Put($key, $value, $ttl, $tags);
 	}
 
 	/**
