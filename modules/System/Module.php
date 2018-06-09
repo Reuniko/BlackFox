@@ -13,5 +13,6 @@ class Module extends \System\AModule {
 		Groups::I()->Synchronize();
 		Users2Groups::I()->Synchronize();
 		Content::I()->Synchronize();
+		Redirects::I()->Synchronize();
 	}
 }
