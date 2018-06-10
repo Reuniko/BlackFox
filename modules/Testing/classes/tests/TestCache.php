@@ -118,6 +118,17 @@ class TestCache extends Test {
 		throw new Exception($result);
 	}
 
+	public function TestDelete() {
+		$this->CACHE->Set('test_delete', 'fweifjiwejfiew');
+		$this->CACHE->Delete('test_delete');
+		try {
+			$value = $this->CACHE->Get('test_delete');
+		} catch (\System\ExceptionCache $error) {
+			return $error->GetMessage();
+		}
+		throw new Exception("Key test_delete exist: {$value}");
+	}
+
 	public function TestTagsStrikeOddAndEvenNumbers() {
 		foreach (array_fill(1, 20, 0) as $index => $value) {
 			$tag = ($index % 2) ? 'test_number_odd' : 'test_number_even';
