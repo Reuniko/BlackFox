@@ -21,8 +21,12 @@ return [
 				'LINK' => '/admin/System/Modules.php',
 			],
 			'System_Content'      => [
-				'NAME' => 'Контент',
+				'NAME' => 'Контентные страницы',
 				'LINK' => '/admin/System/Content.php',
+			],
+			'System_Redirects'    => [
+				'NAME' => 'Редиректы',
+				'LINK' => '/admin/System/Redirects.php',
 			],
 			'System_Users'        => [
 				'NAME' => 'Пользователи',
