@@ -92,7 +92,11 @@ abstract class Unit {
 
 	public static function Run($PARAMS = [], $template = 'default') {
 		$self = new static($template);
-		$self->Execute($PARAMS);
+		try {
+			$self->Execute($PARAMS);
+		} catch (Exception $error) {
+			Engine::I()->ShowErrors([$error->getMessage()]);
+		}
 	}
 
 	public function Execute($PARAMS = []) {
