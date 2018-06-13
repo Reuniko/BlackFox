@@ -15,10 +15,6 @@ class Content extends \System\SCRUD {
 				'INDEX'    => true,
 				'UNIQUE'   => true,
 			],
-			'REDIRECT'    => [
-				'TYPE' => 'STRING',
-				'NAME' => 'Редирект',
-			],
 			'TITLE'       => [
 				'TYPE' => 'STRING',
 				'NAME' => 'Заголовок',

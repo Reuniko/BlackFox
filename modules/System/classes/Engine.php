@@ -220,13 +220,17 @@ class Engine extends Instanceable {
 				return;
 			}
 
+			// редирект
+			$redirect = Redirects::I()->Read(['URL' => $this->url['path']]);
+			if ($redirect) {
+				Redirects::I()->Update($redirect['ID'], ['COUNT' => $redirect['COUNT'] + 1]);
+				header("Location: {$redirect['REDIRECT']}");
+				die();
+			}
+
 			// запрос на контент в бд
 			$page = Content::I()->Read(['URL' => $this->url['path']]);
 			if ($page) {
-				if (!empty($page['REDIRECT'])) {
-					header("Location: {$page['REDIRECT']}");
-					die();
-				}
 				$this->TITLE = $page['TITLE'];
 				$this->KEYWORDS = $page['KEYWORDS'];
 				$this->DESCRIPTION = $page['DESCRIPTION'];
