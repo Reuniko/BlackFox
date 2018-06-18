@@ -41,7 +41,7 @@ class Engine extends Instanceable {
 		// Init and prolong user session
 		session_start();
 		$lifetime = 7 * 24 * 60 * 60;
-		setcookie(session_name(), session_id(), time() + $lifetime);
+		setcookie(session_name(), session_id(), time() + $lifetime, '/');
 
 		// read main config
 		$this->config = require($_SERVER["DOCUMENT_ROOT"] . '/config.php');
