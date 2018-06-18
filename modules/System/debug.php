@@ -16,7 +16,7 @@ if (!function_exists('debug')) {
 	 * - email - отправляется на почту
 	 * @param string $target путь отправки: имя файла или почтовый адрес
 	 */
-	function debug($data = array(), $title = '', $mode = 'print_r', $target = '/debug.txt') {
+	function debug($data = [], $title = '', $mode = 'print_r', $target = '/debug.txt') {
 		if (!\System\Engine::Instance()->config['debug']) {
 			return;
 		}

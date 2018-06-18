@@ -173,7 +173,7 @@ abstract class Unit {
 		}
 	}
 
-	public function Debug($data, $title = '', $mode = 'textarea', $target = '/debug.txt') {
+	public function Debug($data, $title = '', $mode = 'print_r', $target = '/debug.txt') {
 		$this->ENGINE->Debug($data, $title, $mode, $target);
 	}
 
