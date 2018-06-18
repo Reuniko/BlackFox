@@ -288,7 +288,7 @@ class Engine extends Instanceable {
 		}
 	}
 
-	public function Debug($data, $title = '', $mode = 'textarea', $target = '/debug.txt') {
+	public function Debug($data, $title = '', $mode = 'print_r', $target = '/debug.txt') {
 		debug($data, $title, $mode, $target);
 	}
 
