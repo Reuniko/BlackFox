@@ -14,6 +14,7 @@ class Module extends \System\AModule {
 		Users2Groups::I()->Synchronize();
 		Content::I()->Synchronize();
 		Redirects::I()->Synchronize();
+		Log::I()->Synchronize();
 		CacheData::I()->Synchronize();
 		CacheTags::I()->Synchronize();
 	}
