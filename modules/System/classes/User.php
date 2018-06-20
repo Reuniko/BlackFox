@@ -37,9 +37,19 @@ class User extends Instanceable {
 		}
 		$user = Users::I()->Read(['LOGIN' => $login], ['ID', 'SALT', 'LOGIN', 'PASSWORD']);
 		if (empty($user)) {
+			Log::I()->Create([
+				'TYPE'    => 'USER_AUTH_NOT_FOUND',
+				'MESSAGE' => "Пользователь '{$login}' не существует",
+				'DATA'    => ['LOGIN' => $login],
+			]);
 			throw new Exception("Пользователь '{$login}' не существует");
 		}
 		if ($user['PASSWORD'] <> sha1($user['SALT'] . ':' . $password)) {
+			Log::I()->Create([
+				'TYPE'    => 'USER_AUTH_WRONG_PASSWORD',
+				'MESSAGE' => "Введен некорректный пароль от логина '{$login}'",
+				'DATA'    => ['LOGIN' => $login],
+			]);
 			throw new Exception("Введен некорректный пароль");
 		}
 		$this->Login($user['ID']);
@@ -52,6 +62,11 @@ class User extends Instanceable {
 		}
 
 		Users::I()->Update($ID, ['LAST_AUTH' => time()]);
+		Log::I()->Create([
+			'USER'    => $ID,
+			'TYPE'    => 'USER_AUTH_SUCCESS',
+			'MESSAGE' => 'Успешная авторизация',
+		]);
 		$_SESSION['USER']['ID'] = $ID;
 		self::I()->Load($ID);
 	}

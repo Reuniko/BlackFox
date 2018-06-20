@@ -44,6 +44,10 @@ return [
 				'NAME' => 'Файлы',
 				'LINK' => '/admin/System/Files.php',
 			],
+			'System_Log'          => [
+				'NAME' => 'Журнал системы',
+				'LINK' => '/admin/System/Log.php',
+			],
 		],
 	],
 ];
