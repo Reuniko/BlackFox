@@ -49,6 +49,7 @@ class User extends Instanceable {
 				'TYPE'    => 'USER_AUTH_WRONG_PASSWORD',
 				'MESSAGE' => "Введен некорректный пароль от логина '{$login}'",
 				'DATA'    => ['LOGIN' => $login],
+				'USER'    => $user['ID'],
 			]);
 			throw new Exception("Введен некорректный пароль");
 		}
