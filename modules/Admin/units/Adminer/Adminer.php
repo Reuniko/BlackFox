@@ -162,13 +162,18 @@ class Adminer extends \System\Unit {
 
 	public function Delete($ID) {
 		$this->SCRUD->Delete($ID);
-		$this->Redirect($this->GetBackLink(), "Удален элемент №{$ID}");
+		if (is_array($ID)) {
+			$message = "Удалены элементы №№ " . implode(', ', $ID);
+		} else {
+			$message = "Удален элемент №{$ID}";
+		}
+		$this->Redirect($this->GetBackLink(), $message);
 	}
 
 	private function GetPages($total, $current, $limit) {
 		$RESULT = [];
 
-		$spread = 5;
+		$spread = 7;
 		$current = $current ?: 1;
 
 		$pages_count = (int)ceil($total / $limit);
