@@ -84,7 +84,7 @@
 					$script = "$(window.opener.document)
 						.find('[data-link-input=\'{$RESULT['POPUP']}\']').val('{$row['ID']}').end()
 						.find('[data-link-a=\'{$RESULT['POPUP']}\']').attr('href', '{$this->SCRUD->GetAdminUrl()}?ID={$row['ID']}').end()
-						.find('[data-link-span=\'{$RESULT['POPUP']}\']').val('{$this->GetDisplayName($row)}').end()
+						.find('[data-link-span=\'{$RESULT['POPUP']}\']').val('{$this->SCRUD->GetElementTitle($row)}').end()
 						;window.close();";
 					$href = "javascript:{$script}";
 					$ondblclick = $script;
