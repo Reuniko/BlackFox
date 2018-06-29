@@ -40,6 +40,11 @@ class Adminer extends \System\Unit {
 		$this->ControlUrl();
 
 		$this->ENGINE->TITLE = $this->SCRUD->name;
+
+		$back_link = $this->GetBackLink();
+		if ($back_link <> '?') {
+			$this->ENGINE->AddBreadcrumb("...", $back_link);
+		}
 	}
 
 	public function GetActions(array $request = []) {
@@ -118,9 +123,6 @@ class Adminer extends \System\Unit {
 		$this->view = 'element';
 
 		$R['BACK'] = $this->GetBackLink();
-		if ($R['BACK'] <> '?') {
-			$this->ENGINE->AddBreadcrumb("...", $R['BACK']);
-		}
 
 		if ($ID === 0) {
 			$R['MODE'] = 'Create';
@@ -236,17 +238,6 @@ class Adminer extends \System\Unit {
 		$url = str_replace('%25', '%', $url);
 		$url = str_replace('%3A', ':', $url);
 		return $url;
-	}
-
-	public function GetDisplayName($row = []) {
-		$display = [];
-		foreach ($this->SCRUD->structure as $structure_code => $structure_field) {
-			if ($structure_field['SHOW']) {
-				$display[] = $row[$structure_code];
-			}
-		}
-		$display = implode(' ', $display);
-		return $display;
 	}
 
 	public function LoadTableSettings() {
