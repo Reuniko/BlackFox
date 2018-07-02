@@ -12,9 +12,13 @@ class TypeString extends Type {
 		return "varchar({$length})";
 	}
 
+	/**
+	 * Deleting all extra spaces
+	 *
+	 * @param string $value
+	 * @return string
+	 */
 	public function FormatInputValue($value) {
-		$value = preg_replace('#\s+#', ' ', $value);
-		$value = trim($value);
-		return $value;
+		return trim(mb_ereg_replace('#\s+#', ' ', $value));
 	}
 }
