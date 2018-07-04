@@ -497,6 +497,7 @@ abstract class SCRUD extends Instanceable {
 	/**
 	 * Анализирует значение на наличие информации.
 	 * - 0 - информация присутствует
+	 * - 0.0 - информация присутствует
 	 * - '0' - информация присутствует
 	 * - false - информация присутствует
 	 * - null - информация отсутствует
@@ -511,7 +512,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return boolean флаг наличия информации
 	 */
 	public function _hasInformation($value) {
-		if ($value === 0 || $value === '0' || $value === false) {
+		if ($value === 0 || $value === 0.0 || $value === '0' || $value === false) {
 			return true;
 		}
 		if (empty($value)) {
@@ -1142,7 +1143,9 @@ abstract class SCRUD extends Instanceable {
 		try {
 			return $this->DB->Query($SQL, $key);
 		} catch (ExceptionSQL $ExceptionSQL) {
-			if (substr($ExceptionSQL->getMessage(), 0, 14) === 'Unknown column') {
+			$need_sync = substr($ExceptionSQL->getMessage(), 0, 14) === 'Unknown column';
+			$need_sync |= substr($ExceptionSQL->getMessage(), -13) === 'doesn\'t exist';
+			if ($need_sync) {
 				$this->Synchronize();
 				return $this->DB->Query($SQL, $key);
 			} else {
