@@ -7,14 +7,16 @@ class Users2Groups extends SCRUD {
 		$this->structure = [
 			'ID'    => self::ID,
 			'USER'  => [
-				'TYPE' => 'OUTER',
-				'LINK' => 'System\Users',
-				'NAME' => 'Пользователь',
+				'TYPE'  => 'OUTER',
+				'LINK'  => 'System\Users',
+				'NAME'  => 'Пользователь',
+				'VITAL' => true,
 			],
 			'GROUP' => [
-				'TYPE' => 'OUTER',
-				'LINK' => 'System\Groups',
-				'NAME' => 'Группа',
+				'TYPE'  => 'OUTER',
+				'LINK'  => 'System\Groups',
+				'NAME'  => 'Группа',
+				'VITAL' => true,
 			],
 		];
 	}
@@ -30,5 +32,9 @@ class Users2Groups extends SCRUD {
 		} else {
 			return parent::Create($fields);
 		}
+	}
+
+	public function GetElementTitle($element = []) {
+		return $element['GROUP']['NAME'];
 	}
 }

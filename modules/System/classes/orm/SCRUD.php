@@ -293,7 +293,7 @@ abstract class SCRUD extends Instanceable {
 			'SORT'       => [],
 			'FILTER'     => [],
 			'CONDITIONS' => [],
-			'FIELDS'     => ['*@'],
+			'FIELDS'     => ['*@@'],
 			'LIMIT'      => 100,
 			'PAGE'       => 1,
 			'ESCAPE'     => true,
