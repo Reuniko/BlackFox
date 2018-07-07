@@ -58,7 +58,7 @@ class Adminer extends \System\Unit {
 		$FILTER = [],
 		$PAGE = 1,
 		$SORT = ['ID' => 'DESC'],
-		$FIELDS = ['*@'],
+		$FIELDS = ['*@@'],
 		$popup = null
 	) {
 		$this->view = 'section';
