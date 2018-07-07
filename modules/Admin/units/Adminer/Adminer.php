@@ -110,7 +110,7 @@ class Adminer extends \System\Unit {
 			'FILTER' => $_GET['FILTER'],
 			'PAGE'   => $_GET['PAGE'],
 			'SORT'   => $_GET['SORT'],
-			'FRAME'  => $_GET['FRAME']
+			'FRAME'  => $_GET['FRAME'],
 		];
 		$back = array_filter($back, function ($element) {
 			return !empty($element);
@@ -289,6 +289,7 @@ class Adminer extends \System\Unit {
 					'NAME' => $info['NAME'],
 					'VIEW' => 'element_tab_external',
 				];
+				unset($this->SCRUD->composition[$info['GROUP']]['FIELDS'][$code]);
 			}
 		}
 		return $tabs;
