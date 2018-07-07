@@ -31,8 +31,9 @@ $ID = $RESULT['DATA'][$code]['ID'];
 
 	<? if (!empty($file)): ?>
 
-		<div class="btn-group">
+		<div class="ml-1">
 			[<a href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>" data-link-a="FIELDS[<?= $code ?>]"><?= $RESULT['DATA'][$code]['ID'] ?: '...' ?></a>]
+
 			<a target="_blank" href="<?= $file['SRC'] ?>" style="color: green">
 				<span data-link-span="FIELDS[<?= $code ?>]">
 					<? foreach ($Link->structure as $s_code => $s_field): ?>

@@ -8,7 +8,7 @@
 	id="<?= $code ?>"
 	name="FIELDS[<?= $code ?>]"
 	<?= ($field['DISABLED']) ? 'disabled' : '' ?>
-	rows="10"
+	rows="5"
 	<? if ($field['WYSIWYG']): ?>
 		data-wysiwyg=""
 	<? endif; ?>
