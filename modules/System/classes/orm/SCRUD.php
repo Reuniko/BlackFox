@@ -61,7 +61,9 @@ abstract class SCRUD extends Instanceable {
 
 
 	public function __construct() {
-		$this->DB = Database::Instance();
+		/** @var \System\Database $DB */
+		$DB = Database::Instance();
+		$this->DB = $DB;
 		$this->code = strtolower(implode('_', array_filter(explode('\\', static::class))));
 		$this->Init();
 		$this->ProvideIntegrity();
