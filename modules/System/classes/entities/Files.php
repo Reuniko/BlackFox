@@ -65,7 +65,7 @@ class Files extends SCRUD {
 			}
 			break;
 		}
-		mkdir($_SERVER['DOCUMENT_ROOT'] . $dir);
+		@mkdir($_SERVER['DOCUMENT_ROOT'] . $dir);
 		return $src;
 	}
 

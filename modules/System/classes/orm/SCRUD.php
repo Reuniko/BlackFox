@@ -577,12 +577,18 @@ abstract class SCRUD extends Instanceable {
 
 		$this->SQL = "INSERT INTO {$this->code} SET ";
 
+		$errors = [];
+		$is_root = User::I()->InGroup('root');
 		foreach ($this->structure as $code => $field) {
 			if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT'])) {
 				if (!$this->_hasInformation($fields[$code])) {
-					throw new Exception("Не указано обязательное поле '{$field['NAME']}' [{$code}]");
+					$hint = $is_root ? " ({$this->code}.{$code})" : '';
+					$errors[] = "Не указано обязательное поле '{$field['NAME']}'{$hint}";
 				}
 			}
+		}
+		if ($errors) {
+			throw new Exception($errors);
 		}
 
 		$rows = [];
