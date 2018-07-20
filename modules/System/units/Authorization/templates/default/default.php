@@ -10,7 +10,7 @@
 			"
 	>
 		<form class="form" method="POST">
-			<? $this->ShowMessages(); ?>
+			<? $this->ShowAlerts(); ?>
 			<h2><?= $this->PARAMS['TITLE'] ?: 'Вход в систему' ?></h2>
 			<div class="form-group">
 				<input type="text" name="login" value="<?= $RESULT['LOGIN'] ?>" class="form-control" placeholder="Логин"/>

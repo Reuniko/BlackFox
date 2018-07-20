@@ -30,8 +30,10 @@ abstract class Unit {
 	/** @var array результат работы */
 	public $RESULT = [];
 	/** @var array сообщения+предупреждения+ошибки возникшие в процессе работы */
-	public $MESSAGES = [];
+	public $ALERTS = [];
 
+	public $ajax = false;
+	public $json = false;
 	public $allow_ajax_request = false;
 	public $allow_json_request = false;
 
@@ -101,17 +103,21 @@ abstract class Unit {
 
 	public function Execute($PARAMS = []) {
 		$this->Init($PARAMS);
-		$this->SetMessagesFromSession();
+		$this->SetAlertsFromSession();
 
 		if ($this->allow_ajax_request and (in_array($this->class, [$_REQUEST['AJAX'], $_REQUEST['ajax']]))) {
+			$this->ajax = true;
 			$this->ENGINE->TEMPLATE = null;
 			echo $this->ProcessView($this->ProcessResult());
 			return;
 		}
 
 		if ($this->allow_json_request and (in_array($this->class, [$_REQUEST['JSON'], $_REQUEST['json']]))) {
+			$this->json = true;
 			$this->ENGINE->TEMPLATE = null;
-			echo json_encode($this->ProcessResult());
+			$RESULT = $this->ProcessResult();
+			$RESULT += ['ALERTS' => $this->ALERTS];
+			echo json_encode($RESULT);
 			return;
 		}
 
@@ -239,10 +245,10 @@ abstract class Unit {
 				if (is_array($answer)) {
 					$result += $answer;
 				} else {
-					$this->MESSAGES[] = ['TYPE' => 'SUCCESS', 'TEXT' => $answer];
+					$this->ALERTS[] = ['TYPE' => 'SUCCESS', 'TEXT' => $answer];
 				}
-			} catch (Exception $error) {
-				$result += $this->Error($error->getMessage(), $action, $request);
+			} catch (Exception $Exception) {
+				$result += $this->Error($Exception, $action, $request);
 			}
 		}
 
@@ -296,29 +302,25 @@ abstract class Unit {
 	 * Вызывается при ловле ошибки выполнения любого действия из под контроллера.
 	 * Может переопределяться в классах-наследниках для переопределения логики обработки ошибок.
 	 *
-	 * @param string $message
+	 * @param Exception $Exception
 	 * @param string $action
 	 * @param array $request
 	 * @return array
 	 */
-	public function Error($message, $action = null, $request = []) {
-		//$this->Debug($message, 'Error $error');
-		//$this->Debug($action, 'Error $action');
-		//$this->Debug($request, 'Error $request');
-		$this->MESSAGES[] = [
-			'TYPE' => 'ERROR',
-			'TEXT' => $message,
-		];
+	public function Error($Exception, $action = null, $request = []) {
+		foreach ($Exception->getArray() as $error) {
+			$this->ALERTS[] = [
+				'TYPE' => 'danger',
+				'TEXT' => $error,
+			];
+		}
 		return [];
 	}
 
-	/**
-	 *
-	 */
-	public function SetMessagesFromSession() {
-		if (!empty($_SESSION['MESSAGES'][$this->class])) {
-			$this->MESSAGES = $_SESSION['MESSAGES'][$this->class];
-			$_SESSION['MESSAGES'][$this->class] = [];
+	public function SetAlertsFromSession() {
+		if (!empty($_SESSION['ALERTS'][$this->class])) {
+			$this->ALERTS = $_SESSION['ALERTS'][$this->class];
+			$_SESSION['ALERTS'][$this->class] = [];
 		}
 	}
 
@@ -348,13 +350,14 @@ abstract class Unit {
 
 		ob_start();
 		debug($RESULT, $this->class . ' $RESULT');
+		debug($this->ALERTS, $this->class . ' ALERTS');
 		$view_file = $this->Path("{$this->view}.php");
 		require($view_file);
 		$content = ob_get_clean();
 
-		if (!empty($this->MESSAGES)) {
+		if (!empty($this->ALERTS)) {
 			ob_start();
-			$this->ShowMessages();
+			$this->ShowAlerts();
 			$content = ob_get_clean() . $content;
 		}
 
@@ -407,18 +410,11 @@ abstract class Unit {
 		throw new Exception("Template parent path not found");
 	}
 
-	public function ShowMessages() {
-		$types = [
-			'SUCCESS' => 'success',
-			'INFO'    => 'info',
-			'WARNING' => 'warning',
-			'ERROR'   => 'danger',
-			'DANGER'  => 'danger',
-		];
-		foreach ($this->MESSAGES as $message) {
-			echo "<div class='alert alert-{$types[$message['TYPE']]}'>{$message['TEXT']}</div>";
+	public function ShowAlerts() {
+		foreach ($this->ALERTS as $message) {
+			echo "<div class='alert alert-{$message['TYPE']}'>{$message['TEXT']}</div>";
 		}
-		$this->MESSAGES = [];
+		$this->ALERTS = [];
 	}
 
 	/**
@@ -458,23 +454,25 @@ abstract class Unit {
 	 * Завершает выполнение скрипта.
 	 *
 	 * @param string|null $url URL-адрес
-	 * @param string $message_text текстовое сообщение
-	 * @param string $message_type тип текстового сообщения (SUCCESS|WARNING|ERROR)
+	 * @param string|array $alerts текстовое сообщение | массив сообщений
 	 * @throws Exception
 	 */
-	public function Redirect($url, $message_text = null, $message_type = 'SUCCESS') {
-		header('Location: ' . ($url ?: $_SERVER['REQUEST_URI']));
-		if (!empty($message_text)) {
-			$_SESSION['MESSAGES'][$this->class][] = [
-				'TYPE' => $message_type,
-				'TEXT' => $message_text,
-			];
+	public function Redirect($url, $alerts = []) {
+		$alerts = is_array($alerts) ? $alerts : [$alerts];
+		foreach ($alerts as &$alert) {
+			if (is_string($alert)) {
+				$alert = ['TEXT' => $alert, 'TYPE' => 'success'];
+			}
 		}
-		echo json_encode([
-			'URL'  => $url,
-			'TYPE' => $message_type,
-			'TEXT' => $message_text,
-		]);
+		if ($this->json) {
+			echo json_encode([
+				'URL'    => $url ?: $_SERVER['REQUEST_URI'],
+				'ALERTS' => $alerts,
+			]);
+		} else {
+			header('Location: ' . ($url ?: $_SERVER['REQUEST_URI']));
+			$_SESSION['ALERTS'][$this->class] = $alerts;
+		}
 		die();
 	}
 
