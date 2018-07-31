@@ -9,11 +9,12 @@ class Content extends \System\SCRUD {
 		$this->structure = [
 			'ID'          => self::ID,
 			'URL'         => [
-				'TYPE'     => 'STRING',
-				'NAME'     => 'Адрес',
-				'NOT_NULL' => true,
-				'INDEX'    => true,
-				'UNIQUE'   => true,
+				'TYPE'        => 'STRING',
+				'NAME'        => 'Адрес',
+				'NOT_NULL'    => true,
+				'INDEX'       => true,
+				'UNIQUE'      => true,
+				'DESCRIPTION' => 'Относительно корня сайта',
 			],
 			'TITLE'       => [
 				'TYPE' => 'STRING',
