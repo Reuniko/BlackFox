@@ -6,7 +6,7 @@ class Exception extends \Exception {
 
 	/**
 	 * Exception constructor.
-	 * @param string|array $exception
+	 * @param string|array $exception either a string or an array of strings
 	 */
 	public function __construct($exception = []) {
 		if (empty($exception)) {
@@ -14,7 +14,7 @@ class Exception extends \Exception {
 		}
 		if (is_array($exception)) {
 			$this->array = $exception;
-			$this->message = implode("<br/>", $exception); // TODO <br/> or \r\n depend on CONTEXT
+			$this->message = implode($this->getImplodeSymbols(), $exception);
 		}
 		if (is_string($exception)) {
 			$this->message = $exception;
@@ -24,5 +24,9 @@ class Exception extends \Exception {
 
 	public function getArray() {
 		return $this->array;
+	}
+
+	public function getImplodeSymbols() {
+		return (php_sapi_name() === 'cli') ? "\r\n" : '<br/>';
 	}
 }
