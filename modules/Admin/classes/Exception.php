@@ -1,6 +1,6 @@
 <?php
 namespace Admin;
 
-class Exception extends \Exception {
+class Exception extends \System\Exception {
 
 }
