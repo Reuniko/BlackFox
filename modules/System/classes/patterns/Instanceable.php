@@ -47,7 +47,7 @@ abstract class Instanceable {
 			throw new Exception("Unsupported param type");
 		}
 
-		if (is_null(self::$instance[$class][$hash])) {
+		if (!isset(self::$instance[$class][$hash])) {
 			self::$instance[$class][$hash] = new $class($params);
 			self::$instance[$class][$hash]->instanced = true;
 		}
