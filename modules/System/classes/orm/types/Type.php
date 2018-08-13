@@ -35,7 +35,7 @@ abstract class Type {
 
 		$type = $this->GetStructureStringType();
 
-		$null = ($info["NOT_NULL"]) ? "NOT NULL" : "NULL";
+		$null = ($info["NOT_NULL"] || $info['PRIMARY']) ? "NOT NULL" : "NULL";
 
 		$default = "";
 		if ($info['DEFAULT']) {
