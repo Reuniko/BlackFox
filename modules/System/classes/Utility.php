@@ -28,11 +28,13 @@ class Utility extends Instanceable {
 			$date = strtotime($date);
 		}
 		$answer = strftime($format, $date);
+		/*
 		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			$format = iconv('utf-8', 'cp1251', $format);
 			$answer = strftime($format, $date);
 			$answer = iconv('cp1251', 'utf-8', $answer);
 		}
+		*/
 		return $answer;
 	}
 
