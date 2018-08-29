@@ -18,8 +18,8 @@ php_flag html_errors on
 
 	# если [запрос на php файл] или [запрос на директорию]
 	# то [перенаправляет запрос в движок]
-	RewriteCond %{REQUEST_URI} !/site/engine.php$
-	RewriteRule ^[^\.]*$|\.php$ /site/engine.php [L]
+	RewriteCond %{REQUEST_URI} !/core/engine.php$
+	RewriteRule ^[^\.]*$|\.php$ /core/engine.php [L]
 
 	# если [запрос на статичный существующий файл]
 	# то [ничего не изменяет]
