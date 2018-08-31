@@ -62,7 +62,7 @@ abstract class Unit {
 		$this->class = get_called_class();
 		$this->name = $this->name ?: $this->class;
 		list($module, $unit) = explode('\\', $this->class);
-		$this->parents[$this->class] = $this->ENGINE->GetCoreDir("modules/{$module}/units/{$unit}");
+		$this->parents[$this->class] = $this->ENGINE->GetCoreDirectoryAbsolute("modules/{$module}/units/{$unit}");
 		$this->unit_absolute_folder = $this->parents[$this->class];
 		$this->unit_relative_folder = $this->ENGINE->GetRelativePath($this->unit_absolute_folder);
 
@@ -73,7 +73,7 @@ abstract class Unit {
 				continue;
 			}
 			list($module, $unit) = explode('\\', $parent);
-			$this->parents[$parent] = $this->ENGINE->GetCoreDir("modules/{$module}/units/{$unit}");
+			$this->parents[$parent] = $this->ENGINE->GetCoreDirectoryAbsolute("modules/{$module}/units/{$unit}");
 		}
 
 		$this->template = $this->SelectTemplateFolder($template);
@@ -180,7 +180,7 @@ abstract class Unit {
 	}
 
 	public function Debug($data, $title = '', $mode = 'print_r', $target = '/debug.txt') {
-		$this->ENGINE->Debug($data, $title, $mode, $target);
+		debug($data, $title, $mode, $target);
 	}
 
 	/**
