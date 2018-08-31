@@ -31,35 +31,62 @@ class Engine extends Instanceable {
 
 	protected $initialized = false;
 
+	/**
+	 * Engine constructor:
+	 * - Initializes (and prolongs) user session
+	 * - Reads main config into $this->config, $this->roots and $this->cores
+	 * - Links autoload class system to $this->AutoloadClass()
+	 * - Loads module 'System'
+	 * - Initializes the main connection to the default database
+	 *
+	 * @throws Exception
+	 */
 	public function __construct() {
-		// prevent double run
-		if ($this->initialized) {
-			throw new Exception("Engine already initialized");
-		}
-		$this->initialized = true;
+		$this->InitUserSession();
+		$this->InitMainConfig();
+		$this->InitAutoloadClasses();
+		$this->RegisterModuleClasses('System');
+		$this->InitDatabase();
+	}
 
-		// Init and prolong user session
+	/**
+	 * Initializes (and prolongs) user session
+	 */
+	public function InitUserSession() {
 		session_start();
 		$lifetime = 7 * 24 * 60 * 60;
 		setcookie(session_name(), session_id(), time() + $lifetime, '/');
+	}
 
-		// read main config
+	/**
+	 * Reads main config into $this->config, $this->roots and $this->cores
+	 */
+	public function InitMainConfig() {
 		$this->config = require($_SERVER["DOCUMENT_ROOT"] . '/config.php');
 		$this->roots = $this->config['roots'];
 		$this->cores = $this->config['cores'];
+	}
 
-		// Init autoload classes
+	/**
+	 * Links autoload class system to $this->AutoloadClass()
+	 */
+	public function InitAutoloadClasses() {
 		spl_autoload_register([$this, 'AutoloadClass']);
-		$this->RegisterModuleClasses('System');
+	}
 
-		// Init database connector
+	/**
+	 * Initializes the main connection to the default database
+	 */
+	public function InitDatabase() {
 		/** @var Database $DB */
 		$DB = Database::InstanceDefault($this->config['database']);
 		$this->DB = $DB;
 	}
 
 	/**
-	 * Checks access for section
+	 * Checks access for section:
+	 * - if user has no access - throws an exception
+	 * - if user has access - does nothing
 	 *
 	 * @param array $rules section rules: ['<group_code>' => '<true\false>', ...]
 	 * @param array $groups user group codes: ['<group_code>', ...]
@@ -84,18 +111,21 @@ class Engine extends Instanceable {
 		if (User::I()->IsAuthorized()) {
 			throw new ExceptionAccessDenied('This section requires higher privileges');
 		} else {
-			throw new ExceptionAuthRequired('This section requires authorisation');
+			throw new ExceptionAuthRequired('This section requires authorization');
 		}
 	}
 
-	public function ShowAuthForm($message = null) {
-		$this->WRAPPER = 'frame';
-		\System\Authorization::Run(['MESSAGE' => $message]);
-	}
-
-	public function Work() {
-
-		// Load section info
+	/**
+	 * Loads all Engine properties associated with requested page:
+	 * - SECTION - array content of closest ancestor '.section.php' file
+	 * - TEMPLATE - symbol code of template, defined by section
+	 * - WRAPPER - symbol code of wrapper, defined by section
+	 * - TEMPLATE_PATH - relative path to root of template
+	 * - TITLE - title of section
+	 *
+	 * All these properties can be reset in the future execution of the script!
+	 */
+	public function LoadSectionInfo() {
 		$this->url = parse_url($_SERVER['REQUEST_URI']);
 		$path_to_section_config = $this->SearchAncestorFile($this->url['path'], '.section.php');
 		$this->SECTION = !empty($path_to_section_config) ? require($path_to_section_config) : [];
@@ -103,14 +133,25 @@ class Engine extends Instanceable {
 		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
 		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
 		$this->TITLE = $this->SECTION['NAME'];
+	}
 
-		// Init other modules
-		$this->LoadModules();
-
-		// setup USER
+	/**
+	 * Loads the default instance of the user
+	 */
+	public function LoadUser() {
 		/** @var User $USER */
 		$USER = User::InstanceDefault();
 		$this->USER = $USER;
+	}
+
+	/**
+	 *
+	 */
+	public function Work() {
+
+		$this->LoadSectionInfo();
+		$this->LoadModules();
+		$this->LoadUser();
 
 		// generate CONTENT
 		ob_start();
@@ -259,6 +300,16 @@ class Engine extends Instanceable {
 		}
 	}
 
+	/**
+	 * Launches auth unit with no frame
+	 *
+	 * @param string $message reason to auth
+	 */
+	public function ShowAuthForm($message = null) {
+		$this->WRAPPER = 'frame';
+		\System\Authorization::Run(['MESSAGE' => $message]);
+	}
+
 	public function ShowErrors($errors = []) {
 		if (!is_array($errors)) {
 			$errors = [$errors];
@@ -387,15 +438,7 @@ class Engine extends Instanceable {
 	}
 
 	public function LoadModules() {
-
-		try {
-			$this->modules = Modules::I()->GetList(['SORT' => ['SORT' => 'ASC']]);
-		} catch (\Exception $error) {
-			Modules::I()->Synchronize();
-			Modules::I()->Create(['ID' => 'System']);
-			$this->modules = Modules::I()->GetList(['SORT' => ['SORT' => 'ASC']]);
-		}
-
+		$this->modules = Modules::I()->GetList(['SORT' => ['SORT' => 'ASC']]);
 		foreach ($this->modules as $module) {
 			if ($module['ID'] === 'System') {
 				continue; // already registered
