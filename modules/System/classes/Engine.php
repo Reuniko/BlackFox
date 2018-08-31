@@ -3,6 +3,7 @@
 namespace System;
 
 class Engine extends Instanceable {
+
 	public $config = [];
 	public $cores = [];
 	public $roots = [];
@@ -28,8 +29,6 @@ class Engine extends Instanceable {
 	public $TEMPLATE = "";
 	public $TEMPLATE_PATH = "";
 	public $WRAPPER = "wrapper";
-
-	protected $initialized = false;
 
 	/**
 	 * Engine constructor:
@@ -131,7 +130,7 @@ class Engine extends Instanceable {
 		$this->SECTION = !empty($path_to_section_config) ? require($path_to_section_config) : [];
 		$this->TEMPLATE = isset($this->SECTION['TEMPLATE']) ? $this->SECTION['TEMPLATE'] : $this->config['template'];
 		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
-		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
+		$this->TEMPLATE_PATH = $this->GetCoreDirectoryRelative('templates/' . $this->TEMPLATE);
 		$this->TITLE = $this->SECTION['NAME'];
 	}
 
@@ -145,7 +144,15 @@ class Engine extends Instanceable {
 	}
 
 	/**
+	 * Main entry point of the Engine:
 	 *
+	 * - Loads all properties associated with requested page
+	 * - Loads all active modules
+	 * - Loads the default instance of the user
+	 *
+	 * - Generates the content by using method $this->ShowContent()
+	 * - If needed, generates wrapper and puts content into it
+	 * - Outputs the result of the work
 	 */
 	public function Work() {
 
@@ -170,11 +177,19 @@ class Engine extends Instanceable {
 
 	}
 
+	/**
+	 * Resets current Engine's template and the root path to it
+	 * @param string $template symbol code of new template
+	 */
 	public function SetTemplate($template) {
 		$this->TEMPLATE = $template;
-		$this->TEMPLATE_PATH = $this->GetCoreDir('templates/' . $this->TEMPLATE, true);
+		$this->TEMPLATE_PATH = $this->GetCoreDirectoryRelative('templates/' . $this->TEMPLATE);
 	}
 
+	/**
+	 * Adds style file to headers.
+	 * @param string $path relative path to the style file
+	 */
 	public function AddHeaderStyle($path) {
 		$this->HEADERS[$path] = [
 			'TYPE' => 'STYLE',
@@ -182,6 +197,10 @@ class Engine extends Instanceable {
 		];
 	}
 
+	/**
+	 * Adds script file to headers.
+	 * @param string $path relative path to the script file
+	 */
 	public function AddHeaderScript($path) {
 		$this->HEADERS[$path] = [
 			'TYPE' => 'SCRIPT',
@@ -189,6 +208,10 @@ class Engine extends Instanceable {
 		];
 	}
 
+	/**
+	 * Adds any string to headers.
+	 * @param string $string
+	 */
 	public function AddHeaderString($string) {
 		$this->HEADERS[] = [
 			'TYPE'   => 'STRING',
@@ -196,9 +219,17 @@ class Engine extends Instanceable {
 		];
 	}
 
-	public function MakeHeader() {
+	/**
+	 * Makes and returns printable string of html header,
+	 * combining Engine's HEADERS property together.
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
+	public function GetHeader() {
 		if (empty($this->HEADERS)) {
-			return null;
+			$this->HEADER = null;
+			return $this->HEADER;
 		}
 		$headers = [];
 		foreach ($this->HEADERS as $header) {
@@ -209,7 +240,6 @@ class Engine extends Instanceable {
 			$version = null;
 			$path_absolute = $_SERVER['DOCUMENT_ROOT'] . $header['PATH'];
 			if (file_exists($path_absolute)) {
-				// throw new Exception("Header not found: {$header['PATH']}");
 				$version = '?' . filemtime($path_absolute);
 			}
 			if ($header['TYPE'] === 'STYLE') {
@@ -222,64 +252,81 @@ class Engine extends Instanceable {
 			}
 			throw new Exception("Unknown header type '{$header['TYPE']}'");
 		}
-		return implode("\r\n", $headers);
-	}
-
-	public function GetHeader() {
-		$this->HEADER = $this->HEADER ?: $this->MakeHeader();
+		$this->HEADER = implode("\r\n\t", $headers);
 		return $this->HEADER;
 	}
 
+	/**
+	 * This method tries to generate main content of the page with several steps:
+	 * - if requested file exist - executes it and exit
+	 * - if requested directory with file 'index.php' exist - executes it and exit
+	 * - if there are somewhere in ancestors file '.controller.php' exist - executes it and exit
+	 * - if redirect exist - does redirect and die
+	 * - if content page exist - prints it and exit
+	 * If nothing works - throws ExceptionPageNotFound
+	 */
+	public function MakeContent() {
+
+		// request for specific file
+		foreach ($this->roots as $root) {
+			$request_path = $root . $this->url['path'];
+			if (file_exists($request_path) and !is_dir($request_path)) {
+				require($request_path);
+				return;
+			}
+		}
+
+		// request for specific directory with 'index.php'
+		foreach ($this->roots as $root) {
+			$request_path = $root . $this->url['path'];
+			if (is_dir($request_path) and file_exists($request_path . 'index.php')) {
+				require($request_path . 'index.php');
+				return;
+			}
+		}
+
+		// request for non-existing file
+		$path_to_controller = $this->SearchAncestorFile($this->url['path'], '.controller.php');
+		if ($path_to_controller) {
+			require($path_to_controller);
+			return;
+		}
+
+		// redirect
+		$redirect = Redirects::I()->Read(['URL' => $this->url['path']]);
+		if ($redirect) {
+			Redirects::I()->Update($redirect['ID'], ['COUNT' => $redirect['COUNT'] + 1]);
+			header("Location: {$redirect['REDIRECT']}");
+			die();
+		}
+
+		// content from database
+		$page = Content::I()->Read(['URL' => $this->url['path']]);
+		if ($page) {
+			$this->TITLE = $page['TITLE'];
+			$this->KEYWORDS = $page['KEYWORDS'];
+			$this->DESCRIPTION = $page['DESCRIPTION'];
+			echo htmlspecialchars_decode($page['CONTENT']);
+			return;
+		}
+
+		throw new ExceptionPageNotFound();
+	}
+
+	/**
+	 * This method unconditionally displays the content for the page, using $this->MakeContent().
+	 * If any exception occurs during the process of content generation -
+	 * catches it and launches the corresponding alternative method:
+	 * - ShowErrors
+	 * - ShowAuthForm
+	 * - Show404
+	 * - Show403
+	 */
 	public function ShowContent() {
 		try {
 
-			// Check access
 			$this->CheckSectionAccess($this->SECTION['ACCESS'], $this->USER->GROUPS);
-
-			// запрос на конкретный скрипт
-			foreach ($this->roots as $root) {
-				$request_path = $root . $this->url['path'];
-				if (file_exists($request_path) and !is_dir($request_path)) {
-					require($request_path);
-					return;
-				}
-			}
-
-			// запрос на директорию с index.php
-			foreach ($this->roots as $root) {
-				$request_path = $root . $this->url['path'];
-				if (is_dir($request_path) and file_exists($request_path . 'index.php')) {
-					require($request_path . 'index.php');
-					return;
-				}
-			}
-
-			// запрос на контроллер
-			$path_to_controller = $this->SearchAncestorFile($this->url['path'], '.controller.php');
-			if ($path_to_controller) {
-				require($path_to_controller);
-				return;
-			}
-
-			// редирект
-			$redirect = Redirects::I()->Read(['URL' => $this->url['path']]);
-			if ($redirect) {
-				Redirects::I()->Update($redirect['ID'], ['COUNT' => $redirect['COUNT'] + 1]);
-				header("Location: {$redirect['REDIRECT']}");
-				die();
-			}
-
-			// запрос на контент в бд
-			$page = Content::I()->Read(['URL' => $this->url['path']]);
-			if ($page) {
-				$this->TITLE = $page['TITLE'];
-				$this->KEYWORDS = $page['KEYWORDS'];
-				$this->DESCRIPTION = $page['DESCRIPTION'];
-				echo htmlspecialchars_decode($page['CONTENT']);
-				return;
-			}
-
-			throw new ExceptionPageNotFound();
+			$this->MakeContent();
 
 		} catch (ExceptionSQL $exception) {
 			$message = 'SQL QUERY ERROR: ' . $exception->getMessage();
@@ -302,7 +349,6 @@ class Engine extends Instanceable {
 
 	/**
 	 * Launches auth unit with no frame
-	 *
 	 * @param string $message reason to auth
 	 */
 	public function ShowAuthForm($message = null) {
@@ -310,16 +356,28 @@ class Engine extends Instanceable {
 		\System\Authorization::Run(['MESSAGE' => $message]);
 	}
 
+	/**
+	 * This method tries to show passed array of errors,
+	 * using file 'errors.php' from the current template root folder.
+	 * Otherwise displays them as plain divs.
+	 * @param string|array $errors
+	 */
 	public function ShowErrors($errors = []) {
 		if (!is_array($errors)) {
 			$errors = [$errors];
 		}
+
 		if (!empty($this->TEMPLATE)) {
-			require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/errors.php'));
-		} else {
-			foreach ($errors as $error) {
-				echo $error;
+			try {
+				require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/errors.php'));
+				return;
+			} catch (Exception $error) {
+				// no 'errors.php' found, it's okay
 			}
+		}
+
+		foreach ($errors as $error) {
+			echo "<div>{$error}</div>";
 		}
 	}
 
@@ -333,14 +391,18 @@ class Engine extends Instanceable {
 		$this->ShowErrors(['403 Forbidden']);
 	}
 
+	/**
+	 * Auto-loader for classes.
+	 * All classes stores in $this->classes array, where:
+	 * - key - is a full class name with namespace
+	 * - value - absolute path to the file with class definition
+	 *
+	 * @param string $class class than needs to be loaded
+	 */
 	public function AutoloadClass($class) {
 		if (isset($this->classes[$class])) {
 			require_once($this->classes[$class]);
 		}
-	}
-
-	public function Debug($data, $title = '', $mode = 'print_r', $target = '/debug.txt') {
-		debug($data, $title, $mode, $target);
 	}
 
 	/**
@@ -365,11 +427,11 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Выбирает информацию обо всех файлах в указанной директории и поддиректориях.
+	 * Scans info about all files in specified directory and all subdirectories.
 	 *
-	 * @param string $directory абсолютный путь к директории
-	 * @param int $depth глубина сканирования (не обязательно)
-	 * @return array список всех файлов в виде структур pathinfo: {dirname, basename, extension, filename}
+	 * @param string $directory absolute path to directory
+	 * @param int $depth deepness of scan (optional)
+	 * @return array list of all files as pathinfo structs: {dirname, basename, extension, filename}
 	 */
 	public function ScanDirectoryRecursive($directory, $depth = null) {
 		$files = [];
@@ -392,6 +454,14 @@ class Engine extends Instanceable {
 		return $files;
 	}
 
+	/**
+	 * Search and return absolute path to the file, first among all active cores.
+	 * If no file found - throws an exception.
+	 *
+	 * @param string $path path to file, relative to any core root
+	 * @return string absolute path to file
+	 * @throws Exception Found no file '___' in cores
+	 */
 	public function GetCoreFile($path) {
 		foreach ($this->cores as $core) {
 			$full_path = "{$core}/{$path}";
@@ -403,40 +473,45 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Ищет директорию в ядре.
-	 * Возвращает к ней путь в зависимости от флага:
-	 * - false - абсолютный
-	 * - true - относительно корня сайта
+	 * Search and return absolute path to the directory, first among all active cores.
+	 * If no directory found - throws an exception.
 	 *
-	 * Генерирует исключение в случае если директория не найдена.
-	 *
-	 * @param string $path путь к директории относительно корня ядра
-	 * @param bool $relative возвращаемый путь: true - относительный, false - абсолютный
-	 * @return string относительный\абсолютный путь к директории
-	 * @throws Exception директория не найдена
+	 * @param string $path path to directory, relative to any core root
+	 * @return string absolute path to directory
+	 * @throws Exception Found no directory '___' in cores
 	 */
-	public function GetCoreDir($path, $relative = false) {
+	public function GetCoreDirectoryAbsolute($path) {
 		foreach ($this->cores as $relative_path => $absolute_path) {
 			$full_path = "{$absolute_path}/{$path}";
 			if (is_dir($full_path)) {
-				if (!$relative) {
-					return $full_path;
-				} else {
-					return "{$relative_path}/{$path}";
-				}
+				return $full_path;
 			}
 		}
-		throw new Exception("Found no dir '{$path}' in cores: " . print_r($this->cores, true));
+		throw new Exception("Found no directory '{$path}' in cores");
 	}
 
-	public function BufferRestart() {
-		ob_end_clean();
+	/**
+	 * Search and return relative path to the directory, first among all active cores.
+	 * If no directory found - throws an exception.
+	 *
+	 * @param string $path path to directory, relative to any core root
+	 * @return string path to directory, relative server root
+	 * @throws Exception Found no directory '___' in cores
+	 */
+	public function GetCoreDirectoryRelative($path) {
+		foreach ($this->cores as $relative_path => $absolute_path) {
+			$full_path = "{$absolute_path}/{$path}";
+			if (is_dir($full_path)) {
+				return "{$relative_path}/{$path}";
+			}
+		}
+		throw new Exception("Found no directory '{$path}' in cores");
 	}
 
-	public function BufferFlush() {
-		ob_get_flush();
-	}
-
+	/**
+	 * Register all active modules,
+	 * except module 'System' cause it's been loaded already.
+	 */
 	public function LoadModules() {
 		$this->modules = Modules::I()->GetList(['SORT' => ['SORT' => 'ASC']]);
 		foreach ($this->modules as $module) {
@@ -447,6 +522,10 @@ class Engine extends Instanceable {
 		}
 	}
 
+	/**
+	 * Upgrade all active modules:
+	 * for every active module - launches it's Upgrade() method.
+	 */
 	public function UpgradeActiveModules() {
 		$namespaces = Modules::I()->Select();
 		foreach ($namespaces as $namespace) {
@@ -457,19 +536,22 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Ищет ближайший файл вверх по иерархии директорий.
+	 * Search for the nearest file up the hierarchy of directories.
 	 *
-	 * @param string $uri относительный путь к директории
-	 * @param string $filename имя искомого файла
-	 * @return string абсолютный путь к искомому файлу (если файл найден)
+	 * @param string $uri path to directory, relative server root
+	 * @param string $filename the name of the file to search for
+	 * @return null|string absolute path to the search file (if file found), null (if no file found)
 	 * @throws Exception
 	 */
 	public function SearchAncestorFile($uri, $filename) {
-		if (empty($filename)) {
-			throw new Exception("Specify \$filename");
+		if (empty($uri)) {
+			throw new Exception("Specify uri");
 		}
+		if (empty($filename)) {
+			throw new Exception("Specify filename");
+		}
+
 		$folders = array_filter(explode('/', $uri));
-		//$this->Debug($folders, '$folders');
 		$path = '/';
 		$paths = ['/' . $filename];
 		foreach ($folders as $folder) {
@@ -477,8 +559,6 @@ class Engine extends Instanceable {
 			$paths[] = $path . $filename;
 		}
 		$paths = array_reverse($paths);
-		//$this->Debug($paths, '$paths');
-		//$this->Debug($this->roots, '$this->roots');
 		foreach ($paths as $path) {
 			foreach ($this->roots as $root) {
 				if (file_exists($root . $path)) {
@@ -491,31 +571,13 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Выполняет PHP-файл.
-	 * Возвращает имя последнего определенного класса.
+	 * Converts absolute path to path, relative server root or specified root
 	 *
-	 * @param string $file php-файл
-	 * @return string имя последнего определенного класса
-	 * @throws Exception новые классы не были определены
-	 * @deprecated use PSR-0 lol
+	 * @param string $absolute_path absolute path
+	 * @param string $root_path root path (optional, server root by default)
+	 * @return string relative path
+	 * @throws Exception
 	 */
-	public function DetectClassNameFromFile($file) {
-		$classes1 = get_declared_classes();
-		require($file);
-		$classes2 = get_declared_classes();
-		//$this->Debug($classes1, '$classes1');
-		//$this->Debug($classes2, '$classes2');
-		$diff = array_diff($classes2, $classes1);
-		//$this->Debug($diff, '$diff');
-		unset($classes1);
-		unset($classes2);
-		if (empty($diff)) {
-			throw new Exception("No new classes found");
-		}
-		$class = end($diff);
-		return $class;
-	}
-
 	public function GetRelativePath($absolute_path, $root_path = null) {
 		$root_path = $root_path ?: $_SERVER['DOCUMENT_ROOT'];
 		if (strpos($absolute_path, $root_path) === false) {
@@ -526,11 +588,11 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Добавляет хлебную крошку в конец цепочки.
-	 * Если ссылка не указана, берет ссылку на текущий запрос (REQUEST_URI).
+	 * Adds breadcrumbs to the end of the chain.
+	 * If the link is not specified, it takes a link to the current request (SERVER REQUEST_URI)
 	 *
-	 * @param string $name имя хлебной крошки
-	 * @param string $link ссылка хлебной крошки
+	 * @param string $name breadcrumb name
+	 * @param string $link breadcrumb link (optional)
 	 */
 	public function AddBreadcrumb($name, $link = null) {
 		if ($link === null) {
