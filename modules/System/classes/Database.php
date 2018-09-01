@@ -33,6 +33,9 @@ class Database extends Instanceable {
 
 	private function Connect() {
 		$this->link = mysqli_connect($this->host, $this->user, $this->password, $this->database, $this->port);
+		if ($this->link === false) {
+			throw new Exception(mysqli_connect_error());
+		}
 		mysqli_set_charset($this->link, $this->charset);
 	}
 
