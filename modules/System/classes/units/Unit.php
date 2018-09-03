@@ -11,9 +11,9 @@ abstract class Unit {
 	/** @var array Ассоциативный массив, описывающий возможные параметры */
 	public $options = [];
 
-	/** @var Engine Engine */
+	/** @var Engine $ENGINE */
 	public $ENGINE;
-	/** @var array User */
+	/** @var User $USER */
 	public $USER;
 
 	/** @var array предки компонента */
