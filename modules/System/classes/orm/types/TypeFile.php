@@ -18,9 +18,12 @@ class TypeFile extends TypeOuter {
 	}
 
 	public function FormatInputValue($value) {
-		if (is_array($value)) {
-			$value = $this->info['LINK']::I()->Create($value);
+		if (is_numeric($value)) {
+			return (int)$value;
 		}
-		return (int)$value;
+		if (is_array($value)) {
+			return $this->info['LINK']::I()->Create($value);
+		}
+		return null;
 	}
 }

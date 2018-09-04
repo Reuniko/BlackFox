@@ -983,9 +983,9 @@ abstract class SCRUD extends Instanceable {
 	 * - Числовые - приводит к числу нужного формата.
 	 * - Строковые - обрезает по нужному размеру.
 	 * - Списковые - подставляет корректное значение.
-	 * - Битовые - подставляет Y|N.
-	 * - Даты - подставляет дату в формате ISO8601.
-	 * - Файловые - сохраняет файл в b_file, выдает его идентификатор.
+	 * - Битовые - подставляет true|false.
+	 * - Даты - подставляет дату в формате базы данных.
+	 * - Файловые - сохраняет файл в System\Files и выдает его идентификатор.
 	 *
 	 * @param string $code код поля
 	 * @param mixed $value значение
@@ -997,7 +997,6 @@ abstract class SCRUD extends Instanceable {
 		if (!isset($this->structure[$code])) {
 			throw new Exception("Неизвестный код поля: '{$code}'");
 		}
-		$info = $this->structure[$code];
 
 		if (!$this->_hasInformation($value)) {
 			return null;
@@ -1005,8 +1004,7 @@ abstract class SCRUD extends Instanceable {
 
 		$value = $this->types[$code]->FormatInputValue($value);
 
-		$value = $this->DB->Escape($value);
-		return $value;
+		return $this->DB->Escape($value);
 	}
 
 
