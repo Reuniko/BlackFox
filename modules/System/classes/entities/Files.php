@@ -6,44 +6,49 @@ class Files extends SCRUD {
 
 	public function Init() {
 		$this->name = 'Файлы';
-		$this->groups = ['SYSTEM' => 'Файл'];
+		$this->groups = [
+			'SYSTEM' => 'Системные поля',
+			'FILE'   => 'Файл',
+		];
 		$this->structure += [
-			'ID'          => self::ID,
+			'ID'          => self::ID + ['GROUP' => 'SYSTEM'],
 			'CREATE_DATE' => [
-				'TYPE'  => 'DATETIME',
-				'NAME'  => 'Дата создания',
-				'GROUP' => 'SYSTEM',
+				'TYPE'     => 'DATETIME',
+				'NAME'     => 'Дата создания',
+				'GROUP'    => 'SYSTEM',
+				'DISABLED' => true,
 			],
 			'CREATE_BY'   => [
-				'TYPE'  => 'OUTER',
-				'NAME'  => 'Кем создан',
-				'LINK'  => 'System\Users',
-				'GROUP' => 'SYSTEM',
+				'TYPE'     => 'OUTER',
+				'NAME'     => 'Кем создан',
+				'LINK'     => 'System\Users',
+				'GROUP'    => 'SYSTEM',
+				'DISABLED' => true,
 			],
 			'NAME'        => [
 				'TYPE'  => 'STRING',
 				'NAME'  => 'Имя файла',
 				'VITAL' => true,
 				'SHOW'  => true,
-				'GROUP' => 'SYSTEM',
+				'GROUP' => 'FILE',
 			],
 			'SIZE'        => [
 				'TYPE'  => 'NUMBER',
 				'NAME'  => 'Размер файла',
 				'VITAL' => true,
-				'GROUP' => 'SYSTEM',
+				'GROUP' => 'FILE',
 			],
 			'TYPE'        => [
 				'TYPE'  => 'STRING',
 				'NAME'  => 'Тип контента',
 				'VITAL' => true,
-				'GROUP' => 'SYSTEM',
+				'GROUP' => 'FILE',
 			],
 			'SRC'         => [
 				'TYPE'  => 'STRING',
 				'NAME'  => 'Путь к файлу',
 				'VITAL' => true,
-				'GROUP' => 'SYSTEM',
+				'GROUP' => 'FILE',
 			],
 		];
 	}
@@ -108,5 +113,20 @@ class Files extends SCRUD {
 			'TYPE'        => filetype($path),
 			'SRC'         => $src,
 		]);
+	}
+
+
+	public function GetElementTitle($element = []) {
+		return $element['NAME'];
+	}
+
+	public function GetPrintableFileSize($size) {
+		if ($size > 1024 * 1024) {
+			return ceil($size / 1024 * 1024) . ' мб.';
+		}
+		if ($size > 1024) {
+			return ceil($size / 1024) . ' кб.';
+		}
+		return $size . ' б.';
 	}
 }

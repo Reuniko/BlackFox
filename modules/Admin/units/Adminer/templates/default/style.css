@@ -145,3 +145,7 @@
 	margin-bottom: 0;
 	padding-left: 1rem;
 }
+
+.adminer .hidden {
+	visibility: hidden; display: none;
+}
