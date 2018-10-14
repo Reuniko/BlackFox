@@ -29,7 +29,11 @@ abstract class Unit {
 	public $PARAMS = [];
 	/** @var array результат работы */
 	public $RESULT = [];
-	/** @var array сообщения+предупреждения+ошибки возникшие в процессе работы */
+	/**
+	 * - TYPE - часть CSS-класса alert-*
+	 * - TEXT - контент алерта
+	 * @var array сообщения+предупреждения+ошибки возникшие в процессе работы:
+	 */
 	public $ALERTS = [];
 
 	public $ajax = false;
