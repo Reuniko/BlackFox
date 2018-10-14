@@ -40,6 +40,7 @@ if (!function_exists('debug')) {
 				z-index: 99999; 
 				border: 1px green dashed;
 				width: auto;
+				line-height: 1.5;
 				'
 			>{$title}=" . htmlspecialchars($data) . "</textarea>";
 			static $need_js = true;
