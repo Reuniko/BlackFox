@@ -109,25 +109,34 @@ abstract class Unit {
 		$this->Init($PARAMS);
 		$this->SetAlertsFromSession();
 
-		if ($this->allow_ajax_request and (in_array($this->class, [$_REQUEST['AJAX'], $_REQUEST['ajax']]))) {
-			$this->ajax = true;
+		$this->ajax = $this->IsRequestTypeAjax();
+		$this->json = $this->IsRequestTypeJson();
+
+		$this->RESULT = $this->ProcessResult();
+
+		if ($this->ajax) {
 			$this->ENGINE->TEMPLATE = null;
-			echo $this->ProcessView($this->ProcessResult());
+			echo $this->ProcessView($this->RESULT);
 			return;
 		}
 
-		if ($this->allow_json_request and (in_array($this->class, [$_REQUEST['JSON'], $_REQUEST['json']]))) {
-			$this->json = true;
+		if ($this->json) {
 			$this->ENGINE->TEMPLATE = null;
-			$RESULT = $this->ProcessResult();
-			$RESULT += ['ALERTS' => $this->ALERTS];
-			echo json_encode($RESULT);
+			echo json_encode($this->RESULT + ['ALERTS' => $this->ALERTS]);
 			return;
 		}
 
 		$this->ManageHeaders();
-		echo $this->ProcessView($this->ProcessResult());
+		echo $this->ProcessView($this->RESULT);
 		return;
+	}
+
+	public function IsRequestTypeAjax() {
+		return $this->allow_ajax_request and in_array($this->class, [$_REQUEST['AJAX'], $_REQUEST['ajax']]);
+	}
+
+	public function IsRequestTypeJson() {
+		return $this->allow_json_request and in_array($this->class, [$_REQUEST['JSON'], $_REQUEST['json']]);
 	}
 
 	/**
@@ -336,8 +345,7 @@ abstract class Unit {
 	 */
 	public function ProcessResult() {
 		$request = array_merge_recursive($_REQUEST, $this->_files());
-		$this->RESULT = (array)$this->Controller($request);
-		return $this->RESULT;
+		return (array)$this->Controller($request);
 	}
 
 	/**
