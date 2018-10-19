@@ -58,7 +58,7 @@ abstract class Unit {
 
 		// Do not remove local variable $USER, it needs for phpStorm to detect $this->USER as instance of class
 		/** @var User $USER */
-		$USER = User::I();
+		$USER = User::Instance();
 		$this->USER = $USER;
 
 		// TODO cache all below:
@@ -142,7 +142,6 @@ abstract class Unit {
 	/**
 	 * Устанавливает параметры компонента $this->PARAMS:
 	 * - проверяет соответствие типов переданных параметров желаемым
-	 * - конвертирует типы параметров при несоответствии
 	 * - устанавливает параметры по умолчанию
 	 * - кидает ошибки в любой непонятной ситуации
 	 *
@@ -153,38 +152,32 @@ abstract class Unit {
 	public function Init($PARAMS = []) {
 		$errors = [];
 		foreach ($this->options as $code => $option) {
-			if (array_key_exists($code, $PARAMS)) {
+			if (isset($PARAMS[$code]) || array_key_exists($code, $PARAMS)) {
 				$value = $PARAMS[$code];
-				switch ($this->options[$code]['TYPE']) {
-					case 'STRING':
-						$value = (string)$value;
-						break;
-					case 'BOOLEAN':
-						$value = (bool)$value;
-						break;
-					case 'ARRAY':
-						$value = is_array($value) ? $value : [$value];
-						break;
-					case 'OBJECT':
-						if (!is_object($value)) {
-							throw new Exception("Unit param '{$code}' expect object");
-						}
-						break;
+
+				if (!empty($this->options[$code]['TYPE'])) {
+					$type_expected = strtolower($this->options[$code]['TYPE']); // strtolower - for backward compatibility
+					$type_passed = gettype($value);
+					if ($type_expected <> $type_passed) {
+						$errors[] = "Unit '{$this->class}' initialisation error: param - '{$code}', expecting type - '{$type_expected}', passed value type - '{$type_passed}'";
+						continue;
+					}
 				}
+
 				$this->PARAMS[$code] = $value;
 				unset($PARAMS[$code]);
 				continue;
 			}
-			if (array_key_exists('DEFAULT', $option)) {
+			if (isset($option['DEFAULT']) || array_key_exists('DEFAULT', $option)) {
 				$this->PARAMS[$code] = $option['DEFAULT'];
 				continue;
 			}
-			$errors[] = "Для инициализации компонента '{$this->class}' требуется указать параметр '{$code}'";
+			$errors[] = "Unit '{$this->class}' initialisation error: required param - '{$code}'";
 			unset($PARAMS[$code]);
 		}
 		if (!empty($PARAMS)) {
 			foreach ($PARAMS as $code => $value) {
-				$errors[] = "В инициализацию компонента '{$this->class}' передан неизвестный параметр '{$code}'";
+				$errors[] = "Unit '{$this->class}' initialisation error: passed unknown param - '{$code}'";
 			}
 		}
 		if (!empty($errors)) {
@@ -226,7 +219,7 @@ abstract class Unit {
 	 *    - ошибка - ловит ошибку и отправляет ее в $this->Error
 	 *    - редирект - прекращает выполнение
 	 * - выполняет финальное действие:
-	 *    - успех - агрегирует ответ в результат
+	 *    - успех - преобразует ответ в массив и агрегирует его в результат
 	 *    - ошибка - не ловит ошибку, позволяя ей всплыть на уровень выше
 	 *    - редирект - прекращает выполнение
 	 *
@@ -257,9 +250,13 @@ abstract class Unit {
 				$answer = $this->Invoke($action, $request);
 				if (is_array($answer)) {
 					$result += $answer;
-				} else {
-					$this->ALERTS[] = ['TYPE' => 'SUCCESS', 'TEXT' => $answer];
+					continue;
 				}
+				if (is_string($answer)) {
+					$this->ALERTS[] = ['TYPE' => 'success', 'TEXT' => $answer];
+					continue;
+				}
+				throw new Exception("Unknown answer type: '" . gettype($answer) . "' for action '{$action}'");
 			} catch (Exception $Exception) {
 				$result += $this->Error($Exception, $action, $request);
 			}
@@ -277,7 +274,7 @@ abstract class Unit {
 	 * @param string $method метод - название публичного метода в классе контроллера
 	 * @param array $request данные запроса - ассоциативный массив данных пришедших по любому каналу
 	 * @return array|string результат выполнения метода (зачастую метод самостоятельно редиректит дальше)
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	private function Invoke($method, $request) {
 		if (!method_exists($this, $method)) {
@@ -342,6 +339,7 @@ abstract class Unit {
 	 * passing a request combined from globals
 	 *
 	 * @return array result data
+	 * @throws Exception
 	 */
 	public function ProcessResult() {
 		$request = array_merge_recursive($_REQUEST, $this->_files());
@@ -354,6 +352,7 @@ abstract class Unit {
 	 *
 	 * @param array $RESULT result data
 	 * @return null|string content (html)
+	 * @throws Exception
 	 */
 	public function ProcessView($RESULT) {
 		if (empty($this->view)) {
@@ -361,8 +360,7 @@ abstract class Unit {
 		}
 
 		ob_start();
-		debug($RESULT, $this->class . ' $RESULT');
-		debug($this->ALERTS, $this->class . ' ALERTS');
+		debug(['ALERTS' => $this->ALERTS] + $RESULT, $this->class . ' ALERTS & RESULT');
 		$view_file = $this->Path("{$this->view}.php");
 		require($view_file);
 		$content = ob_get_clean();

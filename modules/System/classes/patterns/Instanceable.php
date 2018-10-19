@@ -61,6 +61,7 @@ abstract class Instanceable {
 	 *
 	 * @param mixed $params параметры конструктора класса
 	 * @return static инстациируемый объект
+	 * @throws Exception
 	 */
 	public static function I($params = null) {
 		return self::Instance($params);
