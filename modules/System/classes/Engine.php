@@ -20,7 +20,6 @@ class Engine extends Instanceable {
 	public $KEYWORDS = "";
 	public $DESCRIPTION = "";
 
-	public $HEADER = "";
 	public $HEADERS = [];
 	public $CONTENT = "";
 	public $BREADCRUMBS = [];
@@ -29,6 +28,8 @@ class Engine extends Instanceable {
 	public $TEMPLATE = "";
 	public $TEMPLATE_PATH = "";
 	public $WRAPPER = "wrapper";
+
+	public $DELAYED = [];
 
 	/**
 	 * Engine constructor:
@@ -160,26 +161,42 @@ class Engine extends Instanceable {
 		$this->LoadModules();
 		$this->LoadUser();
 
-		// generate CONTENT
-		ob_start();
-		$this->ShowContent();
-		$this->CONTENT = ob_get_clean();
+		$this->SetContent();
+		// TODO: section .wrapper.php (optional)
+		$this->WrapContent();
+		$this->ProcessDelayed();
 
-		ob_start();
-		// Launch wrapper if it needs
-		if ((!empty($this->TEMPLATE) and !empty($this->WRAPPER))) {
-			// input: $this-> CONTENT, TITLE, TEMPLATE_PATH
-			require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/' . $this->WRAPPER . '.php'));
-		} else {
-			echo $this->CONTENT;
+		echo $this->CONTENT;
+	}
+
+	/**
+	 * Launch wrapper if it needs
+	 *
+	 * @throws Exception (wrapper not found)
+	 */
+	public function WrapContent() {
+		if (empty($this->TEMPLATE) or empty($this->WRAPPER)) {
+			return;
 		}
-		echo ob_get_clean();
+		ob_start();
+		require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/' . $this->WRAPPER . '.php'));
+		$this->CONTENT = ob_get_clean();
+	}
 
+	/**
+	 * For each row in $this->DELAYED calls the callable and replaces designation (in content) with result of call
+	 */
+	public function ProcessDelayed() {
+		foreach ($this->DELAYED as $delayed) {
+			$insert = call_user_func_array($delayed['CALLABLE'], $delayed['PARAMS']);
+			$this->CONTENT = str_replace($delayed['TEMPLATE'], $insert, $this->CONTENT);
+		}
 	}
 
 	/**
 	 * Resets current Engine's template and the root path to it
 	 * @param string $template symbol code of new template
+	 * @throws Exception
 	 */
 	public function SetTemplate($template) {
 		$this->TEMPLATE = $template;
@@ -188,29 +205,35 @@ class Engine extends Instanceable {
 
 	/**
 	 * Adds style file to headers.
-	 * @param string $path relative path to the style file
+	 * @param string $path relative/full path to the style file
 	 */
 	public function AddHeaderStyle($path) {
+		$path_absolute = $_SERVER['DOCUMENT_ROOT'] . $path;
+		$version = !file_exists($path_absolute) ? '' : '?' . filemtime($path_absolute);
 		$this->HEADERS[$path] = [
-			'TYPE' => 'STYLE',
-			'PATH' => $path,
+			'TYPE'   => 'STYLE',
+			'PATH'   => $path,
+			'STRING' => "<link rel='stylesheet' href='{$path}{$version}'/>",
 		];
 	}
 
 	/**
 	 * Adds script file to headers.
-	 * @param string $path relative path to the script file
+	 * @param string $path relative/full path to the script file
 	 */
 	public function AddHeaderScript($path) {
+		$path_absolute = $_SERVER['DOCUMENT_ROOT'] . $path;
+		$version = !file_exists($path_absolute) ? '' : '?' . filemtime($path_absolute);
 		$this->HEADERS[$path] = [
-			'TYPE' => 'SCRIPT',
-			'PATH' => $path,
+			'TYPE'   => 'SCRIPT',
+			'PATH'   => $path,
+			'STRING' => "<script src='{$path}{$version}'></script>",
 		];
 	}
 
 	/**
 	 * Adds any string to headers.
-	 * @param string $string
+	 * @param string $string arbitrary string
 	 */
 	public function AddHeaderString($string) {
 		$this->HEADERS[] = [
@@ -224,36 +247,39 @@ class Engine extends Instanceable {
 	 * combining Engine's HEADERS property together.
 	 *
 	 * @return string
-	 * @throws Exception
+	 */
+	public function MakeHeader() {
+		$strings = [];
+		foreach ($this->HEADERS as $header) {
+			$strings[] = $header['STRING'];
+		}
+		return implode("\r\n\t", $strings);
+	}
+
+	/**
+	 * Makes and returns a designation of delayed call for MakeHeader method
 	 */
 	public function GetHeader() {
-		if (empty($this->HEADERS)) {
-			$this->HEADER = null;
-			return $this->HEADER;
-		}
-		$headers = [];
-		foreach ($this->HEADERS as $header) {
-			if ($header['TYPE'] === 'STRING') {
-				$headers[] = $header['STRING'];
-				continue;
-			}
-			$version = null;
-			$path_absolute = $_SERVER['DOCUMENT_ROOT'] . $header['PATH'];
-			if (file_exists($path_absolute)) {
-				$version = '?' . filemtime($path_absolute);
-			}
-			if ($header['TYPE'] === 'STYLE') {
-				$headers[] = "<link rel='stylesheet' href='{$header['PATH']}{$version}'/>";
-				continue;
-			}
-			if ($header['TYPE'] === 'SCRIPT') {
-				$headers[] = "<script src='{$header['PATH']}{$version}'></script>";
-				continue;
-			}
-			throw new Exception("Unknown header type '{$header['TYPE']}'");
-		}
-		$this->HEADER = implode("\r\n\t", $headers);
-		return $this->HEADER;
+		return $this->AddDelayedCall([$this, 'MakeHeader']);
+	}
+
+	/**
+	 * Adds row to $this->DELAYED,
+	 * returns a designation to print, witch will be replaced later with the result of callable
+	 *
+	 * @param mixed $callable
+	 * @param array $params (optional)
+	 * @return string designation to print
+	 */
+	public function AddDelayedCall($callable, $params = []) {
+		$id = uniqid();
+		$template = "[[[DELAYED_{$id}]]]";
+		$this->DELAYED[$id] = [
+			'TEMPLATE' => $template,
+			'CALLABLE' => $callable,
+			'PARAMS'   => $params,
+		];
+		return $template;
 	}
 
 	/**
@@ -264,6 +290,8 @@ class Engine extends Instanceable {
 	 * - if redirect exist - does redirect and die
 	 * - if content page exist - prints it and exit
 	 * If nothing works - throws ExceptionPageNotFound
+	 * @throws ExceptionPageNotFound
+	 * @throws Exception
 	 */
 	public function MakeContent() {
 
@@ -345,6 +373,15 @@ class Engine extends Instanceable {
 		} catch (\Exception $exception) {
 			$this->ShowErrors([$exception->getMessage()]);
 		}
+	}
+
+	/**
+	 * Sets $this->CONTENT
+	 */
+	public function SetContent() {
+		ob_start();
+		$this->ShowContent();
+		$this->CONTENT = ob_get_clean();
 	}
 
 	/**

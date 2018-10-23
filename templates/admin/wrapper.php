@@ -3,15 +3,15 @@
 <html>
 <head>
 	<? require('_header.php') ?>
+	<? $this->AddHeaderStyle($this->TEMPLATE_PATH . '/style.css') ?>
 	<?= $this->GetHeader() ?>
-	<link href="<?= $this->TEMPLATE_PATH ?>/style.css?<?= filemtime($_SERVER['DOCUMENT_ROOT'] . $this->TEMPLATE_PATH . '/style.css') ?>" rel="stylesheet">
 </head>
 <body>
 
 <nav class="header p-2">
 	<button
-		class="btn btn-info d-inline-block d-md-none"
-		data-toggle-sidebar=""
+			class="btn btn-info d-inline-block d-md-none"
+			data-toggle-sidebar=""
 	>
 		<i class="fa fa-bars"></i>
 		<span class="d-none d-md-inline-block">Меню</span>

@@ -1,8 +1,6 @@
 <?php /** @var \System\Unit $this */ ?>
 <?php /** @var array $RESULT */ ?>
 
-<link rel='stylesheet' href="<?= $this->template_relative_folder ?>/style.css"/>
-
 <ol class="breadcrumb m-0 mb-2">
 	<? function BuildDefaultBreadcrumbsRecursive($item) { ?>
 		<? if ($item['ACTIVE']): ?>

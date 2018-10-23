@@ -465,7 +465,6 @@ abstract class Unit {
 	 *
 	 * @param string|null $url URL-адрес
 	 * @param string|array $alerts текстовое сообщение | массив сообщений
-	 * @throws Exception
 	 */
 	public function Redirect($url, $alerts = []) {
 		$alerts = is_array($alerts) ? $alerts : [$alerts];
@@ -486,16 +485,23 @@ abstract class Unit {
 		die();
 	}
 
+	/**
+	 * Добавляет в заголовки страницы файлы 'style.css' и 'script.js' если они существуют
+	 */
 	public function ManageHeaders() {
+		// style.css
 		try {
-			$style = $this->ENGINE->GetRelativePath($this->Path('style.css'));
-			$this->ENGINE->AddHeaderStyle($style);
-		} catch (\Exception $error) {
+			$style_absolute_path = $this->Path('style.css');
+			$style_relative_path = $this->ENGINE->GetRelativePath($style_absolute_path);
+			$this->ENGINE->AddHeaderStyle($style_relative_path);
+		} catch (Exception $error) {
 		}
+		// script.js
 		try {
-			$style = $this->ENGINE->GetRelativePath($this->Path('script.js'));
-			$this->ENGINE->AddHeaderScript($style);
-		} catch (\Exception $error) {
+			$script_absolute_path = $this->Path('script.js');
+			$script_relative_path = $this->ENGINE->GetRelativePath($script_absolute_path);
+			$this->ENGINE->AddHeaderScript($script_relative_path);
+		} catch (Exception $error) {
 		}
 	}
 
