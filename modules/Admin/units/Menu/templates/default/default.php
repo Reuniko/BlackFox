@@ -1,7 +1,5 @@
 <?php /** @var \System\Unit $this */ ?>
 <?php /** @var array $RESULT */ ?>
-	<script src="<?= $this->template_relative_folder ?>/script.js"></script>
-	<link rel='stylesheet' href="<?= $this->template_relative_folder ?>/style.css"/>
 
 	<ul class="menu">
 		<? foreach ($RESULT as $category): ?>

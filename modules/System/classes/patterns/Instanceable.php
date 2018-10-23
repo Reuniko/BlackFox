@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 
 /**
@@ -25,7 +26,6 @@ abstract class Instanceable {
 	 *
 	 * @param mixed $params параметры конструктора класса
 	 * @return static инстациируемый объект
-	 * @throws Exception Unsupported param type
 	 */
 	public static function Instance($params = null) {
 
@@ -41,10 +41,8 @@ abstract class Instanceable {
 			$hash = 'DEFAULT';
 		} elseif (is_string($params) or is_numeric($params)) {
 			$hash = (string)$params;
-		} elseif (is_array($params)) {
-			$hash = md5(serialize($params));
 		} else {
-			throw new Exception("Unsupported param type");
+			$hash = md5(serialize($params));
 		}
 
 		if (!isset(self::$instance[$class][$hash])) {
@@ -61,7 +59,6 @@ abstract class Instanceable {
 	 *
 	 * @param mixed $params параметры конструктора класса
 	 * @return static инстациируемый объект
-	 * @throws Exception
 	 */
 	public static function I($params = null) {
 		return self::Instance($params);
