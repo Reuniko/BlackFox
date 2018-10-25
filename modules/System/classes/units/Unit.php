@@ -160,6 +160,7 @@ abstract class Unit {
 					$type_passed = gettype($value);
 					if ($type_expected <> $type_passed) {
 						$errors[] = "Unit '{$this->class}' initialisation error: param - '{$code}', expecting type - '{$type_expected}', passed value type - '{$type_passed}'";
+						unset($PARAMS[$code]);
 						continue;
 					}
 				}
