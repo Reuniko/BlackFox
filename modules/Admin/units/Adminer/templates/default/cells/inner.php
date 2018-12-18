@@ -9,8 +9,10 @@ $url = $Link->GetAdminUrl();
 <ul>
 	<? foreach ($value as $row): ?>
 		<li>
-			<nobr>[<a target="_top" href="<?= $url ?>?ID=<?= $row['ID'] ?>"><?= $row['ID'] ?></a>]</nobr>
-			<?= $Link->GetElementTitle($row); ?>
+			<nobr>
+				[<a target="_top" href="<?= $url ?>?ID=<?= $row['ID'] ?>"><?= $row['ID'] ?></a>]
+				<?= $Link->GetElementTitle($row); ?>
+			</nobr>
 		</li>
 	<? endforeach; ?>
 </ul>

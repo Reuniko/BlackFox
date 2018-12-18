@@ -12,7 +12,6 @@ class Students extends \System\SCRUD {
 				'TYPE'  => 'STRING',
 				'NAME'  => 'First name',
 				'VITAL' => true,
-				'SHOW'  => true,
 			],
 			'LAST_NAME'  => [
 				'TYPE' => 'STRING',

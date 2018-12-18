@@ -24,7 +24,6 @@ class Table1 extends \System\SCRUD {
 				'TYPE'  => 'STRING',
 				'NAME'  => 'String',
 				'VITAL' => true,
-				'SHOW'  => true,
 			],
 			'LINK'     => [
 				'TYPE' => 'OUTER',

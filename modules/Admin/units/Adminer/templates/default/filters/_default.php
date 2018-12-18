@@ -1,1 +1,1 @@
-<p class="form-control-static"> — </p>
+<p class="form-control-plaintext"> — </p>
