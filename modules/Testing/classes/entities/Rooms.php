@@ -13,7 +13,6 @@ class Rooms extends \System\SCRUD {
 				'NAME'     => 'A. Number',
 				'NOT_NULL' => true,
 				'VITAL'    => true,
-				'SHOW'     => true,
 			],
 		];
 	}

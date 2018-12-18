@@ -20,7 +20,6 @@ class Users extends SCRUD {
 				'INDEX'    => true,
 				'UNIQUE'   => true,
 				'VITAL'    => true,
-				'SHOW'     => true,
 			],
 			'PASSWORD'        => [
 				'TYPE'        => 'STRING',

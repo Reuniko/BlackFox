@@ -32,16 +32,6 @@ $ID = $RESULT['FILTER'][$code];
 			<?= ($field['DISABLED']) ? 'disabled' : '' ?>
 		>
 	</div>
-	<div class="btn-group">
-		[<a href="<?= ($ID) ? "{$url}?ID={$ID}" : "#" ?>" data-link-a="FILTER[<?= $code ?>]"><?= $RESULT['DATA'][$code]['ID'] ?: '...' ?></a>]
-		<span data-link-span="FILTER[<?= $code ?>]">
-			<? foreach ($this->SCRUD->structure as $s_code => $s_field): ?>
-				<? if ($s_field['SHOW']): ?>
-					<?= $RESULT['DATA'][$code][$s_code] ?>
-				<? endif; ?>
-			<? endforeach; ?>
-		</span>
-	</div>
 </div>
 
 

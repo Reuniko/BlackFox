@@ -29,7 +29,6 @@ class Files extends SCRUD {
 				'TYPE'  => 'STRING',
 				'NAME'  => 'Имя файла',
 				'VITAL' => true,
-				'SHOW'  => true,
 				'GROUP' => 'FILE',
 			],
 			'SIZE'        => [

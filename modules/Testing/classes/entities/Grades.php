@@ -12,7 +12,6 @@ class Grades extends \System\SCRUD {
 				'TYPE'  => 'STRING',
 				'NAME'  => 'Title',
 				'VITAL' => true,
-				'SHOW'  => true,
 			],
 			'CAPTAIN'    => [
 				'TYPE'     => 'OUTER',
