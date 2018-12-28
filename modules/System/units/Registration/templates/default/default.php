@@ -3,7 +3,7 @@
 	<form method="POST" class="form form-horizontal">
 		<? foreach ($RESULT['FIELDS'] as $code => $field): ?>
 			<div class="form-group row">
-				<label for="<?= $code ?>" class="d-sm-none 	col-sm-3 form-control-plaintext text-sm-right">
+				<label for="<?= $code ?>" class="col-sm-3 form-control-plaintext text-sm-right">
 					<?= $field['NAME'] ?>
 				</label>
 				<div class="col-sm-8">
