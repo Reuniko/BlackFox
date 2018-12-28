@@ -37,7 +37,7 @@ class Registration extends \System\Unit {
 	];
 
 	public function Init($PARAMS = []) {
-		foreach (\System\Users::Instance()->structure as $code => $field) {
+		foreach (Users::Instance()->structure as $code => $field) {
 			if ($code === 'ID') {
 				continue;
 			}
@@ -49,16 +49,14 @@ class Registration extends \System\Unit {
 	}
 
 	public function Work($VALUES = []) {
-		$this->Debug($this->PARAMS, '$this->PARAMS');
 		$RESULT['FIELDS'] = Users::Instance()->ExtractStructure($this->PARAMS['FIELDS']);
 		$RESULT['VALUES'] = $VALUES;
-		$this->Debug($RESULT, '$RESULT');
 		return $RESULT;
 	}
 
 	public function Registration($VALUES = []) {
-		$this->Debug($VALUES, '$VALUES');
-		Users::Instance()->Create($VALUES);
-		$this->Redirect($this->PARAMS['REDIRECT'], 'Успешная регистрация');
+		$ID = Users::Instance()->Create($VALUES);
+		User::I()->Login($ID);
+		$this->Redirect($this->PARAMS['REDIRECT']);
 	}
 }

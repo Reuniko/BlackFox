@@ -348,7 +348,7 @@ abstract class Unit {
 	}
 
 	/**
-	 * Connects the [$RESULT] to a [$this->template]
+	 * Connects the [$RESULT] to a [$this->view]
 	 * and returns the resulting content
 	 *
 	 * @param array $RESULT result data
@@ -361,7 +361,11 @@ abstract class Unit {
 		}
 
 		ob_start();
-		debug(['ALERTS' => $this->ALERTS] + $RESULT, $this->class . ' ALERTS & RESULT');
+		debug([
+			'PARAMS' => $this->PARAMS,
+			'ALERTS' => $this->ALERTS,
+			'RESULT' => $RESULT,
+		], $this->class);
 		$view_file = $this->Path("{$this->view}.php");
 		require($view_file);
 		$content = ob_get_clean();

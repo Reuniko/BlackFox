@@ -54,7 +54,7 @@ if (!function_exists('debug')) {
                             if (event.altKey && event.keyCode === 192) {
                                 var debug = document.querySelectorAll('.debug');
                                 debug.forEach(function (element) {
-                                    element.style.display = (element.style.display == 'none') ? 'block' : 'none';
+                                    element.style.display = (element.style.display == 'none') ? 'inline-block' : 'none';
                                 });
                             }
                         });
