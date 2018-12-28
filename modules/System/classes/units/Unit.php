@@ -199,15 +199,22 @@ abstract class Unit {
 	 */
 	public function GetActions(array $request = []) {
 		$actions = [];
-		if ($request['ACTION'] or $request['action']) {
-			$actions[] = $request['ACTION'] ?: $request['action'];
+
+		$request['ACTION'] = $request['ACTION'] ?: $request['action'] ?: null;
+		$request['VIEW'] = $request['VIEW'] ?: $request['view'] ?: null;
+
+		if ($request['ACTION']) {
+			$actions[] = $request['ACTION'];
 		}
-		if ($request['VIEW'] or $request['view']) {
-			$actions[] = $request['VIEW'] ?: $request['view'];
-			$this->view = $request['VIEW'] ?: $request['view'];
-			return $actions;
+
+		if ($request['VIEW']) {
+			$actions[] = $request['VIEW'];
+			$this->view = $request['VIEW'];
+		} else {
+			$actions[] = 'Work';
+			$this->view = 'default';
 		}
-		$actions[] = 'Work';
+
 		return $actions;
 	}
 
