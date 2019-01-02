@@ -390,7 +390,7 @@ class Engine extends Instanceable {
 	 */
 	public function ShowAuthForm($message = null) {
 		$this->WRAPPER = 'frame';
-		\System\Authorization::Run(['MESSAGE' => $message]);
+		\System\Authorization::Run(['MESSAGE' => $message, 'REDIRECT' => '']);
 	}
 
 	/**

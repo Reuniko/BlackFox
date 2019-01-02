@@ -43,6 +43,9 @@ class Authorization extends \System\Unit {
 	}
 
 	public function Form($login = null, $password = null) {
+		if ($this->PARAMS['MESSAGE'] and empty($this->ALERTS)) {
+			$this->ALERTS[] = ['TYPE' => 'info', 'TEXT' => $this->PARAMS['MESSAGE']];
+		}
 		return [
 			'LOGIN'    => $login,
 			'PASSWORD' => $password,
@@ -51,7 +54,7 @@ class Authorization extends \System\Unit {
 
 	public function Login($login = null, $password = null) {
 		User::I()->Authorization($login, $password);
-		$this->Redirect(false, "Вы успешно авторизированы");
+		$this->Redirect($this->PARAMS['REDIRECT']);
 	}
 
 }
