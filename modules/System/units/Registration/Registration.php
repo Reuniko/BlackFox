@@ -48,7 +48,7 @@ class Registration extends \System\Unit {
 
 	}
 
-	public function Work($VALUES = []) {
+	public function Default($VALUES = []) {
 		$RESULT['FIELDS'] = Users::Instance()->ExtractStructure($this->PARAMS['FIELDS']);
 		$RESULT['VALUES'] = $VALUES;
 		return $RESULT;
