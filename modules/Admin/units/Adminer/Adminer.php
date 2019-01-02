@@ -61,7 +61,7 @@ class Adminer extends \System\Unit {
 		$FIELDS = ['*@@'],
 		$popup = null
 	) {
-		$this->view = 'section';
+		//$this->view = 'section';
 		$R['MODE'] = 'SECTION';
 
 		// TODO replace popups with ajax
@@ -120,7 +120,7 @@ class Adminer extends \System\Unit {
 	}
 
 	public function Element($ID = 0, $FILTER = []) {
-		$this->view = 'element';
+		//$this->view = 'element';
 
 		$R['BACK'] = $this->GetBackLink();
 
