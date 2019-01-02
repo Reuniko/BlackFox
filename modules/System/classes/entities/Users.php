@@ -120,7 +120,7 @@ class Users extends SCRUD {
 
 		// prevent doubles for LOGIN
 		if (!empty($this->Read(['LOGIN' => $fields['LOGIN']], ['ID']))) {
-			throw new Exception("User with LOGIN '{$fields['LOGIN']}' already exist");
+			throw new Exception("User with login '{$fields['LOGIN']}' already exist");
 		}
 
 		// auto hash password
