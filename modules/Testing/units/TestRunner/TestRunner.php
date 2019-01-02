@@ -22,7 +22,7 @@ class TestRunner extends \System\Unit {
 		}
 	}
 
-	public function Work() {
+	public function Default() {
 		$R = [];
 		foreach ($this->tests as $test_class_name => $Test) {
 			/** @var Test $Test */

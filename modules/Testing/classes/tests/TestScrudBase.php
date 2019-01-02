@@ -37,7 +37,7 @@ class TestScrudBase extends Test {
 				'NUMBER'   => random_int(0, 99),
 				'FLOAT'    => random_int(0, 99999) / random_int(1, 9),
 				'STRING'   => sha1(random_bytes(8)),
-				'LINK'     => array_rand($R),
+				'LINK'     => @array_rand($R),
 				'TEXT'     => str_repeat(sha1(random_bytes(8)) . ' ', 50),
 				'DATETIME' => time() + random_int(-99999, 99999),
 				'TIME'     => random_int(0, 23) . ':' . random_int(0, 59),
