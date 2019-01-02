@@ -272,6 +272,11 @@ class Adminer extends \System\Unit {
 				'ACTIVE' => true,
 			],
 		];
+		foreach ($this->SCRUD->structure as $code => $info) {
+			if ($info['TYPE'] === 'INNER') {
+				unset($this->SCRUD->composition[$info['GROUP']]['FIELDS'][$code]);
+			}
+		}
 		return $tabs;
 	}
 
