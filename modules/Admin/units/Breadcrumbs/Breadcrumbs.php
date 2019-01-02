@@ -5,11 +5,11 @@ namespace Admin;
 class Breadcrumbs extends \Admin\Menu {
 
 	public function GetActions(array $request = []) {
-		return 'Work';
+		return 'Default';
 	}
 
-	public function Work() {
-		$RESULT['MENU'] = parent::Work();
+	public function Default() {
+		$RESULT['MENU'] = parent::Default();
 		$RESULT['BREADCRUMBS'] = $this->ENGINE->BREADCRUMBS;
 		return $RESULT;
 	}

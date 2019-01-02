@@ -7,10 +7,10 @@ class Menu extends \System\Unit {
 	protected $path;
 
 	public function GetActions(array $request = []) {
-		return 'Work';
+		return 'Default';
 	}
 
-	public function Work() {
+	public function Default() {
 		$this->RESULT = [];
 		foreach ($this->ENGINE->modules as $module => $info) {
 			try {

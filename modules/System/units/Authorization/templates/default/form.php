@@ -19,7 +19,7 @@
 				<input type="password" name="password" value="<?= $RESULT['PASSWORD'] ?>" class="form-control" placeholder="Пароль"/>
 			</div>
 			<div class="form-group">
-				<button type="submit" class="btn btn-default" name="ACTION" value="Login">
+				<button type="submit" class="btn btn-primary" name="ACTION" value="Login">
 					Войти
 				</button>
 			</div>
