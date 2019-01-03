@@ -57,4 +57,115 @@ class TypeOuter extends Type {
 		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}.{$current_key} = {$target_alias}.{$target_key}";
 		return [$target_alias => $statement];
 	}
+
+	public function PrintValue($value) {
+		/** @var \System\SCRUD $Link */
+		$Link = $this->info['LINK']::I();
+		$url = $Link->GetAdminUrl();
+		$ID = is_array($value) ? $value['ID'] : $value;
+		?>
+		<? if (User::I()->InGroup('root')): ?>
+			<nobr>[<a target="_top" href="<?= $url ?>?ID=<?= $ID ?>"><?= $ID ?></a>]</nobr>
+		<? endif; ?>
+		<?= $Link->GetElementTitle($value); ?>
+		<?
+	}
+
+	public function PrintFormControl($value, $name, $class = 'form-control') {
+		/** @var \System\SCRUD $Link */
+		$Link = $this->info['LINK']::I();
+		$url = $Link->GetAdminUrl();
+		$code = $this->info['CODE'];
+		$ID = is_array($value) ? $value['ID'] : $value;
+		?>
+
+		<div class="row">
+			<div class="col-12 col-sm-6 mb-1">
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<button
+							style="width: 40px;"
+							type="button"
+							class="btn btn-secondary"
+							title="Выбрать элемент"
+							<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+							onclick="window.open(
+								'<?= $url ?>?popup=<?= $name ?>',
+								'',
+								'height=' + ((screen.height) - 100) + ',width=' + ((screen.width) - 20) + ''
+								);"
+						>
+							<i class="fa fa-search"></i>
+						</button>
+					</div>
+					<input
+						type="text"
+						class="<?= $class ?>"
+						width="100px"
+						id="<?= $name ?>"
+						name="<?= $name ?>"
+						data-link-input="<?= $name ?>"
+						value="<?= $ID ?>"
+						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+					>
+				</div>
+			</div>
+			<div class="col-12 col-sm-6 mb-1">
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<a
+							style="width: 40px;"
+							class="btn btn-secondary"
+							href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>"
+							data-link-a="<?= $name ?>"
+							title="Открыть элемент"
+						><i class="fa fa-external-link-alt"></i></a>
+					</div>
+					<input
+						type="text"
+						class="<?= $class ?>"
+						disabled="disabled"
+						data-link-span="<?= $name ?>"
+						value="<?= is_array($value) ? $Link->GetElementTitle($value) : '' ?>"
+					>
+				</div>
+			</div>
+		</div>
+		<?
+	}
+
+	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
+		/** @var \System\SCRUD $Link */
+		$Link = $this->info['LINK']::I();
+		$code = $this->info['CODE'];
+		$url = $Link->GetAdminUrl();
+		$ID = $filter[$code];
+		?>
+		<div class="btn-toolbar" style="vertical-align: middle; line-height: 34px;">
+			<div class="btn-group">
+				<button
+					type="button"
+					class="form-control"
+					onclick="window.open(
+						'<?= $url ?>?popup=FILTER[<?= $code ?>]',
+						'',
+						'height=' + ((screen.height) - 100) + ',width=' + ((screen.width) - 20) + ''
+						);"
+				>
+					<i class="fa fa-search"></i>
+				</button>
+			</div>
+			<div class="btn-group">
+				<input
+					type="text"
+					class="<?= $class ?>"
+					id="<?= $group ?>[<?= $code ?>]"
+					name="<?= $group ?>[<?= $code ?>]"
+					data-link-input="<?= $group ?>[<?= $code ?>]"
+					value="<?= $ID ?>"
+				>
+			</div>
+		</div>
+		<?
+	}
 }

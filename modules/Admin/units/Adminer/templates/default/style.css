@@ -27,6 +27,7 @@
 
 .adminer input[type=checkbox],
 .adminer input[type=radio] {
+	display: inline-block;
 	width: 1.2rem;
 	height: 1.2rem;
 	vertical-align: middle;

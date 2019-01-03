@@ -641,6 +641,8 @@ abstract class SCRUD extends Instanceable {
 	 * Удаляет строки из таблицы
 	 *
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
+	 * @throws Exception
+	 * @throws ExceptionSQL
 	 */
 	public function Delete($filter = []) {
 		$answer = $this->PrepareWhereAndJoinByFilter($filter);
@@ -691,8 +693,7 @@ abstract class SCRUD extends Instanceable {
 			if (empty($this->structure[$code])) {
 				throw new Exception("Unknown field code: '{$code}' in table '{$this->code}'");
 			}
-			$Type = $this->types[$code];
-			$result = $Type->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
+			$result = $this->types[$code]->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
 			$select += (array)$result['SELECT'];
 			$join += (array)$result['JOIN'];
 		}

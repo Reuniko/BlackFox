@@ -18,18 +18,15 @@
 					<div class="form-group row">
 						<label
 							class="col-sm-3 col-form-label sm-text-right"
-							for="<?= $code ?>"
 							title="<?= $code ?>"
 						>
 							<?= $field['NAME'] ?>
 						</label>
 						<div class="col-sm-8">
 							<?
-							try {
-								require($this->Path('filters/' . strtolower($field['TYPE']) . '.php'));
-							} catch (\Exception $error) {
-								require($this->Path('filters/' . '_default' . '.php'));
-							}
+							// -------------------------------------------------------------------------------
+							$this->SCRUD->types[$code]->PrintFilterControl($RESULT['FILTER'], 'FILTER');
+							// -------------------------------------------------------------------------------
 							?>
 						</div>
 					</div>

@@ -11,11 +11,8 @@ class TypeDate extends Type {
 	}
 
 	public function FormatInputValue($value) {
-		if (is_numeric($value)) {
-			$value = date('Y-m-d', $value);
-		} else {
-			$value = date('Y-m-d', strtotime($value));
-		}
+		$value = is_numeric($value) ? $value : strtotime($value);
+		$value = date('Y-m-d', $value);
 		return $value;
 	}
 
@@ -23,5 +20,50 @@ class TypeDate extends Type {
 		$code = $this->info['CODE'];
 		$element[$code . '|TIMESTAMP'] = strtotime($element[$code]);
 		return $element;
+	}
+
+	public function PrintFormControl($value, $name, $class = 'form-control') {
+		?>
+		<input
+			type="text"
+			class="<?= $class ?>"
+			id="<?= $name ?>"
+			name="<?= $name ?>"
+			placeholder=""
+			value="<?= $value ?>"
+			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+			data-datepicker=""
+		/>
+		<?
+	}
+
+	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
+		$code = $this->info['CODE'];
+		?>
+		<div class="row no-gutters">
+			<div class="col-6">
+				<input
+					type="text"
+					class="<?= $class ?>"
+					id="<?= $code ?>"
+					name="<?= $group ?>[><?= $code ?>]"
+					placeholder="от"
+					value="<?= $filter['>' . $code] ?>"
+					data-datepicker=""
+				/>
+			</div>
+			<div class="col-6">
+				<input
+					type="text"
+					class="<?= $class ?>"
+					id="<?= $code ?>"
+					name="<?= $group ?>[<<?= $code ?>]"
+					placeholder="до"
+					value="<?= $filter['<' . $code] ?>"
+					data-datepicker=""
+				/>
+			</div>
+		</div>
+		<?
 	}
 }
