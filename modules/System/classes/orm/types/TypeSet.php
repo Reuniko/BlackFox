@@ -36,4 +36,66 @@ class TypeSet extends Type {
 		}
 		return $element;
 	}
+
+	public function PrintValue($value) {
+		if (empty($value)) return;
+		?>
+		<ul class="set">
+			<? foreach ($value as $code): ?>
+				<li><?= $this->info['VALUES'][$code] ?></li>
+			<? endforeach; ?>
+		</ul>
+		<?
+	}
+
+	public function PrintFormControl($value, $name, $class = 'form-control') {
+		?>
+		<input
+			type="hidden"
+			name="<?= $name ?>"
+			value=""
+		/>
+		<? foreach ($this->info['VALUES'] as $code => $display): ?>
+			<div>
+				<label class="enum">
+					<input
+						type="checkbox"
+						class="<?= $class ?>"
+						name="<?= $name ?>[]"
+						value="<?= $code ?>"
+						<?= (in_array($code, $value ?: [])) ? 'checked' : '' ?>
+						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+					>
+					<span class="dashed"><?= $display ?></span>
+				</label>
+			</div>
+		<? endforeach; ?>
+		<?
+	}
+
+	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
+		$code = $this->info['CODE'];
+		?>
+		<input
+			type="hidden"
+			name="<?= $group ?>[<?= $code ?>]"
+			value=""
+		/>
+		<? foreach ($this->info['VALUES'] as $value => $display): ?>
+			<div class="col-xs-3">
+				<label class="enum">
+					<input
+						type="checkbox"
+						class="<?= $class ?>"
+						name="<?= $group ?>[<?= $code ?>][]"
+						value="<?= $value ?>"
+						<?= (in_array($value, $filter[$code] ?: [])) ? 'checked' : '' ?>
+						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+					>
+					<span class="dashed"><?= $display ?></span>
+				</label>
+			</div>
+		<? endforeach; ?>
+		<?
+	}
 }

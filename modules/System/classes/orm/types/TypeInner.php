@@ -95,4 +95,30 @@ class TypeInner extends Type {
 		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}.{$current_key} = {$target_alias}.{$target_key}";
 		return [$target_alias => $statement];
 	}
+
+	public function PrintValue($value) {
+		/** @var \System\SCRUD $Link */
+		$Link = $this->info['LINK']::I();
+		$url = $Link->GetAdminUrl();
+		?>
+		<ul>
+			<? foreach ($value as $row): ?>
+				<li>
+					<nobr>
+						<? if (User::I()->InGroup('root')): ?>
+							[<a target="_top" href="<?= $url ?>?ID=<?= $row['ID'] ?>"><?= $row['ID'] ?></a>]
+						<? endif; ?>
+						<?= $Link->GetElementTitle($row); ?>
+					</nobr>
+				</li>
+			<? endforeach; ?>
+		</ul>
+		<?
+	}
+
+	public function PrintFormControl($value, $name, $class = 'form-control') {
+	}
+
+	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
+	}
 }
