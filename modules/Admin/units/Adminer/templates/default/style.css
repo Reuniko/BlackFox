@@ -136,12 +136,6 @@
 	min-height: 600px;
 }
 
-@media (min-width: 576px) {
-	.adminer .sm-text-right {
-		text-align: right;
-	}
-}
-
 .adminer ul {
 	margin-bottom: 0;
 	padding-left: 1rem;

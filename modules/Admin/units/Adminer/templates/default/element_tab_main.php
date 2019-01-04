@@ -14,7 +14,7 @@
 		<? foreach ($group['FIELDS'] as $code => $field): ?>
 			<div class="form-group row">
 				<label
-					class="col-sm-3 col-form-label sm-text-right <?= ($field['NOT_NULL']) ? 'mandatory' : '' ?>"
+					class="col-sm-3 col-form-label text-sm-right <?= ($field['NOT_NULL']) ? 'mandatory' : '' ?>"
 					for="FIELDS[<?= $code ?>]"
 					title="<?= $code ?>"
 				>
