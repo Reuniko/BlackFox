@@ -44,17 +44,17 @@ class TypeFile extends TypeOuter {
 		$Link = $this->info['LINK']::I();
 		$url = $Link->GetAdminUrl();
 		$file = $value;
-		@$ID = $value['ID'] ?: $value ?: null;
+		@$ID = $value['ID'];
 		?>
 
 		<div data-file="">
 
 			<? if (!empty($ID)): ?>
-				<div class="mb-1">
-					<a
-						href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>"
-						class="btn btn-secondary"
-					>№<?= $ID ?: '...' ?></a>
+				<div class="form-control-plaintext">
+					[<a
+						href="<?= "{$url}?ID={$ID}" ?>"
+						class=""
+					>№<?= $ID ?></a>]
 
 					<a
 						target="_blank"
