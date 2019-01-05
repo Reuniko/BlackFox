@@ -22,7 +22,7 @@ class Users extends SCRUD {
 				'VITAL'    => true,
 			],
 			'PASSWORD'        => [
-				'TYPE'        => 'STRING',
+				'TYPE'        => 'PASSWORD',
 				'GROUP'       => 'SYSTEM',
 				'NAME'        => 'Пароль',
 				'DESCRIPTION' => 'В базе хранится sha1 хеш пароля',
