@@ -44,7 +44,7 @@ class TypeFile extends TypeOuter {
 		$Link = $this->info['LINK']::I();
 		$url = $Link->GetAdminUrl();
 		$file = $value;
-		$ID = $value['ID'];
+		@$ID = $value['ID'] ?: $value ?: null;
 		?>
 
 		<div data-file="">
