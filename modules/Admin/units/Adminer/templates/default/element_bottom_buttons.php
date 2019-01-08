@@ -28,13 +28,15 @@
 	<span class="d-none d-md-inline-block">Отмена</span>
 </a>
 
-<button
-	class="btn btn-danger float-right"
-	type="submit"
-	name="ACTION"
-	value="Delete"
-	data-confirm="Подтвердите удаление"
->
-	<i class="fa fa-trash"></i>
-	<span class="d-none d-md-inline-block">Удалить</span>
-</button>
+<? if ($RESULT['MODE'] === 'Update'): ?>
+	<button
+		class="btn btn-danger float-right"
+		type="submit"
+		name="ACTION"
+		value="Delete"
+		data-confirm="Подтвердите удаление"
+	>
+		<i class="fa fa-trash"></i>
+		<span class="d-none d-md-inline-block">Удалить</span>
+	</button>
+<? endif; ?>

@@ -72,6 +72,7 @@ class TypeOuter extends Type {
 	}
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
+		// TODO ajax select
 		/** @var \System\SCRUD $Link */
 		$Link = $this->info['LINK']::I();
 		$url = $Link->GetAdminUrl();
@@ -112,15 +113,17 @@ class TypeOuter extends Type {
 			</div>
 			<div class="col-12 col-sm-6 mb-1">
 				<div class="input-group">
-					<div class="input-group-prepend">
-						<a
-							style="width: 40px;"
-							class="btn btn-secondary"
-							href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>"
-							data-link-a="<?= $name ?>"
-							title="Открыть элемент"
-						><i class="fa fa-external-link-alt"></i></a>
-					</div>
+					<? if (!isset($_REQUEST['FRAME'])): ?>
+						<div class="input-group-prepend">
+							<a
+								style="width: 40px;"
+								class="btn btn-secondary"
+								href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>"
+								data-link-a="<?= $name ?>"
+								title="Открыть элемент"
+							><i class="fa fa-external-link-alt"></i></a>
+						</div>
+					<? endif; ?>
 					<input
 						type="text"
 						class="<?= $class ?>"

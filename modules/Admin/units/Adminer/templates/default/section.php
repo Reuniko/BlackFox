@@ -2,28 +2,31 @@
 <div class="adminer">
 
 	<? require($this->Path('section_settings.php')); ?>
+
 	<? if (!$this->frame): ?>
 		<? require($this->Path('filter.php')) ?>
 	<? endif; ?>
 
-	<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
-		<div class="my-2 buttons">
+	<div class="my-2 buttons">
 
-			<a
-				class="btn btn-light float-right"
-				data-toggle="modal"
-				data-target="#section-settings"
-			>
-				<i class="fa fa-cog"></i>
-			</a>
+		<a
+			class="btn btn-light float-right"
+			data-toggle="modal"
+			data-target="#section-settings"
+		>
+			<i class="fa fa-cog"></i>
+		</a>
 
+		<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
 			<a class="btn btn-success" href="?NEW&<?= http_build_query($_GET) ?>">
 				<i class="fa fa-plus"></i>
 				Создать
 			</a>
+		<? endif; ?>
 
-		</div>
-	<? endif; ?>
+		<div class="clearfix"></div>
+
+	</div>
 
 	<form method="post">
 
@@ -120,20 +123,22 @@
 					<? endforeach; ?>
 				</tr>
 			<? endforeach; ?>
-			<tr>
-				<td colspan="<?= 1 + count($RESULT['STRUCTURE']['FIELDS']) ?>">
-					<button
-						class="btn btn-danger"
-						type="submit"
-						name="ACTION"
-						value="Delete"
-						data-confirm="Подтвердите удаление выделенных элементов"
-					>
-						<i class="fa fa-trash"></i>
-						Удалить выделенные
-					</button>
-				</td>
-			</tr>
+			<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
+				<tr>
+					<td colspan="<?= 1 + count($RESULT['STRUCTURE']['FIELDS']) ?>">
+						<button
+							class="btn btn-danger"
+							type="submit"
+							name="ACTION"
+							value="Delete"
+							data-confirm="Подтвердите удаление выделенных элементов"
+						>
+							<i class="fa fa-trash"></i>
+							Удалить выделенные
+						</button>
+					</td>
+				</tr>
+			<? endif; ?>
 		</table>
 
 	</form>
