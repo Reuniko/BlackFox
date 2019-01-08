@@ -261,7 +261,7 @@ class Adminer extends \System\Unit {
 			$filters,
 			$fields
 		);
-		$this->Redirect(null, 'Настройки сохранены');
+		$this->Redirect(null);
 	}
 
 	public function GetTabsOfCreate() {
