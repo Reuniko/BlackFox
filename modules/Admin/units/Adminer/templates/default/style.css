@@ -141,6 +141,11 @@
 	padding-left: 1rem;
 }
 
+.adminer ul.pagination {
+	padding-left: 0;
+}
+
 .adminer .hidden {
-	visibility: hidden; display: none;
+	visibility: hidden;
+	display: none;
 }
