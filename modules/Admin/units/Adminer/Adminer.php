@@ -246,16 +246,21 @@ class Adminer extends \System\Unit {
 			'ENTITY' => get_class($this->SCRUD),
 		]);
 		if (empty($settings)) {
-			$settings = [
-				'FILTERS' => [$this->SCRUD->key()],
-				'FIELDS'  => array_keys($this->SCRUD->structure),
-			];
+			$settings = [];
+			foreach ($this->SCRUD->structure as $code => $info) {
+				if ($info['VITAL'] or $info['PRIMARY']) {
+					$settings['FILTERS'][] = $code;
+				}
+				if (!$info['DISABLED'] or $info['PRIMARY']) {
+					$settings['FIELDS'][] = $code;
+				}
+			}
 		}
 		return $settings;
 	}
 
 	public function SaveTableSettings($filters = [], $fields = []) {
-		\Admin\TableSettings::I()->Save(
+		TableSettings::I()->Save(
 			$this->USER->ID,
 			get_class($this->SCRUD),
 			$filters,
