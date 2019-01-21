@@ -25,6 +25,8 @@ abstract class Unit {
 	/** @var string отображение - имя php файла подключаемого в папке шаблона */
 	public $view = null;
 
+	/** @var array запрос пользователя */
+	public $REQUEST = [];
 	/** @var array параметры вызова */
 	public $PARAMS = [];
 	/** @var array результат работы */
@@ -342,6 +344,10 @@ abstract class Unit {
 		}
 	}
 
+	public function GetRequest() {
+		return array_merge_recursive($_REQUEST, $this->_files());
+	}
+
 	/**
 	 * Returns the result of the execution of the controller,
 	 * passing a request combined from globals
@@ -350,8 +356,8 @@ abstract class Unit {
 	 * @throws Exception
 	 */
 	public function ProcessResult() {
-		$request = array_merge_recursive($_REQUEST, $this->_files());
-		return (array)$this->Controller($request);
+		$this->REQUEST = $this->GetRequest();
+		return (array)$this->Controller($this->REQUEST);
 	}
 
 	/**
