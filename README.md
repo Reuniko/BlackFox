@@ -1,4 +1,4 @@
-# PHP Rune
+# Black Fox
 Framework for web-sites.
 
 ## Installation
