@@ -9,8 +9,13 @@ class Adminer extends \System\Unit {
 	public $frame = false;
 
 	public $options = [
-		'SCRUD' => [
+		'SCRUD'        => [
 			'NAME' => 'SCRUD',
+		],
+		'RESTRICTIONS' => [
+			'TYPE'    => 'array',
+			'NAME'    => 'RESTRICTIONS',
+			'DEFAULT' => [],
 		],
 	];
 
@@ -71,6 +76,8 @@ class Adminer extends \System\Unit {
 			$this->ENGINE->WRAPPER = 'frame';
 		}
 
+		$FILTER = $this->PARAMS['RESTRICTIONS'] + $FILTER;
+
 		$R['FILTER'] = $FILTER;
 		$R['SETTINGS'] = $this->LoadTableSettings();
 		$R['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractStructure($R['SETTINGS']['FILTERS']);
@@ -120,8 +127,8 @@ class Adminer extends \System\Unit {
 	}
 
 	public function Element($ID = 0, $FILTER = []) {
-		//$this->view = 'element';
 
+		$FILTER = $this->PARAMS['RESTRICTIONS'] + $FILTER;
 		$R['BACK'] = $this->GetBackLink();
 
 		if ($ID === 0) {
@@ -131,7 +138,8 @@ class Adminer extends \System\Unit {
 			$R['TABS'] = $this->GetTabsOfCreate();
 		} else {
 			$R['MODE'] = 'Update';
-			$R['DATA'] = $this->SCRUD->Read($ID);
+			$filter = $this->PARAMS['RESTRICTIONS'] + ['ID' => $ID];
+			$R['DATA'] = $this->SCRUD->Read($filter);
 			if (empty($R['DATA'])) {
 				throw new Exception("Элемент не найден");
 			}
@@ -142,12 +150,18 @@ class Adminer extends \System\Unit {
 	}
 
 	public function Create($FIELDS = [], $REDIRECT = 'Stay') {
+		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
+			$FIELDS[$code] = $value;
+		}
 		$ID = $this->SCRUD->Create($FIELDS);
 		$link = $this->GetLinkForRedirect($ID, $REDIRECT);
 		$this->Redirect($link, "Создан элемент <a href='?ID={$ID}'>№{$ID}</a>");
 	}
 
 	public function Update($ID, $FIELDS = [], $REDIRECT = 'Stay') {
+		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
+			unset($FIELDS[$code]);
+		}
 		$this->SCRUD->Update($ID, $FIELDS);
 		$link = $this->GetLinkForRedirect($ID, $REDIRECT);
 		$this->Redirect($link, "Обновлен элемент <a href='?ID={$ID}'>№{$ID}</a>");
