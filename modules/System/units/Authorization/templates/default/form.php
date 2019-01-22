@@ -12,7 +12,7 @@
 		<form class="form card p-3" method="POST">
 			<h2><?= $this->PARAMS['TITLE'] ?: 'Вход в систему' ?></h2>
 			<div class="form-group">
-				<input type="text" name="login" value="<?= $RESULT['LOGIN'] ?>" class="form-control" placeholder="Логин"/>
+				<input type="text" name="login" value="<?= $RESULT['LOGIN'] ?>" class="form-control" placeholder="Логин" autofocus="autofocus"/>
 			</div>
 			<div class="form-group">
 				<input type="password" name="password" value="<?= $RESULT['PASSWORD'] ?>" class="form-control" placeholder="Пароль"/>
