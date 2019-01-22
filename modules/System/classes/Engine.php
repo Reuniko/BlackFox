@@ -135,6 +135,10 @@ class Engine extends Instanceable {
 		$this->TITLE = $this->SECTION['NAME'];
 	}
 
+	public function GetUrlPathParts() {
+		return array_filter(explode('/', $this->url['path']));
+	}
+
 	/**
 	 * Loads the default instance of the user
 	 */
@@ -286,7 +290,7 @@ class Engine extends Instanceable {
 	 * This method tries to generate main content of the page with several steps:
 	 * - if requested file exist - executes it and exit
 	 * - if requested directory with file 'index.php' exist - executes it and exit
-	 * - if there are somewhere in ancestors file '.controller.php' exist - executes it and exit
+	 * - if there are somewhere in ancestors file '.router.php' exist - executes it and exit
 	 * - if redirect exist - does redirect and die
 	 * - if content page exist - prints it and exit
 	 * If nothing works - throws ExceptionPageNotFound
@@ -314,7 +318,7 @@ class Engine extends Instanceable {
 		}
 
 		// request for non-existing file
-		$path_to_controller = $this->SearchAncestorFile($this->url['path'], '.controller.php');
+		$path_to_controller = $this->SearchAncestorFile($this->url['path'], '.router.php');
 		if ($path_to_controller) {
 			require($path_to_controller);
 			return;
