@@ -88,27 +88,37 @@ class Engine extends Instanceable {
 	 * - if user has no access - throws an exception
 	 * - if user has access - does nothing
 	 *
+	 * - group '*' means 'everyone'
+	 * - group '@' means 'authorized'
+	 *
 	 * @param array $rules section rules: ['<group_code>' => '<true\false>', ...]
-	 * @param array $groups user group codes: ['<group_code>', ...]
+	 * @internal object $this->USER
 	 * @throws ExceptionAccessDenied
 	 * @throws ExceptionAuthRequired
 	 */
-	public function CheckSectionAccess($rules = [], $groups = []) {
+	public function CheckSectionAccess($rules = []) {
 		$rules = $rules ?: [];
-		$groups = $groups ?: [];
+
 		$rules['*'] = isset($rules['*']) ? $rules['*'] : true;
 		if ($rules['*'] === true) {
 			return;
 		}
 		unset($rules['*']);
+
+		if ($rules['@'] === true) {
+			if ($this->USER->IsAuthorized()) {
+				return;
+			}
+		}
+
 		foreach ($rules as $rule_group => $rule_right) {
 			if ($rule_right === true) {
-				if (in_array($rule_group, $groups)) {
+				if (in_array($rule_group, $this->USER->GROUPS ?: [])) {
 					return;
 				}
 			}
 		}
-		if (User::I()->IsAuthorized()) {
+		if ($this->USER->IsAuthorized()) {
 			throw new ExceptionAccessDenied('This section requires higher privileges');
 		} else {
 			throw new ExceptionAuthRequired('This section requires authorization');
@@ -357,7 +367,7 @@ class Engine extends Instanceable {
 	public function ShowContent() {
 		try {
 
-			$this->CheckSectionAccess($this->SECTION['ACCESS'], $this->USER->GROUPS);
+			$this->CheckSectionAccess($this->SECTION['ACCESS']);
 			$this->MakeContent();
 
 		} catch (ExceptionSQL $exception) {
