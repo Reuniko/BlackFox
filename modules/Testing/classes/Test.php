@@ -47,20 +47,24 @@ class Test extends \System\Instanceable {
 				$this->results[$test] = [
 					'NAME'   => $display,
 					'STATUS' => 'FAILURE',
-					'RESULT'  => $error->getMessage() . ":\r\n<pre>" . $error->SQL . "</pre>",
+					'RESULT' => $error->getMessage() . ":\r\n<pre>" . $error->SQL . "</pre>",
 				];
 			} catch (Exception $error) {
 				$this->results[$test] = [
 					'NAME'   => $display,
 					'STATUS' => 'FAILURE',
-					'RESULT'  => $error->getArray(),
+					'RESULT' => $error->getArray(),
 				];
 			} catch (\Exception $error) {
 				$this->results[$test] = [
 					'NAME'   => $display,
 					'STATUS' => 'FAILURE',
-					'RESULT'  => $error->getMessage(),
+					'RESULT' => $error->getMessage(),
 				];
+			}
+
+			if (is_array($this->results[$test]['RESULT']) and count($this->results[$test]['RESULT']) === 1) {
+				$this->results[$test]['RESULT'] = reset($this->results[$test]['RESULT']);
 			}
 		}
 		return $this->results;

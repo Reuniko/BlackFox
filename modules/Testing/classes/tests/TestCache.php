@@ -12,6 +12,13 @@ class TestCache extends Test {
 		$this->CACHE->Clear();
 	}
 
+	public function TestCacheIsNotDefaultEngine() {
+		if (get_class($this->CACHE) === 'System\Cache') {
+			throw new Exception("You are using default cache engine (System\Cache), you should switch to other engine");
+		}
+		return "You are using this cache engine: " . get_class($this->CACHE);
+	}
+
 	public function TestGetNonExistingKey() {
 		try {
 			$value = $this->CACHE->Get('non_exising_key');
