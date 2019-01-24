@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeEnum extends Type {
-	public static $name = 'Enum';
-	public static $code = 'ENUM';
+	public static $TYPE = 'ENUM';
 
 	public function GetStructureStringType() {
 		return 'enum' . '("' . implode('", "', array_keys($this->info['VALUES'])) . '")';

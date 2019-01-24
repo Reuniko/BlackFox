@@ -25,7 +25,7 @@
 						<div class="col-sm-8">
 							<?
 							// -------------------------------------------------------------------------------
-							$this->SCRUD->types[$code]->PrintFilterControl($RESULT['FILTER'], 'FILTER');
+							$this->SCRUD->structure[$code]->PrintFilterControl($RESULT['FILTER'], 'FILTER');
 							// -------------------------------------------------------------------------------
 							?>
 						</div>

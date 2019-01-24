@@ -3,16 +3,14 @@
 namespace System;
 
 class TypeBool extends Type {
-	public static $name = 'Bool';
-	public static $code = 'BOOL';
+	public static $TYPE = 'BOOL';
 
 	public function GetStructureStringType() {
 		return 'bool';
 	}
 
-	public function ProvideInfoIntegrity($info = []) {
-		$info['NOT_NULL'] = true;
-		return $info;
+	public function ProvideInfoIntegrity() {
+		$this->info['NOT_NULL'] = true;
 	}
 
 	public function PrintValue($value) {

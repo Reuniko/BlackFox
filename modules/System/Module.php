@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 
 class Module extends \System\AModule {
@@ -15,7 +16,9 @@ class Module extends \System\AModule {
 		Content::I()->Synchronize();
 		Redirects::I()->Synchronize();
 		Log::I()->Synchronize();
-		CacheData::I()->Synchronize();
-		CacheTags::I()->Synchronize();
+		//CacheData::I()->Synchronize();
+		//CacheTags::I()->Synchronize();
+
+		Cache::I()->Clear();
 	}
 }

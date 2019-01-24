@@ -3,18 +3,16 @@
 namespace System;
 
 class TypeFile extends TypeOuter {
-	public static $name = 'File';
-	public static $code = 'FILE';
+	public static $TYPE = 'FILE';
 
 	public function GetStructureStringType() {
 		return 'int';
 	}
 
-	public function ProvideInfoIntegrity($info = []) {
-		if (empty($info['LINK'])) {
-			$info['LINK'] = 'System\Files';
+	public function ProvideInfoIntegrity() {
+		if (empty($this->info['LINK'])) {
+			$this->info['LINK'] = 'System\Files';
 		}
-		return $info;
 	}
 
 	public function FormatInputValue($value) {

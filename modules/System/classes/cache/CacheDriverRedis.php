@@ -8,6 +8,18 @@ namespace System;
  */
 class CacheDriverRedis extends Cache {
 
+	private $example_config = [
+		'cache' => [
+			'default' => [
+				'hosts' => [[
+					'host'    => '127.0.0.1',
+					'port'    => 6379,
+					'timeout' => 1,
+				]],
+			],
+		],
+	];
+
 	private $Redis;
 
 	public function __construct($params = null) {

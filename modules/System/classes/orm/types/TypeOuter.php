@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeOuter extends Type {
-	public static $name = 'Outer';
-	public static $code = 'OUTER';
+	public static $TYPE = 'OUTER';
 
 	public function GetStructureStringType() {
 		return 'int';
