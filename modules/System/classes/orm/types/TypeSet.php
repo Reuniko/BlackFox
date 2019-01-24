@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeSet extends Type {
-	public static $name = 'Set';
-	public static $code = 'SET';
+	public static $TYPE = 'SET';
 
 	public function GetStructureStringType() {
 		return 'set' . '("' . implode('", "', array_keys($this->info['VALUES'])) . '")';

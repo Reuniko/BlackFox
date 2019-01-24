@@ -2,7 +2,7 @@
 <?php /** @var array $RESULT */ ?>
 <?
 /** @var \System\Type $Type */
-$Type = $this->SCRUD->types[$RESULT['TAB']['CODE']];
+$Type = $this->SCRUD->structure[$RESULT['TAB']['CODE']];
 /** @var \System\SCRUD $Link */
 $Link = new $Type->info['LINK'];
 $url = $Link->GetAdminUrl();

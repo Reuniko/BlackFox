@@ -146,6 +146,11 @@ class Adminer extends \System\Unit {
 			$this->ENGINE->AddBreadcrumb("Редактирование элемента №{$ID}");
 			$R['TABS'] = $this->GetTabsOfUpdate();
 		}
+
+		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
+			$this->SCRUD->structure[$code]['DISABLED'] = true;
+		}
+
 		return $R;
 	}
 

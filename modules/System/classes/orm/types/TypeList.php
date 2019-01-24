@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeList extends TypeText {
-	public static $name = 'List';
-	public static $code = 'LIST';
+	public static $TYPE = 'LIST';
 
 	public function FormatInputValue($value) {
 		$value = is_array($value) ? $value : [$value];

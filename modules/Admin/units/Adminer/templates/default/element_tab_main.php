@@ -23,7 +23,7 @@
 				<div class="col-sm-8">
 					<?
 					// -------------------------------------------------------------------------------------------
-					$this->SCRUD->types[$code]->PrintFormControl($RESULT['DATA'][$code], "FIELDS[{$code}]");
+					$this->SCRUD->structure[$code]->PrintFormControl($RESULT['DATA'][$code], "FIELDS[{$code}]");
 					// -------------------------------------------------------------------------------------------
 					?>
 				</div>

@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeFloat extends Type {
-	public static $name = 'Float';
-	public static $code = 'FLOAT';
+	public static $TYPE = 'FLOAT';
 
 	public function GetStructureStringType() {
 		$length = $this->info['LENGTH'] ?: 13;

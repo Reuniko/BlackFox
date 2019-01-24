@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeTime extends Type {
-	public static $name = 'Time';
-	public static $code = 'TIME';
+	public static $TYPE = 'TIME';
 
 	public function GetStructureStringType() {
 		return 'time';

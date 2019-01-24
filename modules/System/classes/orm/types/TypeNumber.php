@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeNumber extends Type {
-	public static $name = 'Number';
-	public static $code = 'NUMBER';
+	public static $TYPE = 'NUMBER';
 
 	public function GetStructureStringType() {
 		return 'int';

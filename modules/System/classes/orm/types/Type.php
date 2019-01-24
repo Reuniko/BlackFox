@@ -7,49 +7,65 @@ namespace System;
  *
  * Parent for all data types for using in database.
  */
-abstract class Type {
-	/** @var string Displayed name of the type */
-	public static $name;
+abstract class Type implements \ArrayAccess {
+
+	// -------------------------------------------------------------------------------------------------------------- //
+	public function offsetSet($offset, $value) {
+		if (is_null($offset)) {
+			$this->info[] = $value;
+		} else {
+			$this->info[$offset] = $value;
+		}
+	}
+
+	public function offsetExists($offset) {
+		return isset($this->info[$offset]);
+	}
+
+	public function offsetUnset($offset) {
+		unset($this->info[$offset]);
+	}
+
+	public function offsetGet($offset) {
+		return isset($this->info[$offset]) ? $this->info[$offset] : null;
+	}
+	// -------------------------------------------------------------------------------------------------------------- //
+
 	/** @var string Mnemonic code of the type */
-	public static $code;
+	public static $TYPE;
 
 	/** @var array Settings of specific field */
 	public $info;
 
-	public function __construct(array $info) {
-		$this->info = $this->ProvideInfoIntegrity($info);
+	public function __construct(array &$info) {
+		$this->info = &$info;
+		$this->ProvideInfoIntegrity();
 	}
 
-	public function ProvideInfoIntegrity($info = []) {
-		return $info;
+	public function ProvideInfoIntegrity() {
 	}
 
 	abstract function GetStructureStringType();
 
 
 	public function GetStructureString() {
-		$code = $this->info['CODE'];
-		$info = $this->info;
-
-		$info = $this->ProvideInfoIntegrity($info);
-
 		$type = $this->GetStructureStringType();
 
-		$null = ($info["NOT_NULL"] || $info['PRIMARY']) ? "NOT NULL" : "NULL";
+		$null = ($this->info["NOT_NULL"] || $this->info['PRIMARY']) ? "NOT NULL" : "NULL";
 
 		$default = "";
-		if ($info['DEFAULT']) {
-			if (is_array($info['DEFAULT'])) {
-				$info['DEFAULT'] = implode(',', $info['DEFAULT']);
+		if ($this->info['DEFAULT']) {
+			if (is_array($this->info['DEFAULT'])) {
+				$this->info['DEFAULT'] = implode(',', $this->info['DEFAULT']);
 			}
-			$default = "DEFAULT '{$info['DEFAULT']}'";
+			$default = "DEFAULT '{$this->info['DEFAULT']}'";
 		}
 
-		$auto_increment = ($info["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
+		$auto_increment = ($this->info["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
 
-		$comment = ($info["NAME"]) ? " COMMENT '{$info["NAME"]}'" : "";
+		$comment = ($this->info["NAME"]) ? " COMMENT '{$this->info["NAME"]}'" : "";
 
-		$structure_string = "`{$code}` $type $null $default $auto_increment $comment";
+		$structure_string = "`{$this->info['CODE']}` $type $null $default $auto_increment $comment";
 
 		return $structure_string;
 	}

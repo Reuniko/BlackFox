@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeArray extends TypeText {
-	public static $name = 'Array';
-	public static $code = 'ARRAY';
+	public static $TYPE = 'ARRAY';
 
 	public function FormatInputValue($value) {
 		$value = is_array($value) ? $value : [$value];

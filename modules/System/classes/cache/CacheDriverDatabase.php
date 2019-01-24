@@ -2,6 +2,14 @@
 
 namespace System;
 
+/**
+ * Class CacheDriverDatabase
+ * DO NOT USE IT!!!
+ * @package System
+ * @deprecated recursive dependencies: Cache <-> SCRUD
+ * @todo unlink from SCRUD, focus on direct sql queries
+ * @todo pack\unpack via serialize\unserialize
+ */
 class CacheDriverDatabase extends Cache {
 
 	public $DATA;

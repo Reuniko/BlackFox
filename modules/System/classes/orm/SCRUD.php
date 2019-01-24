@@ -10,7 +10,7 @@ namespace System;
  * - Search - постраничный поиск [+ выборка] записей в таблице
  * - Create - создание записей
  * - Read - чтение первой подходящей по фильтрам записи
- * - Update - обновление записи
+ * - Update - обновление записей
  * - Delete - удаление указанных записей
  *
  * Чтобы создать новый источник данных нужно:
@@ -34,10 +34,8 @@ abstract class SCRUD extends Instanceable {
 	/** @var string символьный код таблицы, формируется автоматически, возможно переопределить */
 	public $code;
 
-	/** @var array массив полей базы данных */
+	/** @var mixed массив полей базы данных, поле может быть массивом или объектом Type */
 	public $structure = [];
-	/** @var Type[] массив полей базы данных */
-	public $types = [];
 	/** @var array массив групп полей базы данных */
 	public $groups = [];
 	/** @var array композиция групп полей и полей базы данных, формируется автоматически на основе $this->structure и $this->groups */
@@ -84,12 +82,11 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Обеспечивает целостность данных между структурными массивами:
-	 * - structure
-	 * - types
-	 * - groups
-	 * - composition
-	 * - keys
+	 * Обеспечивает целостность данных между свойствами: structure, groups, composition, keys.
+	 * - формирует keys перебором structure,
+	 * - дополняет groups перебором structure,
+	 * - формирует composition перебором groups и structure,
+	 * - переопределяет structure объектами Type
 	 */
 	public function ProvideIntegrity() {
 
@@ -115,9 +112,9 @@ abstract class SCRUD extends Instanceable {
 				'NAME'   => $group_name,
 				'FIELDS' => [],
 			];
-			foreach ($this->structure as $code => $field) {
+			foreach ($this->structure as $code => &$field) {
 				if ($field['GROUP'] === $group_code) {
-					$this->composition[$group_code]['FIELDS'][$code] = $field;
+					$this->composition[$group_code]['FIELDS'][$code] = &$field;
 				}
 			}
 		}
@@ -127,6 +124,7 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		// Auto-completion of LINK attributes without namespaces
+		// TODO move inside structure
 		foreach ($this->structure as $code => &$info) {
 			if (!empty($info['LINK']) && !class_exists($info['LINK'])) {
 				$link_namespace = (new \ReflectionClass($this))->getNamespaceName();
@@ -139,11 +137,15 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 
-		// Initialisation of $this->types
-		foreach ($this->structure as $code => &$info) {
+		$structure = $this->structure;
+		unset($this->structure);
+
+		foreach ($structure as $code => &$info) {
 			$info['CODE'] = $code;
-			$this->types[$code] = FactoryType::I()->Get($info);
+			$this->structure[$code] = FactoryType::I()->Get($info);
 		}
+
+		unset($structure);
 	}
 
 	/**
@@ -174,7 +176,7 @@ abstract class SCRUD extends Instanceable {
 			$rows = [];
 			foreach ($this->structure as $code => $field) {
 				try {
-					$rows[] = $this->types[$code]->GetStructureString();
+					$rows[] = $this->structure[$code]->GetStructureString();
 				} catch (\Exception $error) {
 					continue;
 				}
@@ -192,7 +194,7 @@ abstract class SCRUD extends Instanceable {
 			$last_after_code = '';
 			foreach ($this->structure as $code => $field) {
 				try {
-					$structure_string = $this->types[$code]->GetStructureString();
+					$structure_string = $this->structure[$code]->GetStructureString();
 				} catch (\Exception $error) {
 					continue;
 				}
@@ -693,7 +695,7 @@ abstract class SCRUD extends Instanceable {
 			if (empty($this->structure[$code])) {
 				throw new Exception("Unknown field code: '{$code}' in table '{$this->code}'");
 			}
-			$result = $this->types[$code]->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
+			$result = $this->structure[$code]->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
 			$select += (array)$result['SELECT'];
 			$join += (array)$result['JOIN'];
 		}
@@ -920,9 +922,7 @@ abstract class SCRUD extends Instanceable {
 
 		foreach ($path as $external) {
 			$structure = &$Object->structure;
-			$types = &$Object->types;
 			$info = $structure[$external];
-			$Type = $types[$external];
 
 			if (empty($info)) {
 				throw new Exception("Unknown external field code: '{$external}'");
@@ -931,7 +931,7 @@ abstract class SCRUD extends Instanceable {
 				throw new Exception("Field is not external: '{$external}'");
 			}
 
-			$join += $Type->GenerateJoinStatements($Object, $prefix);
+			$join += $info->GenerateJoinStatements($Object, $prefix);
 
 			// for next iteration
 			$prefix .= $external . "__";
@@ -1003,7 +1003,7 @@ abstract class SCRUD extends Instanceable {
 			return null;
 		}
 
-		$value = $this->types[$code]->FormatInputValue($value);
+		$value = $this->structure[$code]->FormatInputValue($value);
 
 		return $this->DB->Escape($value);
 	}
@@ -1022,11 +1022,11 @@ abstract class SCRUD extends Instanceable {
 	/**
 	 * Возвращает экземпляр класса SCRUD, на который ссылается поле
 	 *
-	 * @param array $info массив, описывающий поле (с ключем LINK)
+	 * @param mixed $info массив, описывающий поле (с ключем LINK)
 	 * @return SCRUD экземпляр
 	 * @throws ExceptionNotAllowed
 	 */
-	private function GetLink(array $info) {
+	private function GetLink($info) {
 		if (!class_exists($info['LINK'])) {
 			throw new ExceptionNotAllowed("You must set class name to LINK info of field '{$info['NAME']}'");
 		}
@@ -1125,7 +1125,7 @@ abstract class SCRUD extends Instanceable {
 				throw new Exception("Unknown field code '{$code}'");
 			}
 
-			$element = $this->types[$code]->FormatOutputValue($element);
+			$element = $this->structure[$code]->FormatOutputValue($element);
 		}
 		return $element;
 	}
@@ -1145,6 +1145,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param string $key код колонки значения которой будут использованы как ключ в результирующем массиве (не обязательно)
 	 * @return array|int результат выполнения
 	 * @throws ExceptionSQL
+	 * @throws Exception
 	 */
 	public function Query($SQL, $key = null) {
 		try {
@@ -1224,7 +1225,7 @@ abstract class SCRUD extends Instanceable {
 				$code = strtoupper($code);
 				$subfields = $content;
 			}
-			$elements = $this->types[$code]->HookExternalField($elements, $subfields);
+			$elements = $this->structure[$code]->HookExternalField($elements, $subfields);
 		}
 		return $elements;
 	}

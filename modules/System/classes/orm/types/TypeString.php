@@ -3,8 +3,7 @@
 namespace System;
 
 class TypeString extends Type {
-	public static $name = 'String';
-	public static $code = 'STRING';
+	public static $TYPE = 'STRING';
 	const DEFAULT_LENGTH = 255;
 
 	public function GetStructureStringType() {

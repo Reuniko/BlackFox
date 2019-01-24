@@ -109,7 +109,7 @@
 								<?
 								ob_start();
 								// -------------------------------------------------
-								$this->SCRUD->types[$code]->PrintValue($row[$code]);
+								$this->SCRUD->structure[$code]->PrintValue($row[$code]);
 								// -------------------------------------------------
 								$content = ob_get_clean();
 								?>

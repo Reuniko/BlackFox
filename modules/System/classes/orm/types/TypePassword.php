@@ -3,8 +3,7 @@
 namespace System;
 
 class TypePassword extends TypeString {
-	public static $name = 'Password';
-	public static $code = 'PASSWORD';
+	public static $TYPE = 'PASSWORD';
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
 		?>
