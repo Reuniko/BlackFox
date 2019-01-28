@@ -53,6 +53,12 @@ class Adminer extends \System\Unit {
 	}
 
 	public function GetActions(array $request = []) {
+
+		if ($request['ACTION'] === 'SearchOuter') {
+			$this->json = true;
+			return ['SearchOuter'];
+		}
+
 		$actions = [];
 		$actions[] = $request['ACTION'];
 		$actions[] = (!empty($request['ID']) or isset($request['NEW'])) ? 'Element' : 'Section';
@@ -126,14 +132,14 @@ class Adminer extends \System\Unit {
 		return $link;
 	}
 
-	public function Element($ID = 0, $FILTER = []) {
+	public function Element($ID = null, $FILTER = [], $FIELDS = []) {
 
 		$FILTER = $this->PARAMS['RESTRICTIONS'] + $FILTER;
 		$R['BACK'] = $this->GetBackLink();
 
-		if ($ID === 0) {
+		if ($ID === null) {
 			$R['MODE'] = 'Create';
-			$R['DATA'] = $FILTER + $this->GetDefaultValues();
+			$R['DATA'] = $FILTER + $this->GetDefaultValues() + $FIELDS;
 			$this->ENGINE->AddBreadcrumb("Добавление элемента");
 			$R['TABS'] = $this->GetTabsOfCreate();
 		} else {
@@ -322,6 +328,60 @@ class Adminer extends \System\Unit {
 			}
 		}
 		return $tabs;
+	}
+
+	public function SearchOuter($code, $search, $page = 1) {
+		$this->json = true;
+
+		try {
+			$field = $this->SCRUD->structure[$code];
+			if (empty($field)) {
+				throw new Exception("[{$code}] not found");
+			}
+			if ($field['TYPE'] <> 'OUTER') {
+				throw new Exception("[{$code}] is not type OUTER");
+			}
+
+			/**@var \System\SCRUD $Link */
+			$Link = $field['LINK']::I();
+
+			if (!empty($search)) {
+				$filter = ['LOGIC' => 'OR'];
+				foreach ($Link->structure as $code => $field) {
+					if ($field['VITAL'] and $field['TYPE'] === 'STRING') {
+						$filter["~{$code}"] = $search;
+					}
+				}
+				$filter = [$filter];
+			} else {
+				$filter = [];
+			}
+
+			$data = $Link->Search([
+				'FILTER' => $filter,
+				'PAGE'   => $page,
+				'FIELDS' => ['@@'],
+				'LIMIT'  => 5,
+			]);
+
+			$results = [];
+			foreach ($data['ELEMENTS'] as $element) {
+				$results[] = [
+					'id'   => $element['ID'],
+					'text' => $Link->GetElementTitle($element),
+					'link' => $Link->GetAdminUrl() . "?ID={$element['ID']}",
+				];
+			}
+
+			$more = $data['PAGER']['TOTAL'] > $data['PAGER']['CURRENT'] * $data['PAGER']['LIMIT'];
+
+			return [
+				'results'    => $results,
+				'pagination' => ['more' => $more],
+			];
+		} catch (Exception $error) {
+			return ['ERROR' => $error->GetArray()];
+		}
 	}
 
 } 

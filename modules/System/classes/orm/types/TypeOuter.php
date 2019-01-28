@@ -71,67 +71,58 @@ class TypeOuter extends Type {
 	}
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
-		// TODO ajax select
+		// TODO move to Adminer
 		/** @var \System\SCRUD $Link */
 		$Link = $this->info['LINK']::I();
-		$url = $Link->GetAdminUrl();
 		$code = $this->info['CODE'];
 		$ID = is_array($value) ? $value['ID'] : $value;
+		if (!is_array($value) and !empty($value)) {
+			$value = $Link->Read($value, ['@']);
+		}
 		?>
 
-		<div class="row">
-			<div class="col-12 col-sm-6 mb-1">
-				<div class="input-group">
-					<div class="input-group-prepend">
-						<button
-							style="width: 40px;"
-							type="button"
-							class="btn btn-secondary"
-							title="Выбрать элемент"
-							<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
-							onclick="window.open(
-								'<?= $url ?>?popup=<?= $name ?>',
-								'',
-								'height=' + ((screen.height) - 100) + ',width=' + ((screen.width) - 20) + ''
-								);"
-						>
-							<i class="fa fa-search"></i>
-						</button>
-					</div>
-					<input
-						type="text"
-						class="<?= $class ?>"
-						width="100px"
-						id="<?= $name ?>"
-						name="<?= $name ?>"
-						data-link-input="<?= $name ?>"
-						value="<?= $ID ?>"
-						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
-					>
-				</div>
-			</div>
-			<div class="col-12 col-sm-6 mb-1">
-				<div class="input-group">
-					<? if (!isset($_REQUEST['FRAME'])): ?>
-						<div class="input-group-prepend">
-							<a
-								style="width: 40px;"
-								class="btn btn-secondary"
-								href="<?= ($ID) ? "{$url}?ID={$ID}" : "" ?>"
-								data-link-a="<?= $name ?>"
-								title="Открыть элемент"
-							><i class="fa fa-external-link-alt"></i></a>
-						</div>
+		<div
+			class="d-flex flex-fill"
+			data-outer=""
+		>
+			<a
+				class="btn btn-secondary flex-shrink-1"
+				href="<?= $ID ? $Link->GetAdminUrl() . "?ID={$ID}" : 'javascript:void(0);' ?>"
+				data-outer-link=""
+			>
+				<?= $ID ? "№{$ID}" : '...' ?>
+			</a>
+			<div class="flex-grow-1">
+				<select
+					class="form-control"
+					id="<?= $name ?>"
+					name="<?= $name ?>"
+					data-link-input="<?= $name ?>"
+					<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+					data-type="OUTER"
+					data-code="<?= $code ?>"
+				>
+					<? if (!$this->info['NOT_NULL']): ?>
+						<option value=""></option>
 					<? endif; ?>
-					<input
-						type="text"
-						class="<?= $class ?>"
-						disabled="disabled"
-						data-link-span="<?= $name ?>"
-						value="<?= is_array($value) ? $Link->GetElementTitle($value) : '' ?>"
-					>
-				</div>
+
+					<? if (!empty($ID)): ?>
+						<option
+							value="<?= $ID ?>"
+							selected="selected"
+						><?= $Link->GetElementTitle($value) ?></option>
+					<? endif; ?>
+				</select>
 			</div>
+			<? if (!$this->info['DISABLED'] and !$this->info['NOT_NULL']): ?>
+				<button
+					type="button"
+					class="btn btn-secondary flex-shrink-1"
+					data-outer-clean=""
+				>
+					<i class="fa fa-trash"></i>
+				</button>
+			<? endif; ?>
 		</div>
 		<?
 	}
