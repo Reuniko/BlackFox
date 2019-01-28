@@ -35,7 +35,7 @@ class TypeEnum extends Type {
 			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
 		>
 			<? if (!$this->info['NOT_NULL']): ?>
-				<option>- choose one -</option>
+				<option value=""></option>
 			<? endif; ?>
 			<? foreach ($this->info['VALUES'] as $code => $display): ?>
 				<option

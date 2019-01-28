@@ -25,4 +25,9 @@
 <script src="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/l10n/ru.js"></script>
 <link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/flatpickr.min.css">
 
+<script src="<?= $this->TEMPLATE_PATH ?>/lib/select2/js/select2.full.js"></script>
+<script src="<?= $this->TEMPLATE_PATH ?>/lib/select2/js/i18n/ru.js"></script>
+<link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/lib/select2/css/select2.min.css">
+<link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/lib/select2-bootstrap/select2-bootstrap.min.css">
+
 <script src="<?= $this->TEMPLATE_PATH ?>/script.js"></script>
