@@ -150,9 +150,25 @@
 	display: none;
 }
 
+/* SELECT 2 */
 .adminer .select2-container--bootstrap .select2-selection {
 	border-radius: 0;
-	height: calc(2.25rem + 2px);
+	min-height: calc(2.25rem + 2px);
 	font-size: 1rem;
 	padding: .375rem .75rem;
+}
+
+.adminer .select2-container--bootstrap .select2-selection.select2-selection--multiple {
+	padding: 4px;
+}
+
+.adminer .select2-container--bootstrap .select2-selection--multiple .select2-selection__choice {
+	margin: 2px;
+	border-radius: 0;
+	background-color: #EEE;
+	padding: 4px;
+}
+
+.adminer .select2-container--bootstrap .select2-selection--multiple .select2-search--inline .select2-search__field {
+	margin: 2px;
 }
