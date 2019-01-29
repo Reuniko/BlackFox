@@ -55,20 +55,18 @@ class TypeEnum extends Type {
 			name="<?= $group ?>[<?= $code ?>]"
 			value=""
 		/>
-		<? foreach ($this->info['VALUES'] as $code => $display): ?>
-			<div class="col-xs-3">
-				<label class="enum">
-					<input
-						type="checkbox"
-						class="<?= $class ?>"
-						name="<?= $group ?>[<?= $code ?>][]"
-						value="<?= $code ?>"
-						<?= (in_array($code, $filter[$code] ?: [])) ? 'checked' : '' ?>
-						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
-					>
-					<span class="dashed"><?= $display ?></span>
-				</label>
-			</div>
+		<? foreach ($this->info['VALUES'] as $value => $display): ?>
+			<label class="enum p-2">
+				<input
+					type="checkbox"
+					class="<?= $class ?>"
+					name="<?= $group ?>[<?= $code ?>][]"
+					value="<?= $value ?>"
+					<?= (in_array($value, $filter[$code] ?: [])) ? 'checked' : '' ?>
+					<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+				>
+				<span class="dashed"><?= $display ?></span>
+			</label>
 		<? endforeach; ?>
 		<?
 	}

@@ -17,7 +17,7 @@
 				<? foreach ($RESULT['STRUCTURE']['FILTERS'] as $code => $field): ?>
 					<div class="form-group row">
 						<label
-							class="col-sm-3 col-form-label sm-text-right"
+							class="col-sm-3 col-form-label text-sm-right"
 							title="<?= $code ?>"
 						>
 							<?= $field['NAME'] ?>
