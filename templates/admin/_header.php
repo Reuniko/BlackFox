@@ -1,33 +1,37 @@
-<?php /** @var \System\Engine $this */ ?>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<?
+/** @var \System\Engine $this */
+$path = $this->TEMPLATE_PATH;
 
-<meta name="description" content="">
-<meta name="author" content="">
-<link rel="icon" href="<?= $this->TEMPLATE_PATH ?>/favicon.ico">
+// Roboto
+$this->AddHeaderStyle('https://fonts.googleapis.com/css?family=Roboto:300,400,500,700');
 
-<title><?= $this->TITLE ?></title>
+// jquery
+?>
+	<script src='<?= $path ?>/lib/jquery/jquery.min.js'></script>
+	<script src='<?= $path ?>/lib/jquery-ui/jquery-ui.min.js'></script>
+<?
 
-<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+// bootstrap
+$this->AddHeaderStyle($path . '/lib/bootstrap/css/bootstrap.min.css');
+$this->AddHeaderScript($path . '/lib/bootstrap/js/bootstrap.bundle.min.js');
 
-<script src="<?= $this->TEMPLATE_PATH ?>/js/jquery.min.js"></script>
-<script src="<?= $this->TEMPLATE_PATH ?>/js/jquery-ui.min.js"></script>
+// fontawesome
+$this->AddHeaderStyle($path . '/lib/fontawesome/css/all.min.css');
 
-<link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/lib/bootstrap/css/bootstrap.min.css">
-<script src="<?= $this->TEMPLATE_PATH ?>/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+// ckeditor
+$this->AddHeaderScript($path . '/lib/ckeditor/ckeditor.js');
 
-<link href="<?= $this->TEMPLATE_PATH ?>/lib/fontawesome/css/fontawesome-all.min.css" rel="stylesheet">
+// flatpickr
+$this->AddHeaderScript($path . '/lib/flatpickr/flatpickr.min.js');
+$this->AddHeaderScript($path . '/lib/flatpickr/l10n/ru.js');
+$this->AddHeaderStyle($path . '/lib/flatpickr/flatpickr.min.css');
 
-<script src="<?= $this->TEMPLATE_PATH ?>/lib/ckeditor/ckeditor.js"></script>
+// select2
+$this->AddHeaderScript($path . '/lib/select2/js/select2.full.js');
+$this->AddHeaderScript($path . '/lib/select2/js/i18n/ru.js');
+$this->AddHeaderStyle($path . '/lib/select2/css/select2.min.css');
+$this->AddHeaderStyle($path . '/lib/select2-bootstrap/select2-bootstrap.min.css');
 
-<script src="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/flatpickr.min.js"></script>
-<script src="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/l10n/ru.js"></script>
-<link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/lib/flatpickr/flatpickr.min.css">
-
-<script src="<?= $this->TEMPLATE_PATH ?>/lib/select2/js/select2.full.js"></script>
-<script src="<?= $this->TEMPLATE_PATH ?>/lib/select2/js/i18n/ru.js"></script>
-<link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/lib/select2/css/select2.min.css">
-<link rel="stylesheet" href="<?= $this->TEMPLATE_PATH ?>/lib/select2-bootstrap/select2-bootstrap.min.css">
-
-<script src="<?= $this->TEMPLATE_PATH ?>/script.js"></script>
+// custom
+$this->AddHeaderScript($path . '/script.js');
+$this->AddHeaderStyle($path . '/style.css');
