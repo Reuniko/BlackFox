@@ -16,10 +16,10 @@ class AdminerUsers extends Adminer {
 		return parent::Section($FILTER, $PAGE, $SORT, $FIELDS, $popup);
 	}
 
-	public function Element($ID = 0, $FILTER = []) {
+	public function Element($ID = 0, $FILTER = [], $FIELDS = []) {
 		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['SALT']);
 		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['HASH']);
-		return parent::Element($ID, $FILTER);
+		return parent::Element($ID, $FILTER, $FIELDS);
 	}
 
 	public function Login($ID) {
