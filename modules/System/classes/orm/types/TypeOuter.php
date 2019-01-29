@@ -120,7 +120,7 @@ class TypeOuter extends Type {
 					class="btn btn-secondary flex-shrink-1"
 					data-outer-clean=""
 				>
-					<i class="fa fa-trash"></i>
+					<i class="fa fa-eraser"></i>
 				</button>
 			<? endif; ?>
 		</div>
@@ -131,34 +131,26 @@ class TypeOuter extends Type {
 		/** @var \System\SCRUD $Link */
 		$Link = $this->info['LINK']::I();
 		$code = $this->info['CODE'];
-		$url = $Link->GetAdminUrl();
-		$ID = $filter[$code];
+		$IDs = $filter[$code];
+		$elements = $Link->GetList([
+			'FILTER' => ['ID' => $IDs],
+			'FIELDS' => ['@'],
+		]);
 		?>
-		<div class="btn-toolbar" style="vertical-align: middle; line-height: 34px;">
-			<div class="btn-group">
-				<button
-					type="button"
-					class="form-control"
-					onclick="window.open(
-						'<?= $url ?>?popup=FILTER[<?= $code ?>]',
-						'',
-						'height=' + ((screen.height) - 100) + ',width=' + ((screen.width) - 20) + ''
-						);"
-				>
-					<i class="fa fa-search"></i>
-				</button>
-			</div>
-			<div class="btn-group">
-				<input
-					type="text"
-					class="<?= $class ?>"
-					id="<?= $group ?>[<?= $code ?>]"
-					name="<?= $group ?>[<?= $code ?>]"
-					data-link-input="<?= $group ?>[<?= $code ?>]"
-					value="<?= $ID ?>"
-				>
-			</div>
-		</div>
+		<select
+			class="form-control"
+			name="<?= $group ?>[<?= $code ?>][]"
+			data-type="OUTER"
+			data-code="<?= $code ?>"
+			multiple="multiple"
+		>
+			<? foreach ($elements as $element): ?>
+				<option
+					value="<?= $element['ID'] ?>"
+					selected="selected"
+				><?= $Link->GetElementTitle($element) ?></option>
+			<? endforeach; ?>
+		</select>
 		<?
 	}
 }
