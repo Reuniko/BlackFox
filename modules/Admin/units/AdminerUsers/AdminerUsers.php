@@ -9,14 +9,14 @@ class AdminerUsers extends Adminer {
 		parent::Execute($PARAMS);
 	}
 
-	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@@'], $popup = null) {
+	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@@']) {
 		unset($this->SCRUD->structure['SALT']);
 		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['HASH']);
 		unset($this->SCRUD->structure['PASSWORD']);
-		return parent::Section($FILTER, $PAGE, $SORT, $FIELDS, $popup);
+		return parent::Section($FILTER, $PAGE, $SORT, $FIELDS);
 	}
 
-	public function Element($ID = 0, $FILTER = [], $FIELDS = []) {
+	public function Element($ID = null, $FILTER = [], $FIELDS = []) {
 		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['SALT']);
 		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['HASH']);
 		return parent::Element($ID, $FILTER, $FIELDS);
