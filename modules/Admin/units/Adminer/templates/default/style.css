@@ -126,6 +126,10 @@
 	content: '*';
 }
 
+.adminer .vital {
+	font-weight: bold;
+}
+
 .adminer .red {
 	color: red;
 }

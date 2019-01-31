@@ -440,6 +440,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param array $sort сортировка
 	 * @param bool $escape автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию TRUE)
 	 * @return array|false ассоциативный массив, представляющий собой элемент
+	 * @throws Exception
 	 */
 	public function Read($filter = [], $fields = ['*@'], $sort = [], $escape = false) {
 		$arParams = [
@@ -459,6 +460,7 @@ abstract class SCRUD extends Instanceable {
 	 *
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 * @return boolean true - если присутствует, false - если не присутствует
+	 * @throws Exception
 	 */
 	public function Present($filter) {
 		return (bool)$this->Read($filter, $this->keys);
@@ -471,6 +473,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param array $sort сортировка (не обязательно)
 	 * @param string $field символьный код выбираемой колонки (не обязательно, по умолчанию - идентификатор)
 	 * @return array массив идентификаторов элементов
+	 * @throws Exception
 	 */
 	public function Select($filter = [], $sort = [], $field = null) {
 		if (is_null($field)) {
@@ -562,6 +565,15 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
+	 * Вычисляет возможность создания новых записей в таблице
+	 *
+	 * @return bool
+	 */
+	public function CanCreate() {
+		return true;
+	}
+
+	/**
 	 * Создает новую строку в таблице и возвращает ее идентификатор
 	 *
 	 * @param array $fields ассоциативный массив полей для новой строки
@@ -569,6 +581,10 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception
 	 */
 	public function Create($fields) {
+
+		if (!$this->CanCreate()) {
+			throw new ExceptionNotAllowed();
+		}
 
 		$fields = $this->ControlFields($fields);
 
@@ -605,6 +621,16 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
+	 * Вычисляет возможность изменения записей в таблице, подходящих под фильтр
+	 *
+	 * @param array $filter фильтр
+	 * @return bool
+	 */
+	public function CanUpdate($filter = []) {
+		return true;
+	}
+
+	/**
 	 * Изменяет значения указанных полей.
 	 *
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
@@ -613,6 +639,10 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception Поле ... не может быть пустым
 	 */
 	public function Update($filter = [], $fields = []) {
+
+		if (!$this->CanUpdate($filter)) {
+			throw new ExceptionNotAllowed();
+		}
 
 		$fields = $this->ControlFields($fields);
 
@@ -640,6 +670,16 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
+	 * Вычисляет возможность удаления записей в таблице, подходящих под фильтр
+	 *
+	 * @param array $filter фильтр
+	 * @return bool
+	 */
+	public function CanDelete($filter = []) {
+		return true;
+	}
+
+	/**
 	 * Удаляет строки из таблицы
 	 *
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
@@ -647,6 +687,11 @@ abstract class SCRUD extends Instanceable {
 	 * @throws ExceptionSQL
 	 */
 	public function Delete($filter = []) {
+
+		if (!$this->CanDelete($filter)) {
+			throw new ExceptionNotAllowed();
+		}
+
 		$answer = $this->PrepareWhereAndJoinByFilter($filter);
 		$this->SQL = "DELETE FROM `{$this->code}` WHERE " . implode(' AND ', $answer['WHERE']);
 		$this->Query($this->SQL);
