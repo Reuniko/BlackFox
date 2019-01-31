@@ -55,7 +55,6 @@ class Adminer extends \System\Unit {
 	public function GetActions(array $request = []) {
 
 		if ($request['ACTION'] === 'SearchOuter') {
-			$this->json = true;
 			return ['SearchOuter'];
 		}
 
@@ -69,18 +68,9 @@ class Adminer extends \System\Unit {
 		$FILTER = [],
 		$PAGE = 1,
 		$SORT = ['ID' => 'DESC'],
-		$FIELDS = ['*@@'],
-		$popup = null
+		$FIELDS = ['*@@']
 	) {
-		//$this->view = 'section';
 		$R['MODE'] = 'SECTION';
-
-		// TODO replace popups with ajax
-		if (!empty($popup)) {
-			$R['MODE'] = 'POPUP';
-			$R['POPUP'] = $popup;
-			$this->ENGINE->WRAPPER = 'frame';
-		}
 
 		$FILTER = $this->PARAMS['RESTRICTIONS'] + $FILTER;
 

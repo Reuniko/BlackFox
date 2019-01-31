@@ -5,13 +5,14 @@
 	<? require('_header.php') ?>
 	<? $this->AddHeaderStyle($this->TEMPLATE_PATH . '/style.css') ?>
 	<?= $this->GetHeader() ?>
+	<title><?= $this->TITLE ?></title>
 </head>
 <body>
 
 <nav class="header p-2">
 	<button
-			class="btn btn-info d-inline-block d-md-none"
-			data-toggle-sidebar=""
+		class="btn btn-info d-inline-block d-md-none"
+		data-toggle-sidebar=""
 	>
 		<i class="fa fa-bars"></i>
 		<span class="d-none d-md-inline-block">Меню</span>
