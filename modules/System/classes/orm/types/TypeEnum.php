@@ -40,7 +40,7 @@ class TypeEnum extends Type {
 			<? foreach ($this->info['VALUES'] as $code => $display): ?>
 				<option
 					value="<?= $code ?>"
-					<?= ($code === $value) ? 'selected' : '' ?>
+					<?= ((string)$code === (string)$value) ? 'selected' : '' ?>
 				><?= $display ?></option>
 			<? endforeach; ?>
 		</select>
