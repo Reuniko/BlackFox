@@ -1249,7 +1249,7 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	public function GetElementTitle($element = []) {
-		return $element['TITLE'] ?: $element['ID'] ?: '?';
+		return $element['TITLE'] ?: $element['ID'] ?: null;
 	}
 
 	/**

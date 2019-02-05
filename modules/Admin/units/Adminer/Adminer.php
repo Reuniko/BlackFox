@@ -53,15 +53,23 @@ class Adminer extends \System\Unit {
 	}
 
 	public function GetActions(array $request = []) {
-
 		if ($request['ACTION'] === 'SearchOuter') {
 			return ['SearchOuter'];
 		}
 
 		$actions = [];
-		$actions[] = $request['ACTION'];
-		$actions[] = (!empty($request['ID']) or isset($request['NEW'])) ? 'Element' : 'Section';
-		return $actions;
+
+		$actions += $request['ACTION'] ? [$request['ACTION']] : [];
+
+		if (isset($request['NEW'])) {
+			return $actions + ['CreateForm'];
+		}
+
+		if (!empty($request['ID'])) {
+			return $actions + ['UpdateForm'];
+		}
+
+		return $actions + ['Section'];
 	}
 
 	public function Section(
@@ -122,33 +130,44 @@ class Adminer extends \System\Unit {
 		return $link;
 	}
 
-	public function Element($ID = null, $FILTER = [], $FIELDS = []) {
+	public function CreateForm($FILTER = [], $FIELDS = []) {
+		$R['MODE'] = 'Create';
 
-		$FILTER = $this->PARAMS['RESTRICTIONS'] + $FILTER;
+		$R['DATA'] = $this->PARAMS['RESTRICTIONS'] + $FILTER + $this->GetDefaultValues() + $FIELDS;
+
 		$R['BACK'] = $this->GetBackLink();
-
-		if ($ID === null) {
-			$R['MODE'] = 'Create';
-			$R['DATA'] = $FILTER + $this->GetDefaultValues() + $FIELDS;
-			$this->ENGINE->AddBreadcrumb("Добавление элемента");
-			$R['TABS'] = $this->GetTabsOfCreate();
-		} else {
-			$R['MODE'] = 'Update';
-			$filter = $this->PARAMS['RESTRICTIONS'] + ['ID' => $ID];
-			$R['DATA'] = $this->SCRUD->Read($filter);
-			if (empty($R['DATA'])) {
-				throw new Exception("Элемент не найден");
-			}
-			$this->ENGINE->AddBreadcrumb("Редактирование элемента №{$ID}");
-			$R['TABS'] = $this->GetTabsOfUpdate();
-		}
+		$R['TABS'] = $this->GetTabsOfCreate();
 
 		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
 			$this->SCRUD->structure[$code]['DISABLED'] = true;
 		}
 
+		$this->ENGINE->AddBreadcrumb("Добавление элемента");
+		$this->view = 'element';
 		return $R;
 	}
+
+	public function UpdateForm($ID = null, $FIELDS = []) {
+		$R['MODE'] = 'Update';
+
+		$R['DATA'] = $this->SCRUD->Read($this->PARAMS['RESTRICTIONS'] + ['ID' => $ID]);
+		if (empty($R['DATA'])) {
+			throw new Exception("Элемент не найден");
+		}
+		$R['DATA'] = $FIELDS + $R['DATA'];
+
+		$R['BACK'] = $this->GetBackLink();
+		$R['TABS'] = $this->GetTabsOfUpdate();
+
+		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
+			$this->SCRUD->structure[$code]['DISABLED'] = true;
+		}
+
+		$this->ENGINE->AddBreadcrumb("Редактирование элемента №{$ID}");
+		$this->view = 'element';
+		return $R;
+	}
+
 
 	public function Create($FIELDS = [], $REDIRECT = 'Stay') {
 		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
@@ -169,8 +188,10 @@ class Adminer extends \System\Unit {
 	}
 
 	private function GetLinkForRedirect($ID, $REDIRECT) {
+		$get = $_GET;
+		unset($get['NEW']);
 		$variants = [
-			'Stay' => '?' . http_build_query(array_merge($_GET, ['ID' => $ID])),
+			'Stay' => '?' . http_build_query(array_merge($get, ['ID' => $ID])),
 			'Back' => $this->GetBackLink(),
 			'New'  => "?NEW",
 		];
