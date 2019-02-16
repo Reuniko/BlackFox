@@ -20,4 +20,26 @@ class TypeArray extends TypeText {
 		return $element;
 	}
 
+	public function PrintValue($value) {
+		echo '<pre>';
+		print_r($value);
+		echo '</pre>';
+	}
+
+	public function PrintFormControl($value, $name, $class = 'form-control') {
+		?>
+		<textarea
+			class="<?= $class ?>"
+			id="<?= $name ?>"
+			name="<?= $name ?>"
+			disabled="disabled"
+			rows="5"
+		><? print_r($value) ?></textarea>
+		<?
+	}
+
+	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
+
+	}
+
 }
