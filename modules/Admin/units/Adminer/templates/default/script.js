@@ -131,5 +131,19 @@ $(function () {
         ;
     });
 
+    $('[data-outer-multiple]').click(function () {
+        $(this)
+            .closest('[data-outer]')
+            .removeClass('d-flex')
+            .addClass('d-none')
+
+            .siblings('[data-outer-multiple]')
+            .removeClass('d-none')
+
+            .find('select')
+            .prop('disabled', false)
+        ;
+    });
+
 
 });

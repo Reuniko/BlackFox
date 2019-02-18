@@ -128,29 +128,92 @@ class TypeOuter extends Type {
 	}
 
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
+
 		/** @var \System\SCRUD $Link */
 		$Link = $this->info['LINK']::I();
 		$code = $this->info['CODE'];
 		$IDs = $filter[$code];
-		$elements = $Link->GetList([
+
+		if (is_array($IDs) and count($IDs) === 1) {
+			$IDs = reset($IDs);
+		}
+
+		$elements = !empty($IDs) ? $Link->GetList([
 			'FILTER' => ['ID' => $IDs],
 			'FIELDS' => ['@'],
-		]);
+		]) : [];
+
 		?>
-		<select
-			class="form-control"
-			name="<?= $group ?>[<?= $code ?>][]"
-			data-type="OUTER"
-			data-code="<?= $code ?>"
-			multiple="multiple"
+
+		<? if (!is_array($IDs)): ?>
+			<div
+				class="d-flex flex-fill"
+				data-outer=""
+			>
+
+				<button
+					type="button"
+					class="btn btn-secondary flex-shrink-1"
+					data-outer-multiple=""
+					title="Выбрать несколько"
+				>
+					<i class="fa fa-ellipsis-h"></i>
+				</button>
+
+				<div class="flex-grow-1">
+					<select
+						class="form-control"
+						name="<?= $group ?>[<?= $code ?>]"
+						data-type="OUTER"
+						data-code="<?= $code ?>"
+					>
+						<? if (!empty($elements)): ?>
+							<? $element = reset($elements); ?>
+							<option
+								value="<?= $element['ID'] ?>"
+								selected="selected"
+							><?= $Link->GetElementTitle($element) ?></option>
+						<? endif; ?>
+					</select>
+				</div>
+
+				<button
+					type="button"
+					class="btn btn-secondary flex-shrink-1"
+					data-outer-clean=""
+					title="Очистить"
+				>
+					<i class="fa fa-eraser"></i>
+				</button>
+
+
+			</div>
+		<? endif; ?>
+
+		<div
+			<? if (!is_array($IDs)): ?>
+				class="d-none"
+			<? endif; ?>
+			data-outer-multiple=""
 		>
-			<? foreach ($elements as $element): ?>
-				<option
-					value="<?= $element['ID'] ?>"
-					selected="selected"
-				><?= $Link->GetElementTitle($element) ?></option>
-			<? endforeach; ?>
-		</select>
+			<select
+				class="form-control d-none"
+				name="<?= $group ?>[<?= $code ?>][]"
+				data-type="OUTER"
+				data-code="<?= $code ?>"
+				multiple="multiple"
+				<? if (!is_array($IDs)): ?>
+					disabled="disabled"
+				<? endif; ?>
+			>
+				<? foreach ($elements as $element): ?>
+					<option
+						value="<?= $element['ID'] ?>"
+						selected="selected"
+					><?= $Link->GetElementTitle($element) ?></option>
+				<? endforeach; ?>
+			</select>
+		</div>
 		<?
 	}
 }
