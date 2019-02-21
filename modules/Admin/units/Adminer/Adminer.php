@@ -57,19 +57,17 @@ class Adminer extends \System\Unit {
 			return ['SearchOuter'];
 		}
 
-		$actions = [];
-
-		$actions += $request['ACTION'] ? [$request['ACTION']] : [];
+		$actions = $request['ACTION'] ? [$request['ACTION']] : [];
 
 		if (isset($request['NEW'])) {
-			return $actions + ['CreateForm'];
+			return array_merge($actions, ['CreateForm']);
 		}
 
 		if (!empty($request['ID'])) {
-			return $actions + ['UpdateForm'];
+			return array_merge($actions, ['UpdateForm']);
 		}
 
-		return $actions + ['Section'];
+		return array_merge($actions, ['Section']);
 	}
 
 	public function Section(
