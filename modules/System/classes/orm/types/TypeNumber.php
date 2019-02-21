@@ -13,6 +13,12 @@ class TypeNumber extends Type {
 		return (int)$value;
 	}
 
+	public function FormatOutputValue($element) {
+		return $element;
+		// TODO convert to integer (if not null)
+		// $element[$this->info['CODE']] = (int)$element[$this->info['CODE']];
+	}
+
 	public function PrintFormControl($value, $name, $class = 'form-control') {
 		?>
 		<input

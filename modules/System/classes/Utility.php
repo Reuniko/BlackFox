@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 
 class Utility extends Instanceable {
@@ -53,5 +54,17 @@ class Utility extends Instanceable {
 			$name = "[ID:{$user['ID']}]";
 		}
 		return $name;
+	}
+
+	/**
+	 * Если передан массив - возвращает из него значение идентификатора,
+	 * в ином случае - возвращает то что было передано
+	 *
+	 * @param array|string|int $element_or_id элемент или идентификатор
+	 * @param string $key символьный код идентификатора, не обязательно, по умолчанию - 'ID'
+	 * @return string|int
+	 */
+	public static function GetID($element_or_id, $key = 'ID') {
+		return is_array($element_or_id) ? $element_or_id[$key] : $element_or_id;
 	}
 }
