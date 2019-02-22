@@ -15,6 +15,7 @@
 			<div class="card-header">Фильтр</div>
 			<div class="card-body" id="filter">
 				<? foreach ($RESULT['STRUCTURE']['FILTERS'] as $code => $field): ?>
+					<? if (!isset($this->SCRUD->structure[$code])) continue; ?>
 					<div class="form-group row">
 						<label
 							class="col-sm-3 col-form-label text-sm-right"

@@ -90,6 +90,11 @@ abstract class SCRUD extends Instanceable {
 	 */
 	public function ProvideIntegrity() {
 
+		foreach ($this->structure as $code => $info) {
+			$info['CODE'] = $code;
+			$this->structure[$code] = FactoryType::I()->Get(is_object($info) ? $info->info : $info);
+		}
+
 		$this->composition = [];
 		$this->keys = [];
 
@@ -124,7 +129,6 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		// Auto-completion of LINK attributes without namespaces
-		// TODO move inside structure
 		foreach ($this->structure as $code => &$info) {
 			if (!empty($info['LINK']) && !class_exists($info['LINK'])) {
 				$link_namespace = (new \ReflectionClass($this))->getNamespaceName();
@@ -136,16 +140,6 @@ abstract class SCRUD extends Instanceable {
 				}
 			}
 		}
-
-		$structure = $this->structure;
-		unset($this->structure);
-
-		foreach ($structure as $code => &$info) {
-			$info['CODE'] = $code;
-			$this->structure[$code] = FactoryType::I()->Get($info);
-		}
-
-		unset($structure);
 	}
 
 	/**

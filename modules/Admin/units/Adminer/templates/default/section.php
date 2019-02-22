@@ -32,15 +32,14 @@
 
 		<table id="data" class="table table-bordered table-hover table-responsive-sm">
 			<tr>
-				<? if ($RESULT['MODE'] <> 'POPUP'): ?>
-					<th class="sort" width="1%"><span></span></th>
-				<? endif; ?>
+				<th class="sort" width="1%"><span></span></th>
 				<?
 				$get = $_GET;
 				unset($get['SORT']);
 				$url = $this->SanitizeUrl('?' . http_build_query($get));
 				?>
 				<? foreach ($RESULT['STRUCTURE']['FIELDS'] as $structure_code => $field): ?>
+					<? if (!isset($this->SCRUD->structure[$structure_code])) continue; ?>
 					<?
 					$direction = (($_GET['SORT'][$structure_code] === 'ASC') ? 'DESC' : 'ASC');
 					$sort_href = $url . "&SORT[{$structure_code}]={$direction}";
@@ -79,19 +78,8 @@
 			<? endif; ?>
 			<? foreach ($RESULT['DATA']['ELEMENTS'] as $row): ?>
 				<?
-				// $href = "?ID={$row['ID']}";
 				$href = '?' . http_build_query(array_merge($_GET, ['ID' => $row['ID']]));
 				$ondblclick = "window.location.href='{$href}'";
-
-				if ($RESULT['MODE'] === 'POPUP') {
-					$script = "$(window.opener.document)
-						.find('[data-link-input=\'{$RESULT['POPUP']}\']').val('{$row['ID']}').end()
-						.find('[data-link-a=\'{$RESULT['POPUP']}\']').attr('href', '{$this->SCRUD->GetAdminUrl()}?ID={$row['ID']}').end()
-						.find('[data-link-span=\'{$RESULT['POPUP']}\']').val('{$this->SCRUD->GetElementTitle($row)}').end()
-						;window.close();";
-					$href = "javascript:{$script}";
-					$ondblclick = $script;
-				}
 				?>
 				<tr ondblclick="<?= $ondblclick ?>">
 					<? if ($RESULT['MODE'] <> 'POPUP'): ?>
@@ -104,6 +92,7 @@
 						</td>
 					<? endif; ?>
 					<? foreach ($RESULT['STRUCTURE']['FIELDS'] as $code => $field): ?>
+						<? if (!isset($this->SCRUD->structure[$code])) continue; ?>
 						<td>
 							<div class="table-content table-content-<?= $this->SCRUD->structure[$code]['TYPE'] ?>">
 								<?
