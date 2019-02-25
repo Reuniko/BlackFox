@@ -176,3 +176,21 @@
 .adminer .select2-container--bootstrap .select2-selection--multiple .select2-search--inline .select2-search__field {
 	margin: 2px;
 }
+
+/* list of element, separated by comma */
+.adminer ul.comma {
+	margin: 0;
+	padding: 0;
+}
+
+.adminer ul.comma li {
+	display: inline;
+}
+
+.adminer ul.comma li:after {
+	content: ", ";
+}
+
+.adminer ul.comma li:last-child:after {
+	content: "";
+}
