@@ -345,7 +345,7 @@ abstract class Unit {
 	}
 
 	public function GetRequest() {
-		return array_merge_recursive($_REQUEST, $this->_files());
+		return array_merge_recursive($_REQUEST, $this->ConvertFilesStructure($_FILES));
 	}
 
 	/**
@@ -447,33 +447,46 @@ abstract class Unit {
 
 	/**
 	 * Корректирует неадекватную структуру суперглобального массива $_FILES.
-	 * Возвращает строго упорядоченный на два уровня массив пришедших файлов.
-	 * Файлы, пришедшие со статусом ошибки №4 (файл не приложен) отсеиваются.
+	 * Возвращает рекурсивно упорядоченный массив пришедших файлов.
 	 *
-	 * @global array $_FILES
-	 * @return array пришедшие файлы
-	 * @todo упорядочивать на неограниченную вложенность
+	 * @param array $input ожидается массив $_FILES
+	 * @return array массив со скорректированной структурой
 	 */
-	private function _files() {
-		$files = [];
-		foreach ($_FILES as $code1 => $file) {
-			if (!is_array($file['name'])) {
-				$files[$code1] = $file;
-			} else {
-				foreach ($_FILES[$code1]['name'] as $code2 => $crap) {
-					if (empty($_FILES[$code1]['error'][$code2])) {
-						$files[$code1][$code2] = [
-							'name'     => $_FILES[$code1]['name'][$code2],
-							'type'     => $_FILES[$code1]['type'][$code2],
-							'tmp_name' => $_FILES[$code1]['tmp_name'][$code2],
-							'error'    => $_FILES[$code1]['error'][$code2],
-							'size'     => $_FILES[$code1]['size'][$code2],
-						];
-					}
-				}
-			}
+	private function ConvertFilesStructure($input) {
+		$output = [];
+		foreach ($input as $key => $file) {
+			$output[$key] = $this->ConvertFilesStructureRecursive(
+				$file['name'],
+				$file['type'],
+				$file['tmp_name'],
+				$file['error'],
+				$file['size']
+			);
 		}
-		return $files;
+		return $output;
+	}
+
+	private function ConvertFilesStructureRecursive($name, $type, $tmp_name, $error, $size) {
+		if (!is_array($name)) {
+			return [
+				'name'     => $name,
+				'type'     => $type,
+				'tmp_name' => $tmp_name,
+				'error'    => $error,
+				'size'     => $size,
+			];
+		}
+		$output = [];
+		foreach ($name as $key => $_crap) {
+			$output[$key] = $this->ConvertFilesStructureRecursive(
+				$name[$key],
+				$type[$key],
+				$tmp_name[$key],
+				$error[$key],
+				$size[$key]
+			);
+		}
+		return $output;
 	}
 
 	/**
