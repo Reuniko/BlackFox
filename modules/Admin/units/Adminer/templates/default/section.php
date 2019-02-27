@@ -41,7 +41,7 @@
 				<? foreach ($RESULT['STRUCTURE']['FIELDS'] as $structure_code => $field): ?>
 					<? if (!isset($this->SCRUD->structure[$structure_code])) continue; ?>
 					<?
-					$direction = (($_GET['SORT'][$structure_code] === 'ASC') ? 'DESC' : 'ASC');
+					$direction = (($RESULT['SORT'][$structure_code] === 'ASC') ? 'DESC' : 'ASC');
 					$sort_href = $url . "&SORT[{$structure_code}]={$direction}";
 					$is_numeric = in_array($field['TYPE'], [
 						'NUMBER',
@@ -50,14 +50,14 @@
 					]);
 					$icon_class = $is_numeric ? 'numeric' : 'alpha';
 					?>
-					<th class="sort<?= isset($_GET['SORT'][$structure_code]) ? ' active' : '' ?>">
+					<th class="sort<?= isset($RESULT['SORT'][$structure_code]) ? ' active' : '' ?>">
 						<a href="<?= $sort_href ?>">
-							<? if ($_GET['SORT'][$structure_code]): ?>
+							<? if ($RESULT['SORT'][$structure_code]): ?>
 								<div class="sort-icon">
-									<? if ($_GET['SORT'][$structure_code] === 'ASC'): ?>
+									<? if ($RESULT['SORT'][$structure_code] === 'ASC'): ?>
 										<i class="fa fa-sort-<?= $icon_class ?>-down"></i>
 									<? endif; ?>
-									<? if ($_GET['SORT'][$structure_code] === 'DESC'): ?>
+									<? if ($RESULT['SORT'][$structure_code] === 'DESC'): ?>
 										<i class="fa fa-sort-<?= $icon_class ?>-up"></i>
 									<? endif; ?>
 								</div>
