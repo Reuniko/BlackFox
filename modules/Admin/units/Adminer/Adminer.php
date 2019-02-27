@@ -81,6 +81,7 @@ class Adminer extends \System\Unit {
 		$FILTER = $this->PARAMS['RESTRICTIONS'] + $FILTER;
 
 		$R['FILTER'] = $FILTER;
+		$R['SORT'] = $SORT;
 		$R['SETTINGS'] = $this->LoadTableSettings();
 		$R['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractStructure($R['SETTINGS']['FILTERS']);
 		$R['STRUCTURE']['FIELDS'] = $this->SCRUD->ExtractStructure($R['SETTINGS']['FIELDS']);
