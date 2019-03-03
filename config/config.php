@@ -15,11 +15,12 @@ $CONFIG = [
 		'PORT'     => '3306',
 		'USER'     => 'root',
 		'PASSWORD' => '',
-		'DATABASE' => 'tigris',
+		'DATABASE' => 'blackfox',
 	],
 	'template'  => 'bootstrap',
 	'redirects' => [
 		// 'System\\Engine' => '<your namespace>\\Engine',
+		'System\Database' => 'System\DatabaseDriverMySQL',
 	],
 ];
 return $CONFIG;
