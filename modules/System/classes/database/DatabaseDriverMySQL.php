@@ -48,6 +48,9 @@ class DatabaseDriverMySQL extends Database {
 	}
 
 	public function Escape($data) {
+		if (is_null($data)) {
+			return null;
+		}
 		return mysqli_real_escape_string($this->link, $data);
 	}
 }
