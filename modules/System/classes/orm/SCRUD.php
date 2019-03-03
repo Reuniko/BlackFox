@@ -539,7 +539,11 @@ abstract class SCRUD extends Instanceable {
 		}
 		if ($hasInformation) {
 			$value = $this->_formatFieldValue($code, $value);
-			$set = "`{$code}` = '{$value}'";
+			if (!is_null($value)) {
+				$set = "`{$code}` = '{$value}'";
+			} else {
+				$set = "`{$code}` = NULL";
+			}
 		} else {
 			$set = "`{$code}` = NULL";
 		}
