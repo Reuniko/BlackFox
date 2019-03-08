@@ -34,7 +34,7 @@ abstract class SCRUD extends Instanceable {
 	/** @var string символьный код таблицы, формируется автоматически, возможно переопределить */
 	public $code;
 
-	/** @var mixed массив полей базы данных, поле может быть массивом или объектом Type */
+	/** @var Type[] массив полей базы данных */
 	public $structure = [];
 	/** @var array массив групп полей базы данных */
 	public $groups = [];
@@ -42,6 +42,8 @@ abstract class SCRUD extends Instanceable {
 	public $composition = [];
 	/** @var array массив первичных ключей, формируется автоматически */
 	public $keys = [];
+	/** @var string код авто-прирастающего поля */
+	public $increment = null;
 
 	/**
 	 * Идентификатор
@@ -102,6 +104,9 @@ abstract class SCRUD extends Instanceable {
 			if ($field['PRIMARY']) {
 				$this->keys[] = $code;
 			}
+			if ($field['AUTO_INCREMENT']) {
+				$this->increment = $code;
+			}
 			if (empty($field['GROUP'])) {
 				$this->structure[$code]['GROUP'] = 'OUTSIDE';
 				$this->groups['OUTSIDE'] = $this->groups['OUTSIDE'] ?: '-';
@@ -159,114 +164,7 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception
 	 */
 	public function Synchronize($strict = false) {
-		if (empty($this->structure)) {
-			throw new Exception("Synchronize of '{$this->code}' failed: structure is empty");
-		}
-		$tables = $this->Query("SHOW TABLES LIKE '{$this->code}'");
-		$this->structure = $this->FormatArrayKeysCase($this->structure);
-
-		if (empty($tables)) {
-			$this->SQL = "CREATE TABLE IF NOT EXISTS `{$this->code}` \r\n";
-			$rows = [];
-			foreach ($this->structure as $code => $field) {
-				try {
-					$rows[] = $this->structure[$code]->GetStructureString();
-				} catch (\Exception $error) {
-					continue;
-				}
-			}
-			if (!empty($this->keys)) {
-				$rows[] = "PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
-			}
-			$this->SQL = $this->SQL . "(" . implode(",\r\n", $rows) . ");";
-			$this->Query($this->SQL);
-		} else {
-			$columns = $this->Query("SHOW FULL COLUMNS FROM " . $this->code, 'Field');
-			$columns = $this->FormatArrayKeysCase($columns);
-			$this->SQL = "ALTER TABLE `{$this->code}` \r\n";
-			$rows = [];
-			$last_after_code = '';
-			foreach ($this->structure as $code => $field) {
-				try {
-					$structure_string = $this->structure[$code]->GetStructureString();
-				} catch (\Exception $error) {
-					continue;
-				}
-				if ($strict && !empty($last_after_code)) {
-					$structure_string .= " AFTER {$last_after_code}";
-				}
-				if (!empty($columns[$code])) {
-					$rows[] = "MODIFY COLUMN $structure_string";
-				} elseif (!empty($field['CHANGE']) && !empty($columns[$field['CHANGE']])) {
-					$rows[] = "CHANGE COLUMN `{$field['CHANGE']}` $structure_string";
-					unset($columns[$field['CHANGE']]);
-				} else {
-					$rows[] = "ADD COLUMN $structure_string";
-				}
-				$last_after_code = $code;
-				unset($columns[$code]);
-			}
-			if ($strict) {
-				foreach ($columns as $code => $column) {
-					$rows[] = "DROP COLUMN `{$code}`";
-				}
-			}
-			if (!empty($this->keys)) {
-				$rows[] = "DROP PRIMARY KEY, ADD PRIMARY KEY (`" . implode("`, `", $this->keys) . "`)";
-			}
-			$this->SQL = $this->SQL . implode(",\r\n", $rows) . ";";
-			$this->Query($this->SQL);
-		}
-
-		$indexes = $this->Query("SHOW INDEX FROM `{$this->code}`", 'Column_name');
-		foreach ($this->structure as $code => $field) {
-			if (in_array($code, $this->keys)) {
-				continue;
-			}
-			if ($field['UNIQUE']) {
-				$field['INDEX'] = true;
-			}
-			if ($field['INDEX'] === 'UNIQUE') {
-				$field['INDEX'] = true;
-				$field['UNIQUE'] = true;
-			}
-			$unique = ($field['UNIQUE']) ? 'UNIQUE' : '';
-			$index = $indexes[$code];
-
-			// в базе есть, в коде нет - удалить
-			if (isset($index) && !$field['INDEX']) {
-				$this->Query("ALTER TABLE `{$this->code}` DROP INDEX `{$code}`;");
-				continue;
-			}
-
-			// в базе нет, в коде есть - добавить
-			if (($field['INDEX']) && (!isset($index))) {
-				$this->Query("ALTER TABLE `{$this->code}` ADD {$unique} INDEX `{$code}` (`{$code}`);");
-				continue;
-			}
-
-			// в базе есть, в коде есть - уточнение уникальности индекса
-			if (isset($index)) {
-				if (($field['UNIQUE'] && $index['Non_unique']) || (!$field['UNIQUE'] && !$index['Non_unique'])) {
-					$this->Query("ALTER TABLE `{$this->code}` DROP INDEX `{$code}`, ADD {$unique} INDEX `{$code}` (`{$code}`);");
-					continue;
-				}
-			}
-		}
-	}
-
-	public function CompileSQLSelect(array $parts) {
-		$SQL = [];
-		$SQL[] = 'SELECT';
-		if ($parts['LIMIT']) $SQL[] = 'SQL_CALC_FOUND_ROWS';
-		$SQL[] = implode(",\r\n", $parts['SELECT']);
-		$SQL[] = "FROM {$this->code}";
-		$SQL[] = implode("\r\n", $parts['JOIN']);
-		if ($parts['WHERE']) $SQL[] = "WHERE " . implode("\r\nAND ", $parts['WHERE']);
-		if ($parts['GROUP']) $SQL[] = "GROUP BY " . implode(", ", $parts['GROUP']);
-		if ($parts['ORDER']) $SQL[] = "ORDER BY " . implode(", ", $parts['ORDER']);
-		if ($parts['LIMIT']) $SQL[] = "LIMIT {$parts['LIMIT']['FROM']}, {$parts['LIMIT']['COUNT']}";
-		return implode("\r\n", $SQL);
+		$this->DB->SynchronizeTable($this->code, $this->structure);
 	}
 
 	/**
@@ -299,7 +197,8 @@ abstract class SCRUD extends Instanceable {
 		];
 		try {
 			$defParams['KEY'] = $this->key();
-			$defParams['GROUP'] = [$this->key()];
+			// TODO test selects with group
+			// $defParams['GROUP'] = [$this->key()];
 			$defParams['SORT'] = [$this->key() => 'DESC'];
 		} catch (Exception $error) {
 			$defParams['KEY'] = null;
@@ -318,6 +217,7 @@ abstract class SCRUD extends Instanceable {
 
 		// compile parts
 		$this->parts = [
+			'TABLE'  => $this->code,
 			'SELECT' => [],
 			'JOIN'   => [],
 			'WHERE'  => [],
@@ -347,7 +247,7 @@ abstract class SCRUD extends Instanceable {
 			];
 		}
 
-		$this->SQL = $this->CompileSQLSelect($this->parts);
+		$this->SQL = $this->DB->CompileSQLSelect($this->parts);
 
 		$result["ELEMENTS"] = $this->Query($this->SQL, $arParams['KEY']);
 
@@ -363,7 +263,8 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		if ($arParams['LIMIT'] > 1) {
-			$result['PAGER']['TOTAL'] = (int)reset(reset($this->Query('SELECT FOUND_ROWS() as TOTAL;')));
+			// TODO get key TOTAL
+			// $result['PAGER']['TOTAL'] = (int)reset(reset($this->Query('SELECT FOUND_ROWS() as TOTAL;')));
 			$result['PAGER']['CURRENT'] = $arParams['PAGE'];
 			$result['PAGER']['LIMIT'] = $arParams['LIMIT'];
 			$result['PAGER']['SELECTED'] = count($result['ELEMENTS']);
@@ -436,7 +337,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return array|false ассоциативный массив, представляющий собой элемент
 	 * @throws Exception
 	 */
-	public function Read($filter = [], $fields = ['*@'], $sort = [], $escape = false) {
+	public function Read($filter = [], $fields = ['*@'], $sort = [], $escape = true) {
 		$arParams = [
 			"FILTER" => $filter,
 			"FIELDS" => $fields,
@@ -468,6 +369,7 @@ abstract class SCRUD extends Instanceable {
 	 * @param string $field символьный код выбираемой колонки (не обязательно, по умолчанию - идентификатор)
 	 * @return array массив идентификаторов элементов
 	 * @throws Exception
+	 * @todo Reorder params: filter, field, sort, escape
 	 */
 	public function Select($filter = [], $sort = [], $field = null) {
 		if (is_null($field)) {
@@ -540,12 +442,12 @@ abstract class SCRUD extends Instanceable {
 		if ($hasInformation) {
 			$value = $this->_formatFieldValue($code, $value);
 			if (!is_null($value)) {
-				$set = "`{$code}` = '{$value}'";
+				$set = $this->DB->Quote($code) . " = '{$value}'";
 			} else {
-				$set = "`{$code}` = NULL";
+				$set = $this->DB->Quote($code) . " = NULL";
 			}
 		} else {
-			$set = "`{$code}` = NULL";
+			$set = $this->DB->Quote($code) . " = NULL";
 		}
 		return $set;
 	}
@@ -572,10 +474,10 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Создает новую строку в таблице и возвращает ее идентификатор
+	 * Создает новую строку в таблице и возвращает ее идентификатор(ы)
 	 *
 	 * @param array $fields ассоциативный массив полей для новой строки
-	 * @return int идентификатор созданной записи
+	 * @return int|string|array идентификатор(ы) созданной записи
 	 * @throws Exception
 	 */
 	public function Create($fields) {
@@ -588,10 +490,8 @@ abstract class SCRUD extends Instanceable {
 
 		if (empty($fields)) {
 			$this->SQL = "INSERT INTO {$this->code} VALUES ()";
-			return $this->Query($this->SQL);
+			return $this->DB->QuerySingleInsert($this->SQL);
 		}
-
-		$this->SQL = "INSERT INTO {$this->code} SET ";
 
 		$errors = [];
 		$is_root = User::I()->InGroup('root');
@@ -607,14 +507,19 @@ abstract class SCRUD extends Instanceable {
 			throw new Exception($errors);
 		}
 
-		$rows = [];
+
+		$codes = [];
+		$values = [];
+
 		foreach ($this->structure as $code => $field) {
 			if (array_key_exists($code, $fields)) {
-				$rows[] = $this->_prepareSet($code, $fields[$code]);
+				$codes[] = $this->DB->Quote($code);
+				$value = $this->_formatFieldValue($code, $fields[$code]);
+				$values[] = is_null($value) ? 'NULL' : "'{$value}'";
 			}
 		}
-		$this->SQL .= implode(", ", $rows);
-		$ID = $this->Query($this->SQL);
+		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ') VALUES (' . implode(', ', $values) . ')';
+		$ID = $this->DB->QuerySingleInsert($this->SQL, $this->increment);
 		return $ID;
 	}
 
@@ -691,7 +596,7 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		$answer = $this->PrepareWhereAndJoinByFilter($filter);
-		$this->SQL = "DELETE FROM `{$this->code}` WHERE " . implode(' AND ', $answer['WHERE']);
+		$this->SQL = "DELETE FROM {$this->code} WHERE " . implode(' AND ', $answer['WHERE']);
 		$this->Query($this->SQL);
 	}
 
@@ -882,44 +787,46 @@ abstract class SCRUD extends Instanceable {
 				$value = reset($values);
 				switch ($operator) {
 					case '>>':
-						$conditions['>>'] = '>"' . $value . '"';
+						$conditions['>>'] = '>\'' . $value . '\'';
 						break;
 					case '!':
 					case '<>':
-						$conditions['<>'] = '<>"' . $value . '"';
+						$conditions['<>'] = '<>\'' . $value . '\'';
 						break;
 					case '<<':
-						$conditions['<<'] = '<"' . $value . '"';
+						$conditions['<<'] = '<\'' . $value . '\'';
 						break;
 					case '<':
-						$conditions['<'] = '<="' . $value . '"';
+						$conditions['<'] = '<=\'' . $value . '\'';
 						break;
 					case '>':
-						$conditions['>'] = '>="' . $value . '"';
+						$conditions['>'] = '>=\'' . $value . '\'';
 						break;
 					case '%':
 					case '~':
-						$conditions['%'] = ' LIKE "%' . $value . '%"';
+						$conditions['%'] = ' LIKE \'%' . $value . '%\'';
 						break;
 					default:
-						$conditions['='] = '="' . $value . '"';
+						$conditions['='] = '=\'' . $value . '\'';
 						break;
 				}
 			}
 			if (count($values) > 1) {
 				if (!empty($values)) {
-					$conditions[] = ' IN ("' . implode('", "', $values) . '")';
+					$conditions[] = ' IN (\'' . implode('\', \'', $values) . '\')';
 				}
 			}
 
-			// TODO extract this block to TypeDateTime
 			foreach ($conditions as $key => $condition) {
+
+				// TODO extract this block to TypeDateTime
 				if (($key === '%') && ($this->structure[$code]['TYPE'] === 'DATETIME')) {
 					$data = date('Y-m-d', strtotime($value));
 					$conditions[$key] = "DATE({$table}.{$code}) = '{$data}'";
 					continue;
 				}
-				$conditions[$key] = $table . "." . $code . $condition;
+
+				$conditions[$key] = $table . "." . $this->DB->Quote($code) . $condition;
 			}
 
 			$conditions = "(" . implode(' OR ', $conditions) . ")";
@@ -993,16 +900,18 @@ abstract class SCRUD extends Instanceable {
 	 *
 	 * @param array $array Массив фильтра SORT
 	 * @return array Массив с ключами ORDER BY
+	 * @throws Exception
 	 */
 	protected function _prepareOrder($array) {
 		$order = [];
 		foreach ($array as $field_path => $sort) {
+			// TODO make {RANDOM} function in SQLDrivers
 			if ('RAND()' === $field_path) {
 				$order[] = "RAND() {$sort}";
 				continue;
 			}
 			$result = $this->_treatFieldPath($field_path);
-			$order[] = "{$result['TABLE']}.`{$result['CODE']}` {$sort}";
+			$order[] = $this->DB->Quote($result['TABLE']) . '.' . $this->DB->Quote($result['CODE']) . " {$sort}";
 		}
 		return $order;
 	}
@@ -1012,12 +921,13 @@ abstract class SCRUD extends Instanceable {
 	 *
 	 * @param array $array Массив фильтра GROUP
 	 * @return array Массив с ключами GROUP BY
+	 * @throws Exception
 	 */
 	protected function _prepareGroup($array) {
 		$answer = [];
 		foreach ($array as $field_path) {
 			$result = $this->_treatFieldPath($field_path);
-			$answer[] = "{$result['TABLE']}.`{$result['CODE']}`";
+			$answer[] = $this->DB->Quote($result['TABLE']) . '.' . $this->DB->Quote($result['CODE']);
 		}
 		return $answer;
 	}
@@ -1177,7 +1087,7 @@ abstract class SCRUD extends Instanceable {
 	 * Удаляет все данные из таблицы не затрагивая структуру.
 	 */
 	public function Truncate() {
-		$this->Query("TRUNCATE TABLE `{$this->code}`");
+		$this->Query("TRUNCATE TABLE {$this->code}");
 	}
 
 	/**

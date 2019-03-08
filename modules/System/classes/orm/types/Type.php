@@ -9,6 +9,10 @@ namespace System;
  */
 abstract class Type implements \ArrayAccess {
 
+	protected function Quote($id) {
+		return Database::I()->Quote($id);
+	}
+
 	// -------------------------------------------------------------------------------------------------------------- //
 	public function offsetSet($offset, $value) {
 		if (is_null($offset)) {
@@ -46,29 +50,6 @@ abstract class Type implements \ArrayAccess {
 	}
 
 	abstract function GetStructureStringType();
-
-
-	public function GetStructureString() {
-		$type = $this->GetStructureStringType();
-
-		$null = ($this->info["NOT_NULL"] || $this->info['PRIMARY']) ? "NOT NULL" : "NULL";
-
-		$default = "";
-		if ($this->info['DEFAULT']) {
-			if (is_array($this->info['DEFAULT'])) {
-				$this->info['DEFAULT'] = implode(',', $this->info['DEFAULT']);
-			}
-			$default = "DEFAULT '{$this->info['DEFAULT']}'";
-		}
-
-		$auto_increment = ($this->info["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
-
-		$comment = ($this->info["NAME"]) ? " COMMENT '{$this->info["NAME"]}'" : "";
-
-		$structure_string = "`{$this->info['CODE']}` $type $null $default $auto_increment $comment";
-
-		return $structure_string;
-	}
 
 	/**
 	 * Format input value from user to save into database.
@@ -113,7 +94,7 @@ abstract class Type implements \ArrayAccess {
 	 */
 	public function PrepareSelectAndJoinByField($table, $prefix, $subfields) {
 		$code = $this->info['CODE'];
-		$select["{$prefix}{$code}"] = "{$prefix}{$table}.`{$code}` as `{$prefix}{$code}`";
+		$select["{$prefix}{$code}"] = "{$prefix}{$table}" . "." . $this->Quote("{$code}") . " as " . $this->Quote("{$prefix}{$code}");
 		return ['SELECT' => $select];
 	}
 
@@ -175,7 +156,7 @@ abstract class Type implements \ArrayAccess {
 				name="<?= $name ?>"
 				value="<?= $value ?>"
 				disabled="disabled"
-			>
+			/>
 		<? endif; ?>
 		<?
 	}
@@ -198,7 +179,7 @@ abstract class Type implements \ArrayAccess {
 			name="<?= $group ?>[<?= $code ?>]"
 			value="<?= $filter[$code] ?>"
 			disabled="disabled"
-		>
+		/>
 		<?
 	}
 }

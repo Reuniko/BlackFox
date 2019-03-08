@@ -35,7 +35,7 @@ class TypeOuter extends Type {
 		$raw_link_code = $external_prefix . $Link->code;
 
 		$RESULT = $Link->PrepareSelectAndJoinByFields($subfields, $external_prefix);
-		$join = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}.{$code} = {$raw_link_code}.{$Link->key()}";
+		$join = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}." . $this->Quote($code) . " = {$raw_link_code}." . $this->Quote($Link->key());
 		$RESULT['JOIN'] = array_merge(
 			[$raw_link_code => $join],
 			$RESULT['JOIN']
@@ -53,7 +53,7 @@ class TypeOuter extends Type {
 		$target_alias = $prefix . $this->info['CODE'] . '__' . $Target->code;
 		$target_key = $Target->key();
 
-		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}.{$current_key} = {$target_alias}.{$target_key}";
+		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
 		return [$target_alias => $statement];
 	}
 
@@ -71,7 +71,7 @@ class TypeOuter extends Type {
 	}
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
-		// TODO move to Adminer
+		// TODO move to Adminer ?
 		/** @var \System\SCRUD $Link */
 		$Link = $this->info['LINK']::I();
 		$code = $this->info['CODE'];

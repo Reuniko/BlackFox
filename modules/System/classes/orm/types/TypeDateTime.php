@@ -6,7 +6,7 @@ class TypeDateTime extends Type {
 	public static $TYPE = 'DATETIME';
 
 	public function GetStructureStringType() {
-		return 'datetime';
+		return 'timestamp';
 	}
 
 	public function FormatInputValue($value) {
@@ -24,6 +24,8 @@ class TypeDateTime extends Type {
 		return $element;
 	}
 
+	/*
+	 * // TODO replicate somewhere ?
 	public function GetStructureString() {
 		$string = parent::GetStructureString();
 		if ($this->info['TRIGGER'] === 'CREATE') {
@@ -34,6 +36,7 @@ class TypeDateTime extends Type {
 		}
 		return $string;
 	}
+	*/
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
 		?>
