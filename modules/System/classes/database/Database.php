@@ -15,6 +15,8 @@ abstract class Database extends Instanceable {
 	 */
 	abstract public function Query($SQL, $key = null);
 
+	abstract public function QuerySingleInsert($SQL, $increment = null);
+
 	/**
 	 * Process data escape before insert it into SQL query
 	 *
@@ -22,6 +24,8 @@ abstract class Database extends Instanceable {
 	 * @return string
 	 */
 	abstract public function Escape($data);
+
+	abstract public function Quote($data);
 
 	public function StartTransaction() {
 		$this->Query('START TRANSACTION');
@@ -34,4 +38,14 @@ abstract class Database extends Instanceable {
 	public function Commit() {
 		$this->Query('COMMIT');
 	}
+
+	/**
+	 * @param $table
+	 * @param $structure
+	 * @return mixed
+	 * @throws Exception
+	 */
+	abstract public function SynchronizeTable($table, $structure);
+
+	abstract public function CompileSQLSelect(array $parts);
 }
