@@ -115,7 +115,7 @@ class TestCache extends Test {
 	}
 
 	public function TestPutAndGetObject() {
-		$random_user_id = \System\Users::I()->Read([], ['ID'], ['RAND()' => 'ASC'])['ID'];
+		$random_user_id = \System\Users::I()->Read([], ['ID'], ['{RANDOM}' => 'ASC'])['ID'];
 		$value = new \System\User($random_user_id);
 		$this->CACHE->Put('test_object', $value);
 		$result = $this->CACHE->Get('test_object');

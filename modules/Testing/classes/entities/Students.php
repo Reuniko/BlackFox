@@ -36,7 +36,7 @@ class Students extends \System\SCRUD {
 			$this->Create([
 				'FIRST_NAME' => $names[array_rand($names)],
 				'LAST_NAME'  => $lasts[array_rand($lasts)] . '.',
-				'GRADE'      => Grades::I()->Pick([], ['RAND()' => 'ASC']),
+				'GRADE'      => Grades::I()->Pick([], ['{RANDOM}' => 'ASC']),
 			]);
 		}
 	}
