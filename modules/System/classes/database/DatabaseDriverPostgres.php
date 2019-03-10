@@ -35,9 +35,9 @@ class DatabaseDriverPostgres extends Database {
 	}
 
 	public function Query($SQL, $key = null) {
-		$result = pg_query($this->link, $SQL);
+		@$result = pg_query($this->link, $SQL);
 		if ($result === false) {
-			throw new ExceptionSQL(pg_last_error($this->link) . $SQL, $SQL);
+			throw new ExceptionSQL(pg_last_error($this->link), $SQL);
 		}
 		$data = [];
 		while ($row = pg_fetch_assoc($result)) {
@@ -65,6 +65,44 @@ class DatabaseDriverPostgres extends Database {
 		return 'random()';
 	}
 
+	public function GetStructureStringType(Type $Info) {
+		if (empty($Info['TYPE'])) {
+			throw new ExceptionType("Empty data type");
+		}
+		switch ($Info['TYPE']) {
+			case 'STRING':
+			case 'ENUM':
+			case 'SET':
+			case 'PASSWORD':
+				return "varchar(" . ((int)$Info['LENGTH'] ?: 255) . ")";
+				break;
+			case 'ARRAY':
+			case 'TEXT':
+			case 'LIST':
+				return "text";
+			case 'BOOL':
+				return "bool";
+			case 'NUMBER':
+			case 'OUTER':
+			case 'FILE':
+				return "int";
+			case 'FLOAT':
+				$length = $Info['LENGTH'] ?: 13;
+				$decimals = $Info['DECIMALS'] ?: 2;
+				return "numeric({$length},{$decimals})";
+			case 'INNER':
+				throw new ExceptionType("No structure required");
+			case 'TIME':
+				return "time";
+			case 'DATE':
+				return "date";
+			case 'DATETIME':
+				return "timestamp";
+			default:
+				throw new ExceptionType("Unknown data type: " . $Info['TYPE']);
+		}
+	}
+
 	public function SynchronizeTable($table, $structure) {
 		$strict = true;
 		if (empty($table)) {
@@ -81,26 +119,26 @@ class DatabaseDriverPostgres extends Database {
 
 			$rows = [];
 			$keys = [];
-			foreach ($structure as $code => $Type) {
-				/** @var Type $Type */
-				if ($Type['PRIMARY']) {
+			foreach ($structure as $code => $Info) {
+				/** @var Type $Info */
+				if ($Info['PRIMARY']) {
 					$keys[] = $code;
 				}
 				try {
-					$db_type = $Type->GetStructureStringType();
+					$db_type = $this->GetStructureStringType($Info);
 				} catch (\Exception $error) {
 					continue;
 				}
-				$null = ($Type["NOT_NULL"] || $Type['PRIMARY']) ? "NOT NULL" : "NULL";
+				$null = ($Info["NOT_NULL"] || $Info['PRIMARY']) ? "NOT NULL" : "NULL";
 				$default = "";
-				if ($Type['DEFAULT']) {
-					$default = !is_array($Type['DEFAULT']) ? $Type['DEFAULT'] : implode(',', $Type['DEFAULT']);
+				if ($Info['DEFAULT']) {
+					$default = !is_array($Info['DEFAULT']) ? $Info['DEFAULT'] : implode(',', $Info['DEFAULT']);
 					$default = "DEFAULT '{$default}'";
 				}
-				if ($Type["AUTO_INCREMENT"]) {
+				if ($Info["AUTO_INCREMENT"]) {
 					$db_type = 'serial';
 				}
-				$rows[] = $this->Quote($Type['CODE']) . " $db_type $null $default";
+				$rows[] = $this->Quote($Info['CODE']) . " $db_type $null $default";
 			}
 			if (!empty($keys)) {
 				$rows[] = "PRIMARY KEY (" . implode(", ", array_map([$this, 'Quote'], $keys)) . ")";
@@ -116,21 +154,21 @@ class DatabaseDriverPostgres extends Database {
 			$rows = [];
 			$keys = [];
 
-			foreach ($structure as $code => $Type) {
-				/** @var Type $Type */
-				if ($Type['PRIMARY']) {
+			foreach ($structure as $code => $Info) {
+				/** @var Type $Info */
+				if ($Info['PRIMARY']) {
 					$keys[] = $code;
 				}
 				// type
 				try {
-					$db_type = $Type->GetStructureStringType();
+					$db_type = $this->GetStructureStringType($Info);
 				} catch (\Exception $error) {
 					continue;
 				}
 
 				// TODO добавить возможность RENAME COLUMN
 				if (!isset($columns[$code])) {
-					if ($Type["AUTO_INCREMENT"]) {
+					if ($Info["AUTO_INCREMENT"]) {
 						$db_type = 'serial';
 					}
 					$rows[] = "ADD COLUMN \"{$code}\" {$db_type}";
@@ -139,20 +177,20 @@ class DatabaseDriverPostgres extends Database {
 				}
 
 				// null
-				if (($Type["NOT_NULL"] || $Type['PRIMARY'])) {
+				if (($Info["NOT_NULL"] || $Info['PRIMARY'])) {
 					$rows[] = "ALTER COLUMN \"{$code}\" SET NOT NULL";
 				} else {
 					$rows[] = "ALTER COLUMN \"{$code}\" DROP NOT NULL";
 				}
 
 				// default
-				if ($Type["AUTO_INCREMENT"]) {
+				if ($Info["AUTO_INCREMENT"]) {
 					// TODO generate sequences manually
 					$default = 'nextval(\'"' . $table . '_' . $code . '_seq"\'::regclass)';
 					$rows[] = "ALTER COLUMN \"{$code}\" SET DEFAULT {$default}";
 				} else {
-					if (isset($Type['DEFAULT'])) {
-						$default = !is_array($Type['DEFAULT']) ? $Type['DEFAULT'] : implode(',', $Type['DEFAULT']);
+					if (isset($Info['DEFAULT'])) {
+						$default = !is_array($Info['DEFAULT']) ? $Info['DEFAULT'] : implode(',', $Info['DEFAULT']);
 						$rows[] = "ALTER COLUMN \"{$code}\" SET DEFAULT '{$default}'";
 					} else {
 						$rows[] = "ALTER COLUMN \"{$code}\" DROP DEFAULT";

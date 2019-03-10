@@ -40,7 +40,10 @@ class TestScrudInner extends Test {
 
 	/** Тест чтения случайного элемента (студент), проверка структуры */
 	public function TestReadStudent() {
-		$student = $this->Students->Read(rand(100, 200));
+		$student = $this->Students->Read([], ['*@'], ['{RANDOM}' => true]);
+		if (!is_array($student)) {
+			throw new Exception('$student is not array');
+		}
 		if (array_keys($student) <> ['ID', 'FIRST_NAME', 'LAST_NAME', 'GRADE']) {
 			throw new Exception(['Wrong structure of $student', $student]);
 		}
@@ -52,7 +55,10 @@ class TestScrudInner extends Test {
 
 	/** Тест чтения случайного элемента (класс), проверка структуры */
 	public function TestReadGrade() {
-		$grade = $this->Grades->Read(rand(1, 20));
+		$grade = $this->Grades->Read([], ['*@'], ['{RANDOM}' => true]);
+		if (!is_array($grade)) {
+			throw new Exception('$grade is not array');
+		}
 		if (array_keys($grade) <> ['ID', 'TITLE', 'CAPTAIN', 'STUDENTS', 'TIMETABLES']) {
 			throw new Exception(['Wrong structure of $grade', $grade]);
 		}
@@ -64,11 +70,14 @@ class TestScrudInner extends Test {
 
 	/** Тест чтения случайного элемента со специфичной выборкой  */
 	public function TestReadGradeStudents1A() {
-		$grade = $this->Grades->Read(rand(1, 20), [
+		$grade = $this->Grades->Read([], [
 			'ID',
 			'TITLE',
 			'STUDENTS' => ['*'],
-		]);
+		], ['{RANDOM}' => true]);
+		if (!is_array($grade)) {
+			throw new Exception('$grade is not array');
+		}
 		if (array_keys($grade) <> ['ID', 'TITLE', 'STUDENTS']) {
 			throw new Exception(['Wrong structure of $grade', $grade]);
 		}
