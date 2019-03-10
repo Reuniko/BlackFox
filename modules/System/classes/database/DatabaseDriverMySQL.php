@@ -67,6 +67,10 @@ class DatabaseDriverMySQL extends Database {
 		return '`' . $id . '`';
 	}
 
+	public function Random() {
+		return 'rand()';
+	}
+
 	public function SynchronizeTable($table, $structure) {
 		$strict = true;
 		if (empty($structure)) {
@@ -79,13 +83,13 @@ class DatabaseDriverMySQL extends Database {
 		$keys = [];
 
 		if (empty($tables)) {
-			foreach ($structure as $code => $Type) {
-				/** @var Type $Type */
-				if ($Type['PRIMARY']) {
+			foreach ($structure as $code => $Info) {
+				/** @var Type $Info */
+				if ($Info['PRIMARY']) {
 					$keys[] = $code;
 				}
 				try {
-					$rows[] = $this->GetStructureString($Type);
+					$rows[] = $this->GetStructureString($Info);
 				} catch (\Exception $error) {
 					continue;
 				}
@@ -107,13 +111,13 @@ class DatabaseDriverMySQL extends Database {
 			}
 
 			$last_after_code = '';
-			foreach ($structure as $code => $Type) {
-				/** @var Type $Type */
-				if ($Type['PRIMARY']) {
+			foreach ($structure as $code => $Info) {
+				/** @var Type $Info */
+				if ($Info['PRIMARY']) {
 					$keys[] = $code;
 				}
 				try {
-					$structure_string = $this->GetStructureString($Type);
+					$structure_string = $this->GetStructureString($Info);
 				} catch (\Exception $error) {
 					continue;
 				}
@@ -122,9 +126,9 @@ class DatabaseDriverMySQL extends Database {
 				}
 				if (!empty($columns[$code])) {
 					$rows[] = "MODIFY COLUMN $structure_string";
-				} elseif (!empty($Type['CHANGE']) && !empty($columns[$Type['CHANGE']])) {
-					$rows[] = "CHANGE COLUMN `{$Type['CHANGE']}` $structure_string";
-					unset($columns[$Type['CHANGE']]);
+				} elseif (!empty($Info['CHANGE']) && !empty($columns[$Info['CHANGE']])) {
+					$rows[] = "CHANGE COLUMN `{$Info['CHANGE']}` $structure_string";
+					unset($columns[$Info['CHANGE']]);
 				} else {
 					$rows[] = "ADD COLUMN $structure_string";
 				}
@@ -147,35 +151,35 @@ class DatabaseDriverMySQL extends Database {
 		}
 
 		$indexes = $this->Query("SHOW INDEX FROM `{$table}`", 'Column_name');
-		foreach ($structure as $code => $Type) {
+		foreach ($structure as $code => $Info) {
 			if (in_array($code, $keys)) {
 				continue;
 			}
-			if ($Type['UNIQUE']) {
-				$Type['INDEX'] = true;
+			if ($Info['UNIQUE']) {
+				$Info['INDEX'] = true;
 			}
-			if ($Type['INDEX'] === 'UNIQUE') {
-				$Type['INDEX'] = true;
-				$Type['UNIQUE'] = true;
+			if ($Info['INDEX'] === 'UNIQUE') {
+				$Info['INDEX'] = true;
+				$Info['UNIQUE'] = true;
 			}
-			$unique = ($Type['UNIQUE']) ? 'UNIQUE' : '';
+			$unique = ($Info['UNIQUE']) ? 'UNIQUE' : '';
 			$index = $indexes[$code];
 
 			// в базе есть, в коде нет - удалить
-			if (isset($index) && !$Type['INDEX']) {
+			if (isset($index) && !$Info['INDEX']) {
 				$this->Query("ALTER TABLE `{$table}` DROP INDEX `{$code}`;");
 				continue;
 			}
 
 			// в базе нет, в коде есть - добавить
-			if (($Type['INDEX']) && (!isset($index))) {
+			if (($Info['INDEX']) && (!isset($index))) {
 				$this->Query("ALTER TABLE `{$table}` ADD {$unique} INDEX `{$code}` (`{$code}`);");
 				continue;
 			}
 
 			// в базе есть, в коде есть - уточнение уникальности индекса
 			if (isset($index)) {
-				if (($Type['UNIQUE'] && $index['Non_unique']) || (!$Type['UNIQUE'] && !$index['Non_unique'])) {
+				if (($Info['UNIQUE'] && $index['Non_unique']) || (!$Info['UNIQUE'] && !$index['Non_unique'])) {
 					$this->Query("ALTER TABLE `{$table}` DROP INDEX `{$code}`, ADD {$unique} INDEX `{$code}` (`{$code}`);");
 					continue;
 				}
@@ -183,24 +187,24 @@ class DatabaseDriverMySQL extends Database {
 		}
 	}
 
-	public function GetStructureString(Type $Type) {
-		$type = $Type->GetStructureStringType();
+	public function GetStructureString(Type $Info) {
+		$type = $Info->GetStructureStringType();
 
-		$null = ($Type["NOT_NULL"] || $Type['PRIMARY']) ? "NOT NULL" : "NULL";
+		$null = ($Info["NOT_NULL"] || $Info['PRIMARY']) ? "NOT NULL" : "NULL";
 
 		$default = "";
-		if ($Type['DEFAULT']) {
-			if (is_array($Type['DEFAULT'])) {
-				$Type['DEFAULT'] = implode(',', $Type['DEFAULT']);
+		if ($Info['DEFAULT']) {
+			if (is_array($Info['DEFAULT'])) {
+				$Info['DEFAULT'] = implode(',', $Info['DEFAULT']);
 			}
-			$default = "DEFAULT '{$Type['DEFAULT']}'";
+			$default = "DEFAULT '{$Info['DEFAULT']}'";
 		}
 
-		$auto_increment = ($Type["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
+		$auto_increment = ($Info["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
 
-		$comment = ($Type["NAME"]) ? " COMMENT '{$Type["NAME"]}'" : "";
+		$comment = ($Info["NAME"]) ? " COMMENT '{$Info["NAME"]}'" : "";
 
-		$structure_string = $this->Quote($Type['CODE']) . " $type $null $default $auto_increment $comment";
+		$structure_string = $this->Quote($Info['CODE']) . " $type $null $default $auto_increment $comment";
 
 		return $structure_string;
 	}

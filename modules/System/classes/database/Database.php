@@ -27,6 +27,8 @@ abstract class Database extends Instanceable {
 
 	abstract public function Quote($data);
 
+	abstract public function Random();
+
 	public function StartTransaction() {
 		$this->Query('START TRANSACTION');
 	}

@@ -61,6 +61,10 @@ class DatabaseDriverPostgres extends Database {
 		return '"' . $id . '"';
 	}
 
+	public function Random() {
+		return 'random()';
+	}
+
 	public function SynchronizeTable($table, $structure) {
 		$strict = true;
 		if (empty($table)) {

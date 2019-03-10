@@ -905,9 +905,8 @@ abstract class SCRUD extends Instanceable {
 	protected function _prepareOrder($array) {
 		$order = [];
 		foreach ($array as $field_path => $sort) {
-			// TODO make {RANDOM} function in SQLDrivers
-			if ('RAND()' === $field_path) {
-				$order[] = "RAND() {$sort}";
+			if ('{RANDOM}' === $field_path) {
+				$order[] = $this->DB->Random();
 				continue;
 			}
 			$result = $this->_treatFieldPath($field_path);

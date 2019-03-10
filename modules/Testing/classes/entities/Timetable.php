@@ -37,8 +37,8 @@ class Timetable extends \System\SCRUD {
 	public function Fill() {
 		for ($i = 0; $i < 1000; $i++) {
 			$this->Create([
-				'GRADE' => Grades::I()->Pick([], ['RAND()' => 'ASC']),
-				'ROOM'  => Rooms::I()->Pick([], ['RAND()' => 'ASC']),
+				'GRADE' => Grades::I()->Pick([], ['{RANDOM}' => 'ASC']),
+				'ROOM'  => Rooms::I()->Pick([], ['{RANDOM}' => 'ASC']),
 				'START' => time() + $i * 3600,
 			]);
 		}
