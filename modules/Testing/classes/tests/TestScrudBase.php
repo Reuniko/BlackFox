@@ -72,14 +72,15 @@ class TestScrudBase extends Test {
 
 	/** Проверка фильтра: булевое значение */
 	public function TestFilterByBool() {
-		$value = (bool)rand(0, 1);
-		$elements = $this->SCRUD->GetList([
-			'FILTER' => ['BOOL' => $value],
-			'FIELDS' => ['ID', 'BOOL'],
-		]);
-		foreach ($elements as $id => $element) {
-			if ($element['BOOL'] <> $value) {
-				throw new Exception("Элемент #{$id} значение BOOL <> {$value}");
+		foreach ([true, false] as $value) {
+			$elements = $this->SCRUD->GetList([
+				'FILTER' => ['BOOL' => $value],
+				'FIELDS' => ['ID', 'BOOL'],
+			]);
+			foreach ($elements as $id => $element) {
+				if ($element['BOOL'] <> $value) {
+					throw new Exception("Элемент #{$id} значение BOOL: {$value} <> {$element['BOOL']}");
+				}
 			}
 		}
 		return count($elements);
@@ -117,15 +118,18 @@ class TestScrudBase extends Test {
 
 	/** Проверка фильтра: строковое значение подстрокой */
 	public function TestFilterBySubString() {
-		$value = $this->SCRUD->Read(rand(1, $this->limit), ['ID', 'STRING'])['STRING'];
-		$value = substr($value, rand(1, 3), rand(3, 5));
+		$value = $this->SCRUD->Read([], ['ID', 'STRING'], ['{RANDOM}' => '']);
+		$value = substr($value['STRING'], rand(1, 3), rand(3, 5));
+		if (empty($value)) {
+			throw new Exception("Не удалось извлечь случайную подстроку");
+		}
 		$elements = $this->SCRUD->GetList([
-			'FILTER' => ['%STRING' => $value],
+			'FILTER' => ['~STRING' => $value],
 			'FIELDS' => ['ID', 'STRING'],
 		]);
 		foreach ($elements as $id => $element) {
 			if (strpos($element['STRING'], $value) === false) {
-				throw new Exception("Элемент #{$id} значение STRING !~ {$value}");
+				throw new Exception("Элемент #{$id} значение STRING: '{$value}' <> '{$element['STRING']}'");
 			}
 		}
 		return $value;

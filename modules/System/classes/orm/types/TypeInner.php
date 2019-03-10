@@ -90,7 +90,7 @@ class TypeInner extends Type {
 		$target_alias = $prefix . $this->info['CODE'] . '__' . $Target->code;
 		$target_key = $this->info['FIELD'];
 
-		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}.{$current_key} = {$target_alias}.{$target_key}";
+		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
 		return [$target_alias => $statement];
 	}
 
