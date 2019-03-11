@@ -50,19 +50,19 @@ class Table1 extends \System\SCRUD {
 				'TYPE'   => 'ENUM',
 				'NAME'   => 'Enum',
 				'VALUES' => [
-					'VALUE_1' => 'VALUE 1',
-					'VALUE_2' => 'VALUE 2',
-					'VALUE_3' => 'VALUE 3',
+					'VALUE_1' => 'VALUE_1',
+					'VALUE_2' => 'VALUE_2',
+					'VALUE_3' => 'VALUE_3',
 				],
 			],
 			'SET'      => [
 				'TYPE'   => 'SET',
 				'NAME'   => 'Set',
 				'VALUES' => [
-					'VALUE_4' => 'VALUE 4',
-					'VALUE_5' => 'VALUE 5',
-					'VALUE_6' => 'VALUE 6',
-					'VALUE_7' => 'VALUE 7',
+					'VALUE_4' => 'VALUE_4',
+					'VALUE_5' => 'VALUE_5',
+					'VALUE_6' => 'VALUE_6',
+					'VALUE_7' => 'VALUE_7',
 				],
 			],
 			'FILE'     => [

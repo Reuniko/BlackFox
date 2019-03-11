@@ -252,7 +252,6 @@ class DatabaseDriverMySQL extends Database {
 	public function CompileSQLSelect(array $parts) {
 		$SQL = [];
 		$SQL[] = 'SELECT';
-		if ($parts['LIMIT']) $SQL[] = 'SQL_CALC_FOUND_ROWS';
 		$SQL[] = implode(",\r\n", $parts['SELECT']);
 		$SQL[] = "FROM {$parts['TABLE']}";
 		$SQL[] = implode("\r\n", $parts['JOIN']);
