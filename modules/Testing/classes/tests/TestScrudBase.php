@@ -7,7 +7,7 @@ class TestScrudBase extends Test {
 
 	/** @var \System\SCRUD $SCRUD */
 	public $SCRUD = null;
-	public $limit = 100;
+	public $limit = 250;
 
 	/** Взятие инстанса класса "TestScrudBase" */
 	public function TestGetInstance() {
@@ -134,5 +134,25 @@ class TestScrudBase extends Test {
 		}
 		return $value;
 	}
-}
 
+	/** Проверка пейджера: без фильтрации */
+	public function TestPager() {
+		$step = 100;
+		foreach ([1, 2, 3] as $page) {
+			$result = $this->SCRUD->Search([
+				'LIMIT'  => $step,
+				'PAGE'   => $page,
+				'FIELDS' => ['ID'],
+			]);
+			$expected_pager = [
+				'TOTAL'    => $this->limit,
+				'CURRENT'  => $page,
+				'LIMIT'    => $step,
+				'SELECTED' => min($this->limit - ($page - 1) * $step, $step),
+			];
+			if ($result['PAGER'] <> $expected_pager) {
+				throw new Exception(["Unexpected PAGER", $result['PAGER']]);
+			}
+		}
+	}
+}

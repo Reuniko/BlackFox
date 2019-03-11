@@ -169,22 +169,23 @@ abstract class SCRUD extends Instanceable {
 
 	/**
 	 * Формирует данные для вывода страницы элементов.
-	 * $arParams - массив вида:
-	 * - 'SORT' -- сортировка
-	 * - 'FILTER' -- пользовательский фильтр (можно передавать небезопасные данные)
-	 * - 'CONDITIONS' -- произвольные SQL условия для фильтрации
-	 * - 'FIELDS' -- выбираемые поля
-	 * - 'LIMIT' -- количество элементов на странице (по умолчанию — 100)
-	 * - 'PAGE' -- номер страницы (по умолчанию — 1)
-	 * - 'KEY' -- по какому полю нумеровать элементы (укажите FALSE чтобы нумеровать автоматически с помощью [] )
-	 * - 'ESCAPE' -- автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию TRUE)
-	 * - 'GROUP' -- группировка
 	 *
-	 * @param array $arParams
+	 * $params - массив с ключами:
+	 * - SORT -- сортировка, массив, ключ - поле, значение - ASC|DESC
+	 * - FILTER -- пользовательский фильтр (можно передавать небезопасные данные)
+	 * - CONDITIONS -- произвольные SQL условия для фильтрации (нельзя передавать небезопасные данные)
+	 * - FIELDS -- выбираемые поля, составной массив
+	 * - LIMIT -- количество элементов на странице (по умолчанию: *100*)
+	 * - PAGE -- номер страницы (по умолчанию: *1*)
+	 * - KEY -- по какому полю нумеровать элементы (укажите *null* чтобы нумеровать автоматически с помощью [] )
+	 * - ESCAPE -- автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию: *true*)
+	 * - GROUP -- группировка
+	 *
+	 * @param array $params
 	 * @throws Exception
-	 * @return array - массив с ключами: ELEMENTS, TOTAL, PAGER
+	 * @return array - ассоциативный массив с двумя ключами: ELEMENTS:[[]], PAGER:[TOTAL, CURRENT, LIMIT, SELECTED]
 	 */
-	public function Search($arParams = []) {
+	public function Search($params = []) {
 		$defParams = [
 			'SORT'       => [],
 			'FILTER'     => [],
@@ -204,15 +205,15 @@ abstract class SCRUD extends Instanceable {
 			$defParams['KEY'] = null;
 		}
 
-		$arParams = $this->_matchParams($arParams, $defParams);
+		$params = $this->_matchParams($params, $defParams);
 
-		$arParams["PAGE"] = max(1, intval($arParams["PAGE"]));
+		$params["PAGE"] = max(1, intval($params["PAGE"]));
 
-		$arParams['FIELDS'] = $this->ExplainFields($arParams['FIELDS']);
+		$params['FIELDS'] = $this->ExplainFields($params['FIELDS']);
 
-		// если в полях нет ключевого поля - добавить его в начало
-		if (!empty($arParams['KEY']) and !in_array($arParams['KEY'], $arParams['FIELDS'])) {
-			$arParams['FIELDS'][$arParams['KEY']] = $arParams['KEY'];
+		// если в полях нет ключевого поля - добавить его
+		if (!empty($params['KEY']) and !in_array($params['KEY'], $params['FIELDS'])) {
+			$params['FIELDS'][$params['KEY']] = $params['KEY'];
 		}
 
 		// compile parts
@@ -226,58 +227,65 @@ abstract class SCRUD extends Instanceable {
 			'LIMIT'  => [],
 		];
 
-		$answer = $this->PrepareSelectAndJoinByFields($arParams['FIELDS']);
+		$answer = $this->PrepareSelectAndJoinByFields($params['FIELDS']);
 		$this->parts['SELECT'] += $answer['SELECT'];
 		$this->parts['JOIN'] += $answer['JOIN'];
 
-		$answer = $this->PrepareWhereAndJoinByFilter($arParams['FILTER']);
+		$answer = $this->PrepareWhereAndJoinByFilter($params['FILTER']);
 		$this->parts['WHERE'] += $answer['WHERE'];
 		$this->parts['JOIN'] += $answer['JOIN'];
 
-		$arParams['CONDITIONS'] = is_array($arParams['CONDITIONS']) ? $arParams['CONDITIONS'] : [$arParams['CONDITIONS']];
-		$this->parts['WHERE'] += $arParams['CONDITIONS'];
+		$params['CONDITIONS'] = is_array($params['CONDITIONS']) ? $params['CONDITIONS'] : [$params['CONDITIONS']];
+		$this->parts['WHERE'] += $params['CONDITIONS'];
 
-		$this->parts['GROUP'] += $this->_prepareGroup($arParams['GROUP']);
+		$this->parts['GROUP'] += $this->_prepareGroup($params['GROUP']);
 
-		$this->parts['ORDER'] += $this->_prepareOrder($arParams['SORT']);
-		if ($arParams['LIMIT'] > 0) {
+		$this->parts['ORDER'] += $this->_prepareOrder($params['SORT']);
+		if ($params['LIMIT'] > 0) {
 			$this->parts['LIMIT'] = [
-				'FROM'  => ($arParams['PAGE'] - 1) * $arParams['LIMIT'],
-				'COUNT' => $arParams['LIMIT'],
+				'FROM'  => ($params['PAGE'] - 1) * $params['LIMIT'],
+				'COUNT' => $params['LIMIT'],
 			];
 		}
 
 		$this->SQL = $this->DB->CompileSQLSelect($this->parts);
 
-		$result["ELEMENTS"] = $this->Query($this->SQL, $arParams['KEY']);
+		$result["ELEMENTS"] = $this->Query($this->SQL, $params['KEY']);
 
 		foreach ($result["ELEMENTS"] as &$row) {
 			$row = $this->FormatArrayKeysCase($row);
 			$row = $this->FormatListStructure($row);
 			$row = $this->FormatOutputValues($row);
-			if ($arParams['ESCAPE']) {
+			if ($params['ESCAPE']) {
 				array_walk_recursive($row, function (&$value) {
 					$value = htmlspecialchars($value);
 				});
 			}
 		}
 
-		if ($arParams['LIMIT'] > 1) {
-			// TODO get key TOTAL
-			// $result['PAGER']['TOTAL'] = (int)reset(reset($this->Query('SELECT FOUND_ROWS() as TOTAL;')));
-			$result['PAGER']['CURRENT'] = $arParams['PAGE'];
-			$result['PAGER']['LIMIT'] = $arParams['LIMIT'];
+		if ($params['LIMIT'] > 1) {
+			$SQL_for_total = $this->DB->CompileSQLSelect([
+				'TABLE'  => $this->parts['TABLE'],
+				'SELECT' => ['COUNT(*) as total'],
+				'JOIN'   => $this->parts['JOIN'],
+				'WHERE'  => $this->parts['WHERE'],
+				'GROUP'  => $this->parts['GROUP'],
+			]);
+			$result['PAGER']['TOTAL'] = $this->DB->Query($SQL_for_total)[0]['total'];
+
+			$result['PAGER']['CURRENT'] = $params['PAGE'];
+			$result['PAGER']['LIMIT'] = $params['LIMIT'];
 			$result['PAGER']['SELECTED'] = count($result['ELEMENTS']);
 		}
 
-		$result['ELEMENTS'] = $this->HookExternalFields($arParams['FIELDS'], $result['ELEMENTS']);
+		$result['ELEMENTS'] = $this->HookExternalFields($params['FIELDS'], $result['ELEMENTS']);
 
 		return $result;
 	}
 
 	/**
 	 * Выбирает данные из таблицы
-	 * @param array $arParams - массив вида:
+	 * @param array $params - массив вида:
 	 * - "SORT" => сортировка
 	 * - "FILTER" => фильтр
 	 * - "FIELDS" => выбираемые поля
@@ -289,8 +297,8 @@ abstract class SCRUD extends Instanceable {
 	 * @throws Exception
 	 * @return array список выбранных элементов
 	 */
-	public function GetList($arParams = []) {
-		$this->_controlParams($arParams, [
+	public function GetList($params = []) {
+		$this->_controlParams($params, [
 			'SORT',
 			'FILTER',
 			'CONDITIONS',
@@ -300,10 +308,10 @@ abstract class SCRUD extends Instanceable {
 			'KEY',
 			'ESCAPE',
 		]);
-		if (!isset($arParams['LIMIT'])) {
-			$arParams['LIMIT'] = false;
+		if (!isset($params['LIMIT'])) {
+			$params['LIMIT'] = false;
 		}
-		$data = $this->Search($arParams);
+		$data = $this->Search($params);
 		return $data['ELEMENTS'];
 	}
 
