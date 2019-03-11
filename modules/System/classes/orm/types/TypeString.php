@@ -6,11 +6,6 @@ class TypeString extends Type {
 	public static $TYPE = 'STRING';
 	const DEFAULT_LENGTH = 255;
 
-	public function GetStructureStringType() {
-		$length = (int)$this->info['LENGTH'] ?: self::DEFAULT_LENGTH;
-		return "varchar({$length})";
-	}
-
 	/**
 	 * Deleting all extra spaces
 	 *

@@ -5,10 +5,6 @@ namespace System;
 class TypeOuter extends Type {
 	public static $TYPE = 'OUTER';
 
-	public function GetStructureStringType() {
-		return 'int';
-	}
-
 	public function FormatInputValue($value) {
 		return (int)$value;
 	}

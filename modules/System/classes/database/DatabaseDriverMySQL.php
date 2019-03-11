@@ -71,6 +71,68 @@ class DatabaseDriverMySQL extends Database {
 		return 'rand()';
 	}
 
+	public function GetStructureStringType(Type $Info) {
+		if (empty($Info['TYPE'])) {
+			throw new ExceptionType("Empty data type");
+		}
+		switch ($Info['TYPE']) {
+			case 'STRING':
+			case 'PASSWORD':
+				return "varchar(" . ((int)$Info['LENGTH'] ?: 255) . ")";
+				break;
+			case 'ARRAY':
+			case 'TEXT':
+			case 'LIST':
+				return "text";
+			case 'BOOL':
+				return "bool";
+			case 'NUMBER':
+			case 'OUTER':
+			case 'FILE':
+				return "int";
+			case 'FLOAT':
+				$length = $Info['LENGTH'] ?: 13;
+				$decimals = $Info['DECIMALS'] ?: 2;
+				return "float({$length},{$decimals})";
+			case 'INNER':
+				throw new ExceptionType("No structure required");
+			case 'TIME':
+				return "time";
+			case 'DATE':
+				return "date";
+			case 'DATETIME':
+				return "datetime";
+			case 'ENUM':
+				return 'enum' . '("' . implode('", "', array_keys($Info['VALUES'])) . '")';
+			case 'SET':
+				return 'set' . '("' . implode('", "', array_keys($Info['VALUES'])) . '")';
+			default:
+				throw new ExceptionType("Unknown data type: " . $Info['TYPE']);
+		}
+	}
+
+	public function GetStructureString(Type $Info) {
+		$type = $this->GetStructureStringType($Info);
+
+		$null = ($Info["NOT_NULL"] || $Info['PRIMARY']) ? "NOT NULL" : "NULL";
+
+		$default = "";
+		if ($Info['DEFAULT']) {
+			if (is_array($Info['DEFAULT'])) {
+				$Info['DEFAULT'] = implode(',', $Info['DEFAULT']);
+			}
+			$default = "DEFAULT '{$Info['DEFAULT']}'";
+		}
+
+		$auto_increment = ($Info["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
+
+		$comment = ($Info["NAME"]) ? " COMMENT '{$Info["NAME"]}'" : "";
+
+		$structure_string = $this->Quote($Info['CODE']) . " $type $null $default $auto_increment $comment";
+
+		return $structure_string;
+	}
+
 	public function SynchronizeTable($table, $structure) {
 		$strict = true;
 		if (empty($structure)) {
@@ -122,7 +184,7 @@ class DatabaseDriverMySQL extends Database {
 					continue;
 				}
 				if ($strict && !empty($last_after_code)) {
-					$structure_string .= " AFTER {$last_after_code}";
+					$structure_string .= " AFTER " . $this->Quote($last_after_code);
 				}
 				if (!empty($columns[$code])) {
 					$rows[] = "MODIFY COLUMN $structure_string";
@@ -185,28 +247,6 @@ class DatabaseDriverMySQL extends Database {
 				}
 			}
 		}
-	}
-
-	public function GetStructureString(Type $Info) {
-		$type = $Info->GetStructureStringType();
-
-		$null = ($Info["NOT_NULL"] || $Info['PRIMARY']) ? "NOT NULL" : "NULL";
-
-		$default = "";
-		if ($Info['DEFAULT']) {
-			if (is_array($Info['DEFAULT'])) {
-				$Info['DEFAULT'] = implode(',', $Info['DEFAULT']);
-			}
-			$default = "DEFAULT '{$Info['DEFAULT']}'";
-		}
-
-		$auto_increment = ($Info["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
-
-		$comment = ($Info["NAME"]) ? " COMMENT '{$Info["NAME"]}'" : "";
-
-		$structure_string = $this->Quote($Info['CODE']) . " $type $null $default $auto_increment $comment";
-
-		return $structure_string;
 	}
 
 	public function CompileSQLSelect(array $parts) {

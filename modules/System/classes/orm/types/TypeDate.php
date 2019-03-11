@@ -5,10 +5,6 @@ namespace System;
 class TypeDate extends Type {
 	public static $TYPE = 'DATE';
 
-	public function GetStructureStringType() {
-		return 'date';
-	}
-
 	public function FormatInputValue($value) {
 		$value = is_numeric($value) ? $value : strtotime($value);
 		$value = date('Y-m-d', $value);

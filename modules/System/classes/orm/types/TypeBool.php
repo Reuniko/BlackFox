@@ -19,10 +19,6 @@ class TypeBool extends Type {
 		return $value ? 1 : 0;
 	}
 
-	public function GetStructureStringType() {
-		return 'bool';
-	}
-
 	public function ProvideInfoIntegrity() {
 		$this->info['NOT_NULL'] = true;
 	}
