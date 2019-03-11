@@ -49,8 +49,6 @@ abstract class Type implements \ArrayAccess {
 	public function ProvideInfoIntegrity() {
 	}
 
-	abstract function GetStructureStringType();
-
 	/**
 	 * Format input value from user to save into database.
 	 * No escape required.

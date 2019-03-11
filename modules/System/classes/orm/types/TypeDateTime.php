@@ -5,10 +5,6 @@ namespace System;
 class TypeDateTime extends Type {
 	public static $TYPE = 'DATETIME';
 
-	public function GetStructureStringType() {
-		return 'timestamp';
-	}
-
 	public function FormatInputValue($value) {
 		if (is_numeric($value)) {
 			$value = date('Y-m-d H:i:s', $value);

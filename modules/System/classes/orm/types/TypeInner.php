@@ -11,10 +11,6 @@ class TypeInner extends Type {
 		}
 	}
 
-	public function GetStructureStringType() {
-		throw new ExceptionType("No structure required");
-	}
-
 	public function PrepareSelectAndJoinByField($table, $prefix, $subfields) {
 		// этот метод отвечает только за FIELDS, которые подтягиваются отдельно в методе HookExternalField
 		return [];

@@ -5,10 +5,6 @@ namespace System;
 class TypeSet extends Type {
 	public static $TYPE = 'SET';
 
-	public function GetStructureStringType() {
-		return 'set' . '("' . implode('", "', array_keys($this->info['VALUES'])) . '")';
-	}
-
 	public function FormatInputValue($values) {
 		if (!is_array($values)) {
 			$values = [$values];

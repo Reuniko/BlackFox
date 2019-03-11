@@ -5,10 +5,6 @@ namespace System;
 class TypeFile extends TypeOuter {
 	public static $TYPE = 'FILE';
 
-	public function GetStructureStringType() {
-		return 'int';
-	}
-
 	public function ProvideInfoIntegrity() {
 		if (empty($this->info['LINK'])) {
 			$this->info['LINK'] = 'System\Files';

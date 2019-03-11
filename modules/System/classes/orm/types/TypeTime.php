@@ -5,10 +5,6 @@ namespace System;
 class TypeTime extends Type {
 	public static $TYPE = 'TIME';
 
-	public function GetStructureStringType() {
-		return 'time';
-	}
-
 	public function PrintFormControl($value, $name, $class = 'form-control') {
 		?>
 		<input

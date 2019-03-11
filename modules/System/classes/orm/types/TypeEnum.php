@@ -5,10 +5,6 @@ namespace System;
 class TypeEnum extends Type {
 	public static $TYPE = 'ENUM';
 
-	public function GetStructureStringType() {
-		return 'enum' . '("' . implode('", "', array_keys($this->info['VALUES'])) . '")';
-	}
-
 	public function FormatInputValue($value) {
 		if (!isset($this->info['VALUES'][$value])) {
 			throw new ExceptionType("Unknown enum value '{$value}' for field '{$this->info['NAME']}'");

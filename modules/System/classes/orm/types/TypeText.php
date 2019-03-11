@@ -5,10 +5,6 @@ namespace System;
 class TypeText extends Type {
 	public static $TYPE = 'TEXT';
 
-	public function GetStructureStringType() {
-		return 'text';
-	}
-
 	public function PrintValue($value) {
 		if ($this->info['WYSIWYG']) {
 			$value = htmlspecialchars_decode($value);
