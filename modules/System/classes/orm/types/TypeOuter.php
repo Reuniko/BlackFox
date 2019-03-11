@@ -82,6 +82,7 @@ class TypeOuter extends Type {
 			data-outer=""
 		>
 			<a
+				target="_blank"
 				class="btn btn-secondary flex-shrink-1"
 				href="<?= $ID ? $Link->GetAdminUrl() . "?ID={$ID}" : 'javascript:void(0);' ?>"
 				data-outer-link=""
