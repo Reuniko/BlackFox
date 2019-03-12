@@ -198,8 +198,6 @@ abstract class SCRUD extends Instanceable {
 		];
 		try {
 			$defParams['KEY'] = $this->key();
-			// TODO test selects with group
-			// $defParams['GROUP'] = [$this->key()];
 			$defParams['SORT'] = [$this->key() => 'DESC'];
 		} catch (Exception $error) {
 			$defParams['KEY'] = null;
@@ -269,8 +267,8 @@ abstract class SCRUD extends Instanceable {
 				'SELECT' => ['COUNT(*) as total'],
 				'JOIN'   => $this->parts['JOIN'],
 				'WHERE'  => $this->parts['WHERE'],
-				'GROUP'  => $this->parts['GROUP'],
 			]);
+			$this->SQL = [$this->SQL, $SQL_for_total];
 			$result['PAGER']['TOTAL'] = $this->DB->Query($SQL_for_total)[0]['total'];
 
 			$result['PAGER']['CURRENT'] = $params['PAGE'];

@@ -97,6 +97,7 @@ class Adminer extends \System\Unit {
 			'PAGE'   => $PAGE,
 			'SORT'   => $SORT,
 		]);
+		debug($this->SCRUD->SQL, 'SQL');
 		$R['PAGES'] = $this->GetPages(
 			$R['DATA']['PAGER']['TOTAL'],
 			$R['DATA']['PAGER']['CURRENT'],

@@ -131,6 +131,47 @@ class TestScrudInner extends Test {
 		// return $students;
 	}
 
+	/** Тест фильтра по цепочке: обратная связь */
+	public function TestFilterGradesByStudents() {
+		$random_grade = $this->Grades->Read([], ['*@'], ['{RANDOM}' => ''], false);
+		$random_student_first_name = $random_grade['STUDENTS'][array_rand($random_grade['STUDENTS'])]['FIRST_NAME'];
+
+		$grades = $this->Grades->GetList([
+			'FIELDS' => ['ID', 'TITLE', 'STUDENTS' => ['@']],
+			'FILTER' => ['STUDENTS.FIRST_NAME' => $random_student_first_name],
+		]);
+		foreach ($grades as $grade) {
+			foreach ($grade['STUDENTS'] as $student) {
+				if ($student['FIRST_NAME'] === $random_student_first_name) {
+					continue 2;
+				}
+			}
+			throw new Exception(['Wrong grade', $random_student_first_name, $grade]);
+		}
+		// return $grades;
+		return count($grades);
+	}
+
+	/** Тест фильтра по цепочке: обратная связь + поиск по подстроке */
+	public function TestFilterGradesByStudentsLike() {
+		foreach (['An', 'St'] as $search) {
+			$grades = $this->Grades->GetList([
+				'FIELDS' => ['ID', 'TITLE', 'STUDENTS' => ['@']],
+				'FILTER' => ['~STUDENTS.FIRST_NAME' => $search],
+			]);
+			//debug($this->Grades->SQL, 'SQL');
+			//debug($grades, '$grades');
+			foreach ($grades as $grade) {
+				foreach ($grade['STUDENTS'] as $student) {
+					if (!(strpos($student['FIRST_NAME'], $search) === false)) {
+						continue 2;
+					}
+				}
+				throw new Exception(['Wrong grade', $search, $grade]);
+			}
+		}
+	}
+
 	/** Тест фильтра по цепочке: обратная связь, прямая связь */
 	public function TestFilterGradesByRooms() {
 		$grades = $this->Grades->GetList([
@@ -147,5 +188,6 @@ class TestScrudInner extends Test {
 		}
 		// return $grades;
 	}
+
 
 }

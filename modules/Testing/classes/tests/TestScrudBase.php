@@ -151,7 +151,7 @@ class TestScrudBase extends Test {
 				'SELECTED' => min($this->limit - ($page - 1) * $step, $step),
 			];
 			if ($result['PAGER'] <> $expected_pager) {
-				throw new Exception(["Unexpected PAGER", $result['PAGER']]);
+				throw new Exception(["Unexpected PAGER", $expected_pager, $result['PAGER'], $this->SCRUD->SQL]);
 			}
 		}
 	}
