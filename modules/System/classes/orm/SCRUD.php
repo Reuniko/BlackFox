@@ -1094,7 +1094,7 @@ abstract class SCRUD extends Instanceable {
 	 * Удаляет все данные из таблицы не затрагивая структуру.
 	 */
 	public function Truncate() {
-		$this->Query("TRUNCATE TABLE {$this->code}");
+		$this->DB->Truncate($this->code);
 	}
 
 	/**
