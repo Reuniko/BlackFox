@@ -12,6 +12,7 @@ abstract class Database extends Instanceable {
 	 * @param string $SQL
 	 * @param string $key
 	 * @return mixed
+	 * @throws ExceptionSQL
 	 */
 	abstract public function Query($SQL, $key = null);
 
@@ -44,7 +45,6 @@ abstract class Database extends Instanceable {
 	/**
 	 * @param $table
 	 * @param $structure
-	 * @return mixed
 	 * @throws Exception
 	 */
 	abstract public function SynchronizeTable($table, $structure);
