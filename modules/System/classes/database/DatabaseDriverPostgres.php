@@ -325,4 +325,8 @@ class DatabaseDriverPostgres extends Database {
 		ALTER TYPE admin_level1_new RENAME TO admin_level1;
 		 */
 	}
+
+	public function Truncate($table) {
+		$this->Query("TRUNCATE TABLE {$table} RESTART IDENTITY");
+	}
 }

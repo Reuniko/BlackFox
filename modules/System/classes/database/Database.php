@@ -50,4 +50,8 @@ abstract class Database extends Instanceable {
 	abstract public function SynchronizeTable($table, $structure);
 
 	abstract public function CompileSQLSelect(array $parts);
+
+	public function Truncate($table) {
+		$this->Query("TRUNCATE TABLE {$table}");
+	}
 }
