@@ -114,10 +114,15 @@ abstract class Type implements \ArrayAccess {
 	 * @param SCRUD $Current объект текущей таблицы
 	 * @param string $prefix префикс
 	 * @internal array $info
-	 * @return array ассоциатив: ['уникальный алиас присоединяемой таблицы' => 'SQL-строка, описывающая присоединяемую таблицу', ...]
+	 * @return array :
+	 * - JOIN - ['уникальный алиас присоединяемой таблицы' => 'SQL-строка, описывающая присоединяемую таблицу', ...]
+	 * - GROUP - ['уникальный алиас присоединяемой таблицы' => 'SQL-строка, описывающая группировку', ...]
 	 */
-	public function GenerateJoinStatements(SCRUD $Current, $prefix) {
-		return [];
+	public function GenerateJoinAndGroupStatements(SCRUD $Current, $prefix) {
+		return [
+			'JOIN'  => [],
+			'GROUP' => [],
+		];
 	}
 
 	/**

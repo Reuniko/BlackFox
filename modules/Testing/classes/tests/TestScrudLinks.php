@@ -2,7 +2,7 @@
 
 namespace Testing;
 
-class TestScrudInner extends Test {
+class TestScrudLinks extends Test {
 	public $name = 'Тест SCRUD: внешние связи';
 
 	/** @var Grades $Grades */
@@ -149,24 +149,23 @@ class TestScrudInner extends Test {
 			throw new Exception(['Wrong grade', $random_student_first_name, $grade]);
 		}
 		// return $grades;
-		return count($grades);
 	}
 
 	/** Тест фильтра по цепочке: обратная связь + поиск по подстроке */
 	public function TestFilterGradesByStudentsLike() {
-		foreach (['An', 'St'] as $search) {
+		foreach (['ani', 'nia', 'vel'] as $search) {
 			$grades = $this->Grades->GetList([
 				'FIELDS' => ['ID', 'TITLE', 'STUDENTS' => ['@']],
 				'FILTER' => ['~STUDENTS.FIRST_NAME' => $search],
 			]);
-			//debug($this->Grades->SQL, 'SQL');
-			//debug($grades, '$grades');
 			foreach ($grades as $grade) {
 				foreach ($grade['STUDENTS'] as $student) {
-					if (!(strpos($student['FIRST_NAME'], $search) === false)) {
+					if (!(stripos($student['FIRST_NAME'], $search) === false)) {
 						continue 2;
 					}
 				}
+				debug($this->Grades->parts, 'parts');
+				debug($this->Grades->SQL, 'SQL');
 				throw new Exception(['Wrong grade', $search, $grade]);
 			}
 		}
