@@ -76,7 +76,7 @@ class TypeInner extends Type {
 		return $elements;
 	}
 
-	public function GenerateJoinStatements(SCRUD $Current, $prefix) {
+	public function GenerateJoinAndGroupStatements(SCRUD $Current, $prefix) {
 		// debug($this->info, '$this->info');
 		/** @var SCRUD $Target */
 		$Target = $this->info['LINK']::I();
@@ -86,8 +86,13 @@ class TypeInner extends Type {
 		$target_alias = $prefix . $this->info['CODE'] . '__' . $Target->code;
 		$target_key = $this->info['FIELD'];
 
-		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
-		return [$target_alias => $statement];
+		$join_statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
+		$group_statement = "{$Current->code}." . $this->Quote($current_key);
+
+		return [
+			'JOIN'  => [$target_alias => $join_statement],
+			'GROUP' => [$current_alias => $group_statement],
+		];
 	}
 
 	public function PrintValue($value) {

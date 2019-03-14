@@ -229,9 +229,10 @@ abstract class SCRUD extends Instanceable {
 		$this->parts['SELECT'] += $answer['SELECT'];
 		$this->parts['JOIN'] += $answer['JOIN'];
 
-		$answer = $this->PrepareWhereAndJoinByFilter($params['FILTER']);
+		$answer = $this->PreparePartsByFilter($params['FILTER']);
 		$this->parts['WHERE'] += $answer['WHERE'];
 		$this->parts['JOIN'] += $answer['JOIN'];
+		$this->parts['GROUP'] += $answer['GROUP'];
 
 		$params['CONDITIONS'] = is_array($params['CONDITIONS']) ? $params['CONDITIONS'] : [$params['CONDITIONS']];
 		$this->parts['WHERE'] += $params['CONDITIONS'];
@@ -572,7 +573,7 @@ abstract class SCRUD extends Instanceable {
 		}
 		$this->SQL .= implode(",\r\n", $rows);
 
-		$answer = $this->PrepareWhereAndJoinByFilter($filter);
+		$answer = $this->PreparePartsByFilter($filter);
 		$this->SQL .= "\r\n WHERE " . implode(' AND ', $answer['WHERE']);
 
 		$this->Query($this->SQL);
@@ -601,7 +602,7 @@ abstract class SCRUD extends Instanceable {
 			throw new ExceptionNotAllowed();
 		}
 
-		$answer = $this->PrepareWhereAndJoinByFilter($filter);
+		$answer = $this->PreparePartsByFilter($filter);
 		$this->SQL = "DELETE FROM {$this->code} WHERE " . implode(' AND ', $answer['WHERE']);
 		$this->Query($this->SQL);
 	}
@@ -690,9 +691,10 @@ abstract class SCRUD extends Instanceable {
 	 * @return array :
 	 * - WHERE - массив строк, представляющих собой SQL-условия, которые следует объеденить операторами AND или OR
 	 * - JOIN - ассоциативный массив уникальных SQL-строк, описывающий присоединяемые таблицы
+	 * - GROUP - ассоциативный массив уникальных SQL-строк, описывающий группировку
 	 * @throws Exception
 	 */
-	public function PrepareWhereAndJoinByFilter($filter) {
+	public function PreparePartsByFilter($filter) {
 		if (!is_array($filter) and empty($filter)) {
 			throw new ExceptionNotAllowed("Empty non-array filter, ID missed?");
 		}
@@ -700,6 +702,7 @@ abstract class SCRUD extends Instanceable {
 			return [
 				'WHERE' => [],
 				'JOIN'  => [],
+				'GROUP'  => [],
 			];
 		}
 		if (!is_array($filter)) {
@@ -717,6 +720,7 @@ abstract class SCRUD extends Instanceable {
 
 		$where = [];
 		$join = [];
+		$group = [];
 
 		foreach ($filter as $filter_key => $values) {
 			if ($values === '') {
@@ -737,11 +741,12 @@ abstract class SCRUD extends Instanceable {
 					}
 					unset($values['LOGIC']);
 				}
-				$answer = $this->PrepareWhereAndJoinByFilter($values);
+				$answer = $this->PreparePartsByFilter($values);
 				if (!empty($answer['WHERE'])) {
 					$where[] = '(' . implode(" {$logic} ", $answer['WHERE']) . ')';
 				}
 				$join += $answer['JOIN'];
+				$group += $answer['GROUP'];
 				continue;
 			}
 
@@ -760,6 +765,7 @@ abstract class SCRUD extends Instanceable {
 			$table = $result['TABLE'];
 			$code = $result['CODE'];
 			$join += $result['JOIN'];
+			$group += $result['GROUP'];
 
 			$values = is_array($values) ? $values : [$values];
 			$values_have_null = false;
@@ -841,6 +847,7 @@ abstract class SCRUD extends Instanceable {
 		return [
 			'WHERE' => $where,
 			'JOIN'  => $join,
+			'GROUP' => $group,
 		];
 	}
 
@@ -852,6 +859,7 @@ abstract class SCRUD extends Instanceable {
 	 * - TABLE - псевдоним для таблицы (alias)
 	 * - CODE - код поля
 	 * - JOIN - ассоциативный массив уникальных SQL-строк, описывающий присоединяемые таблицы
+	 * - GROUP - ассоциативный массив уникальных SQL-строк, описывающий группировку
 	 *
 	 * @param string $field_path мнемонический путь к полю, например: 'EXTERNAL_FIELD.EXTERNAL_FIELD.FIELD'
 	 * @return array
@@ -867,6 +875,7 @@ abstract class SCRUD extends Instanceable {
 				'TABLE'  => $this->code,
 				'CODE'   => $code,
 				'JOIN'   => [],
+				'GROUP'  => [],
 			];
 		}
 		// if (!empty($path)):
@@ -875,29 +884,33 @@ abstract class SCRUD extends Instanceable {
 		$Object = $this;
 		$prefix = '';
 		$join = [];
+		$group = [];
 
 		foreach ($path as $external) {
 			$structure = &$Object->structure;
-			$info = $structure[$external];
+			$Info = $structure[$external];
 
-			if (empty($info)) {
+			if (empty($Info)) {
 				throw new Exception("Unknown external field code: '{$external}'");
 			}
-			if (empty($info['LINK'])) {
+			if (empty($Info['LINK'])) {
 				throw new Exception("Field is not external: '{$external}'");
 			}
 
-			$join += $info->GenerateJoinStatements($Object, $prefix);
+			$answer = $Info->GenerateJoinAndGroupStatements($Object, $prefix);
+			$join += $answer['JOIN'];
+			$group += $answer['GROUP'];
 
 			// for next iteration
 			$prefix .= $external . "__";
-			$Object = $info['LINK']::I();
+			$Object = $Info['LINK']::I();
 		}
 		return [
 			'OBJECT' => $Object,
 			'TABLE'  => $prefix . $Object->code,
 			'CODE'   => $code,
 			'JOIN'   => $join,
+			'GROUP'  => $group,
 		];
 	}
 

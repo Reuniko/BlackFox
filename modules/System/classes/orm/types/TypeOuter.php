@@ -36,7 +36,7 @@ class TypeOuter extends Type {
 		return $RESULT;
 	}
 
-	public function GenerateJoinStatements(SCRUD $Current, $prefix) {
+	public function GenerateJoinAndGroupStatements(SCRUD $Current, $prefix) {
 		// debug($this->info, '$this->info');
 		/** @var SCRUD $Target */
 		$Target = $this->info['LINK']::I();
@@ -47,7 +47,10 @@ class TypeOuter extends Type {
 		$target_key = $Target->key();
 
 		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
-		return [$target_alias => $statement];
+		return [
+			'JOIN'  => [$target_alias => $statement],
+			'GROUP' => [],
+		];
 	}
 
 	public function PrintValue($value) {
