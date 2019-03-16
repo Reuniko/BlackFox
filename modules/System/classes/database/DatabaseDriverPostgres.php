@@ -211,35 +211,32 @@ class DatabaseDriverPostgres extends Database {
 			$this->Query($SQL);
 		}
 
-		// $indexes = $this->Query("SELECT * FROM pg_indexes WHERE tablename ='{$code}'", 'Column_name');
-		// TODO: проверять, добавлять и удалять индексы
-
-		/*
-			select
-			    t.relname as table_name,
+		// Indexes:
+		$SQL = "SELECT
+			    a.attname as column_name,
 			    i.relname as index_name,
-			    a.attname as column_name
-			from
+			    ix.indisunique as index_unique
+			FROM
 			    pg_class t,
 			    pg_class i,
 			    pg_index ix,
 			    pg_attribute a
-			where
+			WHERE
 			    t.oid = ix.indrelid
 			    and i.oid = ix.indexrelid
 			    and a.attrelid = t.oid
 			    and a.attnum = ANY(ix.indkey)
 			    and t.relkind = 'r'
-			    and t.relname ='test1'
-			order by
+			    and t.relname ='{$table}'
+			ORDER BY
 			    t.relname,
-			    i.relname;
-		 */
-		$indexes = [];
+			    i.relname
+			    ";
+		$indexes = $this->Query($SQL, 'column_name');
+		//debug($indexes, '$indexes');
 
-		/*
 		foreach ($structure as $code => $field) {
-			if (in_array($code, $this->keys)) {
+			if (in_array($code, $keys)) {
 				continue;
 			}
 			if ($field['UNIQUE']) {
@@ -252,29 +249,27 @@ class DatabaseDriverPostgres extends Database {
 			$unique = ($field['UNIQUE']) ? 'UNIQUE' : '';
 			$index = $indexes[$code];
 
-			// в базе есть, в коде нет - удалить
-			if (isset($index) && !$field['INDEX']) {
-				//$this->Query("ALTER TABLE \"{$code}\" DROP INDEX \"{$code}\";");
+			// index is: present in database, missing in code - drop it
+			if (isset($index) and !$field['INDEX']) {
+				$this->Query("DROP INDEX " . $this->Quote($index['index_name']));
 				continue;
 			}
 
-			// в базе нет, в коде есть - добавить
-			// CREATE INDEX  ON "public"."test1" ("TITLE");
-
-			if (($field['INDEX']) && (!isset($index))) {
-				//$this->Query("ALTER TABLE \"{$code}\" ADD {$unique} INDEX \"{$code}\" (\"{$code}\");");
+			// index is: missing in database, present in code - create it
+			if ($field['INDEX'] and !isset($index)) {
+				$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
 				continue;
 			}
 
-			// в базе есть, в коде есть - уточнение уникальности индекса
+			// index is: present in database, present in code - check unique
 			if (isset($index)) {
-				if (($field['UNIQUE'] && $index['Non_unique']) || (!$field['UNIQUE'] && !$index['Non_unique'])) {
-					//$this->Query("ALTER TABLE \"{$code}\" DROP INDEX \"{$code}\", ADD {$unique} INDEX \"{$code}\" (\"{$code}\");");
+				if (($field['UNIQUE'] and $index['index_unique']) or (!$field['UNIQUE'] and !$index['index_unique'])) {
+					$this->Query("DROP INDEX {$index['index_name']}");
+					$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
 					continue;
 				}
 			}
 		}
-		*/
 	}
 
 	public function CompileSQLSelect(array $parts) {
