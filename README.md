@@ -1,5 +1,5 @@
 # Black Fox
-Framework for web-sites.
+Framework for web applications.
 
 ## Installation
 * Setup server with PHP 7+ and MySQL 5.5+ environment
