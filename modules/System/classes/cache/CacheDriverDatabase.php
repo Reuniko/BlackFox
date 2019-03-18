@@ -62,7 +62,7 @@ class CacheDriverDatabase extends Cache {
 			throw new ExceptionCache("Empty key passed");
 		}
 		$keys = is_array($key) ? $key : [$key];
-		$data = $this->DATA->GetList([
+		$data = $this->DATA->Select([
 			'FILTER' => ['KEY' => $keys],
 			'FIELDS' => ['KEY', 'VALUE', 'TYPE'],
 			'ESCAPE' => false,
@@ -103,7 +103,7 @@ class CacheDriverDatabase extends Cache {
 
 	public function Strike($tags) {
 		$tags = is_array($tags) ? $tags : [$tags];
-		$keys = $this->TAGS->Select(['TAG' => $tags], [], 'KEY');
+		$keys = $this->TAGS->GetColumn(['TAG' => $tags], [], 'KEY');
 		$this->DATA->Delete(['KEY' => $keys]);
 		$this->TAGS->Delete(['TAG' => $tags]);
 		$this->TAGS->Delete(['KEY' => $keys]);

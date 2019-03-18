@@ -135,7 +135,7 @@ class TypeOuter extends Type {
 			$IDs = reset($IDs);
 		}
 
-		$elements = !empty($IDs) ? $Link->GetList([
+		$elements = !empty($IDs) ? $Link->Select([
 			'FILTER' => ['ID' => $IDs],
 			'FIELDS' => ['@'],
 		]) : [];
