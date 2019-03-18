@@ -31,19 +31,17 @@ class DatabaseDriverMySQL extends Database {
 			throw new ExceptionSQL(mysqli_error($this->link), $SQL);
 		}
 		if ($result === true) {
-			return mysqli_insert_id($this->link) ?: true;
+			return null;
 		}
-		if (is_object($result)) {
-			$data = [];
-			while ($row = mysqli_fetch_assoc($result)) {
-				if (isset($key) and isset($row[$key])) {
-					$data[$row[$key]] = $row;
-				} else {
-					$data[] = $row;
-				}
+		$data = [];
+		while ($row = mysqli_fetch_assoc($result)) {
+			if (isset($key) and isset($row[$key])) {
+				$data[$row[$key]] = $row;
+			} else {
+				$data[] = $row;
 			}
-			return $data;
 		}
+		return $data;
 	}
 
 	public function QuerySingleInsert($SQL, $increment = null) {
