@@ -63,7 +63,7 @@ class TypeInner extends Type {
 		}
 		$subfields[$link_key_to_source] = $link_key_to_source;
 
-		$data = $Link->GetList([
+		$data = $Link->Select([
 			'FILTER' => [$link_key_to_source => $ids],
 			'FIELDS' => $subfields,
 		]);

@@ -564,7 +564,7 @@ class Engine extends Instanceable {
 	 * except module 'System' cause it's been loaded already.
 	 */
 	public function LoadModules() {
-		$this->modules = Modules::I()->GetList(['SORT' => ['SORT' => 'ASC']]);
+		$this->modules = Modules::I()->Select(['SORT' => ['SORT' => 'ASC']]);
 		foreach ($this->modules as $module) {
 			if ($module['ID'] === 'System') {
 				continue; // already registered
@@ -578,7 +578,7 @@ class Engine extends Instanceable {
 	 * for every active module - launches it's Upgrade() method.
 	 */
 	public function UpgradeActiveModules() {
-		$namespaces = Modules::I()->Select();
+		$namespaces = Modules::I()->GetColumn();
 		foreach ($namespaces as $namespace) {
 			$module = "{$namespace}\\Module";
 			/* @var \System\AModule $module */

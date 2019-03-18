@@ -22,7 +22,7 @@ class TestScrudBase extends Test {
 	/** Удаление всех записей */
 	public function TestTruncate() {
 		$this->SCRUD->Truncate();
-		$rows = $this->SCRUD->GetList();
+		$rows = $this->SCRUD->Select();
 		if (!empty($rows)) {
 			throw new Exception("В таблице остались записи");
 		}
@@ -73,7 +73,7 @@ class TestScrudBase extends Test {
 	/** Проверка фильтра: булевое значение */
 	public function TestFilterByBool() {
 		foreach ([true, false] as $value) {
-			$elements = $this->SCRUD->GetList([
+			$elements = $this->SCRUD->Select([
 				'FILTER' => ['BOOL' => $value],
 				'FIELDS' => ['ID', 'BOOL'],
 			]);
@@ -89,7 +89,7 @@ class TestScrudBase extends Test {
 	/** Проверка фильтра: целочисленное значение */
 	public function TestFilterByNumber() {
 		$value = rand(0, 99);
-		$elements = $this->SCRUD->GetList([
+		$elements = $this->SCRUD->Select([
 			'FILTER' => ['NUMBER' => $value],
 			'FIELDS' => ['ID', 'NUMBER'],
 		]);
@@ -104,7 +104,7 @@ class TestScrudBase extends Test {
 	/** Проверка фильтра: строковое значение целиком */
 	public function TestFilterByString() {
 		$value = $this->SCRUD->Read(rand(1, $this->limit), ['ID', 'STRING'])['STRING'];
-		$elements = $this->SCRUD->GetList([
+		$elements = $this->SCRUD->Select([
 			'FILTER' => ['STRING' => $value],
 			'FIELDS' => ['ID', 'STRING'],
 		]);
@@ -123,7 +123,7 @@ class TestScrudBase extends Test {
 		if (empty($value)) {
 			throw new Exception("Не удалось извлечь случайную подстроку");
 		}
-		$elements = $this->SCRUD->GetList([
+		$elements = $this->SCRUD->Select([
 			'FILTER' => ['~STRING' => $value],
 			'FIELDS' => ['ID', 'STRING'],
 		]);

@@ -89,7 +89,7 @@ class TestScrudLinks extends Test {
 
 	/** Тест фильтра по цепочке: прямая связь */
 	public function TestFilterStudentsByGrades() {
-		$students = $this->Students->GetList([
+		$students = $this->Students->Select([
 			'FILTER' => ['GRADE.TITLE' => '9B'],
 		]);
 		foreach ($students as $student) {
@@ -102,7 +102,7 @@ class TestScrudLinks extends Test {
 
 	/** Тест фильтра по цепочке: прямая связь (в выборке отсутствуют поля фильтра) */
 	public function TestFilterStudentsByGradesWithoutFilterField() {
-		$students = $this->Students->GetList([
+		$students = $this->Students->Select([
 			'FILTER' => ['GRADE.TITLE' => '9B'],
 			'FIELDS' => ['ID', 'FIRST_NAME'],
 		]);
@@ -118,7 +118,7 @@ class TestScrudLinks extends Test {
 	/** Тест фильтра по цепочке: прямая связь, прямая связь */
 	public function TestFilterStudentsByGradeCaptain() {
 		// Carlota
-		$students = $this->Students->GetList([
+		$students = $this->Students->Select([
 			'FILTER' => ['GRADE.CAPTAIN.FIRST_NAME' => 'Carlota'],
 			'FIELDS' => ['ID', 'FIRST_NAME'],
 		]);
@@ -136,7 +136,7 @@ class TestScrudLinks extends Test {
 		$random_grade = $this->Grades->Read([], ['*@'], ['{RANDOM}' => ''], false);
 		$random_student_first_name = $random_grade['STUDENTS'][array_rand($random_grade['STUDENTS'])]['FIRST_NAME'];
 
-		$grades = $this->Grades->GetList([
+		$grades = $this->Grades->Select([
 			'FIELDS' => ['ID', 'TITLE', 'STUDENTS' => ['@']],
 			'FILTER' => ['STUDENTS.FIRST_NAME' => $random_student_first_name],
 		]);
@@ -154,7 +154,7 @@ class TestScrudLinks extends Test {
 	/** Тест фильтра по цепочке: обратная связь + поиск по подстроке */
 	public function TestFilterGradesByStudentsLike() {
 		foreach (['ani', 'nia', 'vel'] as $search) {
-			$grades = $this->Grades->GetList([
+			$grades = $this->Grades->Select([
 				'FIELDS' => ['ID', 'TITLE', 'STUDENTS' => ['@']],
 				'FILTER' => ['~STUDENTS.FIRST_NAME' => $search],
 			]);
@@ -173,7 +173,7 @@ class TestScrudLinks extends Test {
 
 	/** Тест фильтра по цепочке: обратная связь, прямая связь */
 	public function TestFilterGradesByRooms() {
-		$grades = $this->Grades->GetList([
+		$grades = $this->Grades->Select([
 			'FIELDS' => ['ID', 'TITLE', 'TIMETABLES' => ['*@']],
 			'FILTER' => ['TIMETABLES.ROOM.TITLE' => 'R-304'],
 		]);
