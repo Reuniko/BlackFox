@@ -1,4 +1,5 @@
 <?php
+
 namespace System;
 
 class User extends Instanceable {
@@ -26,8 +27,8 @@ class User extends Instanceable {
 			if (empty($this->FIELDS)) {
 				throw new ExceptionElementNotFound();
 			}
-			$group_ids = Users2Groups::I()->GetColumn(['USER' => $this->ID], [], 'GROUP');
-			$this->GROUPS = Groups::I()->GetColumn(['ID' => $group_ids], [], 'CODE');
+			$group_ids = Users2Groups::I()->GetColumn(['USER' => $this->ID], 'GROUP');
+			$this->GROUPS = Groups::I()->GetColumn(['ID' => $group_ids], 'CODE');
 		}
 	}
 
