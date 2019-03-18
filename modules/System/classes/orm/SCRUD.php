@@ -361,20 +361,19 @@ abstract class SCRUD extends Instanceable {
 	 * Выбирает список идентификаторов\значений указанной колонки.
 	 *
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
-	 * @param array $sort сортировка (не обязательно)
 	 * @param string $field символьный код выбираемой колонки (не обязательно, по умолчанию - идентификатор)
+	 * @param array $sort сортировка (не обязательно)
+	 * @param bool $escape
 	 * @return array массив идентификаторов элементов
 	 * @throws Exception
-	 * @todo Reorder params: filter, field, sort, escape
 	 */
-	public function GetColumn($filter = [], $sort = [], $field = null) {
-		if (is_null($field)) {
-			$field = $this->key();
-		}
+	public function GetColumn($filter = [], $field = null, $sort = [], $escape = false) {
+		$field = $field ?: $this->key();
 		$elements = $this->Select([
 			'FILTER' => $filter,
 			'FIELDS' => [$field],
 			'SORT'   => $sort,
+			'ESCAPE' => $escape,
 		]);
 		$rows = [];
 		foreach ($elements as $key => $element) {
@@ -383,11 +382,27 @@ abstract class SCRUD extends Instanceable {
 		return $rows;
 	}
 
-	public function Pick($filter = [], $sort = [], $field = null) {
-		$data = $this->GetColumn($filter, $sort, $field);
-		return reset($data);
+	/**
+	 * Выбирает первое значение из списка идентификаторов\значений указанной колонки.
+	 *
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
+	 * @param string $field символьный код выбираемой колонки (не обязательно, по умолчанию - идентификатор)
+	 * @param array $sort сортировка (не обязательно)
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function Pick($filter = [], $field = null, $sort = []) {
+		return reset($this->GetColumn($filter, $field, $sort));
 	}
 
+	/**
+	 * Вычисляет количество элементов, подходящих под фильтр.
+	 *
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
+	 * @return int
+	 * @throws Exception
+	 * @todo use SQL
+	 */
 	public function Count($filter = []) {
 		$data = $this->GetColumn($filter);
 		return count($data);
@@ -594,23 +609,6 @@ abstract class SCRUD extends Instanceable {
 		$answer = $this->PreparePartsByFilter($filter);
 		$this->SQL = "DELETE FROM {$this->code} WHERE " . implode(' AND ', $answer['WHERE']);
 		$this->Query($this->SQL);
-	}
-
-
-	/**
-	 * Формирует массив параметров на основе входящих параметров и дефолтных параметров.
-	 * Выдает массив, ключи которого состоят из дефолтных параметров, а значения - из входящих по возможности.
-	 * @param array $arParams - входящие параметры
-	 * @param array $defParams - дефолтные параметры
-	 * @return array - инициализированные параметры
-	 */
-	protected function _matchParams($arParams, $defParams) {
-		foreach ($defParams as $key => $param) {
-			if (array_key_exists($key, $arParams)) {
-				$defParams[$key] = $arParams[$key];
-			}
-		}
-		return $defParams;
 	}
 
 	/**

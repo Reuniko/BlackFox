@@ -103,7 +103,7 @@ class CacheDriverDatabase extends Cache {
 
 	public function Strike($tags) {
 		$tags = is_array($tags) ? $tags : [$tags];
-		$keys = $this->TAGS->GetColumn(['TAG' => $tags], [], 'KEY');
+		$keys = $this->TAGS->GetColumn(['TAG' => $tags], 'KEY');
 		$this->DATA->Delete(['KEY' => $keys]);
 		$this->TAGS->Delete(['TAG' => $tags]);
 		$this->TAGS->Delete(['KEY' => $keys]);
