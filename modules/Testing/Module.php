@@ -1,4 +1,5 @@
 <?php
+
 namespace Testing;
 
 class Module extends \System\AModule {
@@ -7,5 +8,6 @@ class Module extends \System\AModule {
 	public $version = '1.0';
 
 	public function Upgrade() {
+		// All Synchronize() is inside Testing classes
 	}
 }

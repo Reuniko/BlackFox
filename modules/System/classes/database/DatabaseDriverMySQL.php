@@ -11,6 +11,8 @@ class DatabaseDriverMySQL extends Database {
 
 	public function __construct($params = []) {
 
+		$this->database = $params['DATABASE'];
+
 		$this->link = mysqli_connect(
 			$params['HOST'],
 			$params['USER'],
@@ -210,10 +212,69 @@ class DatabaseDriverMySQL extends Database {
 			$this->Query($SQL);
 		}
 
-		$indexes = $this->Query("SHOW INDEX FROM `{$table}`", 'Column_name');
+		// FOREIGN KEYS:
+		$db_constraints = $this->Query("
+			SELECT 
+			KEY_COLUMN_USAGE.CONSTRAINT_NAME,
+			KEY_COLUMN_USAGE.COLUMN_NAME, 
+			REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
+			REFERENTIAL_CONSTRAINTS.DELETE_RULE,
+			-1 FROM information_schema.KEY_COLUMN_USAGE
+			INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS
+				ON REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME = KEY_COLUMN_USAGE.CONSTRAINT_NAME
+			WHERE KEY_COLUMN_USAGE.TABLE_SCHEMA = '{$this->database}'
+			AND KEY_COLUMN_USAGE.TABLE_NAME = '{$table}'
+		", 'COLUMN_NAME');
+		debug($db_constraints, $table);
 		foreach ($structure as $code => $Info) {
+			/** @var Type $Info */
+			$db_constraint = $db_constraints[$code];
+
+			$need_to_drop = false;
+			$need_to_create = false;
+			$action = is_string($Info['FOREIGN']) ? $Info['FOREIGN'] : 'NO ACTION';
+
+			// FOREIGN KEY is: present in database, missing in code - drop it
+			if (isset($db_constraint) && !$Info['FOREIGN']) {
+				$need_to_drop = true;
+			}
+
+			// FOREIGN KEY is: missing in database, present in code - create it
+			if ($Info['FOREIGN'] and !isset($db_constraint)) {
+				$need_to_create = true;
+			}
+
+			// FOREIGN KEY is:  present in database, present in code - check actions
+			if (isset($db_constraint)) {
+				if ($db_constraint['UPDATE_RULE'] <> $action or $db_constraint['DELETE_RULE'] <> $action) {
+					$need_to_drop = true;
+					$need_to_create = true;
+				}
+			}
+
+			if ($need_to_drop) {
+				$this->Query("ALTER TABLE `{$table}` DROP FOREIGN KEY `{$db_constraint['CONSTRAINT_NAME']}`");
+			}
+
+			if ($need_to_create) {
+				/** @var SCRUD $Link */
+				$Link = $Info['LINK']::I();
+				$link_key = $Info['FIELD'] ?: $Link->key();
+				// ON UPDATE {$action}
+				$this->Query("ALTER TABLE `{$table}` ADD FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action}");
+			}
+
+		}
+
+		// INDEXES:
+		$db_indexes = $this->Query("SHOW INDEX FROM `{$table}`", 'Column_name');
+		foreach ($structure as $code => $Info) {
+			/** @var Type $Info */
 			if (in_array($code, $keys)) {
 				continue;
+			}
+			if ($Info['FOREIGN']) {
+				$Info['INDEX'] = true;
 			}
 			if ($Info['UNIQUE']) {
 				$Info['INDEX'] = true;
@@ -223,28 +284,29 @@ class DatabaseDriverMySQL extends Database {
 				$Info['UNIQUE'] = true;
 			}
 			$unique = ($Info['UNIQUE']) ? 'UNIQUE' : '';
-			$index = $indexes[$code];
+			$db_index = $db_indexes[$code];
 
-			// в базе есть, в коде нет - удалить
-			if (isset($index) && !$Info['INDEX']) {
+			// index is: present in database, missing in code - drop it
+			if (isset($db_index) and !$Info['INDEX']) {
 				$this->Query("ALTER TABLE `{$table}` DROP INDEX `{$code}`;");
 				continue;
 			}
 
-			// в базе нет, в коде есть - добавить
-			if (($Info['INDEX']) && (!isset($index))) {
+			// index is: missing in database, present in code - create it
+			if ($Info['INDEX'] and !isset($db_index)) {
 				$this->Query("ALTER TABLE `{$table}` ADD {$unique} INDEX `{$code}` (`{$code}`);");
 				continue;
 			}
 
-			// в базе есть, в коде есть - уточнение уникальности индекса
-			if (isset($index)) {
-				if (($Info['UNIQUE'] && $index['Non_unique']) || (!$Info['UNIQUE'] && !$index['Non_unique'])) {
+			// index is: present in database, present in code - check unique
+			if (isset($db_index)) {
+				if (($Info['UNIQUE'] and $db_index['Non_unique']) or (!$Info['UNIQUE'] and !$db_index['Non_unique'])) {
 					$this->Query("ALTER TABLE `{$table}` DROP INDEX `{$code}`, ADD {$unique} INDEX `{$code}` (`{$code}`);");
 					continue;
 				}
 			}
 		}
+
 	}
 
 	public function CompileSQLSelect(array $parts) {

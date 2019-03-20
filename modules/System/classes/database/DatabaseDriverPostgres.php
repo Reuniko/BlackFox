@@ -8,6 +8,8 @@ class DatabaseDriverPostgres extends Database {
 
 	public function __construct($params = []) {
 
+		$this->database = $params['DATABASE'];
+
 		$connection_string = [
 			"host={$params['HOST']}",
 			"port={$params['PORT']}",

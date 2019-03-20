@@ -18,24 +18,24 @@ class TestScrudLinks extends Test {
 		parent::__construct();
 
 		$this->Grades = Grades::I();
-		$this->Grades->Synchronize();
-		$this->Grades->Truncate();
-		$this->Grades->Fill();
-
-		$this->Students = Students::I();
-		$this->Students->Synchronize();
-		$this->Students->Truncate();
-		$this->Students->Fill();
-
 		$this->Rooms = Rooms::I();
-		$this->Rooms->Synchronize();
-		$this->Rooms->Truncate();
-		$this->Rooms->Fill();
-
 		$this->Timetable = Timetable::I();
+		$this->Students = Students::I();
+
+		$this->Students->Drop();
+		$this->Timetable->Drop();
+		$this->Rooms->Drop();
+		$this->Grades->Drop();
+
+		$this->Grades->Synchronize();
+		$this->Rooms->Synchronize();
 		$this->Timetable->Synchronize();
-		$this->Timetable->Truncate();
+		$this->Students->Synchronize();
+
+		$this->Grades->Fill();
+		$this->Rooms->Fill();
 		$this->Timetable->Fill();
+		$this->Students->Fill();
 	}
 
 	/** Тест чтения случайного элемента (студент), проверка структуры */
