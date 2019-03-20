@@ -18,9 +18,10 @@ class Students extends \System\SCRUD {
 				'NAME' => 'Last name',
 			],
 			'GRADE'      => [
-				'TYPE' => 'OUTER',
-				'LINK' => 'Testing\Grades',
-				'NAME' => 'Grade',
+				'TYPE'    => 'OUTER',
+				'LINK'    => 'Testing\Grades',
+				'NAME'    => 'Grade',
+				'FOREIGN' => 'RESTRICT',
 			],
 		];
 	}

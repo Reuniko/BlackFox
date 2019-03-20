@@ -7,17 +7,19 @@ class Timetable extends \System\SCRUD {
 		$this->name = 'Расписание занятий';
 		$this->structure = [
 			'ID'       => self::ID,
-			'GRADE'    => [
-				'TYPE'     => 'OUTER',
-				'NAME'     => 'Класс',
-				'LINK'     => 'Testing\Grades',
-				'NOT_NULL' => true,
-			],
 			'ROOM'     => [
 				'TYPE'     => 'OUTER',
 				'NAME'     => 'Аудитория',
-				'LINK'     => 'Testing\Rooms',
+				'LINK'     => 'Rooms',
 				'NOT_NULL' => true,
+				'FOREIGN'  => 'CASCADE',
+			],
+			'GRADE'    => [
+				'TYPE'     => 'OUTER',
+				'NAME'     => 'Класс',
+				'LINK'     => 'Grades',
+				'NOT_NULL' => true,
+				'FOREIGN'  => 'CASCADE',
 			],
 			'START'    => [
 				'TYPE'     => 'DATETIME',

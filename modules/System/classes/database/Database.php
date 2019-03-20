@@ -4,6 +4,8 @@ namespace System;
 
 abstract class Database extends Instanceable {
 
+	public $database;
+
 	abstract function __construct($params);
 
 	/**
@@ -53,5 +55,9 @@ abstract class Database extends Instanceable {
 
 	public function Truncate($table) {
 		$this->Query("TRUNCATE TABLE {$table}");
+	}
+
+	public function Drop($table) {
+		$this->Query("DROP TABLE IF EXISTS {$table}");
 	}
 }

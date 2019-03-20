@@ -14,21 +14,20 @@ class Grades extends \System\SCRUD {
 				'VITAL' => true,
 			],
 			'CAPTAIN'    => [
-				'TYPE'     => 'OUTER',
-				'LINK'     => 'Testing\Students',
-				'NAME'     => 'Captain',
-				'NOT_NULL' => true,
+				'NAME' => 'Captain',
+				'TYPE' => 'OUTER',
+				'LINK' => 'Students',
 			],
 			'STUDENTS'   => [
 				'NAME'  => 'Students',
 				'TYPE'  => 'INNER',
-				'LINK'  => 'Testing\Students',
+				'LINK'  => 'Students',
 				'FIELD' => 'GRADE',
 			],
 			'TIMETABLES' => [
-				'NAME'  => 'Timetables',
+				'NAME'  => 'Timetable',
 				'TYPE'  => 'INNER',
-				'LINK'  => 'Testing\Timetable',
+				'LINK'  => 'Timetable',
 				'FIELD' => 'GRADE',
 			],
 		];
