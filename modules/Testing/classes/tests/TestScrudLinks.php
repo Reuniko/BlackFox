@@ -188,5 +188,41 @@ class TestScrudLinks extends Test {
 		// return $grades;
 	}
 
+	/** Тест внешнего ключа: RESTRICT создание */
+	public function TestForeignRestrict() {
+		$max_grade_id = $this->Grades->Read([], ['ID'], ['ID' => 'DESC'])['ID'];
+
+		$new_student_id = $this->Students->Create([
+			'FIRST_NAME' => 'New',
+			'LAST_NAME'  => 'Student',
+			'GRADE'      => $max_grade_id,
+		]);
+		if (empty($new_student_id)) {
+			throw new Exception("Can't create new student");
+		}
+
+		try {
+			$another_student_id = $this->Students->Create([
+				'FIRST_NAME' => 'Another',
+				'LAST_NAME'  => 'Student',
+				'GRADE'      => $max_grade_id + 1,
+			]);
+		} catch (\Exception $error) {
+			return $error->GetMessage();
+		}
+
+		throw new Exception("Can create student with no-existing grade #" . $max_grade_id + 1);
+	}
+
+	/** Тест внешнего ключа: CASCADE удаление */
+	public function TestForeignCascade() {
+		$random_timetable = $this->Timetable->Read([], ['*'], ['{RANDOM}' => '']);
+		$this->Rooms->Delete($random_timetable['ROOM']);
+		$test = $this->Timetable->Read($random_timetable['ID']);
+		if (!empty($test)) {
+			throw new Exception(["Timetable still exist", $random_timetable, $test]);
+		}
+	}
+
 
 }
