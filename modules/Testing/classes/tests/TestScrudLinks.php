@@ -14,26 +14,42 @@ class TestScrudLinks extends Test {
 	/** @var Timetable $Timetable */
 	public $Timetable = null;
 
-	public function TestInitialize() {
+	public function __construct() {
+		parent::__construct();
 		$this->Grades = Grades::I();
 		$this->Rooms = Rooms::I();
 		$this->Timetable = Timetable::I();
 		$this->Students = Students::I();
+	}
 
+	public function TestDrop() {
 		$this->Students->Drop();
 		$this->Timetable->Drop();
 		$this->Rooms->Drop();
 		$this->Grades->Drop();
+	}
 
+	public function TestSynchronize() {
 		$this->Grades->Synchronize();
 		$this->Rooms->Synchronize();
 		$this->Timetable->Synchronize();
 		$this->Students->Synchronize();
+	}
 
+	public function TestFillGrades() {
 		$this->Grades->Fill();
+	}
+
+	public function TestFillRooms() {
 		$this->Rooms->Fill();
-		$this->Timetable->Fill();
-		$this->Students->Fill();
+	}
+
+	public function TestFillTimetable() {
+		$this->Timetable->Fill(300);
+	}
+
+	public function TestFillStudents() {
+		$this->Students->Fill(100);
 	}
 
 	/** Тест чтения случайного элемента (студент), проверка структуры */
