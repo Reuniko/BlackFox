@@ -55,6 +55,18 @@
 									<?= $test_method_result['NAME'] ?>
 								</div>
 							</div>
+
+							<div class="col-1">
+								<div class="alert alert-sm alert-warning">
+									<i class="far fa-hourglass"></i>
+									<? if ($test_method_result['TIME'] > 5): ?>
+										<strong><?= $test_method_result['TIME'] ?></strong>
+									<? else: ?>
+										<?= $test_method_result['TIME'] ?>
+									<? endif; ?>
+								</div>
+							</div>
+
 							<div class="col">
 								<div class="alert alert-sm <?= $status2alert[$test_method_result['STATUS']] ?> limit">
 									<i class="<?= $status2icon[$test_method_result['STATUS']] ?>"></i>

@@ -36,6 +36,7 @@ class Test extends \System\Instanceable {
 	public function RunAll() {
 		$this->results = [];
 		foreach ($this->tests as $test => $display) {
+			$time1 = microtime(true);
 			try {
 				$result = $this->Run($test);
 				$this->results[$test] = [
@@ -62,6 +63,8 @@ class Test extends \System\Instanceable {
 					'RESULT' => $error->getMessage(),
 				];
 			}
+			$time2 = microtime(true);
+			$this->results[$test]['TIME'] = ceil(($time2 - $time1) * 10) / 10;
 
 			if (is_array($this->results[$test]['RESULT']) and count($this->results[$test]['RESULT']) === 1) {
 				$this->results[$test]['RESULT'] = reset($this->results[$test]['RESULT']);
