@@ -14,9 +14,7 @@ class TestScrudLinks extends Test {
 	/** @var Timetable $Timetable */
 	public $Timetable = null;
 
-	public function __construct() {
-		parent::__construct();
-
+	public function TestInitialize() {
 		$this->Grades = Grades::I();
 		$this->Rooms = Rooms::I();
 		$this->Timetable = Timetable::I();
