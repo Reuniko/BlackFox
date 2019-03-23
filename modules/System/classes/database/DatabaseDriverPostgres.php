@@ -238,8 +238,6 @@ class DatabaseDriverPostgres extends Database {
 		WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='{$table}';
 		", 'column_name');
 
-		debug($db_constraints, '$db_constraints of ' . $table);
-
 		foreach ($structure as $code => $Info) {
 			/** @var Type $Info */
 			$db_constraint = $db_constraints[$code];
@@ -303,35 +301,38 @@ class DatabaseDriverPostgres extends Database {
 		$indexes = $this->Query($SQL, 'column_name');
 		//debug($indexes, '$indexes');
 
-		foreach ($structure as $code => $field) {
+		foreach ($structure as $code => $Info) {
 			if (in_array($code, $keys)) {
 				continue;
 			}
-			if ($field['UNIQUE']) {
-				$field['INDEX'] = true;
+			if ($Info['FOREIGN']) {
+				$Info['INDEX'] = true;
 			}
-			if ($field['INDEX'] === 'UNIQUE') {
-				$field['INDEX'] = true;
-				$field['UNIQUE'] = true;
+			if ($Info['UNIQUE']) {
+				$Info['INDEX'] = true;
 			}
-			$unique = ($field['UNIQUE']) ? 'UNIQUE' : '';
+			if ($Info['INDEX'] === 'UNIQUE') {
+				$Info['INDEX'] = true;
+				$Info['UNIQUE'] = true;
+			}
+			$unique = ($Info['UNIQUE']) ? 'UNIQUE' : '';
 			$index = $indexes[$code];
 
 			// index is: present in database, missing in code - drop it
-			if (isset($index) and !$field['INDEX']) {
+			if (isset($index) and !$Info['INDEX']) {
 				$this->Query("DROP INDEX " . $this->Quote($index['index_name']));
 				continue;
 			}
 
 			// index is: missing in database, present in code - create it
-			if ($field['INDEX'] and !isset($index)) {
+			if ($Info['INDEX'] and !isset($index)) {
 				$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
 				continue;
 			}
 
 			// index is: present in database, present in code - check unique
 			if (isset($index)) {
-				if (($field['UNIQUE'] and $index['index_unique']) or (!$field['UNIQUE'] and !$index['index_unique'])) {
+				if (($Info['UNIQUE'] and $index['index_unique']) or (!$Info['UNIQUE'] and !$index['index_unique'])) {
 					$this->Query("DROP INDEX {$index['index_name']}");
 					$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
 					continue;

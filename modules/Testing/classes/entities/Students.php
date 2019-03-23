@@ -30,10 +30,10 @@ class Students extends \System\SCRUD {
 		return $element['FIRST_NAME'];
 	}
 
-	public function Fill() {
+	public function Fill($total) {
 		$names = file(__DIR__ . '/data/names.txt', FILE_IGNORE_NEW_LINES);
 		$lasts = ['J', 'G', 'V', 'X', 'Z'];
-		for ($i = 0; $i < 800; $i++) {
+		for ($i = 0; $i < $total; $i++) {
 			$this->Create([
 				'FIRST_NAME' => $names[array_rand($names)],
 				'LAST_NAME'  => $lasts[array_rand($lasts)] . '.',
