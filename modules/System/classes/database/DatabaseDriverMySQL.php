@@ -261,7 +261,7 @@ class DatabaseDriverMySQL extends Database {
 				$Link = $Info['LINK']::I();
 				$link_key = $Info['FIELD'] ?: $Link->key();
 				// ON UPDATE {$action}
-				$this->Query("ALTER TABLE `{$table}` ADD FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action}");
+				$this->Query("ALTER TABLE `{$table}` ADD FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}");
 			}
 
 		}

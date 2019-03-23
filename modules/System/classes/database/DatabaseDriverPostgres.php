@@ -213,6 +213,72 @@ class DatabaseDriverPostgres extends Database {
 			$this->Query($SQL);
 		}
 
+		// FOREIGN KEYS:
+		$db_constraints = $this->Query("
+			SELECT
+		    tc.table_schema, 
+		    tc.constraint_name, 
+		    tc.table_name, 
+		    kcu.column_name, 
+		    ccu.table_schema AS foreign_table_schema,
+		    ccu.table_name AS foreign_table_name,
+		    ccu.column_name AS foreign_column_name,
+			rc.update_rule,
+			rc.delete_rule,
+			-1 FROM 
+		    information_schema.table_constraints AS tc 
+		    JOIN information_schema.key_column_usage AS kcu
+		      ON tc.constraint_name = kcu.constraint_name
+		      AND tc.table_schema = kcu.table_schema
+		    JOIN information_schema.constraint_column_usage AS ccu
+		      ON ccu.constraint_name = tc.constraint_name
+		      AND ccu.table_schema = tc.table_schema
+			JOIN information_schema.referential_constraints AS rc
+			  ON rc.constraint_name =  tc.constraint_name
+		WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='{$table}';
+		", 'column_name');
+
+		debug($db_constraints, '$db_constraints of ' . $table);
+
+		foreach ($structure as $code => $Info) {
+			/** @var Type $Info */
+			$db_constraint = $db_constraints[$code];
+
+			$need_to_drop = false;
+			$need_to_create = false;
+			$action = is_string($Info['FOREIGN']) ? $Info['FOREIGN'] : 'NO ACTION';
+
+			// FOREIGN KEY is: present in database, missing in code - drop it
+			if (isset($db_constraint) && !$Info['FOREIGN']) {
+				$need_to_drop = true;
+			}
+
+			// FOREIGN KEY is: missing in database, present in code - create it
+			if ($Info['FOREIGN'] and !isset($db_constraint)) {
+				$need_to_create = true;
+			}
+
+			// FOREIGN KEY is:  present in database, present in code - check actions
+			if (isset($db_constraint)) {
+				if ($db_constraint['update_rule'] <> $action or $db_constraint['delete_rule'] <> $action) {
+					$need_to_drop = true;
+					$need_to_create = true;
+				}
+			}
+
+			if ($need_to_drop) {
+				$this->Query("ALTER TABLE \"{$table}\" DROP CONSTRAINT \"{$db_constraint['constraint_name']}\"");
+			}
+
+			if ($need_to_create) {
+				/** @var SCRUD $Link */
+				$Link = $Info['LINK']::I();
+				$link_key = $Info['FIELD'] ?: $Link->key();
+				$this->Query("ALTER TABLE \"{$table}\" ADD FOREIGN KEY (\"{$code}\") REFERENCES \"{$Link->code}\" (\"{$link_key}\") ON DELETE {$action} ON UPDATE {$action}");
+			}
+
+		}
+
 		// Indexes:
 		$SQL = "SELECT
 			    a.attname as column_name,
