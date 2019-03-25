@@ -671,7 +671,6 @@ abstract class SCRUD extends Instanceable {
 	 * -  <   - меньше либо равно
 	 * -  >>  - строго больше
 	 * -  <<  - строго меньше
-	 * -  %   - LIKE
 	 * -  ~   - LIKE
 	 *
 	 * @param mixed $filter ассоциатив фильтров | список идентификаторов | идентификатор
@@ -754,79 +753,7 @@ abstract class SCRUD extends Instanceable {
 			$join += $result['JOIN'];
 			$group += $result['GROUP'];
 
-			$values = is_array($values) ? $values : [$values];
-			$values_have_null = false;
-
-			if (count($values) === 0) {
-				$values_have_null = true;
-			}
-
-			foreach ($values as $key => $value) {
-				if (is_null($value)) {
-					$values_have_null = true;
-					unset($values[$key]);
-				} else {
-					$values[$key] = $object->_formatFieldValue($code, $values[$key]);
-				}
-			}
-
-			$conditions = [];
-			if ($values_have_null) {
-				switch ($operator) {
-					case '!':
-					case '<>':
-						$conditions['null'] = ' IS NOT NULL';
-						break;
-					default:
-						$conditions['null'] = ' IS NULL';
-						break;
-				}
-			}
-			if (count($values) === 1) {
-				$value = reset($values);
-				switch ($operator) {
-					case '>>':
-						$conditions['>>'] = '>\'' . $value . '\'';
-						break;
-					case '!':
-					case '<>':
-						$conditions['<>'] = '<>\'' . $value . '\'';
-						break;
-					case '<<':
-						$conditions['<<'] = '<\'' . $value . '\'';
-						break;
-					case '<':
-						$conditions['<'] = '<=\'' . $value . '\'';
-						break;
-					case '>':
-						$conditions['>'] = '>=\'' . $value . '\'';
-						break;
-					case '%':
-					case '~':
-						$conditions['%'] = ' LIKE \'%' . $value . '%\'';
-						break;
-					default:
-						$conditions['='] = '=\'' . $value . '\'';
-						break;
-				}
-			}
-			if (count($values) > 1) {
-				if (!empty($values)) {
-					$conditions[] = ' IN (\'' . implode('\', \'', $values) . '\')';
-				}
-			}
-
-			foreach ($conditions as $key => $condition) {
-
-				// TODO extract this block to TypeDateTime
-				if (($key === '%') && ($this->structure[$code]['TYPE'] === 'DATETIME')) {
-					$data = date('Y-m-d', strtotime($value));
-					$conditions[$key] = "DATE({$table}.{$code}) = '{$data}'";
-					continue;
-				}
-
-				$conditions[$key] = $table . "." . $this->DB->Quote($code) . $condition;
-			}
+			$conditions = $object->structure[$code]->PrepareConditions($table, $operator, $values);
 
 			$conditions = "(" . implode(' OR ', $conditions) . ")";
 			$where[] = $conditions;
