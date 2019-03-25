@@ -106,7 +106,6 @@ class DatabaseDriverPostgres extends Database {
 	}
 
 	public function SynchronizeTable($table, $structure) {
-		$strict = true;
 		if (empty($table)) {
 			throw new Exception("Synchronize failed: no code of table");
 		}
@@ -155,20 +154,27 @@ class DatabaseDriverPostgres extends Database {
 
 			$rows = [];
 			$keys = [];
+			$renames = [];
 
 			foreach ($structure as $code => $Info) {
 				/** @var Type $Info */
 				if ($Info['PRIMARY']) {
 					$keys[] = $code;
 				}
+
+				// renames
+				if ($Info['CHANGE'] and !empty($columns[$Info['CHANGE']])) {
+					$renames[] = "RENAME \"{$Info['CHANGE']}\" TO \"{$code}\"";
+					$columns[$code] = $columns[$Info['CHANGE']];
+					unset($columns[$Info['CHANGE']]);
+				}
+
 				// type
 				try {
 					$db_type = $this->GetStructureStringType($Info);
 				} catch (\Exception $error) {
 					continue;
 				}
-
-				// TODO добавить возможность RENAME COLUMN
 				if (!isset($columns[$code])) {
 					if ($Info["AUTO_INCREMENT"]) {
 						$db_type = 'serial';
@@ -187,7 +193,6 @@ class DatabaseDriverPostgres extends Database {
 
 				// default
 				if ($Info["AUTO_INCREMENT"]) {
-					// TODO generate sequences manually
 					$default = 'nextval(\'"' . $table . '_' . $code . '_seq"\'::regclass)';
 					$rows[] = "ALTER COLUMN \"{$code}\" SET DEFAULT {$default}";
 				} else {
@@ -201,13 +206,15 @@ class DatabaseDriverPostgres extends Database {
 
 				unset($columns[$code]);
 			}
-			if ($strict) {
-				foreach ($columns as $code => $column) {
-					$rows[] = "DROP COLUMN \"{$code}\"";
-				}
+			foreach ($columns as $code => $column) {
+				$rows[] = "DROP COLUMN \"{$code}\"";
 			}
 			if (!empty($keys)) {
 				$rows[] = "DROP CONSTRAINT IF EXISTS \"{$table}_pkey\", ADD CONSTRAINT \"{$table}_pkey\" PRIMARY KEY (\"" . implode("\", \"", $keys) . "\")";
+			}
+			if (!empty($renames)) {
+				$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $renames) . ";";
+				$this->Query($SQL);
 			}
 			$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $rows) . ";";
 			$this->Query($SQL);

@@ -222,10 +222,11 @@ class TestScrudLinks extends Test {
 				'GRADE'      => $max_grade_id + 1,
 			]);
 		} catch (\Exception $error) {
-			return $error->GetMessage();
+			return;
+			$error->GetMessage();
 		}
 
-		throw new Exception("Can create student with no-existing grade #" . $max_grade_id + 1);
+		throw new Exception("Can create student with no-existing grade #" . ($max_grade_id + 1));
 	}
 
 	/** Тест внешнего ключа: CASCADE удаление */
@@ -235,6 +236,21 @@ class TestScrudLinks extends Test {
 		$test = $this->Timetable->Read($random_timetable['ID']);
 		if (!empty($test)) {
 			throw new Exception(["Timetable still exist", $random_timetable, $test]);
+		}
+	}
+
+	/** Тест переименования колонки */
+	public function TestRenameColumn() {
+		// FIRST_NAME -> SECOND_NAME
+		$this->Students->structure['SECOND_NAME'] = clone $this->Students->structure['FIRST_NAME'];
+		$this->Students->structure['SECOND_NAME']['CHANGE'] = 'FIRST_NAME';
+		unset($this->Students->structure['FIRST_NAME']);
+		$this->Students->ProvideIntegrity();
+		$this->Students->Synchronize();
+
+		$random_student = $this->Students->Read([], ['*'], ['{RANDOM}' => '']);
+		if (!array_key_exists('SECOND_NAME', $random_student)) {
+			throw new Exception(["No key SECOND_NAME", $random_student]);
 		}
 	}
 
