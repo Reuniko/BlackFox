@@ -135,6 +135,18 @@ class TestScrudBase extends Test {
 		return $value;
 	}
 
+	/** Проверка фильтра: примерная дата */
+	public function TestFilterDateApproximate() {
+		$values = $this->SCRUD->GetColumn(['~DATETIME' => date('d.m.Y')], 'DATETIME');
+		foreach ($values as $raw) {
+			$date = date('d.m.Y', strtotime($raw));
+			if ($date <> date('d.m.Y')) {
+				throw new Exception("Wrong date: {$date}");
+			}
+		}
+		// return [$this->SCRUD->SQL, $values];
+	}
+
 	/** Проверка пейджера: без фильтрации */
 	public function TestPager() {
 		$step = 100;

@@ -75,6 +75,76 @@ abstract class Type implements \ArrayAccess {
 		return $element;
 	}
 
+	public function PrepareConditions($table, $operator, $values) {
+		$values = is_array($values) ? $values : [$values];
+		$values_have_null = false;
+
+		if (count($values) === 0) {
+			$values_have_null = true;
+		}
+
+		foreach ($values as $key => $value) {
+			if (is_null($value)) {
+				$values_have_null = true;
+				unset($values[$key]);
+			} else {
+				$values[$key] = $this->FormatInputValue($values[$key]);
+				$values[$key] = Database::I()->Escape($values[$key]);
+			}
+		}
+
+		$conditions = [];
+		if ($values_have_null) {
+			switch ($operator) {
+				case '!':
+				case '<>':
+					$conditions['null'] = ' IS NOT NULL';
+					break;
+				default:
+					$conditions['null'] = ' IS NULL';
+					break;
+			}
+		}
+		if (count($values) === 1) {
+			$value = reset($values);
+			switch ($operator) {
+				case '>>':
+					$conditions['>>'] = '>\'' . $value . '\'';
+					break;
+				case '!':
+				case '<>':
+					$conditions['<>'] = '<>\'' . $value . '\'';
+					break;
+				case '<<':
+					$conditions['<<'] = '<\'' . $value . '\'';
+					break;
+				case '<':
+					$conditions['<'] = '<=\'' . $value . '\'';
+					break;
+				case '>':
+					$conditions['>'] = '>=\'' . $value . '\'';
+					break;
+				case '~':
+					$conditions['~'] = 'LIKE \'%' . $value . '%\'';
+					break;
+				default:
+					$conditions['='] = '=\'' . $value . '\'';
+					break;
+			}
+		}
+		if (count($values) > 1) {
+			if (!empty($values)) {
+				$conditions['in'] = 'IN (\'' . implode('\', \'', $values) . '\')';
+			}
+		}
+
+		foreach ($conditions as $key => $condition) {
+			$conditions[$key] = $table . "." . $this->Quote($this->info['CODE']) . $condition;
+		}
+
+		return $conditions;
+	}
+
 	/**
 	 * This method must generate and return array with keys:
 	 * - SELECT - array of SQL parts for SELECT section
