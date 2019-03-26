@@ -9,7 +9,7 @@ abstract class Database extends Instanceable {
 	abstract function __construct($params);
 
 	/**
-	 * Execute SQL query and return a result as array or value of ID, which has been inserted
+	 * Execute SQL query and return a result as array
 	 *
 	 * @param string $SQL
 	 * @param string $key
@@ -18,6 +18,14 @@ abstract class Database extends Instanceable {
 	 */
 	abstract public function Query($SQL, $key = null);
 
+	/**
+	 * Execute SQL query and return a result as value of ID, which has been inserted
+	 *
+	 * @param string $SQL
+	 * @param string $increment
+	 * @return int|string
+	 * @throws ExceptionSQL
+	 */
 	abstract public function QuerySingleInsert($SQL, $increment = null);
 
 	/**
@@ -44,12 +52,21 @@ abstract class Database extends Instanceable {
 		$this->Query('COMMIT');
 	}
 
+	abstract public function DropTableConstraints($table);
+
+	/**
+	 * @param string $table code of the table
+	 * @param array $structure
+	 * @throws Exception
+	 */
+	abstract public function SynchronizeTable($table, $structure);
+
 	/**
 	 * @param $table
 	 * @param $structure
 	 * @throws Exception
 	 */
-	abstract public function SynchronizeTable($table, $structure);
+	abstract public function CreateTableConstraints($table, $structure);
 
 	abstract public function CompileSQLSelect(array $parts);
 

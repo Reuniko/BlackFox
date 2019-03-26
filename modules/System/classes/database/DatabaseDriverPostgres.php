@@ -105,6 +105,39 @@ class DatabaseDriverPostgres extends Database {
 		}
 	}
 
+	private function GetConstraints($table) {
+		return $this->Query("
+			SELECT
+		    tc.table_schema, 
+		    tc.constraint_name, 
+		    tc.table_name, 
+		    kcu.column_name, 
+		    ccu.table_schema AS foreign_table_schema,
+		    ccu.table_name AS foreign_table_name,
+		    ccu.column_name AS foreign_column_name,
+			rc.update_rule,
+			rc.delete_rule,
+			-1 FROM 
+		    information_schema.table_constraints AS tc 
+		    JOIN information_schema.key_column_usage AS kcu
+		      ON tc.constraint_name = kcu.constraint_name
+		      AND tc.table_schema = kcu.table_schema
+		    JOIN information_schema.constraint_column_usage AS ccu
+		      ON ccu.constraint_name = tc.constraint_name
+		      AND ccu.table_schema = tc.table_schema
+			JOIN information_schema.referential_constraints AS rc
+			  ON rc.constraint_name =  tc.constraint_name
+		WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='{$table}';
+		", 'column_name');
+	}
+
+	public function DropTableConstraints($table) {
+		$db_constraints = $this->GetConstraints($table);
+		if (!empty($db_constraints))
+			foreach ($db_constraints as $db_constraint)
+				$this->Query("ALTER TABLE \"{$table}\" DROP CONSTRAINT \"{$db_constraint['constraint_name']}\"");
+	}
+
 	public function SynchronizeTable($table, $structure) {
 		if (empty($table)) {
 			throw new Exception("Synchronize failed: no code of table");
@@ -157,6 +190,7 @@ class DatabaseDriverPostgres extends Database {
 			$renames = [];
 
 			foreach ($structure as $code => $Info) {
+				$code_id = $this->Quote($code);
 				/** @var Type $Info */
 				if ($Info['PRIMARY']) {
 					$keys[] = $code;
@@ -164,7 +198,7 @@ class DatabaseDriverPostgres extends Database {
 
 				// renames
 				if ($Info['CHANGE'] and !empty($columns[$Info['CHANGE']])) {
-					$renames[] = "RENAME \"{$Info['CHANGE']}\" TO \"{$code}\"";
+					$renames[] = "RENAME \"{$Info['CHANGE']}\" TO {$code_id}";
 					$columns[$code] = $columns[$Info['CHANGE']];
 					unset($columns[$Info['CHANGE']]);
 				}
@@ -175,117 +209,65 @@ class DatabaseDriverPostgres extends Database {
 				} catch (\Exception $error) {
 					continue;
 				}
+
+				// ADD COLUMN:
 				if (!isset($columns[$code])) {
 					if ($Info["AUTO_INCREMENT"]) {
 						$db_type = 'serial';
 					}
-					$rows[] = "ADD COLUMN \"{$code}\" {$db_type}";
-				} else {
-					$rows[] = "ALTER COLUMN \"{$code}\" TYPE {$db_type}";
+					$default = $Info['DEFAULT'] ? "DEFAULT '{$Info['DEFAULT']}'" : '';
+					$not_null = $Info['NOT_NULL'] ? 'NOT NULL' : '';
+					$rows[] = "ADD COLUMN {$code_id} {$db_type} {$default} {$not_null}";
+
+					unset($columns[$code]);
+					continue;
 				}
 
-				// null
+				// ALTER COLUMN:
+				// todo не делать лишней работы
+				$rows[] = "ALTER COLUMN {$code_id} TYPE {$db_type}";
+
+				// $not_null
 				if (($Info["NOT_NULL"] || $Info['PRIMARY'])) {
-					$rows[] = "ALTER COLUMN \"{$code}\" SET NOT NULL";
+					$rows[] = "ALTER COLUMN {$code_id} SET NOT NULL";
 				} else {
-					$rows[] = "ALTER COLUMN \"{$code}\" DROP NOT NULL";
+					$rows[] = "ALTER COLUMN {$code_id} DROP NOT NULL";
 				}
 
-				// default
+				// $default
 				if ($Info["AUTO_INCREMENT"]) {
-					$rows[] = "ALTER COLUMN \"{$code}\" SET DEFAULT " . 'nextval(\'"' . $table . '_' . $code . '_seq"\'::regclass)';
+					$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT " . 'nextval(\'"' . $table . '_' . $code . '_seq"\'::regclass)';
 				} else {
 					if (isset($Info['DEFAULT'])) {
 						$default = !is_array($Info['DEFAULT']) ? $Info['DEFAULT'] : implode(',', $Info['DEFAULT']);
-						$rows[] = "ALTER COLUMN \"{$code}\" SET DEFAULT '{$default}'";
+						$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT '{$default}'";
 					} else {
-						$rows[] = "ALTER COLUMN \"{$code}\" DROP DEFAULT";
+						$rows[] = "ALTER COLUMN {$code_id} DROP DEFAULT";
 					}
 				}
 
 				unset($columns[$code]);
 			}
+
+			// DROP COLUMN:
 			foreach ($columns as $code => $column) {
-				$rows[] = "DROP COLUMN \"{$code}\"";
+				$rows[] = "DROP COLUMN " . $this->Quote($code);
+				unset($columns[$code]);
 			}
+
 			if (!empty($keys)) {
 				$rows[] = "DROP CONSTRAINT IF EXISTS \"{$table}_pkey\", ADD CONSTRAINT \"{$table}_pkey\" PRIMARY KEY (\"" . implode("\", \"", $keys) . "\")";
 			}
-
-			//$this->Query("ALTER TABLE {$table} DISABLE TRIGGER ALL;");
 
 			if (!empty($renames)) {
 				$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $renames) . ";";
 				$this->Query($SQL);
 			}
-			$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $rows) . ";";
-			$this->Query($SQL);
 
-			//$this->Query("ALTER TABLE {$table} ENABLE TRIGGER ALL;");
-		}
-
-		// FOREIGN KEYS:
-		$db_constraints = $this->Query("
-			SELECT
-		    tc.table_schema, 
-		    tc.constraint_name, 
-		    tc.table_name, 
-		    kcu.column_name, 
-		    ccu.table_schema AS foreign_table_schema,
-		    ccu.table_name AS foreign_table_name,
-		    ccu.column_name AS foreign_column_name,
-			rc.update_rule,
-			rc.delete_rule,
-			-1 FROM 
-		    information_schema.table_constraints AS tc 
-		    JOIN information_schema.key_column_usage AS kcu
-		      ON tc.constraint_name = kcu.constraint_name
-		      AND tc.table_schema = kcu.table_schema
-		    JOIN information_schema.constraint_column_usage AS ccu
-		      ON ccu.constraint_name = tc.constraint_name
-		      AND ccu.table_schema = tc.table_schema
-			JOIN information_schema.referential_constraints AS rc
-			  ON rc.constraint_name =  tc.constraint_name
-		WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='{$table}';
-		", 'column_name');
-
-		foreach ($structure as $code => $Info) {
-			/** @var Type $Info */
-			$db_constraint = $db_constraints[$code];
-
-			$need_to_drop = false;
-			$need_to_create = false;
-			$action = is_string($Info['FOREIGN']) ? $Info['FOREIGN'] : 'NO ACTION';
-
-			// FOREIGN KEY is: present in database, missing in code - drop it
-			if (isset($db_constraint) && !$Info['FOREIGN']) {
-				$need_to_drop = true;
+			if (!empty($rows)) {
+				$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $rows) . ";";
+				$this->Query($SQL);
 			}
-
-			// FOREIGN KEY is: missing in database, present in code - create it
-			if ($Info['FOREIGN'] and !isset($db_constraint)) {
-				$need_to_create = true;
-			}
-
-			// FOREIGN KEY is:  present in database, present in code - check actions
-			if (isset($db_constraint)) {
-				if ($db_constraint['update_rule'] <> $action or $db_constraint['delete_rule'] <> $action) {
-					$need_to_drop = true;
-					$need_to_create = true;
-				}
-			}
-
-			if ($need_to_drop) {
-				$this->Query("ALTER TABLE \"{$table}\" DROP CONSTRAINT \"{$db_constraint['constraint_name']}\"");
-			}
-
-			if ($need_to_create) {
-				/** @var SCRUD $Link */
-				$Link = $Info['LINK']::I();
-				$link_key = $Info['FIELD'] ?: $Link->key();
-				$this->Query("ALTER TABLE \"{$table}\" ADD FOREIGN KEY (\"{$code}\") REFERENCES \"{$Link->code}\" (\"{$link_key}\") ON DELETE {$action} ON UPDATE {$action}");
-			}
-
 		}
 
 		// Indexes:
@@ -349,6 +331,20 @@ class DatabaseDriverPostgres extends Database {
 					continue;
 				}
 			}
+		}
+	}
+
+	public function CreateTableConstraints($table, $structure) {
+		foreach ($structure as $code => $Info) {
+			/** @var Type $Info */
+			if (!isset($Info['FOREIGN'])) {
+				continue;
+			}
+			$action = is_string($Info['FOREIGN']) ? $Info['FOREIGN'] : 'RESTRICT';
+			/** @var SCRUD $Link */
+			$Link = $Info['LINK']::I();
+			$link_key = $Info['FIELD'] ?: $Link->key();
+			$this->Query("ALTER TABLE \"{$table}\" ADD FOREIGN KEY (\"{$code}\") REFERENCES \"{$Link->code}\" (\"{$link_key}\") ON DELETE {$action} ON UPDATE {$action}");
 		}
 	}
 

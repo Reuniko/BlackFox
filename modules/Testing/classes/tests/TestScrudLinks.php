@@ -36,6 +36,13 @@ class TestScrudLinks extends Test {
 		$this->Students->Synchronize();
 	}
 
+	public function TestCreateConstraints() {
+		$this->Grades->CreateConstraints();
+		$this->Rooms->CreateConstraints();
+		$this->Timetable->CreateConstraints();
+		$this->Students->CreateConstraints();
+	}
+
 	public function TestFillGrades() {
 		$this->Grades->Fill();
 	}
@@ -223,7 +230,6 @@ class TestScrudLinks extends Test {
 			]);
 		} catch (\Exception $error) {
 			return;
-			$error->GetMessage();
 		}
 
 		throw new Exception("Can create student with no-existing grade #" . ($max_grade_id + 1));
