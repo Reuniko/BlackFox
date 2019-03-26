@@ -133,6 +133,28 @@ class DatabaseDriverMySQL extends Database {
 		return $structure_string;
 	}
 
+	private function GetConstraints($table) {
+		$this->Query("
+			SELECT 
+			KEY_COLUMN_USAGE.CONSTRAINT_NAME,
+			KEY_COLUMN_USAGE.COLUMN_NAME, 
+			REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
+			REFERENTIAL_CONSTRAINTS.DELETE_RULE,
+			-1 FROM information_schema.KEY_COLUMN_USAGE
+			INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS
+				ON REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME = KEY_COLUMN_USAGE.CONSTRAINT_NAME
+			WHERE KEY_COLUMN_USAGE.TABLE_SCHEMA = '{$this->database}'
+			AND KEY_COLUMN_USAGE.TABLE_NAME = '{$table}'
+		", 'COLUMN_NAME');
+	}
+
+	public function DropTableConstraints($table) {
+		$db_constraints = $this->GetConstraints($table);
+		if (!empty($db_constraints))
+			foreach ($db_constraints as $db_constraint)
+				$this->Query("ALTER TABLE `{$table}` DROP FOREIGN KEY `{$db_constraint['CONSTRAINT_NAME']}`");
+	}
+
 	public function SynchronizeTable($table, $structure) {
 		$strict = true;
 		if (empty($structure)) {
@@ -212,60 +234,6 @@ class DatabaseDriverMySQL extends Database {
 			$this->Query($SQL);
 		}
 
-		// FOREIGN KEYS:
-		$db_constraints = $this->Query("
-			SELECT 
-			KEY_COLUMN_USAGE.CONSTRAINT_NAME,
-			KEY_COLUMN_USAGE.COLUMN_NAME, 
-			REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
-			REFERENTIAL_CONSTRAINTS.DELETE_RULE,
-			-1 FROM information_schema.KEY_COLUMN_USAGE
-			INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS
-				ON REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME = KEY_COLUMN_USAGE.CONSTRAINT_NAME
-			WHERE KEY_COLUMN_USAGE.TABLE_SCHEMA = '{$this->database}'
-			AND KEY_COLUMN_USAGE.TABLE_NAME = '{$table}'
-		", 'COLUMN_NAME');
-		debug($db_constraints, $table);
-		foreach ($structure as $code => $Info) {
-			/** @var Type $Info */
-			$db_constraint = $db_constraints[$code];
-
-			$need_to_drop = false;
-			$need_to_create = false;
-			$action = is_string($Info['FOREIGN']) ? $Info['FOREIGN'] : 'NO ACTION';
-
-			// FOREIGN KEY is: present in database, missing in code - drop it
-			if (isset($db_constraint) && !$Info['FOREIGN']) {
-				$need_to_drop = true;
-			}
-
-			// FOREIGN KEY is: missing in database, present in code - create it
-			if ($Info['FOREIGN'] and !isset($db_constraint)) {
-				$need_to_create = true;
-			}
-
-			// FOREIGN KEY is:  present in database, present in code - check actions
-			if (isset($db_constraint)) {
-				if ($db_constraint['UPDATE_RULE'] <> $action or $db_constraint['DELETE_RULE'] <> $action) {
-					$need_to_drop = true;
-					$need_to_create = true;
-				}
-			}
-
-			if ($need_to_drop) {
-				$this->Query("ALTER TABLE `{$table}` DROP FOREIGN KEY `{$db_constraint['CONSTRAINT_NAME']}`");
-			}
-
-			if ($need_to_create) {
-				/** @var SCRUD $Link */
-				$Link = $Info['LINK']::I();
-				$link_key = $Info['FIELD'] ?: $Link->key();
-				// ON UPDATE {$action}
-				$this->Query("ALTER TABLE `{$table}` ADD FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}");
-			}
-
-		}
-
 		// INDEXES:
 		$db_indexes = $this->Query("SHOW INDEX FROM `{$table}`", 'Column_name');
 		foreach ($structure as $code => $Info) {
@@ -307,6 +275,20 @@ class DatabaseDriverMySQL extends Database {
 			}
 		}
 
+	}
+
+	public function CreateTableConstraints($table, $structure) {
+		foreach ($structure as $code => $Info) {
+			/** @var Type $Info */
+			if (!isset($Info['FOREIGN'])) {
+				continue;
+			}
+			$action = is_string($Info['FOREIGN']) ? $Info['FOREIGN'] : 'RESTRICT';
+			/** @var SCRUD $Link */
+			$Link = $Info['LINK']::I();
+			$link_key = $Info['FIELD'] ?: $Link->key();
+			$this->Query("ALTER TABLE `{$table}` ADD FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}");
+		}
 	}
 
 	public function CompileSQLSelect(array $parts) {

@@ -157,14 +157,16 @@ abstract class SCRUD extends Instanceable {
 
 	}
 
-	/**
-	 * Синхронизирует структуру таблицы в базе данных
-	 *
-	 * @param bool $strict если указан, то синхронизация удаляет лишние поля и пересортирует текущие
-	 * @throws Exception
-	 */
-	public function Synchronize($strict = false) {
+	public function DropConstraints() {
+		$this->DB->DropTableConstraints($this->code);
+	}
+
+	public function Synchronize() {
 		$this->DB->SynchronizeTable($this->code, $this->structure);
+	}
+
+	public function CreateConstraints() {
+		$this->DB->CreateTableConstraints($this->code, $this->structure);
 	}
 
 	/**

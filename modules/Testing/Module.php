@@ -8,6 +8,18 @@ class Module extends \System\AModule {
 	public $version = '1.0';
 
 	public function Upgrade() {
-		// All Synchronize() is inside Testing classes
+
+		Grades::I()->DropConstraints();
+		Timetable::I()->DropConstraints();
+		Students::I()->DropConstraints();
+
+		Grades::I()->Synchronize();
+		Rooms::I()->Synchronize();
+		Timetable::I()->Synchronize();
+		Students::I()->Synchronize();
+
+		Grades::I()->CreateConstraints();
+		Timetable::I()->CreateConstraints();
+		Students::I()->CreateConstraints();
 	}
 }
