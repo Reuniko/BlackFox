@@ -193,8 +193,7 @@ class DatabaseDriverPostgres extends Database {
 
 				// default
 				if ($Info["AUTO_INCREMENT"]) {
-					$default = 'nextval(\'"' . $table . '_' . $code . '_seq"\'::regclass)';
-					$rows[] = "ALTER COLUMN \"{$code}\" SET DEFAULT {$default}";
+					$rows[] = "ALTER COLUMN \"{$code}\" SET DEFAULT " . 'nextval(\'"' . $table . '_' . $code . '_seq"\'::regclass)';
 				} else {
 					if (isset($Info['DEFAULT'])) {
 						$default = !is_array($Info['DEFAULT']) ? $Info['DEFAULT'] : implode(',', $Info['DEFAULT']);
@@ -212,12 +211,17 @@ class DatabaseDriverPostgres extends Database {
 			if (!empty($keys)) {
 				$rows[] = "DROP CONSTRAINT IF EXISTS \"{$table}_pkey\", ADD CONSTRAINT \"{$table}_pkey\" PRIMARY KEY (\"" . implode("\", \"", $keys) . "\")";
 			}
+
+			//$this->Query("ALTER TABLE {$table} DISABLE TRIGGER ALL;");
+
 			if (!empty($renames)) {
 				$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $renames) . ";";
 				$this->Query($SQL);
 			}
 			$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $rows) . ";";
 			$this->Query($SQL);
+
+			//$this->Query("ALTER TABLE {$table} ENABLE TRIGGER ALL;");
 		}
 
 		// FOREIGN KEYS:
@@ -340,7 +344,7 @@ class DatabaseDriverPostgres extends Database {
 			// index is: present in database, present in code - check unique
 			if (isset($index)) {
 				if (($Info['UNIQUE'] and $index['index_unique']) or (!$Info['UNIQUE'] and !$index['index_unique'])) {
-					$this->Query("DROP INDEX {$index['index_name']}");
+					$this->Query("DROP INDEX " . $this->Quote($index['index_name']));
 					$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
 					continue;
 				}
