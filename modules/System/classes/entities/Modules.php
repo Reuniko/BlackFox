@@ -5,7 +5,10 @@ namespace System;
 class Modules extends SCRUD {
 
 	final public function Init() {
-		$this->name = 'Модули';
+		$this->name = T([
+			'en' => 'Modules',
+			'ru' => 'Модули',
+		]);
 		$this->structure += [
 			'ID'          => [
 				'TYPE'           => 'STRING',
@@ -19,19 +22,31 @@ class Modules extends SCRUD {
 			],
 			'NAME'        => [
 				'TYPE' => 'STRING',
-				'NAME' => 'Имя',
+				'NAME' => T([
+					'en' => 'Name',
+					'ru' => 'Имя',
+				]),
 			],
 			'DESCRIPTION' => [
 				'TYPE' => 'STRING',
-				'NAME' => 'Описание',
+				'NAME' => T([
+					'en' => 'Description',
+					'ru' => 'Описание',
+				]),
 			],
 			'VERSION'     => [
 				'TYPE' => 'STRING',
-				'NAME' => 'Версия',
+				'NAME' => T([
+					'en' => 'Version',
+					'ru' => 'Версия',
+				]),
 			],
 			'SORT'        => [
 				'TYPE' => 'NUMBER',
-				'NAME' => 'Сортировка',
+				'NAME' => T([
+					'en' => 'Sort',
+					'ru' => 'Сортировка',
+				]),
 			],
 		];
 	}

@@ -9,14 +9,20 @@ class Users2Groups extends SCRUD {
 			'USER'  => [
 				'TYPE'    => 'OUTER',
 				'LINK'    => 'Users',
-				'NAME'    => 'Пользователь',
+				'NAME'    => T([
+					'en' => 'User',
+					'ru' => 'Пользователь',
+				]),
 				'VITAL'   => true,
 				'FOREIGN' => 'CASCADE',
 			],
 			'GROUP' => [
 				'TYPE'    => 'OUTER',
 				'LINK'    => 'Groups',
-				'NAME'    => 'Группа',
+				'NAME'    => T([
+					'en' => 'Group',
+					'ru' => 'Группа',
+				]),
 				'VITAL'   => true,
 				'FOREIGN' => 'CASCADE',
 			],

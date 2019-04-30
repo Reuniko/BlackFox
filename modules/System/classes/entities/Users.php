@@ -5,17 +5,29 @@ namespace System;
 class Users extends SCRUD {
 
 	public function Init() {
-		$this->name = 'Пользователи';
+		$this->name = T([
+			'en' => 'Users',
+			'ru' => 'Пользователи',
+		]);
 		$this->groups = [
-			'SYSTEM'  => 'Система',
-			'CONTENT' => 'Контент',
+			'SYSTEM'  => T([
+				'en' => 'System',
+				'ru' => 'Система',
+			]),
+			'CONTENT' => T([
+				'en' => 'Content',
+				'ru' => 'Контент',
+			]),
 		];
 		$this->structure += [
 			'ID'              => self::ID + ['GROUP' => 'SYSTEM'],
 			'LOGIN'           => [
 				'TYPE'     => 'STRING',
 				'GROUP'    => 'SYSTEM',
-				'NAME'     => 'Логин',
+				'NAME'     => T([
+					'en' => 'Login',
+					'ru' => 'Логин',
+				]),
 				'NOT_NULL' => true,
 				'INDEX'    => true,
 				'UNIQUE'   => true,
@@ -24,81 +36,138 @@ class Users extends SCRUD {
 			'PASSWORD'        => [
 				'TYPE'        => 'PASSWORD',
 				'GROUP'       => 'SYSTEM',
-				'NAME'        => 'Пароль',
-				'DESCRIPTION' => 'В базе хранится sha1 хеш пароля',
+				'NAME'        => T([
+					'en' => 'Password',
+					'ru' => 'Пароль',
+				]),
+				'DESCRIPTION' => T([
+					'en' => 'Database contains sha1 hash of the password',
+					'ru' => 'В базе хранится sha1 хеш пароля',
+				]),
 				'NOT_NULL'    => true,
 			],
 			'SALT'            => [
 				'TYPE'     => 'STRING',
 				'GROUP'    => 'SYSTEM',
-				'NAME'     => 'Соль',
+				'NAME'     => T([
+					'en' => 'Salt',
+					'ru' => 'Соль',
+				]),
 				'NOT_NULL' => true,
 			],
 			'HASH'            => [
 				'TYPE'        => 'STRING',
 				'GROUP'       => 'SYSTEM',
-				'NAME'        => 'Хэш',
-				'DESCRIPTION' => 'Для восстановления пароля',
+				'NAME'        => T([
+					'en' => 'Hash',
+					'ru' => 'Хэш',
+				]),
+				'DESCRIPTION' => T([
+					'en' => 'For password recovery',
+					'ru' => 'Для восстановления пароля',
+				]),
+			],
+			'LANG'            => [
+				'TYPE'    => 'STRING',
+				'GROUP'   => 'SYSTEM',
+				'NAME'    => T([
+					'en' => 'Language',
+					'ru' => 'Язык',
+				]),
+				'DEFAULT' => 'en',
 			],
 			'LAST_AUTH'       => [
 				'TYPE'     => 'DATETIME',
 				'GROUP'    => 'SYSTEM',
-				'NAME'     => 'Последнее время авторизации',
+				'NAME'     => T([
+					'en' => 'Last authorisation moment',
+					'ru' => 'Последнее время авторизации',
+				]),
 				'DISABLED' => true,
 			],
 			'REGISTER_MOMENT' => [
 				'TYPE'     => 'DATETIME',
 				'GROUP'    => 'SYSTEM',
-				'NAME'     => 'Время регистрации',
+				'NAME'     => T([
+					'en' => 'Registration moment',
+					'ru' => 'Время регистрации',
+				]),
 				'DISABLED' => true,
 			],
 			'FIRST_NAME'      => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
-				'NAME'  => 'Имя',
+				'NAME'  => T([
+					'en' => 'First name',
+					'ru' => 'Имя',
+				]),
 				'VITAL' => true,
 			],
 			'LAST_NAME'       => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
-				'NAME'  => 'Фамилия',
+				'NAME'  => T([
+					'en' => 'Last name',
+					'ru' => 'Фамилия',
+				]),
 				'VITAL' => true,
 			],
 			'MIDDLE_NAME'     => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
-				'NAME'  => 'Отчество',
+				'NAME'  => T([
+					'en' => 'Middle name',
+					'ru' => 'Отчество',
+				]),
 			],
 			'EMAIL'           => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
-				'NAME'  => 'E-mail',
+				'NAME'  => T([
+					'en' => 'E-mail',
+					'ru' => 'E-mail',
+				]),
 				'VITAL' => true,
 			],
 			'PHONE'           => [
 				'TYPE'  => 'STRING',
 				'GROUP' => 'CONTENT',
-				'NAME'  => 'Телефон',
+				'NAME'  => T([
+					'en' => 'Phone',
+					'ru' => 'Телефон',
+				]),
 			],
 			'AVATAR'          => [
 				'TYPE'  => 'FILE',
 				'GROUP' => 'CONTENT',
-				'NAME'  => 'Аватар',
+				'NAME'  => T([
+					'en' => 'Avatar',
+					'ru' => 'Аватар',
+				]),
 				'LINK'  => 'System\Files',
 			],
 			'BIRTH_DAY'       => [
 				'TYPE'  => 'DATE',
 				'GROUP' => 'CONTENT',
-				'NAME'  => 'День рождения',
+				'NAME'  => T([
+					'en' => 'Birthday',
+					'ru' => 'День рождения',
+				]),
 			],
 			'ABOUT'           => [
 				'TYPE'  => 'TEXT',
 				'GROUP' => 'CONTENT',
-				'NAME'  => 'О себе',
+				'NAME'  => T([
+					'en' => 'About',
+					'ru' => 'О себе',
+				]),
 			],
 			'GROUPS'          => [
 				'TYPE'  => 'INNER',
-				'NAME'  => 'Группы',
+				'NAME'  => T([
+					'en' => 'Groups',
+					'ru' => 'Группы',
+				]),
 				'LINK'  => 'System\Users2Groups',
 				'FIELD' => 'USER',
 			],
@@ -115,12 +184,18 @@ class Users extends SCRUD {
 	public function Create($fields) {
 
 		if (empty($fields['LOGIN'])) {
-			throw new Exception("Login must be specified");
+			throw new Exception(T([
+				'en' => 'Login must be specified',
+				'ru' => 'Укажите логин',
+			]));
 		}
 
 		// prevent doubles for LOGIN
 		if (!empty($this->Read(['LOGIN' => $fields['LOGIN']], ['ID']))) {
-			throw new Exception("User with login '{$fields['LOGIN']}' already exist");
+			throw new Exception(T([
+				'en' => "User with login '{$fields['LOGIN']}' already exist",
+				'ru' => "Пользователь с логином '{$fields['LOGIN']}' уже существует",
+			]));
 		}
 
 		// auto hash password
@@ -146,7 +221,10 @@ class Users extends SCRUD {
 	 */
 	public function SetPassword($ID, $password) {
 		if (empty($password)) {
-			throw new Exception("Password must be specified");
+			throw new Exception(T([
+				'en' => 'Password must be specified',
+				'ru' => 'Укажите пароль',
+			]));
 		}
 		$salt = bin2hex(random_bytes(32));
 		$password = sha1($salt . ':' . $password);
@@ -183,7 +261,10 @@ class Users extends SCRUD {
 	public function AddGroup($ID, $group) {
 		$ID = (int)$ID;
 		if (empty($ID)) {
-			throw new Exception("User ID required");
+			throw new Exception(T([
+				'en' => 'User ID required',
+				'ru' => 'Требуется ID пользователя',
+			]));
 		}
 		if (is_string($group)) {
 			$group_id = Groups::I()->Pick(['CODE' => $group]);
@@ -191,7 +272,10 @@ class Users extends SCRUD {
 			$group_id = (int)$group;
 		}
 		if (empty($group_id)) {
-			throw new Exception("Group ID/CODE required");
+			throw new Exception(T([
+				'en' => 'Group ID/CODE required',
+				'ru' => 'Требуется ID/CODE группы',
+			]));
 		}
 		Users2Groups::I()->Create([
 			'USER'  => $ID,

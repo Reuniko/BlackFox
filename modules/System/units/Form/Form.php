@@ -7,19 +7,19 @@ class Form extends \System\Unit {
 	public $options = [
 		'SCRUD'   => [
 			'TYPE' => 'object',
-			'NAME' => 'Сущность',
+			'NAME' => 'Essence',
 		],
 		'FIELDS'  => [
 			'TYPE' => 'array',
-			'NAME' => 'Поля',
+			'NAME' => 'Fields',
 		],
 		'DATA'    => [
 			'TYPE' => 'array',
-			'NAME' => 'Данные',
+			'NAME' => 'Data',
 		],
 		'ELEMENT' => [
 			'TYPE'    => 'string',
-			'NAME'    => 'Имя элемента',
+			'NAME'    => 'Element name',
 			'DEFAULT' => 'ELEMENT',
 		],
 		'CLASS_GROUP' => [

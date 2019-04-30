@@ -80,7 +80,10 @@ abstract class SCRUD extends Instanceable {
 		if (count($this->keys) === 1) {
 			return reset($this->keys);
 		}
-		throw new Exception("Single primary key required for " . static::class);
+		throw new Exception(T([
+			'en' => "Single primary key required for " . static::class,
+			'ru' => "Требуется одиночный основной ключ для " . static::class,
+		]));
 	}
 
 	/**
@@ -130,7 +133,10 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		if (empty($this->keys)) {
-			throw new Exception("Primary keys required for " . static::class);
+			throw new Exception(T([
+				'en' => "Primary keys required for " . static::class,
+				'ru' => "Требуется основной ключ для " . static::class,
+			]));
 		}
 
 		// Auto-completion of LINK attributes without namespaces
@@ -141,7 +147,10 @@ abstract class SCRUD extends Instanceable {
 				if (class_exists($link)) {
 					$info['LINK'] = $link;
 				} else {
-					throw new Exception("Valid class name required for LINK of field '{$code}' of class " . static::class);
+					throw new Exception(T([
+						'en' => "Valid class name required for LINK of field '{$code}' of class " . static::class,
+						'ru' => "Требуется валидное имя класса для LINK-поля '{$code}' для класса " . static::class,
+					]));
 				}
 			}
 		}
@@ -324,7 +333,10 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 		if (!empty($errors)) {
-			throw new Exception("Переданы некорректные параметры: [" . implode(", ", $errors) . "], допускаются только следующие параметры: [" . implode(", ", $keys) . "]");
+			throw new Exception(T([
+				'en' => "Wrong params: [" . implode(", ", $errors) . "], allowed params: [" . implode(", ", $keys) . "]",
+				'ru' => "Переданы некорректные параметры: [" . implode(", ", $errors) . "], допускаются только следующие параметры: [" . implode(", ", $keys) . "]",
+			]));
 		}
 	}
 
@@ -450,7 +462,10 @@ abstract class SCRUD extends Instanceable {
 	private function _prepareSet($code, $value) {
 		$hasInformation = $this->_hasInformation($value);
 		if (($this->structure[$code]['NOT_NULL'] || $this->structure[$code]['TYPE'] == 'BOOL') && !$hasInformation) {
-			throw new Exception("Поле '{$this->structure[$code]['NAME']}' не может быть пустым");
+			throw new Exception(T([
+				'en' => "Field '{$this->structure[$code]['NAME']}' can not be empty",
+				'ru' => "Поле '{$this->structure[$code]['NAME']}' не может быть пустым",
+			]));
 		}
 		if ($hasInformation) {
 			$value = $this->_formatFieldValue($code, $value);
@@ -512,7 +527,10 @@ abstract class SCRUD extends Instanceable {
 			if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT'])) {
 				if (!$this->_hasInformation($fields[$code])) {
 					$hint = $is_root ? " ({$this->code}.{$code})" : '';
-					$errors[] = "Не указано обязательное поле '{$field['NAME']}'{$hint}";
+					$errors[] = T([
+						'en' => "Field must be specified: '{$field['NAME']}'{$hint}",
+						'ru' => "Не указано обязательное поле '{$field['NAME']}'{$hint}",
+					]);
 				}
 			}
 		}
@@ -563,7 +581,10 @@ abstract class SCRUD extends Instanceable {
 		$fields = $this->ControlFields($fields);
 
 		if (empty($fields)) {
-			throw new Exception("No data to update");
+			throw new Exception(T([
+				'en' => "No data to update",
+				'ru' => 'Нет данных для обновления',
+			]));
 		}
 
 		$this->SQL = "UPDATE {$this->code} SET ";
@@ -575,7 +596,10 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 		if (empty($rows)) {
-			throw new Exception("No rows to update");
+			throw new Exception(T([
+				'en' => "No rows to update",
+				'ru' => 'Нет строк для обновления',
+			]));
 		}
 		$this->SQL .= implode(",\r\n", $rows);
 
@@ -637,7 +661,10 @@ abstract class SCRUD extends Instanceable {
 			unset($content);
 
 			if (empty($this->structure[$code])) {
-				throw new Exception("Unknown field code: '{$code}' in table '{$this->code}'");
+				throw new Exception(T([
+					'en' => "Unknown field code: '{$code}' in table '{$this->code}'",
+					'ru' => "Неизвестный код поля: '{$code}' в таблице '{$this->code}'",
+				]));
 			}
 			$result = $this->structure[$code]->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
 			$select += (array)$result['SELECT'];
@@ -684,7 +711,10 @@ abstract class SCRUD extends Instanceable {
 	 */
 	public function PreparePartsByFilter($filter) {
 		if (!is_array($filter) and empty($filter)) {
-			throw new ExceptionNotAllowed("Empty non-array filter, ID missed?");
+			throw new ExceptionNotAllowed(T([
+				'en' => 'Empty non-array filter passed (ID missed?)',
+				'ru' => 'Передан пустой скалярный фильтр (потерялся ID?)',
+			]));
 		}
 		if (is_array($filter) and empty($filter)) {
 			return [
@@ -718,14 +748,20 @@ abstract class SCRUD extends Instanceable {
 			// вложенные операторы AND и OR
 			if ($filter_key === 'AND' || $filter_key === 'OR' || is_numeric($filter_key)) {
 				if (!is_array($values)) {
-					throw new Exception("При использовании в фильтре вложенных операторов AND и OR значение должно быть массивом условий");
+					throw new Exception(T([
+						'en' => 'When using nested AND and OR operators in a filter, the value must be an array of conditions',
+						'ru' => 'При использовании в фильтре вложенных операторов AND и OR значение должно быть массивом условий',
+					]));
 				}
 				if (!is_numeric($filter_key)) {
 					$logic = $filter_key;
 				} else {
 					$logic = $values['LOGIC'];
 					if (!in_array($logic, ['AND', 'OR'])) {
-						throw new Exception("При использовании в фильтре цифрового ключа значение-массив должно содержать ключ LOGIC = AND|OR");
+						throw new Exception(T([
+							'en' => 'When using a digital key in the filter, the array value must contain the key LOGIC = AND|OR',
+							'ru' => 'При использовании в фильтре цифрового ключа значение-массив должно содержать ключ LOGIC = AND|OR',
+						]));
 					}
 					unset($values['LOGIC']);
 				}
@@ -807,10 +843,16 @@ abstract class SCRUD extends Instanceable {
 			$Info = $structure[$external];
 
 			if (empty($Info)) {
-				throw new Exception("Unknown external field code: '{$external}'");
+				throw new Exception(T([
+					'en' => "Unknown external field code: '{$external}'",
+					'ru' => "Передан код неизвестного внешнего поля: '{$external}'",
+				]));
 			}
 			if (empty($Info['LINK'])) {
-				throw new Exception("Field is not external: '{$external}'");
+				throw new Exception(T([
+					'en' => "Field is not external: '{$external}'",
+					'ru' => "Поле не является внешним: '{$external}'",
+				]));
 			}
 
 			$answer = $Info->GenerateJoinAndGroupStatements($Object, $prefix);
@@ -883,7 +925,10 @@ abstract class SCRUD extends Instanceable {
 	protected function _formatFieldValue($code, $value) {
 		$code = strtoupper($code);
 		if (!isset($this->structure[$code])) {
-			throw new Exception("Неизвестный код поля: '{$code}'");
+			throw new Exception(T([
+				'en' => "Unknown field code: '{$code}'",
+				'ru' => "Неизвестный код поля: '{$code}'",
+			]));
 		}
 
 		if (!$this->_hasInformation($value)) {
@@ -915,11 +960,17 @@ abstract class SCRUD extends Instanceable {
 	 */
 	private function GetLink($info) {
 		if (!class_exists($info['LINK'])) {
-			throw new ExceptionNotAllowed("You must set class name to LINK info of field '{$info['NAME']}'");
+			throw new ExceptionNotAllowed(T([
+				'en' => "You must set class name to LINK info of field '{$info['NAME']}'",
+				'ru' => "Необходимо установить имя класса в ключ LINK поля '{$info['NAME']}'",
+			]));
 		}
 		$parents = class_parents($info['LINK']);
 		if (!in_array('System\SCRUD', $parents)) {
-			throw new ExceptionNotAllowed("You must set class (child of SCRUD) name to LINK info of field '{$info['NAME']}'");
+			throw new ExceptionNotAllowed(T([
+				'en' => "You must set class (child of SCRUD) name to LINK info of field '{$info['NAME']}'",
+				'ru' => "Необходимо установить имя класса (наследник от SCRUD) в ключ LINK поля '{$info['NAME']}'",
+			]));
 		}
 		/** @var SCRUD $Link */
 		$Link = $info['LINK']::I();
@@ -1009,7 +1060,10 @@ abstract class SCRUD extends Instanceable {
 		foreach ($element as $code => $value) {
 			$info = $this->structure[$code];
 			if (empty($info)) {
-				throw new Exception("Unknown field code '{$code}'");
+				throw new Exception(T([
+					'en' => "Unknown field code '{$code}'",
+					'ru' => "Неизвестный код поля '{$code}'",
+				]));
 			}
 
 			$element = $this->structure[$code]->FormatOutputValue($element);
