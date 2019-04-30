@@ -5,47 +5,74 @@ namespace System;
 class Files extends SCRUD {
 
 	public function Init() {
-		$this->name = 'Файлы';
+		$this->name = T([
+			'en' => 'Files',
+			'ru' => 'Файлы',
+		]);
 		$this->groups = [
-			'SYSTEM' => 'Системные поля',
-			'FILE'   => 'Файл',
+			'SYSTEM' => T([
+				'en' => 'System',
+				'ru' => 'Системные поля',
+			]),
+			'FILE'   => T([
+				'en' => 'File',
+				'ru' => 'Файл',
+			]),
 		];
 		$this->structure += [
 			'ID'          => self::ID + ['GROUP' => 'SYSTEM'],
 			'CREATE_DATE' => [
 				'TYPE'     => 'DATETIME',
-				'NAME'     => 'Дата создания',
+				'NAME'     => T([
+					'en' => 'Create date',
+					'ru' => 'Дата создания',
+				]),
 				'GROUP'    => 'SYSTEM',
 				'DISABLED' => true,
 			],
 			'CREATE_BY'   => [
 				'TYPE'     => 'OUTER',
-				'NAME'     => 'Кем создан',
-				'LINK'     => 'System\Users',
+				'NAME'     => T([
+					'en' => 'Created by',
+					'ru' => 'Кем создан',
+				]),
+				'LINK'     => 'Users',
 				'GROUP'    => 'SYSTEM',
 				'DISABLED' => true,
 			],
 			'NAME'        => [
 				'TYPE'  => 'STRING',
-				'NAME'  => 'Имя файла',
+				'NAME'  => T([
+					'en' => 'Name',
+					'ru' => 'Имя',
+				]),
 				'VITAL' => true,
 				'GROUP' => 'FILE',
 			],
 			'SIZE'        => [
 				'TYPE'  => 'NUMBER',
-				'NAME'  => 'Размер файла',
+				'NAME'  => T([
+					'en' => 'Size',
+					'ru' => 'Размер',
+				]),
 				'VITAL' => true,
 				'GROUP' => 'FILE',
 			],
 			'TYPE'        => [
 				'TYPE'  => 'STRING',
-				'NAME'  => 'Тип контента',
+				'NAME'  => T([
+					'en' => 'Type',
+					'ru' => 'Тип',
+				]),
 				'VITAL' => true,
 				'GROUP' => 'FILE',
 			],
 			'SRC'         => [
 				'TYPE'  => 'STRING',
-				'NAME'  => 'Путь к файлу',
+				'NAME'  => T([
+					'en' => 'Src',
+					'ru' => 'Путь',
+				]),
 				'VITAL' => true,
 				'GROUP' => 'FILE',
 			],
@@ -55,7 +82,10 @@ class Files extends SCRUD {
 	public function GetNewSrc($full_name) {
 		$extension = end(explode('.', $full_name));
 		if (empty($extension)) {
-			throw new Exception("File must have extension");
+			throw new Exception(T([
+				'en' => "File must have extension",
+				'ru' => 'Файл должен обладать разширением',
+			]));
 		}
 
 		$dir = '';
@@ -121,11 +151,20 @@ class Files extends SCRUD {
 
 	public function GetPrintableFileSize($size) {
 		if ($size > 1024 * 1024) {
-			return ceil($size / 1024 * 1024) . ' мб.';
+			return ceil($size / 1024 * 1024) . T([
+					'en' => ' mb.',
+					'ru' => ' мб.',
+				]);
 		}
 		if ($size > 1024) {
-			return ceil($size / 1024) . ' кб.';
+			return ceil($size / 1024) . T([
+					'en' => ' kb.',
+					'ru' => ' кб.',
+				]);
 		}
-		return $size . ' б.';
+		return $size . T([
+				'en' => ' b.',
+				'ru' => ' б.',
+			]);
 	}
 }

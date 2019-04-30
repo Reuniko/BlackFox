@@ -5,32 +5,53 @@ namespace System;
 class Content extends \System\SCRUD {
 
 	public function Init() {
-		$this->name = 'Контентные страницы';
+		$this->name = T([
+			'en' => 'Content pages',
+			'ru' => 'Контентные страницы',
+		]);
 		$this->structure = [
 			'ID'          => self::ID,
 			'URL'         => [
 				'TYPE'        => 'STRING',
-				'NAME'        => 'Адрес',
+				'NAME'        => T([
+					'en' => 'Url',
+					'ru' => 'Адрес',
+				]),
 				'NOT_NULL'    => true,
 				'INDEX'       => true,
 				'UNIQUE'      => true,
-				'DESCRIPTION' => 'Относительно корня сайта',
+				'DESCRIPTION' => T([
+					'en' => 'Relative to the site root',
+					'ru' => 'Относительно корня сайта',
+				]),
 			],
 			'TITLE'       => [
 				'TYPE' => 'STRING',
-				'NAME' => 'Заголовок',
+				'NAME' => T([
+					'en' => 'Title',
+					'ru' => 'Заголовок',
+				]),
 			],
 			'DESCRIPTION' => [
 				'TYPE' => 'STRING',
-				'NAME' => 'Описание',
+				'NAME' => T([
+					'en' => 'Description',
+					'ru' => 'Описание',
+				]),
 			],
 			'KEYWORDS'    => [
 				'TYPE' => 'STRING',
-				'NAME' => 'Ключевые слова',
+				'NAME' => T([
+					'en' => 'Key words',
+					'ru' => 'Ключевые слова',
+				]),
 			],
 			'CONTENT'     => [
 				'TYPE'    => 'TEXT',
-				'NAME'    => 'Содержимое',
+				'NAME'    => T([
+					'en' => 'Content',
+					'ru' => 'Содержимое',
+				]),
 				'WYSIWYG' => true,
 			],
 		];

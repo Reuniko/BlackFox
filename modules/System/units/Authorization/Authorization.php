@@ -6,28 +6,52 @@ class Authorization extends \System\Unit {
 
 	public function __construct() {
 		parent::__construct();
-		$this->name = 'Авторизация';
-		$this->description = 'Предоставляет форму и механизм авторизации на сайте';
+		$this->name = T([
+			'en' => 'Authorization',
+			'ru' => 'Авторизация',
+		]);
+		$this->description = T([
+			'en' => 'Provides a form and authorization mechanism on the site',
+			'ru' => 'Предоставляет форму и механизм авторизации на сайте',
+		]);
 		$this->options = [
 			'CAPTCHA'  => [
 				'TYPE'    => 'BOOLEAN',
-				'NAME'    => 'Использовать каптчу',
+				'NAME'    => T([
+					'en' => 'Use captcha',
+					'ru' => 'Использовать каптчу',
+				]),
 				'DEFAULT' => 'Y',
 			],
 			'MESSAGE'  => [
 				'TYPE'    => 'STRING',
-				'NAME'    => 'Сообщение',
+				'NAME'    => T([
+					'en' => 'Message',
+					'ru' => 'Сообщение',
+				]),
 				'DEFAULT' => '',
 			],
 			'TITLE'    => [
 				'TYPE'    => 'STRING',
-				'NAME'    => 'Заголовок',
-				'DEFAULT' => 'Вход в систему',
+				'NAME'    => T([
+					'en' => 'Title',
+					'ru' => 'Заголовок',
+				]),
+				'DEFAULT' => T([
+					'en' => 'Sign in',
+					'ru' => 'Вход в систему',
+				]),
 			],
 			'REDIRECT' => [
 				'TYPE'        => 'STRING',
-				'NAME'        => 'Переадресация',
-				'DESCRIPTION' => 'Куда переадресовать пользователя при успешной авторизации',
+				'NAME'        => T([
+					'en' => 'Redirect',
+					'ru' => 'Переадресация',
+				]),
+				'DESCRIPTION' => T([
+					'en' => 'Where to redirect the user upon successful authorization',
+					'ru' => 'Куда переадресовать пользователя при успешной авторизации',
+				]),
 				'DEFAULT'     => '/profile/welcome.php',
 			],
 		];

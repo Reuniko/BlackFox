@@ -24,7 +24,10 @@
 
 			<div class="col-sm-8">
 				<button class="btn btn-primary" type="submit" name="ACTION" value="Registration">
-					Регистрация
+					<?= T([
+						'en' => 'Registration',
+						'ru' => 'Регистрация',
+					]) ?>
 				</button>
 			</div>
 		</div>

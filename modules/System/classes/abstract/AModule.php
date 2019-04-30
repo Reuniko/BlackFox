@@ -1,14 +1,18 @@
 <?php
+
 namespace System;
 abstract class AModule extends Instanceable {
-	public $name = 'Новый неизвестный модуль';
-	public $description = 'Переопределите поля $name, $description и $version';
+	public $name = 'New unknown module';
+	public $description = 'Redefine $name, $description и $version';
 	public $version = '1.0';
 
 	public function Install() {
 		$class = end(explode('\\', static::class));
 		if (Modules::Instance()->Present($class)) {
-			throw new Exception("Module '{$class}' already installed");
+			throw new Exception(T([
+				'en' => "Module '{$class}' already installed",
+				'ru' => "Модуль '{$class}' уже установлен",
+			]));
 		} else {
 			Modules::Instance()->Create([
 				'ID'          => $class,

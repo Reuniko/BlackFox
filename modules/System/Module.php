@@ -3,8 +3,8 @@
 namespace System;
 
 class Module extends \System\AModule {
-	public $name = 'Система';
-	public $description = 'Главный системный модуль, предоставляющий основные инструменты для работы';
+	public $name = 'System';
+	public $description = 'Main system module providing basic tools';
 	public $version = '1.0';
 
 	public function Upgrade() {

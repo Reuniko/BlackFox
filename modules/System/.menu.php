@@ -2,12 +2,18 @@
 /** @var \System\Unit $this */
 return [
 	'System' => [
-		'NAME'     => 'Система',
+		'NAME'     => T([
+			'en' => 'System',
+			'ru' => 'Система',
+		]),
 		'LINK'     => '/admin/System/',
 		'EXPANDER' => true,
 		'CHILDREN' => [
 			'panel'               => [
-				'NAME'     => 'Панель управления',
+				'NAME'     => T([
+					'en' => 'Control panel',
+					'ru' => 'Панель управления',
+				]),
 				'LINK'     => '/admin/System/Panel.php',
 				'CHILDREN' => [
 					'~upgrade' => [
@@ -17,35 +23,59 @@ return [
 				],
 			],
 			'System_Modules'      => [
-				'NAME' => 'Модули',
+				'NAME' => T([
+					'en' => 'Modules',
+					'ru' => 'Модули',
+				]),
 				'LINK' => '/admin/System/Modules.php',
 			],
 			'System_Content'      => [
-				'NAME' => 'Контентные страницы',
+				'NAME' => T([
+					'en' => 'Content pages',
+					'ru' => 'Контентные страницы',
+				]),
 				'LINK' => '/admin/System/Content.php',
 			],
 			'System_Redirects'    => [
-				'NAME' => 'Редиректы',
+				'NAME' => T([
+					'en' => 'Redirects',
+					'ru' => 'Редиректы',
+				]),
 				'LINK' => '/admin/System/Redirects.php',
 			],
 			'System_Users'        => [
-				'NAME' => 'Пользователи',
+				'NAME' => T([
+					'en' => 'Users',
+					'ru' => 'Пользователи',
+				]),
 				'LINK' => '/admin/System/Users.php',
 			],
 			'System_Groups'       => [
-				'NAME' => 'Группы',
+				'NAME' => T([
+					'en' => 'Groups',
+					'ru' => 'Группы',
+				]),
 				'LINK' => '/admin/System/Groups.php',
 			],
 			'System_Users2Groups' => [
-				'NAME' => 'Пользователи в группах',
+				'NAME' => T([
+					'en' => 'Users in groups',
+					'ru' => 'Пользователи в группах',
+				]),
 				'LINK' => '/admin/System/Users2Groups.php',
 			],
 			'System_Files'        => [
-				'NAME' => 'Файлы',
+				'NAME' => T([
+					'en' => 'Files',
+					'ru' => 'Файлы',
+				]),
 				'LINK' => '/admin/System/Files.php',
 			],
 			'System_Log'          => [
-				'NAME' => 'Журнал системы',
+				'NAME' => T([
+					'en' => 'System log',
+					'ru' => 'Журнал системы',
+				]),
 				'LINK' => '/admin/System/Log.php',
 			],
 		],

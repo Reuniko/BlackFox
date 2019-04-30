@@ -5,26 +5,38 @@ namespace System;
 class Groups extends SCRUD {
 
 	public function Init() {
-		$this->name = 'Группы пользователей';
+		$this->name = T([
+			'en' => 'User groups',
+			'ru' => 'Группы пользователей',
+		]);
 		$this->structure += [
 			'ID'          => self::ID,
 			'CODE'        => [
 				'TYPE'     => 'STRING',
-				'NAME'     => 'Символьный код',
+				'NAME'     => T([
+					'en' => 'Symbolic code',
+					'ru' => 'Символьный код',
+				]),
 				'NOT_NULL' => true,
 				'INDEX'    => true,
 				'VITAL'    => true,
 			],
 			'NAME'        => [
 				'TYPE'     => 'STRING',
-				'NAME'     => 'Имя',
+				'NAME'     => T([
+					'en' => 'Name',
+					'ru' => 'Имя',
+				]),
 				'NOT_NULL' => true,
 				'INDEX'    => true,
 				'VITAL'    => true,
 			],
 			'DESCRIPTION' => [
 				'TYPE' => 'TEXT',
-				'NAME' => 'Описание',
+				'NAME' => T([
+					'en' => 'Description',
+					'ru' => 'Описание',
+				]),
 			],
 		];
 	}

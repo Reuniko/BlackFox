@@ -1,41 +1,68 @@
 <?php
+
 namespace System;
 
 class Log extends SCRUD {
-	public $name = 'Журнал системы';
-	public $structure = [
-		'ID'      => self::ID,
-		'MOMENT'  => [
-			'TYPE'     => 'DATETIME',
-			'NAME'     => 'Момент',
-			'NOT_NULL' => true,
-		],
-		'IP'      => [
-			'TYPE' => 'STRING',
-			'NAME' => 'IP адрес',
-		],
-		'USER'    => [
-			'TYPE'  => 'OUTER',
-			'NAME'  => 'Пользователь',
-			'INDEX' => true,
-			'LINK'  => 'Users',
-		],
-		'TYPE'    => [
-			'TYPE'        => 'STRING',
-			'NAME'        => 'Тип события',
-			'DESCRIPTION' => 'Символьный код',
-			'NOT_NULL'    => true,
-			'INDEX'       => true,
-		],
-		'MESSAGE' => [
-			'TYPE' => 'TEXT',
-			'NAME' => 'Сообщение',
-		],
-		'DATA'    => [
-			'TYPE' => 'ARRAY',
-			'NAME' => 'Дополнительные данные',
-		],
-	];
+	public function Init() {
+		$this->name = T([
+			'en' => 'System log',
+			'ru' => 'Журнал системы',
+		]);
+		$this->structure = [
+			'ID'      => self::ID,
+			'MOMENT'  => [
+				'TYPE'     => 'DATETIME',
+				'NAME'     => T([
+					'en' => 'Moment',
+					'ru' => 'Момент',
+				]),
+				'NOT_NULL' => true,
+			],
+			'IP'      => [
+				'TYPE' => 'STRING',
+				'NAME' => T([
+					'en' => 'IP address',
+					'ru' => 'IP адрес',
+				]),
+			],
+			'USER'    => [
+				'TYPE'  => 'OUTER',
+				'NAME'  => T([
+					'en' => 'User',
+					'ru' => 'Пользователь',
+				]),
+				'INDEX' => true,
+				'LINK'  => 'Users',
+			],
+			'TYPE'    => [
+				'TYPE'        => 'STRING',
+				'NAME'        => T([
+					'en' => 'Event type',
+					'ru' => 'Тип события',
+				]),
+				'DESCRIPTION' => T([
+					'en' => 'Symbolic code',
+					'ru' => 'Символьный код',
+				]),
+				'NOT_NULL'    => true,
+				'INDEX'       => true,
+			],
+			'MESSAGE' => [
+				'TYPE' => 'TEXT',
+				'NAME' => T([
+					'en' => 'Message',
+					'ru' => 'Сообщение',
+				]),
+			],
+			'DATA'    => [
+				'TYPE' => 'ARRAY',
+				'NAME' => T([
+					'en' => 'Additional data',
+					'ru' => 'Дополнительные данные',
+				]),
+			],
+		];
+	}
 
 	public function Create($fields) {
 		$fields['MOMENT'] = time();
