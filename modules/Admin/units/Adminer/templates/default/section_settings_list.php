@@ -6,15 +6,24 @@
 <div class="mb-2 text-center">
 	<button type="button" class="btn btn-outline-secondary" data-settings-select="settings-<?= $NAME ?>">
 		<i class="fa fa-check"></i>
-		<span class="d-none d-md-inline-block">Выбрать все</span>
+		<span class="d-none d-md-inline-block"><?= T([
+				'en' => 'Select all',
+				'ru' => 'Выбрать все',
+			]) ?></span>
 	</button>
 	<button type="button" class="btn btn-outline-secondary" data-settings-unselect="settings-<?= $NAME ?>">
 		<i class="fa fa-times"></i>
-		<span class="d-none d-md-inline-block">Снять все</span>
+		<span class="d-none d-md-inline-block"><?= T([
+				'en' => 'Unselect all',
+				'ru' => 'Снять все',
+			]) ?></span>
 	</button>
 	<button type="button" class="btn btn-outline-secondary" data-settings-sort="settings-<?= $NAME ?>">
 		<i class="fa fa-sort"></i>
-		<span class="d-none d-md-inline-block">Сортировать</span>
+		<span class="d-none d-md-inline-block"><?= T([
+				'en' => 'Sort by default',
+				'ru' => 'Сортировать',
+			]) ?></span>
 	</button>
 </div>
 

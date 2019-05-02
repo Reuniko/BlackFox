@@ -5,7 +5,10 @@
 <? else: ?>
 	<form method="post" enctype="multipart/form-data">
 		<label class="btn btn-secondary btn-file m-0">
-			<span>Выбрать файл</span>
+			<span><?= T([
+					'en' => 'Select file',
+					'ru' => 'Выбрать файл',
+				]) ?></span>
 			<input type="file" name="FIELDS" style="display: none;">
 		</label>
 		<button
@@ -13,7 +16,10 @@
 			name="ACTION"
 			value="Create"
 			class="btn btn-secondary"
-		>Загрузить
+		><?= T([
+				'en' => 'Upload',
+				'ru' => 'Загрузить',
+			]) ?>
 		</button>
 	</form>
 

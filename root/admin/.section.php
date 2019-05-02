@@ -1,6 +1,9 @@
 <?php
 return [
-	'NAME'     => 'Административная часть',
+	'NAME'     => T([
+	    'en' => 'Administrative section',
+	    'ru' => 'Административная часть',
+	]),
 	'TEMPLATE' => 'admin',
 	'ACCESS'   => [
 		'*'    => false,

@@ -3,9 +3,15 @@
 <?php $this->Debug($this->SCRUD->composition, 'composition'); ?>
 <?
 if ($RESULT['MODE'] === 'Create') {
-	$this->ENGINE->TITLE = "Добавление элемента '{$this->SCRUD->name}'";
+	$this->ENGINE->TITLE = T([
+		'en' => "Adding element of '{$this->SCRUD->name}'",
+		'ru' => "Добавление элемента '{$this->SCRUD->name}'",
+	]);
 } else {
-	$this->ENGINE->TITLE = "Редактирование элемента №{$RESULT['DATA']['ID']} '{$this->SCRUD->name}'";
+	$this->ENGINE->TITLE = T([
+		'en' => "Editing element #{$RESULT['DATA']['ID']} of '{$this->SCRUD->name}'",
+		'ru' => "Редактирование элемента №{$RESULT['DATA']['ID']} '{$this->SCRUD->name}'",
+	]);
 }
 ?>
 

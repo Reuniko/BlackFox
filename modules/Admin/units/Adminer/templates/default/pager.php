@@ -12,8 +12,14 @@ $base = http_build_query($get);
 <div class="pager">
 
 	<div class="alert alert-info float-right p-2">
-		<span>Отображено <strong><?= $RESULT['DATA']['PAGER']['SELECTED'] ?></strong> элементов.</span>
-		<span>Всего <strong><?= $RESULT['DATA']['PAGER']['TOTAL'] ?></strong> элементов.</span>
+		<?= T([
+			'en' => "Showing <strong>{$RESULT['DATA']['PAGER']['SELECTED']}</strong> elements.",
+			'ru' => "Отображено <strong>{$RESULT['DATA']['PAGER']['SELECTED']}</strong> элементов.",
+		]) ?>
+		<?= T([
+			'en' => "Total <strong>{$RESULT['DATA']['PAGER']['TOTAL']}</strong> elements.",
+			'ru' => "Всего <strong>{$RESULT['DATA']['PAGER']['TOTAL']}</strong> элементов.",
+		]) ?>
 	</div>
 
 	<nav>
@@ -29,7 +35,10 @@ $base = http_build_query($get);
 					<li class="page-item">
 						<a
 							class="page-link"
-							href="javascript:if(page = prompt('Введите номер страницы', '')){window.location='?<?= $base ?>&<?= $RESULT['VARIABLE'] ?>='+page}">
+							href="javascript:if(page = prompt('<?= T([
+								'en' => 'Input page number',
+								'ru' => 'Введите номер страницы',
+							]) ?>', '')){window.location='?<?= $base ?>&<?= $RESULT['VARIABLE'] ?>='+page}">
 							<?= $page["INDEX"] ?>
 						</a>
 					</li>

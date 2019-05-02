@@ -32,4 +32,16 @@ class AdminerUsers extends Adminer {
 		\System\User::I()->Login($ID);
 		$this->Redirect('/');
 	}
+
+	public function GetTabsOfUpdate() {
+		return parent::GetTabsOfUpdate() + [
+				'actions' => [
+					'NAME' => T([
+						'en' => 'Actions',
+						'ru' => 'Действия',
+					]),
+					'VIEW' => 'element_tab_actions',
+				],
+			];
+	}
 }

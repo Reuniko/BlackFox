@@ -142,7 +142,10 @@ class Adminer extends \System\Unit {
 			$this->SCRUD->structure[$code]['DISABLED'] = true;
 		}
 
-		$this->ENGINE->AddBreadcrumb("Добавление элемента");
+		$this->ENGINE->AddBreadcrumb(T([
+			'en' => 'Add element',
+			'ru' => 'Добавление элемента',
+		]));
 		$this->view = 'element';
 		return $R;
 	}
@@ -152,7 +155,10 @@ class Adminer extends \System\Unit {
 
 		$R['DATA'] = $this->SCRUD->Read($this->PARAMS['RESTRICTIONS'] + ['ID' => $ID]);
 		if (empty($R['DATA'])) {
-			throw new Exception("Элемент не найден");
+			throw new Exception(T([
+				'en' => 'Element not found',
+				'ru' => 'Элемент не найден',
+			]));
 		}
 		$R['DATA'] = $FIELDS + $R['DATA'];
 
@@ -163,7 +169,10 @@ class Adminer extends \System\Unit {
 			$this->SCRUD->structure[$code]['DISABLED'] = true;
 		}
 
-		$this->ENGINE->AddBreadcrumb("Редактирование элемента №{$ID}");
+		$this->ENGINE->AddBreadcrumb(T([
+			'en' => "Edit element #{$ID}",
+			'ru' => "Редактирование элемента №{$ID}",
+		]));
 		$this->view = 'element';
 		return $R;
 	}
@@ -175,7 +184,10 @@ class Adminer extends \System\Unit {
 		}
 		$ID = $this->SCRUD->Create($FIELDS);
 		$link = $this->GetLinkForRedirect($ID, $REDIRECT);
-		$this->Redirect($link, "Создан элемент <a href='?ID={$ID}'>№{$ID}</a>");
+		$this->Redirect($link, T([
+			'en' => "Element <a href='?ID={$ID}'>#{$ID}</a> has been created",
+			'ru' => "Создан элемент <a href='?ID={$ID}'>№{$ID}</a>",
+		]));
 	}
 
 	public function Update($ID, $FIELDS = [], $REDIRECT = 'Stay') {
@@ -184,7 +196,10 @@ class Adminer extends \System\Unit {
 		}
 		$this->SCRUD->Update($ID, $FIELDS);
 		$link = $this->GetLinkForRedirect($ID, $REDIRECT);
-		$this->Redirect($link, "Обновлен элемент <a href='?ID={$ID}'>№{$ID}</a>");
+		$this->Redirect($link, T([
+			'en' => "Element <a href='?ID={$ID}'>#{$ID}</a> has been updated",
+			'ru' => "Обновлен элемент <a href='?ID={$ID}'>№{$ID}</a>",
+		]));
 	}
 
 	private function GetLinkForRedirect($ID, $REDIRECT) {
@@ -201,9 +216,15 @@ class Adminer extends \System\Unit {
 	public function Delete($ID) {
 		$this->SCRUD->Delete($ID);
 		if (is_array($ID)) {
-			$message = "Удалены элементы №№ " . implode(', ', $ID);
+			$message = T([
+				'en' => "Elements ## " . implode(', ', $ID) . " has been deleted",
+				'ru' => "Удалены элементы №№ " . implode(', ', $ID),
+			]);
 		} else {
-			$message = "Удален элемент №{$ID}";
+			$message = T([
+				'en' => "Element #{$ID} has been deleted",
+				'ru' => "Удален элемент №{$ID}",
+			]);
 		}
 		$this->Redirect($this->GetBackLink(), $message);
 	}
@@ -308,7 +329,10 @@ class Adminer extends \System\Unit {
 	public function GetTabsOfCreate() {
 		$tabs = [
 			'main' => [
-				'NAME'   => 'Элемент',
+				'NAME'   => T([
+					'en' => 'Element',
+					'ru' => 'Элемент',
+				]),
 				'VIEW'   => 'element_tab_main',
 				'ACTIVE' => true,
 			],
@@ -324,7 +348,10 @@ class Adminer extends \System\Unit {
 	public function GetTabsOfUpdate() {
 		$tabs = [
 			'element' => [
-				'NAME'   => 'Элемент',
+				'NAME'   => T([
+					'en' => 'Element',
+					'ru' => 'Элемент',
+				]),
 				'VIEW'   => 'element_tab_main',
 				'ACTIVE' => true,
 			],

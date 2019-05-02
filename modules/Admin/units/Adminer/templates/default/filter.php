@@ -12,7 +12,10 @@
 
 	<? if (!empty($RESULT['STRUCTURE']['FILTERS'])): ?>
 		<div class="card">
-			<div class="card-header">Фильтр</div>
+			<div class="card-header"><?= T([
+					'en' => 'Filter',
+					'ru' => 'Фильтр',
+				]) ?></div>
 			<div class="card-body" id="filter">
 				<? foreach ($RESULT['STRUCTURE']['FILTERS'] as $code => $field): ?>
 					<? if (!isset($this->SCRUD->structure[$code])) continue; ?>
@@ -41,14 +44,20 @@
 								type="submit"
 							>
 								<i class="fa fa-filter"></i>
-								Фильтровать
+								<?= T([
+									'en' => 'Apply',
+									'ru' => 'Фильтровать',
+								]) ?>
 							</button>
 							<a
 								class="btn btn-secondary"
 								href="?"
 							>
 								<i class="fa fa-ban"></i>
-								Отменить
+								<?= T([
+									'en' => 'Cancel',
+									'ru' => 'Отменить',
+								]) ?>
 							</a>
 						</div>
 
