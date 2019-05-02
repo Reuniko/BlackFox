@@ -1,4 +1,7 @@
-<? $this->TITLE = 'PHP консоль'; ?>
+<? $this->TITLE = T([
+	'en' => 'PHP console',
+	'ru' => 'PHP консоль',
+]); ?>
 <form method="post">
 	<div class="form-group">
 		<textarea

@@ -7,7 +7,10 @@
 	value="Back"
 >
 	<i class="fa fa-save"></i>
-	<span class="d-none d-md-inline-block">Сохранить</span>
+	<span class="d-none d-md-inline-block"><?= T([
+			'en' => 'Save',
+			'ru' => 'Сохранить',
+		]) ?></span>
 </button>
 
 <button
@@ -17,7 +20,10 @@
 	value="Stay"
 >
 	<i class="fa fa-check"></i>
-	<span class="d-none d-md-inline-block">Применить</span>
+	<span class="d-none d-md-inline-block"><?= T([
+			'en' => 'Apply',
+			'ru' => 'Применить',
+		]) ?></span>
 </button>
 
 <a
@@ -25,7 +31,10 @@
 	class="btn btn-secondary"
 >
 	<i class="fa fa-ban"></i>
-	<span class="d-none d-md-inline-block">Отмена</span>
+	<span class="d-none d-md-inline-block"><?= T([
+			'en' => 'Cancel',
+			'ru' => 'Отмена',
+		]) ?></span>
 </a>
 
 <? if ($RESULT['MODE'] === 'Update'): ?>
@@ -34,9 +43,15 @@
 		type="submit"
 		name="ACTION"
 		value="Delete"
-		data-confirm="Подтвердите удаление"
+		data-confirm="<?= T([
+			'en' => 'Confirm deletion',
+			'ru' => 'Подтвердите удаление',
+		]) ?>"
 	>
 		<i class="fa fa-trash"></i>
-		<span class="d-none d-md-inline-block">Удалить</span>
+		<span class="d-none d-md-inline-block"><?= T([
+				'en' => 'Delete',
+				'ru' => 'Удалить',
+			]) ?></span>
 	</button>
 <? endif; ?>

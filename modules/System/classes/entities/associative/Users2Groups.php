@@ -3,7 +3,10 @@
 namespace System;
 class Users2Groups extends SCRUD {
 	public function Init() {
-		$this->name = 'Пользователи в группах';
+		$this->name = T([
+		    'en' => 'Users in groups',
+		    'ru' => 'Пользователи в группах',
+		]);
 		$this->structure = [
 			'ID'    => self::ID,
 			'USER'  => [

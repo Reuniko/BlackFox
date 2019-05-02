@@ -117,7 +117,7 @@ class DatabaseDriverMySQL extends Database {
 		$null = ($Info["NOT_NULL"] || $Info['PRIMARY']) ? "NOT NULL" : "NULL";
 
 		$default = "";
-		if ($Info['DEFAULT']) {
+		if (isset($Info['DEFAULT'])) {
 			if (is_array($Info['DEFAULT'])) {
 				$Info['DEFAULT'] = implode(',', $Info['DEFAULT']);
 			}

@@ -20,7 +20,10 @@
 		<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
 			<a class="btn btn-success" href="?NEW&<?= http_build_query($_GET) ?>">
 				<i class="fa fa-plus"></i>
-				Создать
+				<?= T([
+					'en' => 'Add',
+					'ru' => 'Создать',
+				]) ?>
 			</a>
 		<? endif; ?>
 
@@ -69,10 +72,11 @@
 			</tr>
 			<? if (empty($RESULT['DATA']['ELEMENTS'])): ?>
 				<tr>
-					<td colspan="<?= 1 + count($RESULT['STRUCTURE']['FIELDS']) ?>">
-						<center>
-							- нет данных -
-						</center>
+					<td colspan="<?= 1 + count($RESULT['STRUCTURE']['FIELDS']) ?>" class="text-center">
+						<?= T([
+							'en' => '- no data -',
+							'ru' => '- нет данных -',
+						]) ?>
 					</td>
 				</tr>
 			<? endif; ?>
@@ -120,10 +124,16 @@
 							type="submit"
 							name="ACTION"
 							value="Delete"
-							data-confirm="Подтвердите удаление выделенных элементов"
+							data-confirm="<?= T([
+								'en' => 'Confirm deletion of selected elements',
+								'ru' => 'Подтвердите удаление выделенных элементов',
+							]) ?>"
 						>
 							<i class="fa fa-trash"></i>
-							Удалить выделенные
+							<?=T([
+							    'en' => 'Delete selected',
+							    'ru' => 'Удалить выделенные',
+							])?>
 						</button>
 					</td>
 				</tr>
