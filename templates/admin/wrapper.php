@@ -30,6 +30,8 @@
 			<span class="d-none d-md-inline-block"><?= \System\User::I()->FIELDS['LOGIN'] ?></span>
 		</a>
 
+		<? \Admin\LanguageSwitcher::Run([]); ?>
+
 		<a class="btn btn-secondary" href="/admin/logout.php">
 			<i class="fa fa-sign-out-alt"></i>
 			<span class="d-none d-md-inline-block">Выход</span>
