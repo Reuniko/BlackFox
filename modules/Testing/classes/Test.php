@@ -4,18 +4,18 @@ namespace Testing;
 
 class Test extends \System\Instanceable {
 
-	/** @var string имя набора тестов */
+	/** @var string name of the set of tests */
 	public $name = 'Unknown tests';
 
-	/** @var array $tests ключ — имя метода, значение — расшифровка теста */
+	/** @var array $tests key — method name, value — test description */
 	public $tests = [];
 
 	/**
-	 * @var array $tests ключ — имя метода, значение:
-	 * - NAME - расшифровка теста
+	 * @var array $results key — method name, value:
+	 * - NAME - test description
 	 * - STATUS - SUCCESS|FAILURE
-	 * - RESULT - ответ теста
-	 * - ERROR - ошибка теста
+	 * - RESULT - test answer
+	 * - ERROR - test error
 	 */
 	public $results = [];
 
@@ -23,8 +23,14 @@ class Test extends \System\Instanceable {
 		$ReflectionClass = new \ReflectionClass(static::class);
 		$methods = $ReflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
 		foreach ($methods as $method) {
-			if (substr($method->name, 0, 4) === 'Test') {
-				$this->tests[$method->name] = trim(substr($method->getDocComment(), 3, -2)) ?: $method->name;
+			if (substr($method->name, 0, 4) <> 'Test') {
+				continue;
+			}
+			$comment = $method->getDocComment();
+			if (!$comment) {
+				$this->tests[$method->name] = $method->name;
+			} else {
+				$this->tests[$method->name] = trim(substr($comment, 3, -2));
 			}
 		}
 	}

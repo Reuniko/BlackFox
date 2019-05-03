@@ -2,12 +2,18 @@
 /** @var \System\Unit $this */
 return [
 	'Testing' => [
-		'NAME'     => 'Тесты',
+		'NAME'     => T([
+			'en' => 'Tests',
+			'ru' => 'Тесты',
+		]),
 		'LINK'     => '/admin/Testing',
 		'EXPANDER' => true,
 		'CHILDREN' => [
 			'Tables' => [
-				'NAME'     => 'Таблицы',
+				'NAME'     => T([
+					'en' => 'Tables',
+					'ru' => 'Таблицы',
+				]),
 				'CHILDREN' => [
 					'Table1'    => [
 						'NAME' => 'Table1',
@@ -32,11 +38,17 @@ return [
 				],
 			],
 			'SCRUD'  => [
-				'NAME' => 'Тестирование SCRUD',
+				'NAME' => T([
+					'en' => 'Testing of SCRUD',
+					'ru' => 'Тестирование SCRUD',
+				]),
 				'LINK' => '/admin/Testing/SCRUD.php',
 			],
 			'CACHE'  => [
-				'NAME' => 'Тестирование кеша',
+				'NAME' => T([
+					'en' => 'Testing of Cache',
+					'ru' => 'Тестирование кеша',
+				]),
 				'LINK' => '/admin/Testing/Cache.php',
 			],
 		],

@@ -3,18 +3,18 @@
 namespace Testing;
 
 class TestScrudExplainFields extends Test {
-	public $name = 'Тест SCRUD: метод ExplainFields';
+	public $name = 'Test SCRUD: method ExplainFields';
 
 	/** @var \System\SCRUD $SCRUD */
 	public $SCRUD = null;
 	public $limit = 100;
 
-	/** Взятие инстанса класса "TestScrudBase" */
+	/** Getting instance of TestScrudBase */
 	public function TestGetInstance() {
 		$this->SCRUD = Table1::I();
 	}
 
-	/** * - все поля 1 уровня */
+	/** * — all fields of 1st layer */
 	public function Test1A() {
 		$fields = $this->SCRUD->ExplainFields(['*']);
 		//debug(var_export($fields, true));
@@ -38,7 +38,7 @@ class TestScrudExplainFields extends Test {
 		}
 	}
 
-	/** @ - важные поля 1 уровня */
+	/** @ — vital fields of 1st layer */
 	public function Test1V() {
 		$fields = $this->SCRUD->ExplainFields(['@']);
 		//debug(var_export($fields, true));
@@ -51,7 +51,7 @@ class TestScrudExplainFields extends Test {
 		}
 	}
 
-	/** ** - все поля 1 уровня, все поля 2 уровня */
+	/** ** — all fields of 1st layer, all fields of 2nd layer */
 	public function Test1A2A() {
 		$fields = $this->SCRUD->ExplainFields(['**']);
 		//debug(var_export($fields, true));
@@ -97,7 +97,7 @@ class TestScrudExplainFields extends Test {
 		}
 	}
 
-	/** *@ - все поля 1 уровня, важные поля 2 уровня */
+	/** *@ — all fields of 1st layer, vital fields of 2nd layer */
 	public function Test1A2V() {
 		$fields = $this->SCRUD->ExplainFields(['*@']);
 		//debug(var_export($fields, true));
@@ -130,7 +130,7 @@ class TestScrudExplainFields extends Test {
 		}
 	}
 
-	/** составная выборка */
+	/** complex selection */
 	public function TestComplex() {
 		$fields = $this->SCRUD->ExplainFields([
 			'@',

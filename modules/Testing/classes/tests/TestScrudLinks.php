@@ -3,7 +3,7 @@
 namespace Testing;
 
 class TestScrudLinks extends Test {
-	public $name = 'Тест SCRUD: внешние связи';
+	public $name = 'Test SCRUD: externals';
 
 	/** @var Grades $Grades */
 	public $Grades = null;
@@ -59,7 +59,7 @@ class TestScrudLinks extends Test {
 		$this->Students->Fill(100);
 	}
 
-	/** Тест чтения случайного элемента (студент), проверка структуры */
+	/** Test of reading a random element (student), checking the structure */
 	public function TestReadStudent() {
 		$student = $this->Students->Read([], ['*@'], ['{RANDOM}' => true]);
 		if (!is_array($student)) {
@@ -74,7 +74,7 @@ class TestScrudLinks extends Test {
 		//return $student;
 	}
 
-	/** Тест чтения случайного элемента (класс), проверка структуры */
+	/** Test of reading a random element (grade), checking the structure */
 	public function TestReadGrade() {
 		$grade = $this->Grades->Read([], ['*@'], ['{RANDOM}' => true]);
 		if (!is_array($grade)) {
@@ -89,7 +89,7 @@ class TestScrudLinks extends Test {
 		//return $grade;
 	}
 
-	/** Тест чтения случайного элемента со специфичной выборкой  */
+	/** Test of reading a random element with a specific selection  */
 	public function TestReadGradeStudents1A() {
 		$grade = $this->Grades->Read([], [
 			'ID',
@@ -108,7 +108,7 @@ class TestScrudLinks extends Test {
 		//return $grade;
 	}
 
-	/** Тест фильтра по цепочке: прямая связь */
+	/** Test filter via chain: direct link */
 	public function TestFilterStudentsByGrades() {
 		$students = $this->Students->Select([
 			'FILTER' => ['GRADE.TITLE' => '9B'],
@@ -121,7 +121,7 @@ class TestScrudLinks extends Test {
 		//return $students;
 	}
 
-	/** Тест фильтра по цепочке: прямая связь (в выборке отсутствуют поля фильтра) */
+	/** Test filter via chain: direct link (there are no filter fields in the selection) */
 	public function TestFilterStudentsByGradesWithoutFilterField() {
 		$students = $this->Students->Select([
 			'FILTER' => ['GRADE.TITLE' => '9B'],
@@ -136,7 +136,7 @@ class TestScrudLinks extends Test {
 		// return $students;
 	}
 
-	/** Тест фильтра по цепочке: прямая связь, прямая связь */
+	/** Test filter via chain: direct link, direct link */
 	public function TestFilterStudentsByGradeCaptain() {
 		// Carlota
 		$students = $this->Students->Select([
@@ -152,7 +152,7 @@ class TestScrudLinks extends Test {
 		// return $students;
 	}
 
-	/** Тест фильтра по цепочке: обратная связь */
+	/** Test filter via chain: inverse link */
 	public function TestFilterGradesByStudents() {
 		$random_grade = $this->Grades->Read([], ['*@'], ['{RANDOM}' => ''], false);
 		$random_student_first_name = $random_grade['STUDENTS'][array_rand($random_grade['STUDENTS'])]['FIRST_NAME'];
@@ -172,7 +172,7 @@ class TestScrudLinks extends Test {
 		// return $grades;
 	}
 
-	/** Тест фильтра по цепочке: обратная связь + поиск по подстроке */
+	/** Test filter via chain: inverse link + search by substring */
 	public function TestFilterGradesByStudentsLike() {
 		foreach (['ani', 'nia', 'vel'] as $search) {
 			$grades = $this->Grades->Select([
@@ -192,7 +192,7 @@ class TestScrudLinks extends Test {
 		}
 	}
 
-	/** Тест фильтра по цепочке: обратная связь, прямая связь */
+	/** Test filter via chain: inverse link, direct link */
 	public function TestFilterGradesByRooms() {
 		$grades = $this->Grades->Select([
 			'FIELDS' => ['ID', 'TITLE', 'TIMETABLES' => ['*@']],
@@ -209,7 +209,7 @@ class TestScrudLinks extends Test {
 		// return $grades;
 	}
 
-	/** Тест внешнего ключа: RESTRICT создание */
+	/** Foreign key test: RESTRICT creation */
 	public function TestForeignRestrict() {
 		$max_grade_id = $this->Grades->Read([], ['ID'], ['ID' => 'DESC'])['ID'];
 
@@ -235,7 +235,7 @@ class TestScrudLinks extends Test {
 		throw new Exception("Can create student with no-existing grade #" . ($max_grade_id + 1));
 	}
 
-	/** Тест внешнего ключа: CASCADE удаление */
+	/** Foreign key test: CASCADE deletion */
 	public function TestForeignCascade() {
 		$random_timetable = $this->Timetable->Read([], ['*'], ['{RANDOM}' => '']);
 		$this->Rooms->Delete($random_timetable['ROOM']);
@@ -245,9 +245,8 @@ class TestScrudLinks extends Test {
 		}
 	}
 
-	/** Тест переименования колонки */
+	/** Renaming column: FIRST_NAME -> SECOND_NAME */
 	public function TestRenameColumn() {
-		// FIRST_NAME -> SECOND_NAME
 		$this->Students->structure['SECOND_NAME'] = clone $this->Students->structure['FIRST_NAME'];
 		$this->Students->structure['SECOND_NAME']['CHANGE'] = 'FIRST_NAME';
 		unset($this->Students->structure['FIRST_NAME']);

@@ -4,32 +4,32 @@ namespace Testing;
 
 class Timetable extends \System\SCRUD {
 	public function Init() {
-		$this->name = 'Расписание занятий';
+		$this->name = 'Timetable';
 		$this->structure = [
 			'ID'       => self::ID,
 			'ROOM'     => [
 				'TYPE'     => 'OUTER',
-				'NAME'     => 'Аудитория',
+				'NAME'     => 'Room',
 				'LINK'     => 'Rooms',
 				'NOT_NULL' => true,
 				'FOREIGN'  => 'CASCADE',
 			],
 			'GRADE'    => [
 				'TYPE'     => 'OUTER',
-				'NAME'     => 'Класс',
+				'NAME'     => 'Grade',
 				'LINK'     => 'Grades',
 				'NOT_NULL' => true,
 				'FOREIGN'  => 'CASCADE',
 			],
 			'START'    => [
 				'TYPE'     => 'DATETIME',
-				'NAME'     => 'Время начала занятий',
+				'NAME'     => 'Class start time',
 				'NOT_NULL' => true,
 				'VITAL'    => true,
 			],
 			'DURATION' => [
 				'TYPE'     => 'NUMBER',
-				'NAME'     => 'Продолжительность (в часах)',
+				'NAME'     => 'Duration (in hours)',
 				'NOT_NULL' => true,
 				'DEFAULT'  => 1,
 			],

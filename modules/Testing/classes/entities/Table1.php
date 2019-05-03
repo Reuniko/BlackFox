@@ -5,7 +5,7 @@ namespace Testing;
 class Table1 extends \System\SCRUD {
 
 	public function Init() {
-		$this->name = 'Таблица для тестирования №1';
+		$this->name = 'Table1';
 		$this->structure = [
 			'ID'       => self::ID,
 			'BOOL'     => [

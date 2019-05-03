@@ -3,32 +3,36 @@
 namespace Testing;
 
 class TestScrudBase extends Test {
-	public $name = 'Тест SCRUD: базовые методы';
+	public $name = 'Test SCRUD: base methods';
 
 	/** @var \System\SCRUD $SCRUD */
 	public $SCRUD = null;
 	public $limit = 250;
 
-	/** Взятие инстанса класса "TestScrudBase" */
+	/** Getting instance of TestScrudBase */
 	public function TestGetInstance() {
 		$this->SCRUD = Table1::I();
 	}
 
-	/** Синхронизация структуры */
+	/** Structure synchronization */
 	public function TestSynchronize() {
 		$this->SCRUD->Synchronize();
 	}
 
-	/** Удаление всех записей */
+	/** Deleting of all records */
 	public function TestTruncate() {
 		$this->SCRUD->Truncate();
 		$rows = $this->SCRUD->Select();
 		if (!empty($rows)) {
-			throw new Exception("В таблице остались записи");
+			throw new Exception(T([
+				'en' => 'There are records in the table',
+				'ru' => 'В таблице остались записи',
+			]));
 		}
 	}
 
-	/** Создание 100 случайных записей */
+	/** Creating 100 random records
+	 */
 	public function TestCreateRandomRows() {
 		$R = [];
 		for ($i = 0; $i < $this->limit; $i++) {
@@ -50,27 +54,33 @@ class TestScrudBase extends Test {
 		return $i;
 	}
 
-	/** Попытка создания некорректной записи с полем типа ENUM */
+	/** Attempt to create an incorrect entry with a field of type ENUM */
 	public function TestCreateBadRow() {
 		try {
 			$this->SCRUD->Create(['ENUM' => 'BAD_VALUE']);
 		} catch (\Exception $error) {
 			return $error->getMessage();
 		}
-		throw new Exception("Ожидалась ошибка при попытке вставить в поле типа ENUM неизвестное значение");
+		throw new Exception(T([
+			'en' => 'An error was expected when trying to insert an unknown value in the ENUM type field',
+			'ru' => 'Ожидалась ошибка при попытке вставить в поле типа ENUM неизвестное значение',
+		]));
 	}
 
-	/** Попытка некорректного обновления поля типа ENUM */
+	/** Attempt to incorrectly update a field of type ENUM */
 	public function TestUpdateBadRow() {
 		try {
 			$this->SCRUD->Update(1, ['ENUM' => 'BAD_VALUE']);
 		} catch (\Exception $error) {
 			return $error->getMessage();
 		}
-		throw new Exception("Ожидалась ошибка при попытке обновить в поле типа ENUM неизвестное значение");
+		throw new Exception(T([
+			'en' => 'An error was expected while trying to update an unknown value in the ENUM type field',
+			'ru' => 'Ожидалась ошибка при попытке обновить в поле типа ENUM неизвестное значение',
+		]));
 	}
 
-	/** Проверка фильтра: булевое значение */
+	/** Filter check: boolean value */
 	public function TestFilterByBool() {
 		foreach ([true, false] as $value) {
 			$elements = $this->SCRUD->Select([
@@ -79,14 +89,14 @@ class TestScrudBase extends Test {
 			]);
 			foreach ($elements as $id => $element) {
 				if ($element['BOOL'] <> $value) {
-					throw new Exception("Элемент #{$id} значение BOOL: {$value} <> {$element['BOOL']}");
+					throw new Exception("Element #{$id}: value BOOL: {$value} <> {$element['BOOL']}");
 				}
 			}
 		}
 		return count($elements);
 	}
 
-	/** Проверка фильтра: целочисленное значение */
+	/** Filter check: integer value */
 	public function TestFilterByNumber() {
 		$value = rand(0, 99);
 		$elements = $this->SCRUD->Select([
@@ -95,13 +105,13 @@ class TestScrudBase extends Test {
 		]);
 		foreach ($elements as $id => $element) {
 			if ($element['NUMBER'] <> $value) {
-				throw new Exception("Элемент #{$id} значение NUMBER <> {$value}");
+				throw new Exception("Element #{$id}: value NUMBER <> {$value}");
 			}
 		}
 		return count($elements);
 	}
 
-	/** Проверка фильтра: строковое значение целиком */
+	/** Filter check: string value */
 	public function TestFilterByString() {
 		$value = $this->SCRUD->Read(rand(1, $this->limit), ['ID', 'STRING'])['STRING'];
 		$elements = $this->SCRUD->Select([
@@ -110,18 +120,21 @@ class TestScrudBase extends Test {
 		]);
 		foreach ($elements as $id => $element) {
 			if ($element['STRING'] <> $value) {
-				throw new Exception("Элемент #{$id} значение STRING <> {$value}");
+				throw new Exception("Element #{$id}: value STRING <> {$value}");
 			}
 		}
 		return $value;
 	}
 
-	/** Проверка фильтра: строковое значение подстрокой */
+	/** Filter check: substring value */
 	public function TestFilterBySubString() {
 		$value = $this->SCRUD->Read([], ['ID', 'STRING'], ['{RANDOM}' => '']);
 		$value = substr($value['STRING'], rand(1, 3), rand(3, 5));
 		if (empty($value)) {
-			throw new Exception("Не удалось извлечь случайную подстроку");
+			throw new Exception(T([
+				'en' => 'Could not retrieve random substring',
+				'ru' => 'Не удалось извлечь случайную подстроку',
+			]));
 		}
 		$elements = $this->SCRUD->Select([
 			'FILTER' => ['~STRING' => $value],
@@ -129,13 +142,13 @@ class TestScrudBase extends Test {
 		]);
 		foreach ($elements as $id => $element) {
 			if (strpos($element['STRING'], $value) === false) {
-				throw new Exception("Элемент #{$id} значение STRING: '{$value}' <> '{$element['STRING']}'");
+				throw new Exception("Element #{$id}: value STRING: '{$value}' <> '{$element['STRING']}'");
 			}
 		}
 		return $value;
 	}
 
-	/** Проверка фильтра: примерная дата */
+	/** Filter check: approximate date */
 	public function TestFilterDateApproximate() {
 		$values = $this->SCRUD->GetColumn(['~DATETIME' => date('d.m.Y')], 'DATETIME');
 		foreach ($values as $raw) {
@@ -147,7 +160,7 @@ class TestScrudBase extends Test {
 		// return [$this->SCRUD->SQL, $values];
 	}
 
-	/** Проверка пейджера: без фильтрации */
+	/** Pager check: no filtering */
 	public function TestPager() {
 		$step = 100;
 		foreach ([1, 2, 3] as $page) {
