@@ -3,7 +3,7 @@
 namespace Testing;
 
 class TestCache extends Test {
-	public $name = 'Тест Cache';
+	public $name = 'Test Cache';
 	public $CACHE;
 
 	public function __construct() {

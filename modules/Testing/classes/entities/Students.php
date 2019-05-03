@@ -5,7 +5,7 @@ namespace Testing;
 class Students extends \System\SCRUD {
 
 	public function Init() {
-		$this->name = 'Студенты';
+		$this->name = 'Students';
 		$this->structure = [
 			'ID'         => self::ID,
 			'FIRST_NAME' => [

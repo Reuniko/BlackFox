@@ -6,7 +6,7 @@ class TestRunner extends \System\Unit {
 	public $options = [
 		'TESTS' => [
 			'TYPE' => 'ARRAY',
-			'NAME' => 'Тестовые классы в порядке запуска',
+			'NAME' => 'Test classes in run order',
 		],
 	];
 

@@ -5,7 +5,7 @@ namespace Testing;
 class Grades extends \System\SCRUD {
 
 	public function Init() {
-		$this->name = 'Классы';
+		$this->name = 'Grades';
 		$this->structure = [
 			'ID'         => self::ID,
 			'TITLE'      => [

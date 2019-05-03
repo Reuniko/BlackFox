@@ -5,12 +5,12 @@ namespace Testing;
 class Rooms extends \System\SCRUD {
 
 	public function Init() {
-		$this->name = 'Аудитории';
+		$this->name = 'Rooms';
 		$this->structure = [
 			'ID'    => self::ID,
 			'TITLE' => [
 				'TYPE'     => 'STRING',
-				'NAME'     => 'A. Number',
+				'NAME'     => 'Room number',
 				'NOT_NULL' => true,
 				'VITAL'    => true,
 			],

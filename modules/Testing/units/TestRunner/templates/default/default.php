@@ -10,7 +10,10 @@
 			value="RunAll"
 		>
 			<i class="fa fa-play"></i>
-			Запустить все тесты
+			<?= T([
+				'en' => 'Run all tests',
+				'ru' => 'Запустить все тесты',
+			]) ?>
 		</button>
 	</form>
 
@@ -52,7 +55,7 @@
 						<div class="row">
 							<div class="col">
 								<div class="alert alert-sm alert-info">
-									<?= $test_method_result['NAME'] ?>
+									<?= nl2br($test_method_result['NAME']) ?>
 								</div>
 							</div>
 
