@@ -61,6 +61,10 @@ $(function () {
     $('[data-wysiwyg]').each(function () {
         $(this).summernote({
             height: $(this).data('wysiwyg-height') ? $(this).data('wysiwyg-height') : 300,
+            lang: {
+                'en': 'en-EN',
+                'ru': 'ru-RU',
+            }[lang],
         });
     });
 
@@ -94,7 +98,7 @@ $(function () {
     /* TYPE OUTER */
     $('[data-type=OUTER]').select2({
         theme: "bootstrap",
-        language: "ru",
+        language: lang,
         width: 'auto',
         ajax: {
             url: window.location.href,

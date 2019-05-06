@@ -1,13 +1,13 @@
 $(function () {
 	$('[data-datetimepicker]').flatpickr({
-		locale: "ru",
+		locale: lang,
 		dateFormat: "Y-m-d H:i:S",
 		enableTime: true,
 		time_24hr: true,
 		allowInput: true
 	});
 	$('[data-datepicker]').flatpickr({
-		locale: "ru",
+		locale: lang,
 		enableTime: false,
 		dateFormat: "Y-m-d",
 		allowInput: true
