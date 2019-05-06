@@ -59,8 +59,9 @@ $(function () {
     });
 
     $('[data-wysiwyg]').each(function () {
-        CKEDITOR.config.allowedContent = true;
-        CKEDITOR.replace($(this).attr('id'));
+        $(this).summernote({
+            height: $(this).data('wysiwyg-height') ? $(this).data('wysiwyg-height') : 300,
+        });
     });
 
     $('[data-confirm]').click(function (e) {

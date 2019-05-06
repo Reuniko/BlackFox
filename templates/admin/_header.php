@@ -18,8 +18,9 @@ $this->AddHeaderScript($path . '/lib/bootstrap/js/bootstrap.bundle.min.js');
 // fontawesome
 $this->AddHeaderStyle($path . '/lib/fontawesome/css/all.min.css');
 
-// ckeditor
-$this->AddHeaderScript($path . '/lib/ckeditor/ckeditor.js');
+// summernote
+$this->AddHeaderStyle($path . '/lib/summernote/dist/summernote-bs4.css');
+$this->AddHeaderScript($path . '/lib/summernote/dist/summernote-bs4.js');
 
 // flatpickr
 $this->AddHeaderScript($path . '/lib/flatpickr/flatpickr.min.js');
