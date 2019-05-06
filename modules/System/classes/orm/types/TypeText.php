@@ -26,6 +26,7 @@ class TypeText extends Type {
 			rows="5"
 			<? if ($this->info['WYSIWYG']): ?>
 				data-wysiwyg=""
+				data-wysiwyg-height="300"
 			<? endif; ?>
 		><?= $value ?></textarea>
 		<?
