@@ -36,4 +36,14 @@ abstract class AModule extends Instanceable {
 	public function Load() {
 		// override
 	}
+
+	/**
+	 * Compiles and return the tree of menu for administrative section
+	 * See children for examples
+	 *
+	 * @return array
+	 */
+	public function Menu() {
+		return [];
+	}
 }
