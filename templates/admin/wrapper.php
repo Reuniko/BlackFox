@@ -39,7 +39,10 @@
 
 		<a class="btn btn-secondary" href="/admin/logout.php">
 			<i class="fa fa-sign-out-alt"></i>
-			<span class="d-none d-md-inline-block">Выход</span>
+			<span class="d-none d-md-inline-block"><?=T([
+			    'en' => 'Logout',
+			    'ru' => 'Выход',
+			])?></span>
 		</a>
 
 	</div>
