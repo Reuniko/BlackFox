@@ -13,11 +13,8 @@ class Menu extends \System\Unit {
 	public function Default() {
 		$this->RESULT = [];
 		foreach ($this->ENGINE->modules as $module => $info) {
-			try {
-				$menu = require($this->ENGINE->GetCoreFile("modules/{$module}/.menu.php"));
-			} catch (\Exception $error) {
-				continue;
-			}
+			$Module = "\\{$module}\\Module";
+			$menu = $Module::I()->Menu();
 			$this->RESULT = array_merge($this->RESULT, $menu);
 		}
 		$this->path = parse_url($_SERVER['REQUEST_URI'])['path'];
@@ -41,6 +38,5 @@ class Menu extends \System\Unit {
 		}
 		return $item['ACTIVE'];
 	}
-
 
 }
