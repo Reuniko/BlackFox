@@ -14,7 +14,7 @@ class TypeOuter extends Type {
 		$Link = $this->info['LINK'];
 		$code = $this->info['CODE'];
 		if (!in_array('System\SCRUD', class_parents($Link))) {
-			throw new ExceptionType("Field '{$code}': link '{$Link}' must be SCRUD child ");
+			throw new ExceptionType("Field '{$code}': link '{$Link}' must be SCRUD child");
 		}
 		$element[$code] = $Link::I()->FormatOutputValues($element[$code]);
 		return $element;
@@ -152,7 +152,10 @@ class TypeOuter extends Type {
 					type="button"
 					class="btn btn-secondary flex-shrink-1"
 					data-outer-multiple=""
-					title="Выбрать несколько"
+					title="<?= T([
+						'en' => 'Select several',
+						'ru' => 'Выбрать несколько',
+					]) ?>"
 				>
 					<i class="fa fa-ellipsis-h"></i>
 				</button>
@@ -178,7 +181,10 @@ class TypeOuter extends Type {
 					type="button"
 					class="btn btn-secondary flex-shrink-1"
 					data-outer-clean=""
-					title="Очистить"
+					title="<?=T([
+					    'en' => 'Clean',
+					    'ru' => 'Очистить',
+					])?>"
 				>
 					<i class="fa fa-eraser"></i>
 				</button>

@@ -5,8 +5,8 @@ namespace System;
 class Log extends SCRUD {
 	public function Init() {
 		$this->name = T([
-			'en' => 'System log',
-			'ru' => 'Журнал системы',
+			'en' => 'Log',
+			'ru' => 'Журнал',
 		]);
 		$this->structure = [
 			'ID'      => self::ID,
