@@ -363,6 +363,7 @@ class DatabaseDriverPostgres extends Database {
 	}
 
 	private function RecreateEnumType() {
+		// TODO make Postgres enum types from strings to actually enums
 		/*
 		 CREATE TYPE admin_level1 AS ENUM ('classifier', 'moderator');
 
