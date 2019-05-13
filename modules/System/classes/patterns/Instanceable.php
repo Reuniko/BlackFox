@@ -7,25 +7,38 @@ namespace System;
  * Класс является прямым синонимом синглотну.
  * В отличие от синглтона этот паттерн не запрещает создание новых объектов того же класса.
  * В большинстве случаев в проекте требуется один и тот же неизменяемый глобальный объект.
- * Доступ к этому объекту осуществляется через <название класса>::Instance().
+ * Доступ к этому объекту осуществляется через <название класса>::Instance() или <название класса>::I()
  * В других случаях при необходимости остается возможность создания личных локальных изменяемых объектов (new ...).
  * Рекомендуется при проектировании класса реализовать неизменяемость, анализируя флаг $this->instanced.
+ *
+ * Class Instanceable
+ * Class is a direct synonym for singleton.
+ * Unlike singleton, this pattern does not prohibit the creation of new objects of the same class.
+ * In most cases, the project requires the same immutable global object.
+ * Access to this object is through <class name>::Instance() or <class name>::I()
+ * In other cases, if necessary, it remains possible to create personal local mutable objects (new ...).
+ * It is recommended that when designing a class, implement immutability by analyzing the flag $this->instanced.
+ *
  * @package System
  */
 abstract class Instanceable {
 
-	/** @var array массив инстациированных классов */
+	/** @var array array of instantiated classes */
 	private static $instance = [];
-	/** @var bool если класс был инстациирован - по возможности требуется запретить изменение его внутреннего состояния */
+	/** @var bool if the class has been instanced - in most cases it is required to prohibit a change in its internal state */
 	protected $instanced = false;
 
 	/**
+	 * Returns the object being instantiated:
+	 * - if the object has already been created - returns it
+	 * - if the object has not yet been created - creates it and returns
+	 *
 	 * Возвращает инстациируемый объект:
 	 * - если объект уже был создан - возвращает его
 	 * - если объект еще не был создан - создает его и возвращает
 	 *
-	 * @param mixed $params параметры конструктора класса
-	 * @return static инстациируемый объект
+	 * @param mixed $params class constructor parameters
+	 * @return static object being instantiated
 	 */
 	public static function Instance($params = null) {
 
@@ -53,12 +66,16 @@ abstract class Instanceable {
 	}
 
 	/**
+	 * Returns the object being instantiated:
+	 * - if the object has already been created - returns it
+	 * - if the object has not yet been created - creates it and returns
+	 *
 	 * Возвращает инстациируемый объект:
 	 * - если объект уже был создан - возвращает его
 	 * - если объект еще не был создан - создает его и возвращает
 	 *
-	 * @param mixed $params параметры конструктора класса
-	 * @return static инстациируемый объект
+	 * @param mixed $params class constructor parameters
+	 * @return static object being instantiated
 	 */
 	public static function I($params = null) {
 		return self::Instance($params);
@@ -67,7 +84,6 @@ abstract class Instanceable {
 	/**
 	 * @param mixed $params ...
 	 * @return static ...
-	 * @throws Exception Unsupported param type
 	 */
 	public static function InstanceDefault($params = null) {
 		$Object = self::Instance($params);

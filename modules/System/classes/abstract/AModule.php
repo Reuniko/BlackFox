@@ -25,8 +25,8 @@ abstract class AModule extends Instanceable {
 	}
 
 	public function Uninstall() {
-		$class = end(explode('\\', static::class));
-		Modules::Instance()->Delete($class);
+		$namespace = reset(explode('\\', static::class));
+		Modules::Instance()->Delete($namespace);
 	}
 
 	public function Upgrade() {

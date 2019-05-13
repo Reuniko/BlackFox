@@ -457,11 +457,12 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Ищет все классы модуля и регистрирует их в движке, заполняя массив $this->classes:
-	 * - ключ - имя класса (вместе с неймспейсом)
-	 * - значение - путь к файлу
+	 * Searches for all classes of the module and registers them in the engine, filling the array $this->classes:
+	 * - key - class name (along with namespace)
+	 * - value - file path
 	 *
-	 * @param string $module_name символьный код модуля
+	 * @param string $module_name symbolic code of the module
+	 * @throws Exception
 	 */
 	public function RegisterModuleClasses($module_name) {
 		$this->classes["{$module_name}\\Module"] = $this->GetCoreFile("modules/{$module_name}/Module.php");
