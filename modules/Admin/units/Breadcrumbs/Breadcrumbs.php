@@ -2,7 +2,7 @@
 
 namespace Admin;
 
-class Breadcrumbs extends \Admin\Menu {
+class Breadcrumbs extends Menu {
 
 	public function GetActions(array $request = []) {
 		return 'Default';
