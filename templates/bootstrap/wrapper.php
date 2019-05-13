@@ -9,7 +9,7 @@
 <body>
 <header>
 	<div class="page-header" style="text-align: center;">
-		<h1>Tigris engine demo</h1>
+		<h1>Demo</h1>
 	</div>
 </header>
 <div class="container">
