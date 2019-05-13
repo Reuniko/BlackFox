@@ -34,7 +34,10 @@ class TypeFloat extends Type {
 					class="<?= $class ?>"
 					id="<?= $code ?>"
 					name="<?= $group ?>[><?= $code ?>]"
-					placeholder="от"
+					placeholder="<?= T([
+						'en' => 'from',
+						'ru' => 'от',
+					]) ?>"
 					value="<?= $filter['>' . $code] ?>"
 				>
 			</div>
@@ -45,7 +48,10 @@ class TypeFloat extends Type {
 					class="<?= $class ?>"
 					id="<?= $code ?>"
 					name="<?= $group ?>[<<?= $code ?>]"
-					placeholder="до"
+					placeholder="<?= T([
+						'en' => 'to',
+						'ru' => 'до',
+					]) ?>"
 					value="<?= $filter['<' . $code] ?>"
 				>
 			</div>

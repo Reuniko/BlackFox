@@ -3,7 +3,6 @@
 <html>
 <head>
 	<? require('_header.php') ?>
-	<? $this->AddHeaderStyle($this->TEMPLATE_PATH . '/style.css') ?>
 	<?= $this->GetHeader() ?>
 	<title><?= $this->TITLE ?></title>
 </head>
@@ -15,12 +14,18 @@
 		data-toggle-sidebar=""
 	>
 		<i class="fa fa-bars"></i>
-		<span class="d-none d-md-inline-block">Меню</span>
+		<span class="d-none d-md-inline-block"><?=T([
+		    'en' => 'Menu',
+		    'ru' => 'Меню',
+		])?></span>
 	</button>
 
 	<a class="btn btn-secondary" href="/">
 		<i class="fa fa-desktop"></i>
-		<span class="d-none d-md-inline-block">Сайт</span>
+		<span class="d-none d-md-inline-block"><?=T([
+		    'en' => 'Site',
+		    'ru' => 'Сайт',
+		])?></span>
 	</a>
 
 	<div class="float-right">

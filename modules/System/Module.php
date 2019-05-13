@@ -99,8 +99,8 @@ class Module extends \System\AModule {
 					],
 					'System_Log'          => [
 						'NAME' => T([
-							'en' => 'System log',
-							'ru' => 'Журнал системы',
+							'en' => 'Log',
+							'ru' => 'Журнал',
 						]),
 						'LINK' => '/admin/System/Log.php',
 					],

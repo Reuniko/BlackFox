@@ -40,7 +40,10 @@ class TypeNumber extends Type {
 					class="<?= $class ?>"
 					id="<?= $group ?>[><?= $code ?>]"
 					name="<?= $group ?>[><?= $code ?>]"
-					placeholder="от"
+					placeholder="<?= T([
+						'en' => 'from',
+						'ru' => 'от',
+					]) ?>"
 					value="<?= $filter['>' . $code] ?>"
 				>
 			</div>
@@ -51,7 +54,10 @@ class TypeNumber extends Type {
 					class="<?= $class ?>"
 					id="<?= $group ?>[<<?= $code ?>]"
 					name="<?= $group ?>[<<?= $code ?>]"
-					placeholder="до"
+					placeholder="<?= T([
+						'en' => 'to',
+						'ru' => 'до',
+					]) ?>"
 					value="<?= $filter['<' . $code] ?>"
 				>
 			</div>

@@ -23,7 +23,7 @@ class TypeFile extends TypeOuter {
 
 	public function PrintValue($value) {
 		?>
-		<? if (!empty($value)): ?>
+		<? if (!empty($value['SRC'])): ?>
 			<? if (User::I()->InGroup('root')): ?>
 				[<a target="_blank" href="/admin/System/Files.php?ID=<?= $value['ID'] ?>"><?= $value['ID'] ?></a>]
 			<? endif; ?>
@@ -79,7 +79,10 @@ class TypeFile extends TypeOuter {
 						<div class="input-group-prepend">
 							<span class="btn btn-info">
 								<i class="fa fa-file"></i>
-								<span data-file-name="Выбрать файл">Выбрать файл</span>
+								<span data-file-name=""><?=T([
+								    'en' => 'Select file',
+								    'ru' => 'Выбрать файл',
+								])?></span>
 							</span>
 						</div>
 					</div>

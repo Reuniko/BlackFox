@@ -42,7 +42,10 @@ class TypeDate extends Type {
 					class="<?= $class ?>"
 					id="<?= $code ?>"
 					name="<?= $group ?>[><?= $code ?>]"
-					placeholder="от"
+					placeholder="<?= T([
+						'en' => 'from',
+						'ru' => 'от',
+					]) ?>"
 					value="<?= $filter['>' . $code] ?>"
 					data-datepicker=""
 				/>
@@ -53,7 +56,10 @@ class TypeDate extends Type {
 					class="<?= $class ?>"
 					id="<?= $code ?>"
 					name="<?= $group ?>[<<?= $code ?>]"
-					placeholder="до"
+					placeholder="<?=T([
+					    'en' => 'to',
+					    'ru' => 'до',
+					])?>"
 					value="<?= $filter['<' . $code] ?>"
 					data-datepicker=""
 				/>

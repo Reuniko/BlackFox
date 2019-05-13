@@ -24,7 +24,13 @@ class TypeBool extends Type {
 	}
 
 	public function PrintValue($value) {
-		echo ($value) ? 'Да' : 'Нет';
+		echo ($value) ? T([
+			'en' => 'Yes',
+			'ru' => 'Да',
+		]) : T([
+			'en' => 'No',
+			'ru' => 'Нет',
+		]);
 	}
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
@@ -54,9 +60,18 @@ class TypeBool extends Type {
 			class="<?= $class ?>"
 			name="<?= $group ?>[<?= $code ?>]"
 		>
-			<option value="">- не фильтровать -</option>
-			<option value="0" <?= ($filter[$code] === '0') ? 'selected' : '' ?>>Нет</option>
-			<option value="1" <?= ($filter[$code] === '1') ? 'selected' : '' ?>>Да</option>
+			<option value=""><?= T([
+					'en' => '- do not filter -',
+					'ru' => '- не фильтровать -',
+				]) ?></option>
+			<option value="0" <?= ($filter[$code] === '0') ? 'selected' : '' ?>><?= T([
+					'en' => 'No',
+					'ru' => 'Нет',
+				]) ?></option>
+			<option value="1" <?= ($filter[$code] === '1') ? 'selected' : '' ?>><?= T([
+					'en' => 'Yes',
+					'ru' => 'Да',
+				]) ?></option>
 		</select>
 		<?
 	}

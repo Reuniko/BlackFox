@@ -69,7 +69,10 @@ class TypeDateTime extends Type {
 					class="<?= $class ?>"
 					id="<?= $group ?>[><?= $code ?>]"
 					name="<?= $group ?>[><?= $code ?>]"
-					placeholder="от"
+					placeholder="<?= T([
+						'en' => 'from',
+						'ru' => 'от',
+					]) ?>"
 					value="<?= $filter['>' . $code] ?>"
 					data-datetimepicker=""
 				/>
@@ -80,7 +83,10 @@ class TypeDateTime extends Type {
 					class="<?= $class ?>"
 					id="<?= $group ?>[><?= $code ?>]"
 					name="<?= $group ?>[<<?= $code ?>]"
-					placeholder="до"
+					placeholder="<?= T([
+						'en' => 'to',
+						'ru' => 'до',
+					]) ?>"
 					value="<?= $filter['<' . $code] ?>"
 					data-datetimepicker=""
 				/>
