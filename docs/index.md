@@ -1,5 +1,5 @@
-# Black Fox
-Framework for web applications.
+# BlackFox
 
 * [English](en/index.md)
 * [Русский](ru/index.md)
+
