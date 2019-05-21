@@ -41,7 +41,6 @@ It is very powerful with combination of Adminer: it builds administrative pages 
 ## Unit
 Unit is a class to create controller by inheriting it 
 and also it is a folder with the same name, contains class and templates (views).
-
 Features:
 * Every public method is an action that can be called by user
 * Every param in public method is a part of user request 
@@ -64,19 +63,19 @@ This is a unit that eats SCRUD child as parameter and provides full control of t
 It can be extended in case you need additional functionality.
 
 ## Other classes
-[AModule](../core/modules/System/classes/abstract/AModule.php), 
-[Database](../core/modules/System/classes/database/Database.php), 
-[User](../core/modules/System/classes/User.php), 
-[Exception](../core/modules/System/classes/exceptions/Exception.php), 
-[Cache](../core/modules/System/classes/cache/Cache.php), 
-[Utility](../core/modules/System/classes/Utility.php).
+[AModule](modules/System/classes/abstract/AModule.php), 
+[Database](modules/System/classes/database/Database.php), 
+[User](modules/System/classes/User.php), 
+[Exception](modules/System/classes/exceptions/Exception.php), 
+[Cache](modules/System/classes/cache/Cache.php), 
+[Utility](modules/System/classes/Utility.php).
 
 ## Other entities (childs of SCRUD)
-[Files](../core/modules/System/classes/entities/Files.php), 
-[Users](../core/modules/System/classes/entities/Users.php), 
-[Groups](../core/modules/System/classes/entities/Groups.php), 
-[Users2Groups](../core/modules/System/classes/entities/associative/Users2Groups.php), 
-[Log](../core/modules/System/classes/entities/Log.php), 
-[Modules](../core/modules/System/classes/entities/Modules.php), 
-[Content](../core/modules/System/classes/entities/Content.php), 
-[Redirects](../core/modules/System/classes/entities/Redirects.php).
+[Files](modules/System/classes/entities/Files.php), 
+[Users](modules/System/classes/entities/Users.php), 
+[Groups](modules/System/classes/entities/Groups.php), 
+[Users2Groups](modules/System/classes/entities/associative/Users2Groups.php), 
+[Log](modules/System/classes/entities/Log.php), 
+[Modules](modules/System/classes/entities/Modules.php), 
+[Content](modules/System/classes/entities/Content.php), 
+[Redirects](modules/System/classes/entities/Redirects.php).
