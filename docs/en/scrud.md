@@ -90,19 +90,19 @@ You can override any method:
 class Rooms extends \System\SCRUD {
     public $structure = [...];
     
-	public function Create($fields) {
-		// checks goes here
-		if ($fields['TITLE'] === 'swear words') {
-			throw new Exception("No swear words allowed");
-		}
-		
-		$ID = parent::Create($fields);
-		
-		// on successful create events goes here
-		\System\Log::I()->Create(['MESSAGE' => "The room #{$ID} has been created"]);
-		
-		return $ID;
-	}
+    public function Create($fields) {
+        // checks
+        if ($fields['TITLE'] === 'swear words') {
+            throw new Exception("No swear words allowed");
+        }
+        
+        $ID = parent::Create($fields);
+        
+        // on successful create events
+        \System\Log::I()->Create(['MESSAGE' => "The room #{$ID} has been created"]);
+        
+        return $ID;
+    }
 }
 ```
 You can redefine any method:
