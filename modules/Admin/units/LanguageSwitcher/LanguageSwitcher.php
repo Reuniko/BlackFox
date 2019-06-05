@@ -24,14 +24,13 @@ class LanguageSwitcher extends \System\Unit {
 
 	public function Default() {
 		$R['LANGUAGES'] = $this->PARAMS['LANGUAGES'];
-		$R['LANGUAGE'] = $this->USER->FIELDS['LANG'];
+		$R['LANGUAGE'] = $this->ENGINE->GetLanguage();
 		return $R;
 	}
 
 	public function SwitchLanguage($SwitchLanguage) {
-		\System\Users::I()->Update($this->USER->ID, ['LANG' => $SwitchLanguage]);
-		$_SESSION['USER']['LANG'] = $SwitchLanguage;
-		$this->Redirect('?');
+		$this->ENGINE->SetLanguage($SwitchLanguage);
+		$this->Redirect('?' . http_build_query(array_diff($_GET, ['SwitchLanguage' => $SwitchLanguage])));
 	}
 
 }

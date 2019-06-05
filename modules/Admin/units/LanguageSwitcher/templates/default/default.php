@@ -4,7 +4,10 @@
 	</button>
 	<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
 		<? foreach ($RESULT['LANGUAGES'] as $code => $display): ?>
-			<a class="dropdown-item" href="?SwitchLanguage=<?= $code ?>"><?= $display ?></a>
+			<a
+				class="dropdown-item"
+				href="?<?= http_build_query(array_merge($_GET, ['SwitchLanguage' => $code])) ?>"
+			><?= $display ?></a>
 		<? endforeach; ?>
 	</div>
 </div>

@@ -67,7 +67,7 @@ class Users extends SCRUD {
 					'ru' => 'Для восстановления пароля',
 				]),
 			],
-			'LANG'            => [
+			'LANGUAGE'        => [
 				'TYPE'    => 'STRING',
 				'GROUP'   => 'SYSTEM',
 				'NAME'    => T([

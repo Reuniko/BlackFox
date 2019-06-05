@@ -31,6 +31,8 @@ class Engine extends Instanceable {
 
 	public $DELAYED = [];
 
+	public $DefaultLanguage = 'en';
+
 	/**
 	 * Engine constructor:
 	 * - Initializes (and prolongs) user session
@@ -654,5 +656,31 @@ class Engine extends Instanceable {
 			'NAME' => $name,
 			'LINK' => $link,
 		];
+	}
+
+	/**
+	 * @return string
+	 */
+	public function GetLanguage() {
+		$lang = &$_SESSION['USER']['LANGUAGE'];
+		if (!empty($lang)) {
+			return $lang;
+		}
+		if ($this->USER->IsAuthorized()) {
+			$lang = Users::I()->Read($this->USER->ID, ['LANGUAGE'])['LANGUAGE'];
+		} else {
+			$lang = $this->DefaultLanguage;
+		}
+		return $lang;
+	}
+
+	/**
+	 * @param string $language
+	 */
+	public function SetLanguage($language) {
+		$_SESSION['USER']['LANGUAGE'] = $language;
+		if ($this->USER->IsAuthorized()) {
+			Users::I()->Update($this->USER->ID, ['LANGUAGE' => $language]);
+		}
 	}
 }
