@@ -6,7 +6,7 @@ php_flag display_errors on
 php_flag html_errors on
 
 <IfModule mod_dir.c>
-	DirectoryIndex index.php .controller.php
+	DirectoryIndex index.php .router.php
 </IfModule>
 
 <IfModule mod_rewrite.c>

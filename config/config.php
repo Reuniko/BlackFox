@@ -12,10 +12,10 @@ $CONFIG = [
 	],
 	'database'  => [
 		'HOST'     => 'localhost',
-		'PORT'     => '3306',
-		'USER'     => 'root',
+		'PORT'     => 3306,
+		'USER'     => '',
 		'PASSWORD' => '',
-		'DATABASE' => 'blackfox',
+		'DATABASE' => '',
 	],
 	'template'  => 'bootstrap',
 	'redirects' => [
