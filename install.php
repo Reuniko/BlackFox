@@ -4,10 +4,7 @@
 if (php_sapi_name() <> 'cli') die('Console usage only');
 $_SERVER["DOCUMENT_ROOT"] = __DIR__ . '/../';
 
-require_once("modules/system/classes/patterns/Instanceable.php");
-require_once("modules/system/classes/Engine.php");
-require_once("modules/system/T.php");
-require_once("modules/system/debug.php");
+require_once("includes.php");
 
 \System\Engine::I()->RegisterModuleClasses('System');
 \System\Module::I()->Upgrade();
