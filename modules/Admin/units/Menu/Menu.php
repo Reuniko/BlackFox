@@ -13,10 +13,9 @@ class Menu extends \System\Unit {
 			$MENU = \System\Cache::I()->Get('admin_menu');
 		} catch (\System\ExceptionCache $error) {
 			$MENU = [];
-			foreach ($this->ENGINE->modules as $module => $info) {
-				$Module = "\\{$module}\\Module";
-				$menu = $Module::I()->Menu();
-				$MENU = array_merge($MENU, $menu);
+			foreach ($this->ENGINE->modules as $namespace) {
+				$Module = "\\{$namespace}\\Module";
+				$MENU = array_merge($MENU, $Module::I()->Menu());
 			}
 			\System\Cache::I()->Set('admin_menu', $MENU);
 		}

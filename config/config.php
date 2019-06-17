@@ -10,6 +10,12 @@ $CONFIG = [
 		'/site/root' => $_SERVER['DOCUMENT_ROOT'] . '/site/root',
 		'/core/root' => $_SERVER['DOCUMENT_ROOT'] . '/core/root',
 	],
+	'modules'   => [
+		'System',
+		'Admin',
+		//'Testing',
+		//'<your namespace>',
+	],
 	'database'  => [
 		'HOST'     => 'localhost',
 		'PORT'     => 3306,

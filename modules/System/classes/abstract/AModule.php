@@ -2,33 +2,63 @@
 
 namespace System;
 abstract class AModule extends Instanceable {
-	public $name = 'New unknown module';
 	public $description = 'Redefine $name, $description и $version';
 	public $version = '1.0';
 
-	public function Install() {
-		$class = end(explode('\\', static::class));
-		if (Modules::Instance()->Present($class)) {
-			throw new Exception(T([
-				'en' => "Module '{$class}' already installed",
-				'ru' => "Модуль '{$class}' уже установлен",
-			]));
-		} else {
-			Modules::Instance()->Create([
-				'ID'          => $class,
-				'NAME'        => $this->name,
-				'DESCRIPTION' => $this->description,
-				'VERSION'     => $this->version,
-			]);
+	/**
+	 * Scans info about all files in specified directory and all subdirectories.
+	 *
+	 * @param string $directory absolute path to directory
+	 * @param int $depth deepness of scan (optional)
+	 * @return array list of all files as pathinfo structs: {dirname, basename, extension, filename}
+	 */
+	public function ScanDirectoryRecursive($directory, $depth = null) {
+		$files = [];
+		$names = @scandir($directory);
+		if (!empty($names)) {
+			foreach ($names as $name) {
+				if ($name === '.' or $name === '..') {
+					continue;
+				}
+				if (is_dir("{$directory}/{$name}")) {
+					if ($depth === 0) {
+						continue;
+					}
+					$files += $this->ScanDirectoryRecursive("{$directory}/{$name}", $depth ? ($depth - 1) : $depth);
+				} else {
+					$files["{$directory}/{$name}"] = pathinfo("{$directory}/{$name}");
+				}
+			}
 		}
-		$this->Upgrade();
+		return $files;
 	}
 
-	public function Uninstall() {
-		$namespace = reset(explode('\\', static::class));
-		Modules::Instance()->Delete($namespace);
+	/**
+	 * Method returns classes of this module.
+	 *
+	 * @return array dictionary: key - class name (with namespace), value - absolute path to php-file with class
+	 */
+	public function GetClasses() {
+		global $CONFIG;
+		$classes = [];
+		list($namespace) = explode('\\', get_called_class());
+		foreach ($CONFIG['cores'] as $core_absolute_path) {
+			$files = [];
+			$files += $this->ScanDirectoryRecursive("{$core_absolute_path}/modules/{$namespace}/classes");
+			$files += $this->ScanDirectoryRecursive("{$core_absolute_path}/modules/{$namespace}/units", 1);
+			foreach ($files as $path => $file) {
+				if ($file['extension'] === 'php') {
+					$classes[$namespace . '\\' . $file['filename']] = $path;
+				}
+			}
+		}
+		return $classes;
 	}
 
+	/**
+	 * Use this method to synchronize table structures
+	 * See children for examples
+	 */
 	public function Upgrade() {
 		// override
 	}

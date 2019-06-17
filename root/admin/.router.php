@@ -1,6 +1,5 @@
 <?php
 /** @var $this \System\Engine */
-
 $url = parse_url($_SERVER['REQUEST_URI']);
 $path = explode('/', $url['path']);
 
@@ -8,8 +7,9 @@ if ($path[0] <> '' or $path[1] <> 'admin') {
 	return $this->Show404();
 }
 
+
 $module = $path[2];
-if (empty($this->modules[$module])) {
+if (!in_array($module, $this->modules)) {
 	return $this->Show404();
 }
 
@@ -27,6 +27,7 @@ if (is_subclass_of($Class, "System\\Unit")) {
 	$Class::Run();
 	return;
 }
+
 
 
 return $this->Show404();

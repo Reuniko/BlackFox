@@ -11,7 +11,6 @@ class Module extends \System\AModule {
 
 		Users2Groups::I()->DropConstraints();
 
-		Modules::I()->Synchronize();
 		Users::I()->Synchronize();
 		Files::I()->Synchronize();
 		Groups::I()->Synchronize();
@@ -47,13 +46,6 @@ class Module extends \System\AModule {
 								'LINK' => '/admin/_upgrade.php',
 							],
 						],
-					],
-					'System_Modules'      => [
-						'NAME' => T([
-							'en' => 'Modules',
-							'ru' => 'Модули',
-						]),
-						'LINK' => '/admin/System/Modules.php',
 					],
 					'System_Content'      => [
 						'NAME' => T([

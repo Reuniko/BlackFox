@@ -67,6 +67,7 @@ class Engine extends Instanceable {
 		$this->config = require($_SERVER["DOCUMENT_ROOT"] . '/config.php');
 		$this->roots = $this->config['roots'];
 		$this->cores = $this->config['cores'];
+		$this->modules = $this->config['modules'];
 	}
 
 	/**
@@ -463,49 +464,20 @@ class Engine extends Instanceable {
 	 * - key - class name (along with namespace)
 	 * - value - file path
 	 *
-	 * @param string $module_name symbolic code of the module
+	 * @param string $namespace symbolic code of the module
 	 * @throws Exception
 	 */
-	public function RegisterModuleClasses($module_name) {
-		$this->classes["{$module_name}\\Module"] = $this->GetCoreFile("modules/{$module_name}/Module.php");
-		foreach ($this->cores as $core) {
-			$files = [];
-			$files += $this->ScanDirectoryRecursive("{$core}/modules/{$module_name}/classes");
-			$files += $this->ScanDirectoryRecursive("{$core}/modules/{$module_name}/units", 1);
-			foreach ($files as $path => $file) {
-				if ($file['extension'] === 'php') {
-					$this->classes[$module_name . '\\' . $file['filename']] = $path;
-				}
-			}
+	public function RegisterModuleClasses($namespace) {
+		$Module = "{$namespace}\\Module";
+		$this->classes[$Module] = $this->GetCoreFile("modules/{$namespace}/Module.php");
+		if (!is_subclass_of($Module, 'System\AModule')) {
+			throw new Exception(T([
+				'en' => "Module '{$namespace}' must be the child of 'System\AModule'",
+				'ru' => "Модуль '{$namespace}' должен быть наследником 'System\AModule'",
+			]));
 		}
-	}
-
-	/**
-	 * Scans info about all files in specified directory and all subdirectories.
-	 *
-	 * @param string $directory absolute path to directory
-	 * @param int $depth deepness of scan (optional)
-	 * @return array list of all files as pathinfo structs: {dirname, basename, extension, filename}
-	 */
-	public function ScanDirectoryRecursive($directory, $depth = null) {
-		$files = [];
-		$names = @scandir($directory);
-		if (!empty($names)) {
-			foreach ($names as $name) {
-				if ($name === '.' or $name === '..') {
-					continue;
-				}
-				if (is_dir("{$directory}/{$name}")) {
-					if ($depth === 0) {
-						continue;
-					}
-					$files += $this->ScanDirectoryRecursive("{$directory}/{$name}", $depth ? ($depth - 1) : $depth);
-				} else {
-					$files["{$directory}/{$name}"] = pathinfo("{$directory}/{$name}");
-				}
-			}
-		}
-		return $files;
+		/**@var AModule $Module */
+		$this->classes += $Module::I()->GetClasses();
 	}
 
 	/**
@@ -567,12 +539,11 @@ class Engine extends Instanceable {
 	 * except module 'System' cause it's been loaded already.
 	 */
 	public function LoadModules() {
-		$this->modules = Modules::I()->Select(['SORT' => ['SORT' => 'ASC']]);
-		foreach ($this->modules as $module) {
-			if ($module['ID'] === 'System') {
+		foreach ($this->modules as $namespace) {
+			if ($namespace === 'System') {
 				continue; // already registered
 			}
-			$this->RegisterModuleClasses($module['ID']);
+			$this->RegisterModuleClasses($namespace);
 		}
 	}
 
@@ -581,8 +552,7 @@ class Engine extends Instanceable {
 	 * for every active module - launches it's Upgrade() method.
 	 */
 	public function UpgradeActiveModules() {
-		$namespaces = Modules::I()->GetColumn();
-		foreach ($namespaces as $namespace) {
+		foreach ($this->modules as $namespace) {
 			$module = "{$namespace}\\Module";
 			/* @var \System\AModule $module */
 			$module::I()->Upgrade();
