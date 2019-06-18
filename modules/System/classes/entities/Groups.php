@@ -20,6 +20,7 @@ class Groups extends SCRUD {
 				'NOT_NULL' => true,
 				'INDEX'    => true,
 				'VITAL'    => true,
+				'UNIQUE'   => true,
 			],
 			'NAME'        => [
 				'TYPE'     => 'STRING',
