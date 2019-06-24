@@ -635,7 +635,7 @@ class Engine extends Instanceable {
 			return $_lang;
 		}
 		if (is_object($this->USER) and $this->USER->IsAuthorized()) {
-			$_lang = Users::I()->Read($this->USER->ID, ['LANGUAGE'])['LANGUAGE'];
+			$_lang = $this->USER->FIELDS['LANGUAGE'];
 		} else {
 			$_lang = reset(array_keys($this->languages));
 		}
