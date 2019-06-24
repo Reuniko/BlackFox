@@ -10,6 +10,7 @@ class Engine extends Instanceable {
 	public $modules = [];
 	public $classes = [];
 	public $url = [];
+	public $languages = [];
 
 	/** @var Database $DB */
 	public $DB;
@@ -30,8 +31,6 @@ class Engine extends Instanceable {
 	public $WRAPPER = "wrapper";
 
 	public $DELAYED = [];
-
-	public $DefaultLanguage = 'en';
 
 	/**
 	 * Engine constructor:
@@ -68,6 +67,7 @@ class Engine extends Instanceable {
 		$this->roots = $this->config['roots'];
 		$this->cores = $this->config['cores'];
 		$this->modules = $this->config['modules'];
+		$this->languages = $this->config['languages'];
 	}
 
 	/**
@@ -179,7 +179,6 @@ class Engine extends Instanceable {
 		$this->LoadUser();
 
 		$this->SetContent();
-		// TODO: section .wrapper.php (optional)
 		$this->WrapContent();
 		$this->ProcessDelayed();
 
@@ -188,8 +187,6 @@ class Engine extends Instanceable {
 
 	/**
 	 * Launch wrapper if it needs
-	 *
-	 * @throws Exception (wrapper not found)
 	 */
 	public function WrapContent() {
 		if (empty($this->TEMPLATE) or empty($this->WRAPPER)) {
@@ -311,29 +308,32 @@ class Engine extends Instanceable {
 	 * @throws Exception
 	 */
 	public function MakeContent() {
+		$lang = $this->GetLanguage();
 
-		// request for specific file
+		// request for specific file or directory with 'index.php'
 		foreach ($this->roots as $root) {
 			$request_path = $root . $this->url['path'];
-			if (file_exists($request_path) and !is_dir($request_path)) {
+			if (is_dir($request_path)) {
+				$request_path .= 'index.php';
+			}
+			if ($lang) {
+				$pathinfo = pathinfo($request_path);
+				$requested_path_lang = "{$pathinfo['dirname']}/{$pathinfo['filename']}.{$lang}.{$pathinfo['extension']}";
+				if (file_exists($requested_path_lang)) {
+					require($requested_path_lang);
+					return;
+				}
+			}
+			if (file_exists($request_path)) {
 				require($request_path);
 				return;
 			}
 		}
 
-		// request for specific directory with 'index.php'
-		foreach ($this->roots as $root) {
-			$request_path = $root . $this->url['path'];
-			if (is_dir($request_path) and file_exists($request_path . 'index.php')) {
-				require($request_path . 'index.php');
-				return;
-			}
-		}
-
 		// request for non-existing file
-		$path_to_controller = $this->SearchAncestorFile($this->url['path'], '.router.php');
-		if ($path_to_controller) {
-			require($path_to_controller);
+		$path_to_router = $this->SearchAncestorFile($this->url['path'], '.router.php');
+		if ($path_to_router) {
+			require($path_to_router);
 			return;
 		}
 
@@ -373,22 +373,23 @@ class Engine extends Instanceable {
 			$this->CheckSectionAccess($this->SECTION['ACCESS']);
 			$this->MakeContent();
 
-		} catch (ExceptionSQL $exception) {
-			$message = 'SQL QUERY ERROR: ' . $exception->getMessage();
+		} catch (ExceptionSQL $Exception) {
+			$messages = [];
+			$messages[] = 'SQL QUERY ERROR: ' . $Exception->getMessage();
 			if (User::I()->InGroup('root')) {
-				$message .= "<br/><br/><pre>{$exception->SQL}</pre>";
+				$messages[] = "<pre>{$Exception->SQL}</pre>";
 			}
-			$this->ShowErrors([$message]);
-		} catch (ExceptionAuthRequired $exception) {
-			$this->ShowAuthForm($exception->getMessage());
-		} catch (ExceptionPageNotFound $exception) {
+			$this->ShowErrors($messages);
+		} catch (ExceptionAuthRequired $Exception) {
+			$this->ShowAuthForm($Exception->getMessage());
+		} catch (ExceptionPageNotFound $Exception) {
 			$this->Show404();
-		} catch (ExceptionAccessDenied $exception) {
+		} catch (ExceptionAccessDenied $Exception) {
 			$this->Show403();
-		} catch (Exception $exception) {
-			$this->ShowErrors($exception->getArray());
-		} catch (\Exception $exception) {
-			$this->ShowErrors([$exception->getMessage()]);
+		} catch (Exception $Exception) {
+			$this->ShowErrors($Exception->getArray());
+		} catch (\Exception $Exception) {
+			$this->ShowErrors([$Exception->getMessage()]);
 		}
 	}
 
@@ -629,19 +630,22 @@ class Engine extends Instanceable {
 	}
 
 	public function GetLanguage() {
-		$lang = &$_SESSION['USER']['LANGUAGE'];
-		if (!empty($lang)) {
-			return $lang;
+		$_lang = &$_SESSION['USER']['LANGUAGE'];
+		if (!empty($_lang)) {
+			return $_lang;
 		}
 		if (is_object($this->USER) and $this->USER->IsAuthorized()) {
-			$lang = Users::I()->Read($this->USER->ID, ['LANGUAGE'])['LANGUAGE'];
+			$_lang = Users::I()->Read($this->USER->ID, ['LANGUAGE'])['LANGUAGE'];
 		} else {
-			$lang = $this->DefaultLanguage;
+			$_lang = reset(array_keys($this->languages));
 		}
-		return $lang;
+		return $_lang;
 	}
 
 	public function SetLanguage(string $language) {
+		if (!isset($this->languages[$language])) {
+			throw new Exception("Language '{$language}' not found");
+		}
 		$_SESSION['USER']['LANGUAGE'] = $language;
 		if ($this->USER->IsAuthorized()) {
 			Users::I()->Update($this->USER->ID, ['LANGUAGE' => $language]);

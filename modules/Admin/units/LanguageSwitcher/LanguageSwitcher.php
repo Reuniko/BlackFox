@@ -4,17 +4,6 @@ namespace Admin;
 
 class LanguageSwitcher extends \System\Unit {
 
-	public $options = [
-		'LANGUAGES' => [
-			'TYPE'    => 'ARRAY',
-			'NAME'    => 'Languages',
-			'DEFAULT' => [
-				'en' => 'EN',
-				'ru' => 'RU',
-			],
-		],
-	];
-
 	public function GetActions(array $request = []) {
 		if ($request['SwitchLanguage']) {
 			return 'SwitchLanguage';
@@ -23,7 +12,11 @@ class LanguageSwitcher extends \System\Unit {
 	}
 
 	public function Default() {
-		$R['LANGUAGES'] = $this->PARAMS['LANGUAGES'];
+		if (count($this->ENGINE->languages) <= 1) {
+			$this->view = null;
+			return null;
+		}
+		$R['LANGUAGES'] = $this->ENGINE->languages;
 		$R['LANGUAGE'] = $this->ENGINE->GetLanguage();
 		return $R;
 	}

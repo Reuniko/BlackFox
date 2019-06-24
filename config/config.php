@@ -10,6 +10,10 @@ $CONFIG = [
 		'/site/root' => $_SERVER['DOCUMENT_ROOT'] . '/site/root',
 		'/core/root' => $_SERVER['DOCUMENT_ROOT'] . '/core/root',
 	],
+	'languages' => [
+		//'en' => 'English',
+		//'ru' => 'Русский',
+	],
 	'modules'   => [
 		'System',
 		'Admin',
