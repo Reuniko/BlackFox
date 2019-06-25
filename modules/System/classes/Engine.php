@@ -7,10 +7,27 @@ class Engine extends Instanceable {
 	public $config = [];
 	public $cores = [];
 	public $roots = [];
+
+	/** @var array list of available modules */
 	public $modules = [];
+
+	/**
+	 * dictionary of available classes
+	 * - key - is a full class name with namespace
+	 * - value - absolute path to the file with class definition
+	 * @var array
+	 */
 	public $classes = [];
-	public $url = [];
+
+	/**
+	 * dictionary of available languages
+	 * - key - symbolic code of the language
+	 * - value - display name of the language
+	 * @var array
+	 */
 	public $languages = [];
+
+	public $url = [];
 
 	/** @var Database $DB */
 	public $DB;
@@ -148,6 +165,10 @@ class Engine extends Instanceable {
 		$this->TITLE = $this->SECTION['NAME'];
 	}
 
+	/**
+	 * Handy to use in .router.php
+	 * @return array of url parts
+	 */
 	public function GetUrlPathParts() {
 		return array_filter(explode('/', $this->url['path']));
 	}
@@ -165,7 +186,6 @@ class Engine extends Instanceable {
 	 * Main entry point of the Engine:
 	 *
 	 * - Loads all properties associated with requested page
-	 * - Loads all active modules
 	 * - Loads the default instance of the user
 	 *
 	 * - Generates the content by using method $this->ShowContent()
@@ -175,7 +195,6 @@ class Engine extends Instanceable {
 	public function Work() {
 
 		$this->LoadSectionInfo();
-		$this->LoadModules();
 		$this->LoadUser();
 
 		$this->SetContent();
@@ -376,7 +395,7 @@ class Engine extends Instanceable {
 		} catch (ExceptionSQL $Exception) {
 			$messages = [];
 			$messages[] = 'SQL QUERY ERROR: ' . $Exception->getMessage();
-			if (User::I()->InGroup('root')) {
+			if ($this->USER->InGroup('root')) {
 				$messages[] = "<pre>{$Exception->SQL}</pre>";
 			}
 			$this->ShowErrors($messages);
@@ -448,29 +467,38 @@ class Engine extends Instanceable {
 
 	/**
 	 * Auto-loader for classes.
-	 * All classes stores in $this->classes array, where:
-	 * - key - is a full class name with namespace
-	 * - value - absolute path to the file with class definition
 	 *
-	 * @param string $class class than needs to be loaded
+	 * @param string $class class that needs to be loaded
+	 * @throws Exception
 	 */
 	public function AutoloadClass($class) {
+
 		if (isset($this->classes[$class])) {
 			require_once($this->classes[$class]);
+			return;
+		}
+
+		list($top_namespace) = explode('\\', $class);
+		if (in_array($top_namespace, $this->modules)) {
+			$this->RegisterModuleClasses($top_namespace);
+			if (isset($this->classes[$class])) {
+				require_once($this->classes[$class]);
+				return;
+			}
 		}
 	}
 
 	/**
-	 * Searches for all classes of the module and registers them in the engine, filling the array $this->classes:
-	 * - key - class name (along with namespace)
-	 * - value - file path
+	 * Searches for all classes of the module and registers them in the engine, filling the array $this->classes
 	 *
-	 * @param string $namespace symbolic code of the module
+	 * @param string $namespace symbolic code of the module/namespace
 	 * @throws Exception
+	 * @todo make is run once
 	 */
 	public function RegisterModuleClasses($namespace) {
 		$Module = "{$namespace}\\Module";
 		$this->classes[$Module] = $this->GetCoreFile("modules/{$namespace}/Module.php");
+		require_once($this->classes[$Module]);
 		if (!is_subclass_of($Module, 'System\AModule')) {
 			throw new Exception(T([
 				'en' => "Module '{$namespace}' must be the child of 'System\AModule'",
@@ -479,6 +507,7 @@ class Engine extends Instanceable {
 		}
 		/**@var AModule $Module */
 		$this->classes += $Module::I()->GetClasses();
+		$Module::I()->Load();
 	}
 
 	/**
@@ -533,19 +562,6 @@ class Engine extends Instanceable {
 			}
 		}
 		throw new Exception("Found no directory '{$path}' in cores");
-	}
-
-	/**
-	 * Register all active modules,
-	 * except module 'System' cause it's been loaded already.
-	 */
-	public function LoadModules() {
-		foreach ($this->modules as $namespace) {
-			if ($namespace === 'System') {
-				continue; // already registered
-			}
-			$this->RegisterModuleClasses($namespace);
-		}
 	}
 
 	/**
