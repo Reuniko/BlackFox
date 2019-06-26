@@ -502,10 +502,10 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Создает новую строку в таблице и возвращает ее идентификатор(ы)
+	 * Создает новую строку в таблице и возвращает ее идентификатор
 	 *
 	 * @param array $fields ассоциативный массив полей для новой строки
-	 * @return int|string|array идентификатор(ы) созданной записи
+	 * @return int|string идентификатор созданной строки
 	 * @throws Exception
 	 */
 	public function Create($fields) {
@@ -565,7 +565,7 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
-	 * Изменяет значения указанных полей.
+	 * Изменяет значения указанных элементов.
 	 *
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 * @param array $fields ассоциативный массив изменяемых полей
