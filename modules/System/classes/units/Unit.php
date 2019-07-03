@@ -252,7 +252,7 @@ abstract class Unit {
 			throw new Exception("Unit '{$this->name}', controller can't find any actions");
 		}
 		$final_action = array_pop($actions);
-		$this->view = strtolower($final_action);
+		$this->view = $this->view ?: strtolower($final_action);
 		$result = [];
 
 		foreach ($actions as $action) {
