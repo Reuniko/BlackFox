@@ -71,7 +71,7 @@ class TestCache extends Test {
 		} catch (\System\ExceptionCache $error) {
 			return $error->GetMessage();
 		}
-		throw new Exception('No exception trowed for key "test_multiple_4"');
+		throw new Exception('No exception was thrown for key "test_multiple_4"');
 	}
 
 	public function TestPutAndGetBoolean() {

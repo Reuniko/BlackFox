@@ -83,7 +83,7 @@ class User extends Instanceable {
 			'MESSAGE' => 'Successful authorization',
 		]);
 		$_SESSION['USER']['ID'] = $ID;
-		self::I()->Load($ID);
+		$this->Load($ID);
 	}
 
 	public function Logout() {
