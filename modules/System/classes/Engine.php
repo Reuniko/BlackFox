@@ -426,7 +426,9 @@ class Engine extends Instanceable {
 	 * @param string $message reason to auth
 	 */
 	public function ShowAuthForm($message = null) {
+		header('HTTP/1.0 401 Unauthorized');
 		$this->WRAPPER = 'frame';
+		$this->TITLE = $message;
 		\System\Authorization::Run(['MESSAGE' => $message, 'REDIRECT' => '']);
 	}
 
@@ -457,11 +459,14 @@ class Engine extends Instanceable {
 
 	public function Show404() {
 		header('HTTP/1.0 404 Not Found');
+		$this->TITLE = '404 Not Found';
 		$this->ShowErrors(['404 Not Found']);
 	}
 
 	public function Show403() {
 		header('HTTP/1.0 403 Forbidden');
+		$this->TITLE = '403 Forbidden';
+		$this->WRAPPER = 'frame';
 		$this->ShowErrors(['403 Forbidden']);
 	}
 

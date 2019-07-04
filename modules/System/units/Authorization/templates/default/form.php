@@ -1,6 +1,4 @@
 <?php /** @var \System\Unit $this */ ?>
-<?php $this->Debug($RESULT, '$RESULT'); ?>
-
 <div class="row">
 	<div
 		class="
