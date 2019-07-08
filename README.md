@@ -1,14 +1,14 @@
 # BlackFox
-BlackFox is a PHP framework for web applications, simple outside, powerful inside.
-Supporting, not limiting. It has been designed from programmer to programmers. 
+BlackFox is a PHP framework for web applications. 
 It provides many things you need to help developing a serious non-typical website with complex model.
 Visit [website](http://blackfox.reuniko.com/) for more info.
 
 #### Status
-The framework is ready to use.
-Tutorials and examples are wip.
-The documentation is PHPDoc.
+- the framework is ready to use
+- the PHPDoc is ready to use
+- documentation, Tutorials and examples are wip
 
+<!-- 
 ## [Structure](docs/en/structure.md)
 There are 2 (or more) folders inside your DOCUMENT_ROOT, each folder contain a **solution**.
 Solution is a pack of modules, templates, root folder, etc.
@@ -81,3 +81,4 @@ It can be extended in case you need additional functionality.
 [Modules](modules/System/classes/entities/Modules.php), 
 [Content](modules/System/classes/entities/Content.php), 
 [Redirects](modules/System/classes/entities/Redirects.php).
+-->
