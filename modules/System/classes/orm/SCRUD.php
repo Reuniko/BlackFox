@@ -350,7 +350,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return array|false ассоциативный массив, представляющий собой элемент
 	 * @throws Exception
 	 */
-	public function Read($filter = [], $fields = ['*@'], $sort = [], $escape = true) {
+	public function Read($filter, $fields = ['*@'], $sort = [], $escape = true) {
 		return reset($this->Select([
 			'FILTER' => $filter,
 			'FIELDS' => $fields,
@@ -358,6 +358,20 @@ abstract class SCRUD extends Instanceable {
 			'ESCAPE' => $escape,
 			'LIMIT'  => 1,
 		]));
+	}
+
+	/**
+	 * Возвращает значение искомого поля первого элемента по фильтру.  Можно указать сортировку.
+	 *
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
+	 * @param string $field выбираемое поле
+	 * @param array $sort сортировка
+	 * @param bool $escape автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию TRUE)
+	 * @return mixed значение искомого поля
+	 * @throws Exception
+	 */
+	public function Get($filter, $field, $sort = [], $escape = true) {
+		return $this->Read($filter, [$field], $sort, $escape)[$field];
 	}
 
 	/**

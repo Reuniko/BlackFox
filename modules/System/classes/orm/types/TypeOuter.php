@@ -13,6 +13,9 @@ class TypeOuter extends Type {
 		/** @var SCRUD $Link */
 		$Link = $this->info['LINK'];
 		$code = $this->info['CODE'];
+		if (empty($Link)) {
+			throw new ExceptionType("Field '{$code}': link must be specified");
+		}
 		if (!in_array('System\SCRUD', class_parents($Link))) {
 			throw new ExceptionType("Field '{$code}': link '{$Link}' must be SCRUD child");
 		}
@@ -73,7 +76,7 @@ class TypeOuter extends Type {
 		$code = $this->info['CODE'];
 		$ID = is_array($value) ? $value['ID'] : $value;
 		if (!is_array($value) and !empty($value)) {
-			$value = $Link->Read($value, ['@']);
+			$value = $Link->Read($value, ['@@']);
 		}
 		?>
 
@@ -137,7 +140,7 @@ class TypeOuter extends Type {
 
 		$elements = !empty($IDs) ? $Link->Select([
 			'FILTER' => ['ID' => $IDs],
-			'FIELDS' => ['@'],
+			'FIELDS' => ['@@'],
 		]) : [];
 
 		?>
@@ -181,10 +184,10 @@ class TypeOuter extends Type {
 					type="button"
 					class="btn btn-secondary flex-shrink-1"
 					data-outer-clean=""
-					title="<?=T([
-					    'en' => 'Clean',
-					    'ru' => 'Очистить',
-					])?>"
+					title="<?= T([
+						'en' => 'Clean',
+						'ru' => 'Очистить',
+					]) ?>"
 				>
 					<i class="fa fa-eraser"></i>
 				</button>

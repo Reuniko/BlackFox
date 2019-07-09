@@ -153,7 +153,7 @@ class Adminer extends \System\Unit {
 	public function UpdateForm($ID = null, $FIELDS = []) {
 		$R['MODE'] = 'Update';
 
-		$R['DATA'] = $this->SCRUD->Read($this->PARAMS['RESTRICTIONS'] + ['ID' => $ID]);
+		$R['DATA'] = $this->SCRUD->Read($this->PARAMS['RESTRICTIONS'] + ['ID' => $ID], ['*@@']);
 		if (empty($R['DATA'])) {
 			throw new Exception(T([
 				'en' => 'Element not found',
@@ -269,7 +269,7 @@ class Adminer extends \System\Unit {
 			return;
 		}
 		if ($_SERVER['REQUEST_METHOD'] === 'GET' && is_array($_GET['FILTER'])) {
-			$filter = array();
+			$filter = [];
 			foreach ($_GET['FILTER'] as $key => $value) {
 				if ($this->SCRUD->_hasInformation($value)) {
 					$filter[$key] = $value;
@@ -382,12 +382,17 @@ class Adminer extends \System\Unit {
 
 			/**@var \System\SCRUD $Link */
 			$Link = $field['LINK']::I();
+			$key = $Link->key();
 
 			if (!empty($search)) {
 				$filter = ['LOGIC' => 'OR'];
 				foreach ($Link->structure as $code => $field) {
-					if ($field['VITAL'] and $field['TYPE'] === 'STRING') {
+					if (!$field['VITAL']) continue;
+					if ($field['TYPE'] === 'STRING') {
 						$filter["~{$code}"] = $search;
+					}
+					if ($field['TYPE'] === 'NUMBER') {
+						$filter["{$code}"] = $search;
 					}
 				}
 				$filter = [$filter];
@@ -405,9 +410,9 @@ class Adminer extends \System\Unit {
 			$results = [];
 			foreach ($data['ELEMENTS'] as $element) {
 				$results[] = [
-					'id'   => $element['ID'],
-					'text' => $Link->GetElementTitle($element),
-					'link' => $Link->GetAdminUrl() . "?ID={$element['ID']}",
+					'id'   => $element[$key],
+					'text' => "[{$element[$key]}] " . $Link->GetElementTitle($element),
+					'link' => $Link->GetAdminUrl() . "?{$key}={$element[$key]}",
 				];
 			}
 
