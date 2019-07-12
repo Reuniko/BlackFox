@@ -197,7 +197,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return array - ассоциативный массив с двумя ключами: ELEMENTS:[[]], PAGER:[TOTAL, CURRENT, LIMIT, SELECTED]
 	 */
 	public function Search($params = []) {
-		$params['LIMIT'] = $params['LIMIT'] ?: 100;
+		$params['LIMIT'] = isset($params['LIMIT']) ? $params['LIMIT'] : 100;
 		$params['PAGE'] = max(1, intval($params['PAGE']));
 
 		$result['ELEMENTS'] = $this->Select($params);
@@ -805,6 +805,9 @@ abstract class SCRUD extends Instanceable {
 			$join += $result['JOIN'];
 			$group += $result['GROUP'];
 
+			if (empty($object->structure[$code])) {
+				throw new Exception("Can't form filter: unknown field '{$code}'");
+			}
 			$conditions = $object->structure[$code]->PrepareConditions($table, $operator, $values);
 
 			$conditions = "(" . implode(' OR ', $conditions) . ")";
