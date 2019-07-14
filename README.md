@@ -4,9 +4,9 @@ It provides many things you need to help developing a serious non-typical websit
 Visit [website](http://blackfox.reuniko.com/) for more info.
 
 #### Status
-- the framework is ready to use
-- the PHPDoc is ready to use
-- documentation, Tutorials and examples are wip
+- Framework is complete and ready to use
+- PHPDoc's are in progress
+- [Documentation, tutorials and examples](http://blackfox.reuniko.com/learn/) require translation
 
 <!-- 
 ## [Structure](docs/en/structure.md)
