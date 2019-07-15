@@ -84,7 +84,7 @@ class Files extends SCRUD {
 		if (empty($extension)) {
 			throw new Exception(T([
 				'en' => "File must have extension",
-				'ru' => 'Файл должен обладать разширением',
+				'ru' => 'Файл должен обладать расширением',
 			]));
 		}
 
@@ -99,6 +99,7 @@ class Files extends SCRUD {
 			}
 			break;
 		}
+		@mkdir($_SERVER['DOCUMENT_ROOT'] . '/upload');
 		@mkdir($_SERVER['DOCUMENT_ROOT'] . $dir);
 		return $src;
 	}
