@@ -130,10 +130,10 @@
 							]) ?>"
 						>
 							<i class="fa fa-trash"></i>
-							<?=T([
-							    'en' => 'Delete selected',
-							    'ru' => 'Удалить выделенные',
-							])?>
+							<?= T([
+								'en' => 'Delete selected',
+								'ru' => 'Удалить выделенные',
+							]) ?>
 						</button>
 					</td>
 				</tr>
@@ -142,5 +142,6 @@
 
 	</form>
 
-	<? require($this->Path('pager.php')) ?>
+	<? \System\Pagination::Run($RESULT['DATA']['PAGER'] + ['VARIABLE' => 'PAGE']) ?>
+
 </div>

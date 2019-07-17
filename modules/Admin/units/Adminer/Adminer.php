@@ -98,11 +98,6 @@ class Adminer extends \System\Unit {
 			'SORT'   => $SORT,
 		]);
 		debug($this->SCRUD->SQL, 'SQL');
-		$R['PAGES'] = $this->GetPages(
-			$R['DATA']['PAGER']['TOTAL'],
-			$R['DATA']['PAGER']['CURRENT'],
-			$R['DATA']['PAGER']['LIMIT']
-		);
 		return $R;
 	}
 
@@ -227,41 +222,6 @@ class Adminer extends \System\Unit {
 			]);
 		}
 		$this->Redirect($this->GetBackLink(), $message);
-	}
-
-	private function GetPages($total, $current, $limit) {
-		$RESULT = [];
-
-		$spread = 7;
-		$current = $current ?: 1;
-
-		$pages_count = (int)ceil($total / $limit);
-
-		$pages = array_fill(1, $pages_count, null);
-		$last_was_excluded = false;
-		foreach ($pages as $page => $crap) {
-			$in_spread = (
-				($page === 1)
-				|| ($page === $pages_count)
-				|| (abs($page - $current) <= $spread)
-			);
-			if ($in_spread) {
-				$RESULT[$page] = [
-					'INDEX'  => $page,
-					'ACTIVE' => ($page === $current),
-				];
-				$last_was_excluded = false;
-			} elseif (!$last_was_excluded) {
-				$RESULT[$page] = [
-					'INDEX' => '...',
-					'...'   => true,
-				];
-				$last_was_excluded = true;
-			} else {
-				continue;
-			}
-		}
-		return $RESULT;
 	}
 
 	public function ControlUrl() {
