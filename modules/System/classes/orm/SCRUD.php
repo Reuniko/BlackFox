@@ -213,7 +213,7 @@ abstract class SCRUD extends Instanceable {
 			'WHERE'  => $this->parts['WHERE'],
 		]);
 		$this->SQL = [$this->SQL, $SQL_for_total];
-		$result['PAGER']['TOTAL'] = $this->DB->Query($SQL_for_total)[0]['total'];
+		$result['PAGER']['TOTAL'] = (int)$this->DB->Query($SQL_for_total)[0]['total'];
 
 		return $result;
 	}
