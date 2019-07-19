@@ -14,37 +14,38 @@
 		data-toggle-sidebar=""
 	>
 		<i class="fa fa-bars"></i>
-		<span class="d-none d-md-inline-block"><?=T([
-		    'en' => 'Menu',
-		    'ru' => 'Меню',
-		])?></span>
+		<span class="d-none d-md-inline-block"><?= T([
+				'en' => 'Menu',
+				'ru' => 'Меню',
+			]) ?></span>
 	</button>
 
 	<a class="btn btn-secondary" href="/">
 		<i class="fa fa-desktop"></i>
-		<span class="d-none d-md-inline-block"><?=T([
-		    'en' => 'Site',
-		    'ru' => 'Сайт',
-		])?></span>
+		<span class="d-none d-md-inline-block"><?= T([
+				'en' => 'Site',
+				'ru' => 'Сайт',
+			]) ?></span>
 	</a>
 
 	<div class="float-right">
 
-		<a class="btn btn-secondary" href="/admin/System/Users.php?ID=<?= \System\User::I()->ID ?>">
-			<i class="fa fa-user"></i>
-			<span class="d-none d-md-inline-block"><?= \System\User::I()->FIELDS['LOGIN'] ?></span>
-		</a>
+		<? if ($this->USER->IsAuthorized()): ?>
+			<span class="btn-group">
+				<a class="btn btn-secondary" href="/admin/System/Users.php?ID=<?= $this->USER->ID ?>">
+					<i class="fa fa-user"></i>
+					<span class="d-none d-md-inline-block"><?= $this->USER->FIELDS['LOGIN'] ?></span>
+				</a>
+				<a class="btn btn-secondary" href="/admin/logout.php" title="<?= T([
+					'en' => 'Logout',
+					'ru' => 'Выход',
+				]) ?>"><i class="fa fa-sign-out-alt"></i></a>
+			</span>
+		<? else: ?>
+
+		<? endif; ?>
 
 		<? \Admin\LanguageSwitcher::Run([]); ?>
-
-		<a class="btn btn-secondary" href="/admin/logout.php">
-			<i class="fa fa-sign-out-alt"></i>
-			<span class="d-none d-md-inline-block"><?=T([
-			    'en' => 'Logout',
-			    'ru' => 'Выход',
-			])?></span>
-		</a>
-
 	</div>
 </nav>
 

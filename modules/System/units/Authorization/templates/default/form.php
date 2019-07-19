@@ -1,5 +1,5 @@
 <?php /** @var \System\Unit $this */ ?>
-<div class="row">
+<div class="container authorization">
 	<div
 		class="
 			col-sm-8 offset-sm-2
@@ -39,6 +39,14 @@
 				/>
 			</div>
 			<div class="form-group">
+				<? if ($this->PARAMS['REGISTRATION']): ?>
+					<div class="float-right">
+						<a class="btn btn-link" href="<?= $this->PARAMS['REGISTRATION'] ?>"><?= T([
+								'en' => 'Registration',
+								'ru' => 'Регистрация',
+							]) ?></a>
+					</div>
+				<? endif; ?>
 				<button type="submit" class="btn btn-primary" name="ACTION" value="Login">
 					<?= T([
 						'en' => 'Login',

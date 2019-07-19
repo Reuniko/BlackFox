@@ -15,15 +15,15 @@ class Authorization extends \System\Unit {
 			'ru' => 'Предоставляет форму и механизм авторизации на сайте',
 		]);
 		$this->options = [
-			'CAPTCHA'  => [
+			'CAPTCHA'      => [
 				'TYPE'    => 'BOOLEAN',
 				'NAME'    => T([
 					'en' => 'Use captcha',
 					'ru' => 'Использовать каптчу',
 				]),
-				'DEFAULT' => 'Y',
+				'DEFAULT' => true,
 			],
-			'MESSAGE'  => [
+			'MESSAGE'      => [
 				'TYPE'    => 'STRING',
 				'NAME'    => T([
 					'en' => 'Message',
@@ -31,7 +31,7 @@ class Authorization extends \System\Unit {
 				]),
 				'DEFAULT' => '',
 			],
-			'TITLE'    => [
+			'TITLE'        => [
 				'TYPE'    => 'STRING',
 				'NAME'    => T([
 					'en' => 'Title',
@@ -42,7 +42,7 @@ class Authorization extends \System\Unit {
 					'ru' => 'Вход в систему',
 				]),
 			],
-			'REDIRECT' => [
+			'REDIRECT'     => [
 				'TYPE'        => 'STRING',
 				'NAME'        => T([
 					'en' => 'Redirect',
@@ -52,7 +52,19 @@ class Authorization extends \System\Unit {
 					'en' => 'Where to redirect the user upon successful authorization',
 					'ru' => 'Куда переадресовать пользователя при успешной авторизации',
 				]),
-				'DEFAULT'     => '/profile/welcome.php',
+				'DEFAULT'     => '',
+			],
+			'REGISTRATION' => [
+				'TYPE'        => 'STRING',
+				'NAME'        => T([
+					'en' => 'Registration',
+					'ru' => 'Регистрация',
+				]),
+				'DESCRIPTION' => T([
+					'en' => 'Link to registration',
+					'ru' => 'Ссылка на регистрацию',
+				]),
+				'DEFAULT'     => '',
 			],
 		];
 		$this->allow_ajax_request = true;

@@ -8,15 +8,15 @@ class Registration extends \System\Unit {
 	public function Init($PARAMS = []) {
 
 		$this->options = [
-			'CAPTCHA'  => [
+			'CAPTCHA'   => [
 				'TYPE'    => 'BOOLEAN',
 				'NAME'    => T([
 					'en' => 'Use captcha',
 					'ru' => 'Использовать каптчу',
 				]),
-				'DEFAULT' => 'Y',
+				'DEFAULT' => true,
 			],
-			'TITLE'    => [
+			'TITLE'     => [
 				'TYPE'    => 'STRING',
 				'NAME'    => T([
 					'en' => 'Title',
@@ -27,7 +27,7 @@ class Registration extends \System\Unit {
 					'ru' => 'Регистрация',
 				]),
 			],
-			'REDIRECT' => [
+			'REDIRECT'  => [
 				'TYPE'        => 'STRING',
 				'NAME'        => T([
 					'en' => 'Redirect url',
@@ -39,8 +39,8 @@ class Registration extends \System\Unit {
 				]),
 				'DEFAULT'     => '/',
 			],
-			'FIELDS'   => [
-				'TYPE'    => 'SET',
+			'FIELDS'    => [
+				'TYPE'    => 'ARRAY',
 				'NAME'    => T([
 					'en' => 'Requesting fields',
 					'ru' => 'Запрашиваемые поля',
@@ -53,6 +53,18 @@ class Registration extends \System\Unit {
 					'FIRST_NAME',
 					'LAST_NAME',
 					'MIDDLE_NAME',
+				],
+			],
+			'MANDATORY' => [
+				'TYPE'    => 'ARRAY',
+				'NAME'    => T([
+					'en' => 'Mandatory fields',
+					'ru' => 'Обязательные поля',
+				]),
+				'VALUES'  => [],
+				'DEFAULT' => [
+					'LOGIN',
+					'PASSWORD',
 				],
 			],
 		];
@@ -71,6 +83,7 @@ class Registration extends \System\Unit {
 	public function Default($VALUES = []) {
 		$RESULT['FIELDS'] = Users::Instance()->ExtractStructure($this->PARAMS['FIELDS']);
 		$RESULT['VALUES'] = $VALUES;
+		$this->ENGINE->TITLE = $this->PARAMS['TITLE'];
 		return $RESULT;
 	}
 

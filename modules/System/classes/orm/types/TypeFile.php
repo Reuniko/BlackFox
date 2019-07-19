@@ -88,7 +88,7 @@ class TypeFile extends TypeOuter {
 					</div>
 
 					<input
-						class="hidden <?= $class ?>"
+						class="d-none invisible <?= $class ?>"
 						type="file"
 						id="<?= $name ?>"
 						name="<?= $name ?>"

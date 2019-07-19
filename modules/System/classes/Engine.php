@@ -429,7 +429,7 @@ class Engine extends Instanceable {
 		header('HTTP/1.0 401 Unauthorized');
 		$this->WRAPPER = 'frame';
 		$this->TITLE = $message;
-		\System\Authorization::Run(['MESSAGE' => $message, 'REDIRECT' => '']);
+		\System\Authorization::Run(['MESSAGE' => $message]);
 	}
 
 	/**
