@@ -89,6 +89,9 @@ class Authorization extends \System\Unit {
 	}
 
 	public function Login($login = null, $password = null) {
+		if ($this->PARAMS['CAPTCHA']) {
+			Captcha::I()->Check();
+		}
 		User::I()->Authorization($login, $password);
 		$this->Redirect($this->PARAMS['REDIRECT']);
 	}

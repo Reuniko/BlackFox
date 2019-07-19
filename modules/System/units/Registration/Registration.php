@@ -88,6 +88,9 @@ class Registration extends \System\Unit {
 	}
 
 	public function Registration($VALUES = []) {
+		if ($this->PARAMS['CAPTCHA']) {
+			Captcha::I()->Check();
+		}
 		$ID = Users::Instance()->Create($VALUES);
 		User::I()->Login($ID);
 		$this->Redirect($this->PARAMS['REDIRECT']);

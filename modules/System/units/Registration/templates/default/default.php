@@ -31,6 +31,16 @@
 				</div>
 			</div>
 		<? endforeach; ?>
+
+		<? if ($this->PARAMS['CAPTCHA']): ?>
+			<div class="form-group row">
+				<div class="offset-sm-3 col-sm-8">
+					<? \System\Captcha::I()->Show() ?>
+				</div>
+			</div>
+		<? endif; ?>
+
+
 		<div class="form-group row">
 			<div class="offset-sm-3 col-sm-8">
 				<button class="btn btn-primary" type="submit" name="ACTION" value="Registration">

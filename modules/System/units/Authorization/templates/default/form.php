@@ -38,6 +38,13 @@
 					<? endif; ?>
 				/>
 			</div>
+
+			<? if ($this->PARAMS['CAPTCHA']): ?>
+				<div class="form-group">
+					<? \System\Captcha::I()->Show() ?>
+				</div>
+			<? endif; ?>
+
 			<div class="form-group">
 				<? if ($this->PARAMS['REGISTRATION']): ?>
 					<div class="float-right">
