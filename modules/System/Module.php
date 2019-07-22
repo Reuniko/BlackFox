@@ -31,7 +31,6 @@ class Module extends \System\AModule {
 					'en' => 'System',
 					'ru' => 'Система',
 				]),
-				'LINK'     => '/admin/System/',
 				'EXPANDER' => true,
 				'CHILDREN' => [
 					'panel'               => [

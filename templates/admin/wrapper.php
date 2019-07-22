@@ -55,7 +55,7 @@
 			<? \Admin\Menu::Run() ?>
 		</div>
 		<div class="main col-12 col-md-10 p-3 p-sm-3">
-			<? \Admin\Breadcrumbs::Run() ?>
+			<? \System\Breadcrumbs::Run() ?>
 			<h1 class="page-header"><?= $this->TITLE ?></h1>
 			<?= $this->CONTENT ?>
 		</div>

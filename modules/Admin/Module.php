@@ -22,7 +22,6 @@ class Module extends \System\AModule {
 					'en' => 'Admin',
 					'ru' => 'Админка',
 				]),
-				'LINK'     => '/admin/Admin/',
 				'EXPANDER' => true,
 				'CHILDREN' => [
 					'Admin_TableSettings' => [

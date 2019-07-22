@@ -157,6 +157,7 @@ class Engine extends Instanceable {
 	 */
 	public function LoadSectionInfo() {
 		$this->url = parse_url($_SERVER['REQUEST_URI']);
+		if ($this->url === false) throw new Exception("Can't parse url");
 		$path_to_section_config = $this->SearchAncestorFile($this->url['path'], '.section.php');
 		$this->SECTION = !empty($path_to_section_config) ? require($path_to_section_config) : [];
 		$this->TEMPLATE = isset($this->SECTION['TEMPLATE']) ? $this->SECTION['TEMPLATE'] : $this->config['template'];

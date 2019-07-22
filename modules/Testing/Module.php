@@ -30,7 +30,6 @@ class Module extends \System\AModule {
 					'en' => 'Tests',
 					'ru' => 'Тесты',
 				]),
-				'LINK'     => '/admin/Testing',
 				'EXPANDER' => true,
 				'CHILDREN' => [
 					'Tables' => [
