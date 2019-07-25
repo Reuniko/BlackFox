@@ -166,12 +166,46 @@ class Engine extends Instanceable {
 		$this->TITLE = $this->SECTION['NAME'];
 	}
 
+	private function TrimSlashes($string) {
+		return implode('/', array_filter(explode('/', $string)));
+	}
+
 	/**
 	 * Handy to use in .router.php
+	 * @param array $keys
 	 * @return array of url parts
 	 */
-	public function GetUrlPathParts() {
-		return array_filter(explode('/', $this->url['path']));
+	public function ParseUrlPathRelative($keys = []) {
+		$file = debug_backtrace()[0]['file'];
+		$file = str_replace('\\', '/', $file);
+		$info = pathinfo($file);
+
+		$dirname = $info['dirname'];
+
+		$dirname_relative = null;
+		foreach ($this->roots as $root => $root_folder) {
+			if (strpos($dirname, $root_folder) !== false) {
+				$dirname_relative = str_replace($root_folder, '', $dirname);
+				break;
+			}
+		}
+		$dirname_relative = $this->TrimSlashes($dirname_relative);
+
+		$path = $this->TrimSlashes($this->url['path']);
+
+		$request_relative = str_replace($dirname_relative, '', $path);
+		$request_relative = $this->TrimSlashes($request_relative);
+
+		$result_array = explode('/', $request_relative);
+		if (empty($keys)) {
+			return $result_array;
+		}
+
+		$result_dictionary = [];
+		foreach ($keys as $index => $key) {
+			$result_dictionary[$key] = $result_array[$index];
+		}
+		return $result_dictionary;
 	}
 
 	/**
@@ -642,9 +676,6 @@ class Engine extends Instanceable {
 	 * @param string $link breadcrumb link (optional)
 	 */
 	public function AddBreadcrumb($name, $link = null) {
-		if ($link === null) {
-			$link = $_SERVER['REQUEST_URI'];
-		}
 		$this->BREADCRUMBS[] = [
 			'NAME' => $name,
 			'LINK' => $link,

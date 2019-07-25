@@ -52,7 +52,7 @@ abstract class Unit {
 	/** @var string относительный путь к папке шаблона */
 	public $template_relative_folder;
 
-	public function __construct($template = 'default') {
+	public function __construct(string $template) {
 		// Do not remove local variable $ENGINE, it needs for phpStorm to detect $this->ENGINE as instance of class
 		/** @var Engine $ENGINE */
 		$ENGINE = Engine::Instance();
@@ -82,7 +82,7 @@ abstract class Unit {
 			$this->parents[$parent] = $this->ENGINE->GetCoreDirectoryAbsolute("modules/{$module}/units/{$unit}");
 		}
 
-		$this->template = $this->SelectTemplateFolder($template);
+		$this->template = $this->SelectTemplateFolder($template ?: 'default');
 		$this->template_absolute_folder = $this->unit_absolute_folder . '/templates/' . $this->template;
 		$this->template_relative_folder = $this->ENGINE->GetRelativePath($this->template_absolute_folder);
 	}
@@ -98,23 +98,26 @@ abstract class Unit {
 		return $template;
 	}
 
-	public static function Run($PARAMS = [], $template = 'default') {
-		$self = new static($template);
+	public static function Run($params = [], $request = []) {
+		$self = new static($params['TEMPLATE'] ?: 'default');
 		try {
-			$self->Execute($PARAMS);
+			$self->Execute($params, $request);
 		} catch (Exception $error) {
+			Engine::I()->ShowErrors($error->getArray());
+		} catch (\Exception $error) {
 			Engine::I()->ShowErrors([$error->getMessage()]);
 		}
 	}
 
-	public function Execute($PARAMS = []) {
-		$this->Init($PARAMS);
+	public function Execute($params = [], $request = []) {
+		$this->Init($params);
 		$this->SetAlertsFromSession();
 
 		$this->ajax = $this->IsRequestTypeAjax();
 		$this->json = $this->IsRequestTypeJson();
 
-		$this->RESULT = $this->ProcessResult();
+		$this->REQUEST = $this->GetRequest($request);
+		$this->RESULT = $this->Controller($this->REQUEST);
 
 		if ($this->ajax) {
 			$this->ENGINE->TEMPLATE = null;
@@ -147,28 +150,27 @@ abstract class Unit {
 	 * - устанавливает параметры по умолчанию
 	 * - кидает ошибки в любой непонятной ситуации
 	 *
-	 * @param array $PARAMS параметры компонента на установку
+	 * @param array $params параметры компонента на установку
 	 * @throws Exception требуется указать параметр...
-	 * @throws Exception передан неизвестный параметр...
 	 */
-	public function Init($PARAMS = []) {
+	public function Init($params = []) {
 		$errors = [];
 		foreach ($this->options as $code => $option) {
-			if (isset($PARAMS[$code]) || array_key_exists($code, $PARAMS)) {
-				$value = $PARAMS[$code];
+			if (isset($params[$code]) || array_key_exists($code, $params)) {
+				$value = $params[$code];
 
 				if (!empty($this->options[$code]['TYPE'])) {
 					$type_expected = strtolower($this->options[$code]['TYPE']); // strtolower - for backward compatibility
 					$type_passed = gettype($value);
 					if ($type_expected <> $type_passed) {
 						$errors[] = "Unit '{$this->class}' initialisation error: param - '{$code}', expecting type - '{$type_expected}', passed value type - '{$type_passed}'";
-						unset($PARAMS[$code]);
+						unset($params[$code]);
 						continue;
 					}
 				}
 
 				$this->PARAMS[$code] = $value;
-				unset($PARAMS[$code]);
+				unset($params[$code]);
 				continue;
 			}
 			if (isset($option['DEFAULT']) || array_key_exists('DEFAULT', $option)) {
@@ -176,15 +178,15 @@ abstract class Unit {
 				continue;
 			}
 			$errors[] = "Unit '{$this->class}' initialisation error: required param - '{$code}'";
-			unset($PARAMS[$code]);
-		}
-		if (!empty($PARAMS)) {
-			foreach ($PARAMS as $code => $value) {
-				$errors[] = "Unit '{$this->class}' initialisation error: passed unknown param - '{$code}'";
-			}
+			unset($params[$code]);
 		}
 		if (!empty($errors)) {
 			throw new Exception($errors);
+		}
+		if (!empty($params)) {
+			foreach ($params as $code => $value) {
+				$this->PARAMS[$code] = $value;
+			}
 		}
 	}
 
@@ -344,20 +346,8 @@ abstract class Unit {
 		}
 	}
 
-	public function GetRequest() {
-		return array_merge_recursive($_REQUEST, $this->ConvertFilesStructure($_FILES));
-	}
-
-	/**
-	 * Returns the result of the execution of the controller,
-	 * passing a request combined from globals
-	 *
-	 * @return array result data
-	 * @throws Exception
-	 */
-	public function ProcessResult() {
-		$this->REQUEST = $this->GetRequest();
-		return (array)$this->Controller($this->REQUEST);
+	public function GetRequest($request = []) {
+		return array_merge_recursive($request, $_REQUEST, $this->ConvertFilesStructure($_FILES));
 	}
 
 	/**
@@ -421,7 +411,7 @@ abstract class Unit {
 	}
 
 	public function TemplateParentPath() {
-		$template_file = debug_backtrace()[0]['file'];
+		$template_file = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'];
 		$template_file = str_replace('\\', '/', $template_file);
 		$template_folder = str_replace('\\', '/', $this->template_absolute_folder);
 		$relative_template_file = str_replace($template_folder, '', $template_file);

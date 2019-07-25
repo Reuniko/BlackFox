@@ -350,7 +350,7 @@ abstract class SCRUD extends Instanceable {
 	 * @return array|false ассоциативный массив, представляющий собой элемент
 	 * @throws Exception
 	 */
-	public function Read($filter, $fields = ['*@'], $sort = [], $escape = true) {
+	public function Read($filter, $fields = ['*@@'], $sort = [], $escape = true) {
 		return reset($this->Select([
 			'FILTER' => $filter,
 			'FIELDS' => $fields,
