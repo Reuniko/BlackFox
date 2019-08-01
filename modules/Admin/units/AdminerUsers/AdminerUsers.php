@@ -4,9 +4,9 @@ namespace Admin;
 
 class AdminerUsers extends Adminer {
 
-	public function Execute($PARAMS = []) {
+	public function Execute($PARAMS = [], $REQUEST = []) {
 		$PARAMS['SCRUD'] = 'System\Users';
-		parent::Execute($PARAMS);
+		parent::Execute($PARAMS, $REQUEST);
 	}
 
 	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@@']) {

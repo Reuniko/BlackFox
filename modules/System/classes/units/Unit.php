@@ -52,7 +52,7 @@ abstract class Unit {
 	/** @var string относительный путь к папке шаблона */
 	public $template_relative_folder;
 
-	public function __construct(string $template) {
+	public function __construct(string $template = 'default') {
 		// Do not remove local variable $ENGINE, it needs for phpStorm to detect $this->ENGINE as instance of class
 		/** @var Engine $ENGINE */
 		$ENGINE = Engine::Instance();
