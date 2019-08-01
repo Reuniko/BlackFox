@@ -25,7 +25,11 @@ class TypeFile extends TypeOuter {
 		?>
 		<? if (!empty($value['SRC'])): ?>
 			<? if (User::I()->InGroup('root')): ?>
-				[<a target="_blank" href="/admin/System/Files.php?ID=<?= $value['ID'] ?>"><?= $value['ID'] ?></a>]
+				<?
+				/** @var \System\Files $Link */
+				$Link = $this->info['LINK']::I();
+				?>
+				[<a target="_blank" href="<?= $Link->GetAdminUrl() ?>?ID=<?= $value['ID'] ?>"><?= $value['ID'] ?></a>]
 			<? endif; ?>
 			<a target="_blank" href="<?= $value['SRC'] ?>"><?= $value['NAME'] ?></a>
 		<? endif; ?>
@@ -33,29 +37,25 @@ class TypeFile extends TypeOuter {
 	}
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
-		$code = $this->info['CODE'];
+		Engine::I()->AddHeaderScript(Engine::I()->GetRelativePath(__DIR__ . '/TypeFile.js'));
 		/** @var \System\Files $Link */
 		$Link = $this->info['LINK']::I();
 		$url = $Link->GetAdminUrl();
-		$file = $value;
-		@$ID = $value['ID'];
+		$ID = isset($value['ID']) ? $value['ID'] : null;
 		?>
 
 		<div data-file="">
 
 			<? if (!empty($ID)): ?>
 				<div class="form-control-plaintext">
-					[<a
-						href="<?= "{$url}?ID={$ID}" ?>"
-						class=""
-					>№<?= $ID ?></a>]
+					[<a href="<?= "{$url}?ID={$ID}" ?>"><?= $ID ?></a>]
 
 					<a
 						target="_blank"
-						href="<?= $file['SRC'] ?>"
+						href="<?= $value['SRC'] ?>"
 						style="color: green"
-					><?= $Link->GetElementTitle($file) ?></a>
-					(<?= \System\Files::I()->GetPrintableFileSize($file['SIZE']) ?>)
+					><?= $Link->GetElementTitle($value) ?></a>
+					(<?= $Link->GetPrintableFileSize($value['SIZE']) ?>)
 
 					<label>
 						<input
@@ -79,10 +79,10 @@ class TypeFile extends TypeOuter {
 						<div class="input-group-prepend">
 							<span class="btn btn-info">
 								<i class="fa fa-file"></i>
-								<span data-file-name=""><?=T([
-								    'en' => 'Select file',
-								    'ru' => 'Выбрать файл',
-								])?></span>
+								<span data-file-name=""><?= T([
+										'en' => 'Select file',
+										'ru' => 'Выбрать файл',
+									]) ?></span>
 							</span>
 						</div>
 					</div>
@@ -93,7 +93,7 @@ class TypeFile extends TypeOuter {
 						id="<?= $name ?>"
 						name="<?= $name ?>"
 						placeholder=""
-						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+						<?= (!empty($ID)) ? 'disabled' : '' ?>
 					/>
 				</label>
 			</div>

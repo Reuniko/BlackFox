@@ -114,15 +114,14 @@ class Files extends SCRUD {
 			$src = $this->GetNewSrc($fields['name']);
 
 			move_uploaded_file($fields['tmp_name'], $_SERVER['DOCUMENT_ROOT'] . $src);
-			$file = [
+			return parent::Create([
 				'CREATE_DATE' => time(),
 				'CREATE_BY'   => User::I()->ID,
 				'NAME'        => $fields['name'],
 				'SIZE'        => $fields['size'],
 				'TYPE'        => $fields['type'],
 				'SRC'         => $src,
-			];
-			return parent::Create($file);
+			]);
 		} else {
 			return parent::Create($fields);
 		}

@@ -240,7 +240,8 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Launch wrapper if it needs
+	 * Launch wrapper
+	 * if $this->TEMPLATE and $this->WRAPPER are not empty
 	 */
 	public function WrapContent() {
 		if (empty($this->TEMPLATE) or empty($this->WRAPPER)) {
@@ -447,9 +448,6 @@ class Engine extends Instanceable {
 		}
 	}
 
-	/**
-	 * Sets $this->CONTENT
-	 */
 	public function SetContent() {
 		ob_start();
 		$this->ShowContent();
@@ -661,6 +659,10 @@ class Engine extends Instanceable {
 	 */
 	public function GetRelativePath($absolute_path, $root_path = null) {
 		$root_path = $root_path ?: $_SERVER['DOCUMENT_ROOT'];
+
+		$root_path = str_replace('\\', '/', $root_path);
+		$absolute_path = str_replace('\\', '/', $absolute_path);
+
 		if (strpos($absolute_path, $root_path) === false) {
 			throw new Exception("Can't find relative path for absolute path '{$absolute_path}'");
 		}
