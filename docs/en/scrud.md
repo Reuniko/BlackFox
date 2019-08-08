@@ -20,7 +20,7 @@ It does all migration stuff by
 synchronizing table columns from your php code to database.
 ```php
 // put this code into Upgrade method of corresponding class of module
-// and forget about migraion
+// and forget about migration
 Rooms::I()->Synchronize();
 ```
 It allows you to Create:
