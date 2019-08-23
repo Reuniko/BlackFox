@@ -26,14 +26,11 @@ php_flag html_errors on
 	RewriteCond %{REQUEST_FILENAME} -f
 	RewriteRule (.*) $1 [L]
 
-	# автодополнение /site/
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{DOCUMENT_ROOT}/site/%{REQUEST_URI} -f
-	RewriteRule (.*) /site/$1 [L]
-
-	# автодополнение /root/
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{DOCUMENT_ROOT}/root/%{REQUEST_URI} -f
-	RewriteRule (.*) /root/$1 [L]
+	# если [запрос на статичный несуществующий файл]
+	# если [файл существует в /site/root/]
+	# то [автодополнение /site/root/]
+	#RewriteCond %{REQUEST_FILENAME} !-f
+	#RewriteCond %{DOCUMENT_ROOT}/site/root/%{REQUEST_URI} -f
+	#RewriteRule (.*) /site/root/$1 [L]
 
 </IfModule>
