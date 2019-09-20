@@ -436,11 +436,17 @@ abstract class SCRUD extends Instanceable {
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
 	 * @return int
 	 * @throws Exception
-	 * @todo use SQL
 	 */
 	public function Count($filter = []) {
-		$data = $this->GetColumn($filter);
-		return count($data);
+		$answer = $this->PreparePartsByFilter($filter);
+		$SQL = $this->DB->CompileSQLSelect([
+			'SELECT' => ['COUNT(*) as total'],
+			'TABLE'  => $this->code,
+			'JOIN'   => $answer['JOIN'],
+			'WHERE'  => $answer['WHERE'],
+			// 'GROUP'  => $answer['GROUP'], // ???
+		]);
+		return (int)$this->DB->Query($SQL)[0]['total'];
 	}
 
 	/**

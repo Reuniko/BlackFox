@@ -31,7 +31,7 @@ class TestScrudBase extends Test {
 		}
 	}
 
-	/** Creating 100 random records
+	/** Creating random records
 	 */
 	public function TestCreateRandomRows() {
 		$R = [];
@@ -179,5 +179,16 @@ class TestScrudBase extends Test {
 				throw new Exception(["Unexpected PAGER", $expected_pager, $result['PAGER'], $this->SCRUD->SQL]);
 			}
 		}
+	}
+
+	/** Count check */
+	public function TestCount() {
+		$count[1] = $this->SCRUD->Count([]);
+		$count[2] = $this->SCRUD->Count(['BOOL' => true]);
+		$count[3] = $this->SCRUD->Count(['BOOL' => false]);
+		if ($count[1] <> $count[2] + $count[3]) {
+			throw new Exception("Unexpected checksum");
+		}
+		return "{$count[1]} = {$count[2]} + {$count[3]}";
 	}
 }
