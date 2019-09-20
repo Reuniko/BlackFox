@@ -187,11 +187,13 @@ abstract class Type implements \ArrayAccess {
 	 * @return array :
 	 * - JOIN - ['уникальный алиас присоединяемой таблицы' => 'SQL-строка, описывающая присоединяемую таблицу', ...]
 	 * - GROUP - ['уникальный алиас присоединяемой таблицы' => 'SQL-строка, описывающая группировку', ...]
+	 * - TYPE - 'OUTER'|'INNER'|...
 	 */
 	public function GenerateJoinAndGroupStatements(SCRUD $Current, $prefix) {
 		return [
 			'JOIN'  => [],
 			'GROUP' => [],
+			'TYPE'  => self::$TYPE,
 		];
 	}
 

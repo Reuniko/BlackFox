@@ -206,7 +206,7 @@ class DatabaseDriverPostgres extends Database {
 				// type
 				try {
 					$db_type = $this->GetStructureStringType($Info);
-				} catch (\Exception $error) {
+				} catch (Exception $error) {
 					continue;
 				}
 
@@ -236,7 +236,10 @@ class DatabaseDriverPostgres extends Database {
 
 				// $default
 				if ($Info["AUTO_INCREMENT"]) {
-					$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT " . 'nextval(\'"' . $table . '_' . $code . '_seq"\'::regclass)';
+					$seq_name = "{$table}_{$code}_seq";
+					$this->Query("CREATE SEQUENCE IF NOT EXISTS {$seq_name}");
+					$this->Query("SELECT setval('{$seq_name}', COALESCE((SELECT MAX({$code_id})+1 FROM {$table}), 1), false)");
+					$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT nextval('{$seq_name}')";
 				} else {
 					if (isset($Info['DEFAULT'])) {
 						$default = !is_array($Info['DEFAULT']) ? $Info['DEFAULT'] : implode(',', $Info['DEFAULT']);

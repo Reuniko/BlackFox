@@ -84,7 +84,7 @@ class TestScrudLinks extends Test {
 			throw new Exception(['Wrong structure of $grade', $grade]);
 		}
 		if (array_keys(reset($grade['STUDENTS'])) <> ['ID', 'FIRST_NAME']) {
-			throw new Exception(['Wrong structure of $grade->STUDENTS', reset($grade['STUDENTS'])]);
+			throw new Exception(['Wrong structure of $grade->STUDENTS', array_keys(reset($grade['STUDENTS']))]);
 		}
 		//return $grade;
 	}

@@ -34,7 +34,7 @@ class TypeOuter extends Type {
 		$raw_link_code = $external_prefix . $Link->code;
 
 		$join = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}." . $this->Quote($code) . " = {$raw_link_code}." . $this->Quote($Link->key());
-		$RESULT = $Link->PrepareSelectAndJoinByFields($subfields, $external_prefix);
+		$RESULT = $Link->PreparePartsByFields($subfields, $external_prefix);
 		$RESULT['JOIN'] = array_merge([$raw_link_code => $join], $RESULT['JOIN']);
 		return $RESULT;
 	}
@@ -51,6 +51,7 @@ class TypeOuter extends Type {
 
 		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
 		return [
+			'TYPE'  => self::$TYPE,
 			'JOIN'  => [$target_alias => $statement],
 			'GROUP' => [],
 		];

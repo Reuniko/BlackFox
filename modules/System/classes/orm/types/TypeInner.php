@@ -21,6 +21,8 @@ class TypeInner extends Type {
 	}
 
 	public function HookExternalField($elements, $subfields) {
+		if (empty($elements)) return $elements;
+
 		$code = $this->info['CODE'];
 		$ids = array_keys($elements);
 
@@ -32,7 +34,7 @@ class TypeInner extends Type {
 		$link_key_to_source = $this->info['FIELD'];
 		try {
 			$link_key_primary = $Link->key();
-		} catch (\Exception $error) {
+		} catch (Exception $error) {
 			$link_key_primary = $link_key_to_source;
 		}
 
@@ -45,6 +47,7 @@ class TypeInner extends Type {
 			'FILTER' => [$link_key_to_source => $ids],
 			'FIELDS' => $subfields,
 		]);
+
 		foreach ($data as $associative) {
 			$ID = $associative[$link_key_to_source];
 			unset($associative[$link_key_to_source]); // remove looking back identifier
@@ -67,6 +70,7 @@ class TypeInner extends Type {
 		$group_statement = "{$Current->code}." . $this->Quote($current_key);
 
 		return [
+			'TYPE'  => self::$TYPE,
 			'JOIN'  => [$target_alias => $join_statement],
 			'GROUP' => [$current_alias => $group_statement],
 		];
