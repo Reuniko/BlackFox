@@ -20,7 +20,7 @@ class TypeInner extends Type {
 		return [];
 	}
 
-	public function HookExternalField($elements, $subfields) {
+	public function HookExternalField($elements, $subfields, $subsort) {
 		if (empty($elements)) return $elements;
 
 		$code = $this->info['CODE'];
@@ -46,6 +46,7 @@ class TypeInner extends Type {
 		$data = $Link->Select([
 			'FILTER' => [$link_key_to_source => $ids],
 			'FIELDS' => $subfields,
+			'SORT'   => $subsort,
 		]);
 
 		foreach ($data as $associative) {
@@ -70,7 +71,6 @@ class TypeInner extends Type {
 		$group_statement = "{$Current->code}." . $this->Quote($current_key);
 
 		return [
-			'TYPE'  => self::$TYPE,
 			'JOIN'  => [$target_alias => $join_statement],
 			'GROUP' => [$current_alias => $group_statement],
 		];

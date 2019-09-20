@@ -295,6 +295,7 @@ abstract class SCRUD extends Instanceable {
 		$this->parts['ORDER'] += $answer['ORDER'];
 		$this->parts['JOIN'] += $answer['JOIN'];
 		$this->parts['GROUP'] += $answer['GROUP'];
+		$inner_sort = $answer['INNER_SORT'];
 
 		if ($params['LIMIT'] > 0) {
 			$this->parts['LIMIT'] = [
@@ -318,7 +319,7 @@ abstract class SCRUD extends Instanceable {
 			}
 		}
 
-		$elements = $this->HookExternalFields($elements, $params);
+		$elements = $this->HookExternalFields($elements, $params['FIELDS'], $inner_sort);
 
 		return $elements;
 	}
@@ -806,6 +807,7 @@ abstract class SCRUD extends Instanceable {
 			return [
 				'OBJECT' => $this,
 				'TABLE'  => $this->code,
+				'PATH'   => $path,
 				'CODE'   => $code,
 				'JOIN'   => [],
 				'GROUP'  => [],
@@ -817,7 +819,6 @@ abstract class SCRUD extends Instanceable {
 		/** @var Type $Type */
 		$Object = $this;
 		$prefix = '';
-		$type = [];
 		$join = [];
 		$group = [];
 
@@ -841,7 +842,6 @@ abstract class SCRUD extends Instanceable {
 			$answer = $Info->GenerateJoinAndGroupStatements($Object, $prefix);
 			$join += $answer['JOIN'];
 			$group += $answer['GROUP'];
-			$type[] = $answer['TYPE'];
 
 			// for next iteration
 			$prefix .= $external . "__";
@@ -850,10 +850,10 @@ abstract class SCRUD extends Instanceable {
 		return [
 			'OBJECT' => $Object,
 			'TABLE'  => $prefix . $Object->code,
+			'PATH'   => $path,
 			'CODE'   => $code,
 			'JOIN'   => $join,
 			'GROUP'  => $group,
-			'TYPE'   => $type,
 		];
 	}
 
@@ -861,23 +861,36 @@ abstract class SCRUD extends Instanceable {
 		$order = [];
 		$join = [];
 		$group = [];
+		$inner_sort = [];
 		foreach ($array as $field_path => $sort) {
 			if ('{RANDOM}' === $field_path) {
 				$order[] = $this->DB->Random();
 				continue;
 			}
+
 			$result = $this->_treatFieldPath($field_path);
-			if (in_array('INNER', $result['TYPE'])) {
-				continue;
+
+			if (count($result['PATH']) > 0) {
+				$path = $result['PATH'];
+				$first_path = array_shift($path);
+				$FirstInfo = $this->structure[$first_path];
+				if (is_a($FirstInfo, 'System\TypeInner')) {
+					$inner_path = implode('.', array_merge($path, [$result['CODE']]));
+					$inner_sort[$first_path][$inner_path] = $sort;
+					continue;
+				}
 			}
-			$order[] = $this->DB->Quote($result['TABLE']) . '.' . $this->DB->Quote($result['CODE']) . " {$sort}";
+
+			$order[] = "{$result['TABLE']}." . $this->DB->Quote($result['CODE']) . " {$sort}";
 			$join += $result['JOIN'];
 			$group += $result['GROUP'];
 		}
+
 		return [
-			'ORDER' => $order,
-			'JOIN'  => $join,
-			'GROUP' => $group,
+			'ORDER'      => $order,
+			'JOIN'       => $join,
+			'GROUP'      => $group,
+			'INNER_SORT' => $inner_sort,
 		];
 	}
 
@@ -1155,12 +1168,13 @@ abstract class SCRUD extends Instanceable {
 	 * Например тип TypeInner подцепляет все внешние элементы, ссылающиеся на выбранные элементы.
 	 *
 	 * @param array $elements элементы выборки
-	 * @param array $params параметры запроса
+	 * @param array $fields
+	 * @param array $sort
 	 * @return array элементы выборки, дополненные внешними данными
 	 */
-	private function HookExternalFields($elements, $params) {
+	private function HookExternalFields($elements, $fields, $sort) {
 		if (empty($elements)) return $elements;
-		foreach ($params['FIELDS'] as $key => $value) {
+		foreach ($fields as $key => $value) {
 			if (!is_array($value)) {
 				$code = strtoupper($value);
 				$subfields = null;
@@ -1168,7 +1182,8 @@ abstract class SCRUD extends Instanceable {
 				$code = strtoupper($key);
 				$subfields = $value;
 			}
-			$elements = $this->structure[$code]->HookExternalField($elements, $subfields);
+			$subsort = $sort[$code] ?: [];
+			$elements = $this->structure[$code]->HookExternalField($elements, $subfields, $subsort);
 		}
 		return $elements;
 	}

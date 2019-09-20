@@ -51,7 +51,6 @@ class TypeOuter extends Type {
 
 		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
 		return [
-			'TYPE'  => self::$TYPE,
 			'JOIN'  => [$target_alias => $statement],
 			'GROUP' => [],
 		];

@@ -109,32 +109,32 @@ abstract class Type implements \ArrayAccess {
 			$value = reset($values);
 			switch ($operator) {
 				case '>>':
-					$conditions['>>'] = '>\'' . $value . '\'';
+					$conditions['>>'] = ' > \'' . $value . '\'';
 					break;
 				case '!':
 				case '<>':
-					$conditions['<>'] = '<>\'' . $value . '\'';
+					$conditions['<>'] = ' <> \'' . $value . '\'';
 					break;
 				case '<<':
-					$conditions['<<'] = '<\'' . $value . '\'';
+					$conditions['<<'] = ' < \'' . $value . '\'';
 					break;
 				case '<':
-					$conditions['<'] = '<=\'' . $value . '\'';
+					$conditions['<'] = ' <= \'' . $value . '\'';
 					break;
 				case '>':
-					$conditions['>'] = '>=\'' . $value . '\'';
+					$conditions['>'] = ' >= \'' . $value . '\'';
 					break;
 				case '~':
-					$conditions['~'] = 'LIKE \'%' . $value . '%\'';
+					$conditions['~'] = ' LIKE \'%' . $value . '%\'';
 					break;
 				default:
-					$conditions['='] = '=\'' . $value . '\'';
+					$conditions['='] = ' = \'' . $value . '\'';
 					break;
 			}
 		}
 		if (count($values) > 1) {
 			if (!empty($values)) {
-				$conditions['in'] = 'IN (\'' . implode('\', \'', $values) . '\')';
+				$conditions['in'] = ' IN (\'' . implode('\', \'', $values) . '\')';
 			}
 		}
 
@@ -171,10 +171,11 @@ abstract class Type implements \ArrayAccess {
 	 *
 	 * @param array $elements
 	 * @param array $subfields
+	 * @param array $subsort
 	 * @internal array $info
 	 * @return mixed
 	 */
-	public function HookExternalField($elements, $subfields) {
+	public function HookExternalField($elements, $subfields, $subsort) {
 		return $elements;
 	}
 
@@ -187,13 +188,11 @@ abstract class Type implements \ArrayAccess {
 	 * @return array :
 	 * - JOIN - ['уникальный алиас присоединяемой таблицы' => 'SQL-строка, описывающая присоединяемую таблицу', ...]
 	 * - GROUP - ['уникальный алиас присоединяемой таблицы' => 'SQL-строка, описывающая группировку', ...]
-	 * - TYPE - 'OUTER'|'INNER'|...
 	 */
 	public function GenerateJoinAndGroupStatements(SCRUD $Current, $prefix) {
 		return [
 			'JOIN'  => [],
 			'GROUP' => [],
-			'TYPE'  => self::$TYPE,
 		];
 	}
 
