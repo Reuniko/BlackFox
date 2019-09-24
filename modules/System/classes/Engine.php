@@ -686,20 +686,47 @@ class Engine extends Instanceable {
 
 	public function GetLanguage() {
 		$_lang = &$_SESSION['USER']['LANGUAGE'];
-		if (!empty($_lang)) {
-			return $_lang;
-		}
+		if (!empty($_lang)) return $_lang;
+
 		if (is_object($this->USER) and $this->USER->IsAuthorized()) {
 			$_lang = $this->USER->FIELDS['LANGUAGE'];
 		} else {
-			$_lang = reset(array_keys($this->languages));
+			$_lang = $this->GetDefaultLanguage();
 		}
+
 		return $_lang;
 	}
 
+	public function GetDefaultLanguage() {
+		$browser_language_string = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+		if (!empty($browser_language_string)) {
+			$browser_language_string = explode(',', $browser_language_string);
+			$browser_languages = [];
+			foreach ($browser_language_string as $item) {
+				list($language, $priority) = explode(';', $item);
+				$browser_languages[$priority ?: 'q=1.0'] = $language;
+			}
+			foreach ($browser_languages as $priority => $browser_language) {
+				if (isset($this->languages[$browser_language])) {
+					return $browser_language;
+				}
+			}
+		}
+		return reset(array_keys($this->languages));
+	}
+
 	public function SetLanguage(string $language) {
+		if (empty($language)) {
+			throw new Exception(T([
+				'en' => 'No language specified',
+				'ru' => 'Язык не указан',
+			]));
+		}
 		if (!isset($this->languages[$language])) {
-			throw new Exception("Language '{$language}' not found");
+			throw new Exception(T([
+				'en' => "Language '{$language}' not found",
+				'ru' => "Язык '{$language}' не найден",
+			]));
 		}
 		$_SESSION['USER']['LANGUAGE'] = $language;
 		if ($this->USER->IsAuthorized()) {
