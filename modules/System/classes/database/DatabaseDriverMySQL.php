@@ -118,10 +118,13 @@ class DatabaseDriverMySQL extends Database {
 
 		$default = "";
 		if (isset($Info['DEFAULT'])) {
-			if (is_array($Info['DEFAULT'])) {
-				$Info['DEFAULT'] = implode(',', $Info['DEFAULT']);
+			if (is_bool($Info['DEFAULT'])) {
+				$default = "DEFAULT " . ($Info['DEFAULT'] ? 'true' : 'false');
+			} elseif (is_array($Info['DEFAULT'])) {
+				$default = "DEFAULT '" . implode(',', $Info['DEFAULT']) . "'";
+			} elseif (is_string($Info['DEFAULT'])) {
+				$default = "DEFAULT '{$Info['DEFAULT']}'";
 			}
-			$default = "DEFAULT '{$Info['DEFAULT']}'";
 		}
 
 		$auto_increment = ($Info["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
