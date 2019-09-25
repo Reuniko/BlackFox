@@ -38,8 +38,8 @@ class Authorization extends \System\Unit {
 					'ru' => 'Заголовок',
 				]),
 				'DEFAULT' => T([
-					'en' => 'Sign in',
-					'ru' => 'Вход в систему',
+					'en' => 'Authorization',
+					'ru' => 'Авторизация',
 				]),
 			],
 			'REDIRECT'     => [

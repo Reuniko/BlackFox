@@ -165,7 +165,7 @@ class DatabaseDriverPostgres extends Database {
 				}
 				$null = ($Info["NOT_NULL"] || $Info['PRIMARY']) ? "NOT NULL" : "NULL";
 				$default = "";
-				if ($Info['DEFAULT']) {
+				if (isset($Info['DEFAULT'])) {
 					$default = !is_array($Info['DEFAULT']) ? $Info['DEFAULT'] : implode(',', $Info['DEFAULT']);
 					$default = "DEFAULT '{$default}'";
 				}
@@ -215,7 +215,14 @@ class DatabaseDriverPostgres extends Database {
 					if ($Info["AUTO_INCREMENT"]) {
 						$db_type = 'serial';
 					}
-					$default = $Info['DEFAULT'] ? "DEFAULT '{$Info['DEFAULT']}'" : '';
+					$default = '';
+					if (isset($Info['DEFAULT'])) {
+						if (is_bool($Info['DEFAULT'])) {
+							$default = "DEFAULT " . ($Info['DEFAULT'] ? 'true' : 'false');
+						} else {
+							$default = "DEFAULT '{$Info['DEFAULT']}'";
+						}
+					}
 					$not_null = $Info['NOT_NULL'] ? 'NOT NULL' : '';
 					$rows[] = "ADD COLUMN {$code_id} {$db_type} {$default} {$not_null}";
 

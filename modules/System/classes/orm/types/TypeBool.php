@@ -21,6 +21,7 @@ class TypeBool extends Type {
 
 	public function ProvideInfoIntegrity() {
 		$this->info['NOT_NULL'] = true;
+		$this->info['DEFAULT'] = (bool)($this->info['DEFAULT'] ?: false);
 	}
 
 	public function PrintValue($value) {

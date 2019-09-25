@@ -18,9 +18,9 @@ class CaptchaDriverGoogleRecaptchaV2 extends Captcha {
 		Engine::I()->AddHeaderScript('https://www.google.com/recaptcha/api.js');
 	}
 
-	public function Show() {
+	public function Show($params = []) {
 		?>
-		<div class="g-recaptcha" data-sitekey="<?= $this->key ?>"></div>
+		<div class="g-recaptcha <?= $params['CSS_CLASS'] ?>" data-sitekey="<?= $this->key ?>"></div>
 		<?
 	}
 
@@ -40,8 +40,8 @@ class CaptchaDriverGoogleRecaptchaV2 extends Captcha {
 		// return $result['success'];
 		if ($result['success'] <> true) {
 			throw new ExceptionCaptcha(T([
-			    'en' => 'You must pass the captcha',
-			    'ru' => 'Необходимо пройти капчу',
+				'en' => 'You must pass the captcha',
+				'ru' => 'Необходимо пройти капчу',
 			]));
 		}
 	}

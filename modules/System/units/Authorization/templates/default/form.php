@@ -1,5 +1,6 @@
 <?php /** @var \System\Unit $this */ ?>
-<div class="container authorization">
+<div class="authorization">
+	<h1 class="text-center my-3"><?= $this->PARAMS['TITLE'] ?></h1>
 	<div
 		class="
 			col-sm-8 offset-sm-2
@@ -8,7 +9,6 @@
 	>
 		<? $this->ShowAlerts(); ?>
 		<form class="form card p-3" method="POST">
-			<h2><?= $this->PARAMS['TITLE'] ?></h2>
 			<div class="form-group">
 				<input
 					type="text"
@@ -40,27 +40,29 @@
 			</div>
 
 			<? if ($this->PARAMS['CAPTCHA']): ?>
-				<div class="form-group">
-					<? \System\Captcha::I()->Show() ?>
+				<div class="form-group text-center">
+					<? \System\Captcha::I()->Show(['CSS_CLASS' => 'd-inline-block']) ?>
 				</div>
 			<? endif; ?>
 
-			<div class="form-group">
-				<? if ($this->PARAMS['REGISTRATION']): ?>
-					<div class="float-right">
-						<a class="btn btn-link" href="<?= $this->PARAMS['REGISTRATION'] ?>"><?= T([
-								'en' => 'Registration',
-								'ru' => 'Регистрация',
-							]) ?></a>
-					</div>
-				<? endif; ?>
+			<div class="form-group text-center mb-0">
 				<button type="submit" class="btn btn-primary" name="ACTION" value="Login">
+					<i class="fa fa-door-open"></i>
 					<?= T([
-						'en' => 'Login',
+						'en' => 'Sing in',
 						'ru' => 'Войти',
 					]) ?>
 				</button>
 			</div>
 		</form>
 	</div>
+
+	<? if ($this->PARAMS['REGISTRATION']): ?>
+		<div class="form-group text-center">
+			<a class="btn btn-link" href="<?= $this->PARAMS['REGISTRATION'] ?>"><?= T([
+					'en' => 'Registration',
+					'ru' => 'Регистрация',
+				]) ?></a>
+		</div>
+	<? endif; ?>
 </div>

@@ -75,17 +75,13 @@ class TypeFile extends TypeOuter {
 				style="<?= (!empty($ID)) ? 'display: none;' : '' ?>"
 			>
 				<label for="<?= $name ?>">
-					<div class="input-group">
-						<div class="input-group-prepend">
-							<span class="btn btn-info">
-								<i class="fa fa-file"></i>
-								<span data-file-name=""><?= T([
-										'en' => 'Select file',
-										'ru' => 'Выбрать файл',
-									]) ?></span>
-							</span>
-						</div>
-					</div>
+					<span class="btn btn-info">
+						<i class="fa fa-file"></i>
+						<span data-file-name=""><?= T([
+								'en' => 'Select file',
+								'ru' => 'Выбрать файл',
+							]) ?></span>
+					</span>
 
 					<input
 						class="d-none invisible <?= $class ?>"

@@ -8,7 +8,7 @@ class Registration extends \System\Unit {
 	public function Init($PARAMS = []) {
 
 		$this->options = [
-			'CAPTCHA'   => [
+			'CAPTCHA'       => [
 				'TYPE'    => 'BOOLEAN',
 				'NAME'    => T([
 					'en' => 'Use captcha',
@@ -16,7 +16,7 @@ class Registration extends \System\Unit {
 				]),
 				'DEFAULT' => true,
 			],
-			'TITLE'     => [
+			'TITLE'         => [
 				'TYPE'    => 'STRING',
 				'NAME'    => T([
 					'en' => 'Title',
@@ -27,7 +27,15 @@ class Registration extends \System\Unit {
 					'ru' => 'Регистрация',
 				]),
 			],
-			'REDIRECT'  => [
+			'AUTHORIZATION' => [
+				'TYPE'    => 'STRING',
+				'NAME'    => T([
+					'en' => 'Authorization url',
+					'ru' => 'Адрес входа в систему',
+				]),
+				'DEFAULT' => '/',
+			],
+			'REDIRECT'      => [
 				'TYPE'        => 'STRING',
 				'NAME'        => T([
 					'en' => 'Redirect url',
@@ -39,7 +47,7 @@ class Registration extends \System\Unit {
 				]),
 				'DEFAULT'     => '/',
 			],
-			'FIELDS'    => [
+			'FIELDS'        => [
 				'TYPE'    => 'ARRAY',
 				'NAME'    => T([
 					'en' => 'Requesting fields',
@@ -55,7 +63,7 @@ class Registration extends \System\Unit {
 					'MIDDLE_NAME',
 				],
 			],
-			'MANDATORY' => [
+			'MANDATORY'     => [
 				'TYPE'    => 'ARRAY',
 				'NAME'    => T([
 					'en' => 'Mandatory fields',
@@ -69,7 +77,7 @@ class Registration extends \System\Unit {
 			],
 		];
 
-		foreach (Users::Instance()->structure as $code => $field) {
+		foreach (Users::I()->structure as $code => $field) {
 			if ($code === 'ID') {
 				continue;
 			}
@@ -81,7 +89,7 @@ class Registration extends \System\Unit {
 	}
 
 	public function Default($VALUES = []) {
-		$RESULT['FIELDS'] = Users::Instance()->ExtractStructure($this->PARAMS['FIELDS']);
+		$RESULT['FIELDS'] = Users::I()->ExtractStructure($this->PARAMS['FIELDS']);
 		$RESULT['VALUES'] = $VALUES;
 		$this->ENGINE->TITLE = $this->PARAMS['TITLE'];
 		return $RESULT;
@@ -91,7 +99,7 @@ class Registration extends \System\Unit {
 		if ($this->PARAMS['CAPTCHA']) {
 			Captcha::I()->Check();
 		}
-		$ID = Users::Instance()->Create($VALUES);
+		$ID = Users::I()->Create($VALUES);
 		User::I()->Login($ID);
 		$this->Redirect($this->PARAMS['REDIRECT']);
 	}

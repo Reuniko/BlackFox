@@ -3,11 +3,11 @@
 namespace System;
 class Captcha extends Instanceable {
 
-	public function Show() {
+	public function Show($params = []) {
 		return;
 		throw new ExceptionCaptcha(T([
-		    'en' => 'Override default class "Captcha" with driver',
-		    'ru' => 'Переопределите класс "Captcha" драйвером',
+			'en' => 'Override default class "Captcha" with driver',
+			'ru' => 'Переопределите класс "Captcha" драйвером',
 		]));
 	}
 
