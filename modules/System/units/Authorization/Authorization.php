@@ -52,7 +52,7 @@ class Authorization extends \System\Unit {
 					'en' => 'Where to redirect the user upon successful authorization',
 					'ru' => 'Куда переадресовать пользователя при успешной авторизации',
 				]),
-				'DEFAULT'     => '',
+				'DEFAULT'     => '/',
 			],
 			'REGISTRATION' => [
 				'TYPE'        => 'STRING',
@@ -64,7 +64,7 @@ class Authorization extends \System\Unit {
 					'en' => 'Link to registration',
 					'ru' => 'Ссылка на регистрацию',
 				]),
-				'DEFAULT'     => '',
+				'DEFAULT'     => '/',
 			],
 		];
 		$this->allow_ajax_request = true;
@@ -78,9 +78,12 @@ class Authorization extends \System\Unit {
 		return ['Form'];
 	}
 
-	public function Form($login = null, $password = null) {
+	public function Form($login = null, $password = null, $redirect = null) {
 		if ($this->PARAMS['MESSAGE'] and empty($this->ALERTS)) {
 			$this->ALERTS[] = ['TYPE' => 'info', 'TEXT' => $this->PARAMS['MESSAGE']];
+		}
+		if (!empty($redirect)) {
+			$_SESSION['USER']['REDIRECT'] = $redirect;
 		}
 		return [
 			'LOGIN'    => $login,
@@ -93,7 +96,13 @@ class Authorization extends \System\Unit {
 			Captcha::I()->Check();
 		}
 		User::I()->Authorization($login, $password);
-		$this->Redirect($this->PARAMS['REDIRECT']);
+
+		$url = $this->PARAMS['REDIRECT'];
+		if ($_SESSION['USER']['REDIRECT']) {
+			$url = $_SESSION['USER']['REDIRECT'];
+			unset($_SESSION['USER']['REDIRECT']);
+		}
+		$this->Redirect($url);
 	}
 
 }

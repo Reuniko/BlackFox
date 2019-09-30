@@ -101,6 +101,12 @@ class Registration extends \System\Unit {
 		}
 		$ID = Users::I()->Create($VALUES);
 		User::I()->Login($ID);
-		$this->Redirect($this->PARAMS['REDIRECT']);
+
+		$url = $this->PARAMS['REDIRECT'];
+		if ($_SESSION['USER']['REDIRECT']) {
+			$url = $_SESSION['USER']['REDIRECT'];
+			unset($_SESSION['USER']['REDIRECT']);
+		}
+		$this->Redirect($url);
 	}
 }

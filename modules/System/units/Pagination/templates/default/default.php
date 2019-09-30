@@ -11,17 +11,18 @@ $base = http_build_query($get);
 <div class="pager">
 
 	<div class="alert alert-info float-right m-0 p-2">
-		<?= T([
-			'en' => "Showing <strong>{$this->PARAMS['SELECTED']}</strong> elements.",
-			'ru' => "Отображено <strong>{$this->PARAMS['SELECTED']}</strong> элементов.",
-		]) ?>
-		<?= T([
-			'en' => "Total <strong>{$this->PARAMS['TOTAL']}</strong> elements.",
-			'ru' => "Всего <strong>{$this->PARAMS['TOTAL']}</strong> элементов.",
-		]) ?>
+		<strong title="<?= T([
+			'en' => 'Showing',
+			'ru' => 'Отображено',
+		]) ?>"><?= $this->PARAMS['SELECTED'] ?></strong>
+		/
+		<span title="<?= T([
+			'en' => 'Total',
+			'ru' => 'Всего',
+		]) ?>"><?= $this->PARAMS['TOTAL'] ?></span>
 	</div>
 
-	<nav>
+	<nav class="d-inline-block">
 		<ul class="pagination">
 			<? foreach ($RESULT as $page): ?>
 				<? if ($page['ACTIVE']): ?>
@@ -45,7 +46,7 @@ $base = http_build_query($get);
 					<li class="page-item">
 						<a
 							class="page-link"
-							href="?<?= http_build_query(array_merge($_GET, array($this->PARAMS['VARIABLE'] => $page['INDEX']))) ?>">
+							href="?<?= http_build_query(array_merge($_GET, [$this->PARAMS['VARIABLE'] => $page['INDEX']])) ?>">
 							<?= $page["INDEX"] ?>
 						</a>
 					</li>
