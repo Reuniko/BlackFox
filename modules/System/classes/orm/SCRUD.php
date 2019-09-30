@@ -563,7 +563,7 @@ abstract class SCRUD extends Instanceable {
 				$values[] = is_null($value) ? 'NULL' : "'{$value}'";
 			}
 		}
-		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ') VALUES (' . implode(', ', $values) . ')';
+		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ") \r\n VALUES (" . implode(', ', $values) . ')';
 		$ID = $this->DB->QuerySingleInsert($this->SQL, $this->increment);
 		return $ID;
 	}

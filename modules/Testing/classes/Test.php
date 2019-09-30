@@ -50,12 +50,6 @@ class Test extends \System\Instanceable {
 					'STATUS' => 'SUCCESS',
 					'RESULT' => $result,
 				];
-			} catch (\System\ExceptionSQL $error) {
-				$this->results[$test] = [
-					'NAME'   => $display,
-					'STATUS' => 'FAILURE',
-					'RESULT' => $error->getMessage() . ":\r\n<pre>" . $error->SQL . "</pre>",
-				];
 			} catch (Exception $error) {
 				$this->results[$test] = [
 					'NAME'   => $display,

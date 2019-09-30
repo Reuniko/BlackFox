@@ -428,13 +428,6 @@ class Engine extends Instanceable {
 			$this->CheckSectionAccess($this->SECTION['ACCESS']);
 			$this->MakeContent();
 
-		} catch (ExceptionSQL $Exception) {
-			$messages = [];
-			$messages[] = 'SQL QUERY ERROR: ' . $Exception->getMessage();
-			if ($this->USER->InGroup('root')) {
-				$messages[] = "<pre>{$Exception->SQL}</pre>";
-			}
-			$this->ShowErrors($messages);
 		} catch (ExceptionAuthRequired $Exception) {
 			$this->ShowAuthForm($Exception->getMessage());
 		} catch (ExceptionPageNotFound $Exception) {

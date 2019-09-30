@@ -49,7 +49,7 @@ class DatabaseDriverMySQL extends Database {
 	public function QuerySingleInsert($SQL, $increment = null) {
 		$result = mysqli_query($this->link, $SQL);
 		if ($result === false) {
-			throw new ExceptionSQL(mysqli_error($this->link) . $SQL, $SQL);
+			throw new ExceptionSQL(mysqli_error($this->link), $SQL);
 		}
 		if ($result === true) {
 			return mysqli_insert_id($this->link);
@@ -124,6 +124,10 @@ class DatabaseDriverMySQL extends Database {
 				$default = "DEFAULT '" . implode(',', $Info['DEFAULT']) . "'";
 			} elseif (is_string($Info['DEFAULT'])) {
 				$default = "DEFAULT '{$Info['DEFAULT']}'";
+			} elseif (is_numeric($Info['DEFAULT'])) {
+				$default = "DEFAULT {$Info['DEFAULT']}";
+			} else {
+				throw new Exception("Unknown default value type of '{$Info->info['CODE']}'");
 			}
 		}
 
