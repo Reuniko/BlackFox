@@ -79,6 +79,7 @@ class Authorization extends \System\Unit {
 	}
 
 	public function Form($login = null, $password = null, $redirect = null) {
+		$this->ENGINE->TITLE = $this->name;
 		if ($this->PARAMS['MESSAGE'] and empty($this->ALERTS)) {
 			$this->ALERTS[] = ['TYPE' => 'info', 'TEXT' => $this->PARAMS['MESSAGE']];
 		}
