@@ -330,10 +330,11 @@ abstract class Unit {
 	 * @return array
 	 */
 	public function Error($Exception, $action = null, $request = []) {
+		$this->Debug($Exception, '$Exception');
 		foreach ($Exception->getArray() as $error) {
 			$this->ALERTS[] = [
-				'TYPE' => 'danger',
-				'TEXT' => $error,
+				'TYPE'      => 'danger',
+				'TEXT'      => $error,
 			];
 		}
 		return [];
@@ -364,7 +365,7 @@ abstract class Unit {
 		}
 
 		ob_start();
-		debug([
+		$this->Debug([
 			'PARAMS' => $this->PARAMS,
 			'ALERTS' => $this->ALERTS,
 			'RESULT' => $RESULT,
@@ -480,14 +481,17 @@ abstract class Unit {
 	}
 
 	/**
+	 * Добавляет в сессию уведомления (если они указаны).
 	 * Перенаправляет на другой URL.
-	 * Добавляет в заголовки "Message" если он указан.
 	 * Завершает выполнение скрипта.
 	 *
-	 * @param string|null $url URL-адрес
-	 * @param string|array $alerts текстовое сообщение | массив сообщений
+	 * @param string|null $url URL-адрес (null = $_SERVER['REQUEST_URI'])
+	 * @param string|array $alerts строка, уведомление об успехе
+	 * | массив строк, уведомлений об успехе
+	 * | массив массивов, представляющих собой уведомления в формате [TEXT, TYPE]
 	 */
 	public function Redirect($url, $alerts = []) {
+		$url = is_null($url) ? $_SERVER['REQUEST_URI'] : $url;
 		$alerts = is_array($alerts) ? $alerts : [$alerts];
 		foreach ($alerts as &$alert) {
 			if (is_string($alert)) {
@@ -496,11 +500,11 @@ abstract class Unit {
 		}
 		if ($this->json) {
 			echo json_encode([
-				'URL'    => $url ?: $_SERVER['REQUEST_URI'],
+				'URL'    => $url,
 				'ALERTS' => $alerts,
 			]);
 		} else {
-			header('Location: ' . ($url ?: $_SERVER['REQUEST_URI']));
+			header('Location: ' . ($url));
 			$_SESSION['ALERTS'][$this->class] = $alerts;
 		}
 		die();

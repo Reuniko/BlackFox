@@ -6,6 +6,12 @@ class TypeOuter extends Type {
 	public static $TYPE = 'OUTER';
 
 	public function FormatInputValue($value) {
+		if (!is_numeric($value)) {
+			throw new ExceptionType(T([
+				'en' => "Expected numerical value for '{$this->info['CODE']}', received: '{$value}'",
+				'ru' => "Ожидалось числовое значение для '{$this->info['CODE']}', получено: '{$value}'",
+			]));
+		}
 		return (int)$value;
 	}
 

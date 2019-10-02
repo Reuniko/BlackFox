@@ -56,6 +56,7 @@ abstract class Type implements \ArrayAccess {
 	 * @param mixed $value input value from user
 	 * @internal array $info type info
 	 * @return string input value for database
+	 * @throws ExceptionType
 	 */
 	public function FormatInputValue($value) {
 		return $value;
