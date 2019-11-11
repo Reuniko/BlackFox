@@ -66,7 +66,7 @@ class Log extends SCRUD {
 
 	public function Create($fields) {
 		$fields['MOMENT'] = time();
-		$fields['USER'] = $fields['USER'] ?: User::I()->ID ?: null;
+		$fields['USER'] = $fields['USER'] ?: $_SESSION['USER']['ID'];
 		$fields['IP'] = $_SERVER['REMOTE_ADDR'];
 		return parent::Create($fields);
 	}

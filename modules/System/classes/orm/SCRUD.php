@@ -536,14 +536,12 @@ abstract class SCRUD extends Instanceable {
 		}
 
 		$errors = [];
-		$is_root = User::I()->InGroup('root');
 		foreach ($this->structure as $code => $field) {
 			if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT'])) {
 				if (!$this->_hasInformation($fields[$code])) {
-					$hint = $is_root ? " ({$this->code}.{$code})" : '';
 					$errors[] = T([
-						'en' => "Field must be specified: '{$field['NAME']}'{$hint}",
-						'ru' => "Не указано обязательное поле '{$field['NAME']}'{$hint}",
+						'en' => "Field must be specified: '{$field['NAME']}'",
+						'ru' => "Не указано обязательное поле '{$field['NAME']}'",
 					]);
 				}
 			}

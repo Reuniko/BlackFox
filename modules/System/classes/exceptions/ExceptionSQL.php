@@ -27,6 +27,7 @@ class ExceptionSQL extends Exception {
 				'TYPE'    => static::class,
 				'MESSAGE' => $exception,
 				'DATA'    => $SQL,
+				'USER'    => null,
 			]);
 		} catch (\Exception $error) {
 		}
