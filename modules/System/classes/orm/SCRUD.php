@@ -1110,8 +1110,8 @@ abstract class SCRUD extends Instanceable {
 		try {
 			return $this->DB->Query($SQL, $key);
 		} catch (ExceptionSQL $ExceptionSQL) {
-			$need_sync = substr($ExceptionSQL->getMessage(), 0, 14) === 'Unknown column';
-			$need_sync |= substr($ExceptionSQL->getMessage(), -13) === 'doesn\'t exist';
+			$need_sync = substr($ExceptionSQL->error, 0, 14) === 'Unknown column';
+			$need_sync |= substr($ExceptionSQL->error, -13) === 'doesn\'t exist';
 			if ($need_sync) {
 				$this->Synchronize();
 				return $this->DB->Query($SQL, $key);

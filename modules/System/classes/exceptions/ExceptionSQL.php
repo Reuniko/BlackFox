@@ -4,11 +4,18 @@ namespace System;
 
 class ExceptionSQL extends Exception {
 
-	public function __construct($exception, $SQL) {
+	public $error;
+	public $SQL;
+
+	public function __construct($error, $SQL) {
+
+		$this->error = $error;
+		$this->SQL = $SQL;
+
 		global $CONFIG;
 		if ($CONFIG['debug']) {
 			$message = implode($this->getImplodeSymbols(), [
-				$exception,
+				$error,
 				'<pre>',
 				$SQL,
 				'</pre>',
@@ -25,11 +32,11 @@ class ExceptionSQL extends Exception {
 		try {
 			Log::I()->Create([
 				'TYPE'    => static::class,
-				'MESSAGE' => $exception,
+				'MESSAGE' => $error,
 				'DATA'    => $SQL,
 				'USER'    => null,
 			]);
-		} catch (\Exception $error) {
+		} catch (\Exception $E) {
 		}
 	}
 
