@@ -450,6 +450,26 @@ abstract class SCRUD extends Instanceable {
 	}
 
 	/**
+	 * Вычисляет сумму элементов, подходящих под фильтр.
+	 *
+	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
+	 * @param mixed $field колонка для подсчета суммы
+	 * @return int
+	 * @throws Exception
+	 */
+	public function Sum($filter = [], $field = '') {
+		$answer = $this->PreparePartsByFilter($filter);
+		$SQL = $this->DB->CompileSQLSelect([
+			'SELECT' => ['SUM(' . $this->DB->Quote($field) . ') as total'],
+			'TABLE'  => $this->code,
+			'JOIN'   => $answer['JOIN'],
+			'WHERE'  => $answer['WHERE'],
+			// 'GROUP'  => $answer['GROUP'], // ???
+		]);
+		return (int)$this->DB->Query($SQL)[0]['total'];
+	}
+
+	/**
 	 * Анализирует значение на наличие информации.
 	 * - 0 - информация присутствует
 	 * - 0.0 - информация присутствует
