@@ -28,16 +28,6 @@ class ExceptionSQL extends Exception {
 		}
 
 		parent::__construct($message);
-
-		try {
-			Log::I()->Create([
-				'TYPE'    => static::class,
-				'MESSAGE' => $error,
-				'DATA'    => $SQL,
-				'USER'    => null,
-			]);
-		} catch (\Exception $E) {
-		}
 	}
 
 }
