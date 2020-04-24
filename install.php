@@ -7,11 +7,9 @@ $_SERVER["DOCUMENT_ROOT"] = __DIR__ . '/../';
 require_once("includes.php");
 
 \BlackFox\Engine::I()->RegisterCoreClasses('BlackFox');
-\BlackFox\Core::I()->Upgrade();
-echo "\r\n BlackFox module upgraded;";
+\BlackFox\Engine::I()->InitDatabase();
 
-\BlackFox\Engine::I()->RegisterCoreClasses('BlackFox');
-\BlackFox\Module::I()->Upgrade();
+\BlackFox\Core::I()->Upgrade();
 echo "\r\n BlackFox module upgraded;";
 
 try {

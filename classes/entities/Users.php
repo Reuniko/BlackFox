@@ -144,7 +144,7 @@ class Users extends SCRUD {
 					'en' => 'Avatar',
 					'ru' => 'Аватар',
 				]),
-				'LINK'  => 'Files',
+				'LINK'  => 'BlackFox\Files',
 			],
 			'BIRTH_DAY'       => [
 				'TYPE'  => 'DATE',
@@ -168,7 +168,7 @@ class Users extends SCRUD {
 					'en' => 'Groups',
 					'ru' => 'Группы',
 				]),
-				'LINK'  => 'Users2Groups',
+				'LINK'  => 'BlackFox\Users2Groups',
 				'FIELD' => 'USER',
 			],
 		];
