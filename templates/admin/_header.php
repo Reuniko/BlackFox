@@ -1,6 +1,6 @@
 <script>var lang = '<?=$_SESSION['USER']['LANG'] ?: 'en'?>';</script>
 <?
-/** @var \System\Engine $this */
+/** @var \BlackFox\Engine $this */
 $path = $this->TEMPLATE_PATH;
 
 // Roboto

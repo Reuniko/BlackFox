@@ -5,4 +5,4 @@ if (php_sapi_name() <> 'cli') die('Console usage only');
 $_SERVER["DOCUMENT_ROOT"] = __DIR__ . '/../';
 
 require_once("includes.php");
-\System\Engine::I()->UpgradeActiveModules();
+\BlackFox\Engine::I()->Upgrade();

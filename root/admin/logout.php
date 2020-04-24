@@ -1,3 +1,3 @@
 <?php
-\System\User::I()->Logout();
+\BlackFox\User::I()->Logout();
 header('Location: /admin/');

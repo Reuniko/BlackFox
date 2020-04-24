@@ -14,12 +14,6 @@ $CONFIG = [
 		//'en' => 'English',
 		//'ru' => 'Русский',
 	],
-	'modules'   => [
-		'System',
-		'Admin',
-		//'Testing',
-		//'<your namespace>',
-	],
 	'database'  => [
 		'HOST'     => 'localhost',
 		'PORT'     => 3306,
@@ -29,8 +23,8 @@ $CONFIG = [
 	],
 	'template'  => 'bootstrap',
 	'redirects' => [
-		// 'System\\Engine' => '<your namespace>\\Engine',
-		'System\Database' => 'System\DatabaseDriverMySQL',
+		// 'BlackFox\\Engine' => '<your namespace>\\Engine',
+		'BlackFox\Database' => 'BlackFox\DatabaseDriverMySQL',
 	],
 ];
 return $CONFIG;

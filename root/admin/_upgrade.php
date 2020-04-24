@@ -1,6 +1,6 @@
 <?php
-/* @var \System\Engine $this */
-$this->UpgradeActiveModules();
+/* @var \BlackFox\Engine $this */
+$this->Upgrade();
 ?>
 <div class="alert alert-info">
 	<?= T([

@@ -1,0 +1,95 @@
+.menu, .menu ul {
+	list-style-type: none;
+	font-size: 0.9rem;
+}
+
+.menu {
+	padding-left: 0;
+}
+
+.menu ul {
+	padding-left: 1rem;
+}
+
+.menu ul.level-1 {
+	padding-left: 0;
+}
+
+.menu .item.level-1 {
+	padding: 0.25rem;
+	text-align: center;
+	background-color: rgba(1, 1, 1, 0.1);
+	font-weight: 500;
+	font-size: 125%;
+	margin-bottom: 1px;
+}
+
+.menu .item {
+	display: flex;
+	align-items: center;
+	align-content: stretch;
+	align-self: stretch;
+	overflow: hidden;
+}
+
+.menu .item a,
+.menu .item span {
+	text-decoration: none;
+	color: black;
+	width: calc(100% - 16px);
+	padding: 0.25rem;
+	white-space: nowrap;
+	cursor: pointer;
+	position: relative;
+}
+
+.menu .item:hover {
+	z-index: 3;
+	overflow: visible;
+	position: relative;
+}
+
+.menu .item.current {
+	background-color: rgba(0, 0, 0, 0.15);
+}
+
+.menu .item:hover {
+	text-decoration: none;
+	background-color: rgba(255, 255, 255, 0.5);
+}
+
+.menu .rotate-0,
+.menu .rotate-90 {
+	-webkit-transition: all 0.2s ease-in;
+	-moz-transition: all 0.2s ease-in;
+	-ms-transition: all 0.2s ease-in;
+	-o-transition: all 0.2s ease-in;
+	transition: all 0.2s ease-in;
+}
+
+.menu .rotate-0 {
+	transform: rotate(0deg);
+}
+
+.menu .rotate-90 {
+	transform: rotate(90deg);
+}
+
+.menu .menu-point {
+	height: 16px;
+	width: 16px;
+	opacity: 0.5;
+}
+
+.menu .menu-point-item {
+	background-image: url('img/item.png');
+}
+
+.menu .menu-point-category {
+	background-image: url('img/category.png');
+	cursor: pointer;
+}
+
+.menu .menu-point-category:hover {
+	opacity: 1;
+}

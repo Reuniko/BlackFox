@@ -1,4 +1,4 @@
-<?php /** @var \System\Engine $this */ ?>
+<?php /** @var \BlackFox\Engine $this */ ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,7 +32,7 @@
 
 		<? if ($this->USER->IsAuthorized()): ?>
 			<span class="btn-group">
-				<a class="btn btn-secondary" href="/admin/System/Users.php?ID=<?= $this->USER->ID ?>">
+				<a class="btn btn-secondary" href="/admin/BlackFox/Users.php?ID=<?= $this->USER->ID ?>">
 					<i class="fa fa-user"></i>
 					<span class="d-none d-md-inline-block"><?= $this->USER->FIELDS['LOGIN'] ?></span>
 				</a>
@@ -45,17 +45,17 @@
 
 		<? endif; ?>
 
-		<? \Admin\LanguageSwitcher::Run([]); ?>
+		<? \BlackFox\LanguageSwitcher::Run([]); ?>
 	</div>
 </nav>
 
 <main role="main" class="container-fluid p-0">
 	<div class="row no-gutters">
 		<div class="sidebar col-12 col-md-2" id="sidebar">
-			<? \Admin\Menu::Run() ?>
+			<? \BlackFox\Menu::Run() ?>
 		</div>
 		<div class="main col-12 col-md-10 p-3 p-sm-3">
-			<? \System\Breadcrumbs::Run() ?>
+			<? \BlackFox\Breadcrumbs::Run() ?>
 			<h1 class="page-header"><?= $this->TITLE ?></h1>
 			<?= $this->CONTENT ?>
 		</div>

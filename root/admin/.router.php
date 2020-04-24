@@ -1,5 +1,5 @@
 <?php
-/** @var $this \System\Engine */
+/** @var $this \BlackFox\Engine */
 $url = parse_url($_SERVER['REQUEST_URI']);
 $path = explode('/', $url['path']);
 
@@ -8,8 +8,8 @@ if ($path[0] <> '' or $path[1] <> 'admin') {
 }
 
 
-$module = $path[2];
-if (!in_array($module, $this->modules)) {
+$namespace = $path[2];
+if (!in_array($namespace, array_keys($this->cores))) {
 	return $this->Show404();
 }
 
@@ -18,12 +18,12 @@ if ($x = strpos($target, '.php')) {
 	$target = substr($target, 0, $x);
 }
 
-$Class = "{$module}\\{$target}";
-if (is_subclass_of($Class, "System\\SCRUD")) {
-	\Admin\Adminer::Run(['SCRUD' => $Class]);
+$Class = "{$namespace}\\{$target}";
+if (is_subclass_of($Class, "BlackFox\\SCRUD")) {
+	\BlackFox\Adminer::Run(['SCRUD' => $Class]);
 	return;
 }
-if (is_subclass_of($Class, "System\\Unit")) {
+if (is_subclass_of($Class, "BlackFox\\Unit")) {
 	$Class::Run();
 	return;
 }

@@ -1,4 +1,4 @@
-<?php /** @var \System\Engine $this */ ?>
+<?php /** @var \BlackFox\Engine $this */ ?>
 <!DOCTYPE html>
 <html>
 <head>
