@@ -3,12 +3,16 @@ global $CONFIG;
 $CONFIG = [
 	'debug'     => true,
 	'cores'     => [
-		'/site' => $_SERVER['DOCUMENT_ROOT'] . '/site',
-		'/core' => $_SERVER['DOCUMENT_ROOT'] . '/core',
+		'Site'     => '/Site',
+		'BlackFox' => '/BlackFox',
 	],
 	'roots'     => [
-		'/site/root' => $_SERVER['DOCUMENT_ROOT'] . '/site/root',
-		'/core/root' => $_SERVER['DOCUMENT_ROOT'] . '/core/root',
+		'/Site/root'     => $_SERVER['DOCUMENT_ROOT'] . '/Site/root',
+		'/BlackFox/root' => $_SERVER['DOCUMENT_ROOT'] . '/BlackFox/root',
+	],
+	'templates' => [
+		'main'  => '/Site/templates/main',
+		'admin' => '/BlackFox/templates/admin',
 	],
 	'languages' => [
 		//'en' => 'English',
@@ -21,7 +25,6 @@ $CONFIG = [
 		'PASSWORD' => '',
 		'DATABASE' => '',
 	],
-	'template'  => 'bootstrap',
 	'redirects' => [
 		// 'BlackFox\\Engine' => '<your namespace>\\Engine',
 		'BlackFox\Database' => 'BlackFox\DatabaseDriverMySQL',

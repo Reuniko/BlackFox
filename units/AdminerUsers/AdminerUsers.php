@@ -29,7 +29,7 @@ class AdminerUsers extends Adminer {
 	}
 
 	public function Login($ID) {
-		\BlackFox\User::I()->Login($ID);
+		User::I()->Login($ID);
 		$this->Redirect('/');
 	}
 

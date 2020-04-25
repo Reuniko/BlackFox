@@ -7,6 +7,7 @@ class Engine extends Instanceable {
 	public $config = [];
 	public $cores = [];
 	public $roots = [];
+	public $templates = [];
 
 	/**
 	 * dictionary of available classes
@@ -78,6 +79,7 @@ class Engine extends Instanceable {
 		$this->config = require($_SERVER["DOCUMENT_ROOT"] . '/config.php');
 		$this->roots = $this->config['roots'];
 		$this->cores = $this->config['cores'];
+		$this->templates = $this->config['templates'];
 		$this->languages = $this->config['languages'];
 	}
 
@@ -151,13 +153,57 @@ class Engine extends Instanceable {
 	 */
 	public function LoadSectionInfo() {
 		$this->url = parse_url($_SERVER['REQUEST_URI']);
-		if ($this->url === false) throw new Exception("Can't parse url");
+		if ($this->url === false)
+			throw new Exception("Can't parse url");
+
 		$path_to_section_config = $this->SearchAncestorFile($this->url['path'], '.section.php');
 		$this->SECTION = !empty($path_to_section_config) ? require($path_to_section_config) : [];
-		$this->TEMPLATE = isset($this->SECTION['TEMPLATE']) ? $this->SECTION['TEMPLATE'] : $this->config['template'];
-		$this->WRAPPER = isset($this->SECTION['WRAPPER']) ? $this->SECTION['WRAPPER'] : $this->WRAPPER;
-		$this->TEMPLATE_PATH = $this->GetCoreDirectoryRelative('templates/' . $this->TEMPLATE);
-		$this->TITLE = $this->SECTION['NAME'];
+
+		$this->TITLE = isset($this->SECTION['TITLE']) ? $this->SECTION['TITLE'] : $this->TITLE;
+
+		if (isset($this->SECTION['TEMPLATE'])) {
+			$this->SetTemplate($this->SECTION['TEMPLATE']);
+		}
+		if (isset($this->SECTION['WRAPPER'])) {
+			$this->SetWrapper($this->SECTION['WRAPPER']);
+		}
+	}
+
+	/**
+	 * Sets props TEMPLATE and TEMPLATE_PATH
+	 * @param string $template symbol code of new template
+	 * @throws Exception
+	 */
+	public function SetTemplate($template) {
+		if ($template === null) {
+			$this->TEMPLATE = null;
+			$this->TEMPLATE_PATH = null;
+			return;
+		}
+		if (empty($this->templates[$template])) {
+			throw new Exception("Template not found: '{$template}'");
+		}
+		$this->TEMPLATE = $template;
+		$this->TEMPLATE_PATH = $this->templates[$template];
+	}
+
+	/**
+	 * Sets prop WRAPPER
+	 * @param string $wrapper symbol code of new wrapper
+	 * @throws Exception
+	 */
+	public function SetWrapper($wrapper) {
+		if ($wrapper === null) {
+			$this->WRAPPER = null;
+			return;
+		}
+		if (!empty($wrapper)) {
+			$wrapper_file = $this->GetAbsolutePath($this->TEMPLATE_PATH . "/{$wrapper}.php");
+			if (!file_exists($wrapper_file)) {
+				throw new Exception("Wrapper not found: '{$wrapper}'; of template: '{$this->TEMPLATE}'");
+			}
+		}
+		$this->WRAPPER = $wrapper;
 	}
 
 	private function TrimSlashes($string) {
@@ -244,8 +290,14 @@ class Engine extends Instanceable {
 		if (empty($this->TEMPLATE) or empty($this->WRAPPER)) {
 			return;
 		}
+
+		$wrapper = $this->GetAbsolutePath($this->templates[$this->TEMPLATE] . "/{$this->WRAPPER}.php");
+		if (!file_exists($wrapper)) {
+			throw new Exception("Wrapper file not found: '{$wrapper}'");
+		}
+
 		ob_start();
-		require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/' . $this->WRAPPER . '.php'));
+		require($wrapper);
 		$this->CONTENT = ob_get_clean();
 	}
 
@@ -257,16 +309,6 @@ class Engine extends Instanceable {
 			$insert = call_user_func_array($delayed['CALLABLE'], $delayed['PARAMS']);
 			$this->CONTENT = str_replace($delayed['TEMPLATE'], $insert, $this->CONTENT);
 		}
-	}
-
-	/**
-	 * Resets current Engine's template and the root path to it
-	 * @param string $template symbol code of new template
-	 * @throws Exception
-	 */
-	public function SetTemplate($template) {
-		$this->TEMPLATE = $template;
-		$this->TEMPLATE_PATH = $this->GetCoreDirectoryRelative('templates/' . $this->TEMPLATE);
 	}
 
 	/**
@@ -457,7 +499,7 @@ class Engine extends Instanceable {
 
 	/**
 	 * This method tries to show passed array of errors,
-	 * using file 'errors.php' from the current template root folder.
+	 * using file 'errors.php' from the current template folder.
 	 * Otherwise displays them as plain divs.
 	 * @param string|array $errors
 	 */
@@ -467,16 +509,15 @@ class Engine extends Instanceable {
 		}
 
 		if (!empty($this->TEMPLATE)) {
-			try {
-				require($this->GetCoreFile('templates/' . $this->TEMPLATE . '/errors.php'));
+			$template_errors = $this->GetAbsolutePath($this->templates[$this->TEMPLATE] . "/errors.php");
+			if (file_exists($template_errors)) {
+				require($template_errors);
 				return;
-			} catch (Exception $error) {
-				// no 'errors.php' found, it's okay
 			}
 		}
 
 		foreach ($errors as $error) {
-			echo "<div>{$error}</div>";
+			echo "<div class='alert alert-danger'>{$error}</div>";
 		}
 	}
 
@@ -538,64 +579,34 @@ class Engine extends Instanceable {
 	}
 
 	/**
-	 * Search and return absolute path to the file, first among all active cores.
-	 * If no file found - throws an exception.
+	 * Converts relative path to absolute path
 	 *
-	 * @param string $path path to file, relative to any core root
-	 * @return string absolute path to file
-	 * @throws Exception Found no file '___' in cores
+	 * @param string $relative_path relative path
+	 * @return string absolute path
 	 */
-	public function GetCoreFile($path) {
-		foreach ($this->cores as $namespace => $core_relative_path) {
-			$core_absolute_path = $this->GetAbsolutePath($core_relative_path);
-			$full_path = "{$core_absolute_path}/{$path}";
-			if (file_exists($full_path)) {
-				return $full_path;
-			}
-		}
-		throw new Exception("Found no file '{$path}' in cores");
-	}
-
 	public function GetAbsolutePath($relative_path) {
 		return $_SERVER['DOCUMENT_ROOT'] . $relative_path;
 	}
 
 	/**
-	 * Search and return absolute path to the directory, first among all active cores.
-	 * If no directory found - throws an exception.
+	 * Converts absolute path to path, relative to document root or specified root
 	 *
-	 * @param string $path path to directory, relative to any core root
-	 * @return string absolute path to directory
-	 * @throws Exception Found no directory '___' in cores
+	 * @param string $absolute_path absolute path
+	 * @param string $root_path root path (optional, document root by default)
+	 * @return string relative path
+	 * @throws Exception
 	 */
-	public function GetCoreDirectoryAbsolute($path) {
-		foreach ($this->cores as $namespace => $core_relative_path) {
-			$core_absolute_path = $this->GetAbsolutePath($core_relative_path);
-			$full_path = "{$core_absolute_path}/{$path}";
-			if (is_dir($full_path)) {
-				return $full_path;
-			}
-		}
-		throw new Exception("Found no directory '{$path}' in cores");
-	}
+	public function GetRelativePath($absolute_path, $root_path = null) {
+		$root_path = $root_path ?: $_SERVER['DOCUMENT_ROOT'];
 
-	/**
-	 * Search and return relative path to the directory, first among all active cores.
-	 * If no directory found - throws an exception.
-	 *
-	 * @param string $path path to directory, relative to any core root
-	 * @return string path to directory, relative server root
-	 * @throws Exception Found no directory '___' in cores
-	 */
-	public function GetCoreDirectoryRelative($path) {
-		foreach ($this->cores as $namespace => $core_relative_path) {
-			$core_absolute_path = $this->GetAbsolutePath($core_relative_path);
-			$full_path = "{$core_absolute_path}/{$path}";
-			if (is_dir($full_path)) {
-				return "{$core_relative_path}/{$path}";
-			}
+		$root_path = str_replace('\\', '/', $root_path);
+		$absolute_path = str_replace('\\', '/', $absolute_path);
+
+		if (strpos($absolute_path, $root_path) === false) {
+			throw new Exception("Can't find relative path for absolute path '{$absolute_path}' with root '{$root_path}'");
 		}
-		throw new Exception("Found no directory '{$path}' in cores");
+		$relative_path = str_replace($root_path, '', $absolute_path);
+		return $relative_path;
 	}
 
 	/**
@@ -643,27 +654,6 @@ class Engine extends Instanceable {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * Converts absolute path to path, relative server root or specified root
-	 *
-	 * @param string $absolute_path absolute path
-	 * @param string $root_path root path (optional, server root by default)
-	 * @return string relative path
-	 * @throws Exception
-	 */
-	public function GetRelativePath($absolute_path, $root_path = null) {
-		$root_path = $root_path ?: $_SERVER['DOCUMENT_ROOT'];
-
-		$root_path = str_replace('\\', '/', $root_path);
-		$absolute_path = str_replace('\\', '/', $absolute_path);
-
-		if (strpos($absolute_path, $root_path) === false) {
-			throw new Exception("Can't find relative path for absolute path '{$absolute_path}'");
-		}
-		$relative_path = str_replace($root_path, '', $absolute_path);
-		return $relative_path;
 	}
 
 	/**

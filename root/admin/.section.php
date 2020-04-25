@@ -1,6 +1,6 @@
 <?php
 return [
-	'NAME'     => T([
+	'TITLE'     => T([
 	    'en' => 'Administrative section',
 	    'ru' => 'Административная часть',
 	]),
