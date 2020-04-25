@@ -20,7 +20,7 @@ class Menu extends Unit {
 			$MENU = \BlackFox\Cache::I()->Get('admin_menu');
 		} catch (\BlackFox\ExceptionCache $error) {
 			$MENU = [];
-			foreach ($this->ENGINE->cores as $namespace => $core_relative_path) {
+			foreach ($this->ENGINE->cores as $namespace => $core_absolute_folder) {
 				$Core = "\\{$namespace}\\Core";
 				/**@var ACore $Core */
 				$MENU = array_merge($MENU, $Core::I()->Menu());

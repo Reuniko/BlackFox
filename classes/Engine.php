@@ -223,9 +223,9 @@ class Engine extends Instanceable {
 		$dirname = $info['dirname'];
 
 		$dirname_relative = null;
-		foreach ($this->roots as $root => $root_folder) {
-			if (strpos($dirname, $root_folder) !== false) {
-				$dirname_relative = str_replace($root_folder, '', $dirname);
+		foreach ($this->roots as $root_relative_folder => $root_absolute_folder) {
+			if (strpos($dirname, $root_absolute_folder) !== false) {
+				$dirname_relative = str_replace($root_absolute_folder, '', $dirname);
 				break;
 			}
 		}
@@ -405,8 +405,8 @@ class Engine extends Instanceable {
 		$lang = $this->GetLanguage();
 
 		// request for specific file or directory with 'index.php'
-		foreach ($this->roots as $root) {
-			$request_path = $root . $this->url['path'];
+		foreach ($this->roots as $root_absolute_folder) {
+			$request_path = $root_absolute_folder . $this->url['path'];
 			if (is_dir($request_path)) {
 				$request_path .= 'index.php';
 			}
@@ -539,6 +539,7 @@ class Engine extends Instanceable {
 	 *
 	 * @param string $class class that needs to be loaded
 	 * @throws Exception
+	 * @todo use RegisterCoreClasses once
 	 */
 	public function AutoloadClass($class) {
 
@@ -548,7 +549,7 @@ class Engine extends Instanceable {
 		}
 
 		list($namespace) = explode('\\', $class);
-		if (in_array($namespace, array_keys($this->cores))) {
+		if ($this->cores[$namespace]) {
 			$this->RegisterCoreClasses($namespace);
 			if (isset($this->classes[$class])) {
 				require_once($this->classes[$class]);
@@ -565,7 +566,7 @@ class Engine extends Instanceable {
 	 */
 	public function RegisterCoreClasses($namespace) {
 		$Core = "{$namespace}\\Core";
-		$this->classes[$Core] = $this->GetAbsolutePath($this->cores[$namespace] . '/Core.php');
+		$this->classes[$Core] = $this->cores[$namespace] . '/Core.php';
 		require_once($this->classes[$Core]);
 		if (!is_subclass_of($Core, 'BlackFox\ACore')) {
 			throw new Exception(T([
@@ -614,7 +615,7 @@ class Engine extends Instanceable {
 	 * for every active core - launches it's Upgrade() method.
 	 */
 	public function Upgrade() {
-		foreach ($this->cores as $namespace => $core_relative_path) {
+		foreach ($this->cores as $namespace => $core_absolute_folder) {
 			$Core = "{$namespace}\\Core";
 			/* @var \BlackFox\ACore $Core */
 			$Core::I()->Upgrade();
@@ -646,9 +647,9 @@ class Engine extends Instanceable {
 		}
 		$paths = array_reverse($paths);
 		foreach ($paths as $path) {
-			foreach ($this->roots as $root) {
-				if (file_exists($root . $path)) {
-					$file = $root . $path;
+			foreach ($this->roots as $root_absolute_folder) {
+				if (file_exists($root_absolute_folder . $path)) {
+					$file = $root_absolute_folder . $path;
 					return $file;
 				}
 			}

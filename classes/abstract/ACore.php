@@ -42,7 +42,7 @@ abstract class ACore extends Instanceable {
 	 */
 	public function GetClasses() {
 		list($namespace) = explode('\\', get_called_class());
-		$core_absolute_path = Engine::I()->GetAbsolutePath(Engine::I()->cores[$namespace]);
+		$core_absolute_path = Engine::I()->cores[$namespace];
 
 		$files = [];
 		$files += $this->ScanDirectoryRecursive("{$core_absolute_path}/classes");

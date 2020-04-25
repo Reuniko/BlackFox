@@ -9,7 +9,7 @@ if ($path[0] <> '' or $path[1] <> 'admin') {
 
 
 $namespace = $path[2];
-if (!in_array($namespace, array_keys($this->cores))) {
+if (!$this->cores[$namespace]) {
 	return $this->Show404();
 }
 

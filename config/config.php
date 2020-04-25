@@ -3,8 +3,8 @@ global $CONFIG;
 $CONFIG = [
 	'debug'     => true,
 	'cores'     => [
-		'Site'     => '/Site',
-		'BlackFox' => '/BlackFox',
+		'Site'     => $_SERVER['DOCUMENT_ROOT'] . '/Site',
+		'BlackFox' => $_SERVER['DOCUMENT_ROOT'] . '/BlackFox',
 	],
 	'roots'     => [
 		'/Site/root'     => $_SERVER['DOCUMENT_ROOT'] . '/Site/root',
