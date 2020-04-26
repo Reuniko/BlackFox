@@ -1,14 +1,15 @@
 <?php
 
 namespace BlackFox;
+
 class CaptchaDriverGoogleRecaptchaV2 extends Captcha {
 
 	public $key;
 	private $secret;
 
 	public function __construct() {
-		$this->key = $GLOBALS['CONFIG']['google_recaptcha']['key'];
-		$this->secret = $GLOBALS['CONFIG']['google_recaptcha']['secret'];
+		$this->key = Engine::I()->config['google_recaptcha']['key'];
+		$this->secret = Engine::I()->config['google_recaptcha']['secret'];
 		if (empty($this->key) or empty($this->secret)) {
 			throw new ExceptionCaptcha(T([
 				'en' => 'Specify config keys: google_recaptcha->key, google_recaptcha->secret',

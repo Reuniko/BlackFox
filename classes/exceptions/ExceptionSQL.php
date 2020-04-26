@@ -12,20 +12,12 @@ class ExceptionSQL extends Exception {
 		$this->error = $error;
 		$this->SQL = $SQL;
 
-		global $CONFIG;
-		if ($CONFIG['debug']) {
-			$message = implode($this->getImplodeSymbols(), [
-				$error,
-				'<pre>',
-				$SQL,
-				'</pre>',
-			]);
-		} else {
-			$message = T([
-				'en' => 'Database error',
-				'ru' => 'Ошибка в базе данных',
-			]);
-		}
+		$message = implode($this->getImplodeSymbols(), [
+			$error,
+			'<pre>',
+			$SQL,
+			'</pre>',
+		]);
 
 		parent::__construct($message);
 	}
