@@ -9,16 +9,11 @@ class FactoryType {
 	public $TYPES = [];
 
 	public function __construct() {
-		try {
-			$this->TYPES = Cache::I()->Get('FactoryTypes');
-		} catch (ExceptionCache $error) {
-			foreach (Engine::I()->classes as $class_name => $class_path) {
-				if (in_array('BlackFox\Type', class_parents($class_name))) {
-					/** @var \BlackFox\Type $class_name */
-					$this->TYPES[$class_name::$TYPE] = $class_name;
-				}
+		foreach (Engine::I()->classes as $class_name => $class_path) {
+			if (in_array('BlackFox\Type', class_parents($class_name))) {
+				/** @var \BlackFox\Type $class_name */
+				$this->TYPES[$class_name::$TYPE] = $class_name;
 			}
-			Cache::I()->Put('FactoryTypes', $this->TYPES);
 		}
 	}
 

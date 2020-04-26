@@ -6,27 +6,21 @@ namespace BlackFox;
  * Class CacheDriverRedis
  * @package BlackFox
  */
-class CacheDriverRedis extends Cache {
+class CacheRedis extends Cache {
 
 	private $example_config = [
 		'cache' => [
-			'default' => [
-				'hosts' => [[
-					'host'    => '127.0.0.1',
-					'port'    => 6379,
-					'timeout' => 1,
-				]],
-			],
+			'hosts' => [[
+				'host'    => '127.0.0.1',
+				'port'    => 6379,
+				'timeout' => 1,
+			]],
 		],
 	];
 
 	private $Redis;
 
-	public function __construct($params = null) {
-		if (empty($params)) {
-			global $CONFIG;
-			$params = $CONFIG['cache']['default'];
-		}
+	public function Init(array $params) {
 		$this->Redis = new \Redis();
 		foreach ($params['hosts'] as $host) {
 			@$result = $this->Redis->connect(

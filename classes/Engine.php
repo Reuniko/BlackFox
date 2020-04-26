@@ -33,6 +33,8 @@ class Engine {
 	public $DB;
 	/** @var User $USER */
 	public $USER;
+	/** @var Cache $Cache */
+	public $Cache;
 
 	public $TITLE = "";
 	public $KEYWORDS = "";
@@ -65,6 +67,7 @@ class Engine {
 		$this->InitAutoloadClasses();
 		$this->RegisterCoreClasses('BlackFox');
 		$this->InitDatabase();
+		$this->InitCache();
 	}
 
 	/**
@@ -100,9 +103,13 @@ class Engine {
 	 * Initializes the main connection to the default database
 	 */
 	public function InitDatabase() {
-		/** @var Database $DB */
 		$this->DB = Database::I();
 		$this->DB->Init($this->config['database']);
+	}
+
+	public function InitCache() {
+		$this->Cache = Cache::I();
+		$this->Cache->Init($this->config['cache']);
 	}
 
 	/**

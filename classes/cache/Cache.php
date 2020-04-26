@@ -4,12 +4,14 @@ namespace BlackFox;
 
 /**
  * Base cache driver should to be replaced with any working child.
- * To replace classes go to config, section 'redirects'.
- * @package BlackFox
+ * To replace classes go to config, section 'overrides'.
  */
 class Cache {
 
 	use Instance;
+
+	public function Init(array $params) {
+	}
 
 	/**
 	 * Method tries to get cached value(s) by it's\their's key(s):
@@ -54,6 +56,7 @@ class Cache {
 	 * @param mixed $value value
 	 * @param int|null $ttl time to live (optional)
 	 * @param array $tags tags (optional)
+	 * @throws ExceptionCache
 	 */
 	public function Set(string $key, $value, int $ttl = null, array $tags = []) {
 		$this->Delete($key);
