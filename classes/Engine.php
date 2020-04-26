@@ -51,6 +51,10 @@ class Engine {
 
 	public $DELAYED = [];
 
+	public function GetConfig() : array {
+		return require($_SERVER['DOCUMENT_ROOT'] . '/config.php');
+	}
+
 	/**
 	 * Engine constructor:
 	 * - Initializes (and prolongs) user session
@@ -58,11 +62,10 @@ class Engine {
 	 * - Links autoload class system to $this->AutoloadClass()
 	 * - Loads module 'BlackFox'
 	 * - Initializes the main connection to the default database
-	 * @param array $config
 	 * @throws Exception
 	 */
-	public function Init($config) {
-		$this->InitConfig($config);
+	public function __construct() {
+		$this->InitConfig($this->GetConfig());
 		$this->InitUserSession();
 		$this->InitAutoloadClasses();
 		$this->RegisterCoreClasses('BlackFox');
@@ -71,9 +74,12 @@ class Engine {
 	}
 
 	/**
-	 * Reads main config into $this->config, $this->roots and $this->cores
+	 * Parses main config into props: config, roots, cores, templates, languages.
+	 * Adds overrides from $config['overrides'].
+	 * @param array $config
+	 * @throws Exception
 	 */
-	public function InitConfig($config) {
+	public function InitConfig(array $config) {
 		$this->config = $config;
 		$this->roots = $config['roots'];
 		$this->cores = $config['cores'];
@@ -107,6 +113,9 @@ class Engine {
 		$this->Database->Init($this->config['database']);
 	}
 
+	/**
+	 * Initializes the main connection to the default cache
+	 */
 	public function InitCache() {
 		$this->Cache = Cache::I();
 		$this->Cache->Init($this->config['cache']);

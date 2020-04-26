@@ -43,8 +43,8 @@ abstract class ACore {
 	 * @return array dictionary: key - class name (with namespace), value - absolute path to php-file with class
 	 */
 	public function GetClasses() {
-		list($namespace) = explode('\\', get_called_class());
-		$core_absolute_path = Engine::I()->cores[$namespace];
+		$ReflectionClass = new \ReflectionClass(get_called_class());
+		$core_absolute_path = dirname($ReflectionClass->getFileName());
 
 		$files = [];
 		$files += $this->ScanDirectoryRecursive("{$core_absolute_path}/classes");
@@ -53,7 +53,7 @@ abstract class ACore {
 		$classes = [];
 		foreach ($files as $path => $file) {
 			if ($file['extension'] === 'php') {
-				$classes[$namespace . '\\' . $file['filename']] = $path;
+				$classes[$ReflectionClass->getNamespaceName() . '\\' . $file['filename']] = $path;
 			}
 		}
 		return $classes;

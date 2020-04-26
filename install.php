@@ -5,12 +5,8 @@ if (php_sapi_name() <> 'cli') die('Console usage only');
 $_SERVER["DOCUMENT_ROOT"] = __DIR__ . '/../';
 
 require_once("includes.php");
-
-\BlackFox\Engine::I()->RegisterCoreClasses('BlackFox');
-\BlackFox\Engine::I()->InitDatabase();
-
-\BlackFox\Core::I()->Upgrade();
-echo "\r\n BlackFox module upgraded;";
+\BlackFox\Engine::I()->Upgrade();
+echo "\r\n BlackFox core has been upgraded;";
 
 try {
 	$group_id = \BlackFox\Groups::I()->Create([
@@ -29,5 +25,5 @@ try {
 	]);
 	echo "\r\n User linked to group;";
 } catch (\BlackFox\Exception $error) {
-	echo "\r\n Error:" . $error->GetMessage();
+	echo "\r\n Error: " . $error->GetMessage();
 }

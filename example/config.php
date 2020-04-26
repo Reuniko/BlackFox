@@ -27,7 +27,7 @@ return [
 	],
 	'overrides' => [
 		// 'BlackFox\Engine' => 'Site\Engine',
-		// 'BlackFox\Cache' => 'BlackFox\CacheDriverRedis',
+		// 'BlackFox\Cache' => 'BlackFox\CacheRedis',
 		'BlackFox\Database' => 'BlackFox\MySQL',
 	],
 	'database'  => [

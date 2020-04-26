@@ -18,6 +18,7 @@ class CacheRedis extends Cache {
 		],
 	];
 
+	/**@var \Redis $Redis */
 	private $Redis;
 
 	public function Init(array $params) {
