@@ -4,6 +4,8 @@ namespace BlackFox;
 
 abstract class Unit {
 
+	use Instance;
+
 	/** @var string Наименование */
 	public $name;
 	/** @var string Описание */
@@ -18,11 +20,9 @@ abstract class Unit {
 
 	/** @var array предки компонента */
 	public $parents = [];
-	/** @var string get_called_class */
+	/** @var Unit get_called_class */
 	public $class = '...';
-	/** @var string шаблон - имя папки шаблона в подпапке /templates/ */
-	public $template = 'default';
-	/** @var string отображение - имя php файла подключаемого в папке шаблона */
+	/** @var string отображение - имя php файла подключаемого в подпапке /views */
 	public $view = null;
 
 	/** @var array запрос пользователя */
@@ -47,27 +47,27 @@ abstract class Unit {
 	public $unit_absolute_folder;
 	/** @var string относительный путь к папке юнита */
 	public $unit_relative_folder;
-	/** @var string абсолютный путь к папке шаблона */
-	public $template_absolute_folder;
-	/** @var string относительный путь к папке шаблона */
-	public $template_relative_folder;
+	/** @var string абсолютный путь к папке с отображениями */
+	public $view_absolute_folder;
+	/** @var string относительный путь к папке с отображениями */
+	public $view_relative_folder;
 
-	public function __construct(string $template = 'default') {
-		// Do not remove local variable $ENGINE, it needs for phpStorm to detect $this->ENGINE as instance of class
-		/** @var Engine $ENGINE */
-		$ENGINE = Engine::I();
-		$this->ENGINE = $ENGINE;
-
-		// Do not remove local variable $USER, it needs for phpStorm to detect $this->USER as instance of class
-		/** @var User $USER */
-		$USER = User::I();
-		$this->USER = $USER;
+	public function __construct(
+		Engine $Engine = null,
+		User $User = null
+	) {
+		$this->ENGINE = $Engine ?: Engine::I();
+		$this->USER = $User ?: User::I();
 
 		$this->class = get_called_class();
 		$this->name = $this->name ?: $this->class;
-		$this->parents[$this->class] = dirname($this->ENGINE->classes[$this->class]); // $this->ENGINE->GetAbsolutePath($this->ENGINE->cores[$namespace] . "/units/{$unit}");
+		$this->parents[$this->class] = dirname($this->ENGINE->classes[$this->class]);
+
 		$this->unit_absolute_folder = $this->parents[$this->class];
 		$this->unit_relative_folder = $this->ENGINE->GetRelativePath($this->unit_absolute_folder);
+
+		$this->view_absolute_folder = $this->unit_absolute_folder . '/views';
+		$this->view_relative_folder = $this->unit_relative_folder . '/views';
 
 		// collect info about all parents including self, excluding abstract classes
 		$parents = class_parents($this);
@@ -75,36 +75,29 @@ abstract class Unit {
 			if ((new \ReflectionClass($parent))->isAbstract()) {
 				continue;
 			}
-			$this->parents[$parent] = dirname($this->ENGINE->classes[$parent]); // $this->ENGINE->GetAbsolutePath($this->ENGINE->cores[$namespace] . "/units/{$unit}");
+			$this->parents[$parent] = dirname($this->ENGINE->classes[$parent]);
 		}
-
-		$this->template = $this->SelectTemplateFolder($template ?: 'default');
-		$this->template_absolute_folder = $this->unit_absolute_folder . '/templates/' . $this->template;
-		$this->template_relative_folder = $this->ENGINE->GetRelativePath($this->template_absolute_folder);
-	}
-
-	/**
-	 * Метод должен вычислить и вернуть путь <template> к папке шаблона относительно папки templates:
-	 * /<core>/units/<unit>/templates/<template>
-	 *
-	 * @param string $template
-	 * @return string
-	 */
-	public function SelectTemplateFolder($template) {
-		return $template;
 	}
 
 	public static function Run($params = [], $request = []) {
-		$self = new static($params['TEMPLATE'] ?: 'default');
+		/**@var Unit $class */
+		$class = get_called_class();
+		/**@var Unit $Unit */
+		$Unit = $class::I();
 		try {
-			$self->Execute($params, $request);
+			$Unit->Execute($params, $request);
 		} catch (Exception $error) {
-			Engine::I()->ShowErrors($error->getArray());
+			$Unit->ENGINE->ShowErrors($error->getArray());
 		} catch (\Exception $error) {
-			Engine::I()->ShowErrors([$error->getMessage()]);
+			$Unit->ENGINE->ShowErrors([$error->getMessage()]);
 		}
 	}
 
+	/**
+	 * @param array $params
+	 * @param array $request
+	 * @throws Exception
+	 */
 	public function Execute($params = [], $request = []) {
 		$this->Init($params);
 		$this->SetAlertsFromSession();
@@ -187,7 +180,9 @@ abstract class Unit {
 	}
 
 	public function Debug($data, $title = '', $mode = 'print_r', $target = '/debug.txt') {
-		debug($data, $title, $mode, $target);
+		if (function_exists('debug')) {
+			debug($data, $title, $mode, $target);
+		}
 	}
 
 	/**
@@ -250,7 +245,7 @@ abstract class Unit {
 			throw new Exception("Unit '{$this->name}', controller can't find any actions");
 		}
 		$final_action = array_pop($actions);
-		$this->view = $this->view ?: strtolower($final_action);
+		$this->view = $this->view ?: $final_action;
 		$result = [];
 
 		foreach ($actions as $action) {
@@ -325,7 +320,7 @@ abstract class Unit {
 	 * @param array $request
 	 * @return array
 	 */
-	public function Error($Exception, $action = null, $request = []) {
+	public function Error(Exception $Exception, $action = null, $request = []) {
 		$this->Debug($Exception, '$Exception');
 		foreach ($Exception->getArray() as $error) {
 			$this->ALERTS[] = [
@@ -391,7 +386,7 @@ abstract class Unit {
 	 */
 	public function Path($path) {
 		foreach ($this->parents as $unit => $unit_folder) {
-			$search = "{$unit_folder}/templates/{$this->template}/{$path}";
+			$search = "{$unit_folder}/views/{$path}";
 			if (file_exists($search)) {
 				return $search;
 			}
@@ -407,22 +402,22 @@ abstract class Unit {
 		}
 	}
 
-	public function TemplateParentPath() {
-		$template_file = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'];
-		$template_file = str_replace('\\', '/', $template_file);
-		$template_folder = str_replace('\\', '/', $this->template_absolute_folder);
-		$relative_template_file = str_replace($template_folder, '', $template_file);
+	public function GetParentView() {
+		$view_file = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS)[0]['file'];
+		$view_file = str_replace('\\', '/', $view_file);
+		$view_folder = str_replace('\\', '/', $this->view_absolute_folder);
+		$view_relative_path = str_replace($view_folder, '', $view_file);
 		//debug($this->units, '$this->units');
-		foreach ($this->parents as $object => $path) {
-			if ($this->class === $object) {
+		foreach ($this->parents as $unit => $unit_folder) {
+			if ($this->class === $unit) {
 				continue;
 			}
-			$search = "{$path}/templates/{$this->template}{$relative_template_file}";
+			$search = "{$unit_folder}/views{$view_relative_path}";
 			if (file_exists($search)) {
 				return $search;
 			}
 		}
-		throw new Exception("Template parent path not found");
+		throw new Exception("Parent's view not found");
 	}
 
 	public function ShowAlerts() {

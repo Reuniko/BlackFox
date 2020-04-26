@@ -1,7 +1,7 @@
 <?php /** @var \BlackFox\Adminer $this */ ?>
 <?php /** @var array $RESULT */ ?>
 <? if ($RESULT['MODE'] <> 'Create'): ?>
-	<? require $this->TemplateParentPath(); ?>
+	<? require $this->GetParentView(); ?>
 <? else: ?>
 	<form method="post" enctype="multipart/form-data">
 		<label class="btn btn-secondary btn-file m-0">

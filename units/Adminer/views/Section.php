@@ -1,4 +1,5 @@
 <?php /** @var \BlackFox\Adminer $this */ ?>
+<?php /** @var array $RESULT */ ?>
 <div class="adminer">
 
 	<? require($this->Path('section_settings.php')); ?>

@@ -2,7 +2,7 @@
 if (!function_exists('debug')) {
 	/**
 	 * Базовая глобальная отладка
-	 * работает только если в config.php определен ключ 'debug' => true
+	 * работает только если в /config.php определен ключ 'debug' => true
 	 * не работает, если в реквесте указан ключ 'turn_off_debug' (удобно для финальных AJAX-запросов)
 	 *
 	 * @param mixed $data переменная для отладки
@@ -17,8 +17,11 @@ if (!function_exists('debug')) {
 	 * @param string $target путь отправки: имя файла или почтовый адрес
 	 */
 	function debug($data = [], $title = '', $mode = 'print_r', $target = '/debug.txt') {
-		global $CONFIG;
-		if (!$CONFIG['debug']) {
+		static $config;
+		if (empty($config)) {
+			$config = require($_SERVER['DOCUMENT_ROOT'] . '/config.php');
+		}
+		if (!$config['debug']) {
 			return;
 		}
 		if (isset($_REQUEST['turn_off_debug']) || isset($_REQUEST['TURN_OFF_DEBUG'])) {
