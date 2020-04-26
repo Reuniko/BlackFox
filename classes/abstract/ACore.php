@@ -2,7 +2,9 @@
 
 namespace BlackFox;
 
-abstract class ACore extends Instanceable {
+abstract class ACore {
+
+	use Instance;
 
 	public $description = 'Redefine $name, $description и $version';
 	public $version = '1.0';

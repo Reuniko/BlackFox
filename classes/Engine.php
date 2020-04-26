@@ -2,7 +2,9 @@
 
 namespace BlackFox;
 
-class Engine extends Instanceable {
+class Engine {
+
+	use Instance;
 
 	public $config = [];
 	public $cores = [];
@@ -54,17 +56,31 @@ class Engine extends Instanceable {
 	 * - Links autoload class system to $this->AutoloadClass()
 	 * - Loads module 'BlackFox'
 	 * - Initializes the main connection to the default database
-	 *
+	 * @param array $config
 	 * @throws Exception
 	 */
-	public function __construct() {
+	public function Init($config) {
+		$this->InitConfig($config);
 		$this->InitUserSession();
-		$this->InitMainConfig();
 		$this->InitAutoloadClasses();
+		$this->RegisterCoreClasses('BlackFox');
+		$this->InitDatabase();
 	}
 
 	/**
-	 * Initializes (and prolongs) user session
+	 * Reads main config into $this->config, $this->roots and $this->cores
+	 */
+	public function InitConfig($config) {
+		$this->config = $config;
+		$this->roots = $config['roots'];
+		$this->cores = $config['cores'];
+		$this->templates = $config['templates'];
+		$this->languages = $config['languages'];
+		Instance::AddOverrides($config['overrides'] ?: []);
+	}
+
+	/**
+	 * Initializes and prolongs a user's session
 	 */
 	public function InitUserSession() {
 		session_start();
@@ -72,16 +88,6 @@ class Engine extends Instanceable {
 		setcookie(session_name(), session_id(), time() + $lifetime, '/');
 	}
 
-	/**
-	 * Reads main config into $this->config, $this->roots and $this->cores
-	 */
-	public function InitMainConfig() {
-		$this->config = require($_SERVER["DOCUMENT_ROOT"] . '/config.php');
-		$this->roots = $this->config['roots'];
-		$this->cores = $this->config['cores'];
-		$this->templates = $this->config['templates'];
-		$this->languages = $this->config['languages'];
-	}
 
 	/**
 	 * Links autoload class system to $this->AutoloadClass()
@@ -95,8 +101,8 @@ class Engine extends Instanceable {
 	 */
 	public function InitDatabase() {
 		/** @var Database $DB */
-		$DB = Database::InstanceDefault($this->config['database']);
-		$this->DB = $DB;
+		$this->DB = Database::I();
+		$this->DB->Init($this->config['database']);
 	}
 
 	/**
@@ -251,10 +257,10 @@ class Engine extends Instanceable {
 	/**
 	 * Loads the default instance of the user
 	 */
-	public function LoadUser() {
+	public function InitUser() {
 		/** @var User $USER */
-		$USER = User::InstanceDefault();
-		$this->USER = $USER;
+		$this->USER = User::I();
+		$this->USER->Init($_SESSION['USER']['ID'] ?: null);
 	}
 
 	/**
@@ -268,12 +274,8 @@ class Engine extends Instanceable {
 	 * - Outputs the result of the work
 	 */
 	public function Work() {
-
-		$this->RegisterCoreClasses('BlackFox');
-		$this->InitDatabase();
-
 		$this->LoadSectionInfo();
-		$this->LoadUser();
+		$this->InitUser();
 
 		$this->SetContent();
 		$this->WrapContent();

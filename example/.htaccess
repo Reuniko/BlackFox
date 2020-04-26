@@ -1,0 +1,36 @@
+ErrorDocument 404 /Site/root/404.html
+ErrorDocument 500 /Site/root/500.html
+
+php_flag display_startup_errors on
+php_flag display_errors on
+php_flag html_errors on
+
+<IfModule mod_dir.c>
+	DirectoryIndex index.php .router.php
+</IfModule>
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+
+	# если [в запросе нет точек] и [он не заканчивается на слеш]
+	# то [автодополняет слешем конец запроса]
+	RedirectMatch ^([^\.]*[^/])$ $1/
+
+	# если [запрос на php файл] или [запрос на директорию]
+	# то [перенаправляет запрос в движок]
+	RewriteCond %{REQUEST_URI} !/index.php$
+	RewriteRule ^[^\.]*$|\.php$ /index.php [L]
+
+	# если [запрос на статичный существующий файл]
+	# то [ничего не изменяет]
+	RewriteCond %{REQUEST_FILENAME} -f
+	RewriteRule (.*) $1 [L]
+
+	# если [запрос на статичный несуществующий файл]
+	# если [файл существует в /Site/root/]
+	# то [автодополнение /Site/root/]
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{DOCUMENT_ROOT}/Site/root/%{REQUEST_URI} -f
+	RewriteRule (.*) /Site/root/$1 [L]
+
+</IfModule>

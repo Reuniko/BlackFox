@@ -2,14 +2,11 @@
 
 namespace BlackFox;
 
-class DatabaseDriverMySQL extends Database {
+class MySQL extends Database {
 
-	/**
-	 * @var \mysqli
-	 */
 	private $link;
 
-	public function __construct($params = []) {
+	public function Init(array $params) {
 
 		$this->database = $params['DATABASE'];
 

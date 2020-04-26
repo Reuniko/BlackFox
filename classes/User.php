@@ -2,7 +2,9 @@
 
 namespace BlackFox;
 
-class User extends Instanceable {
+class User {
+use Instance;
+
 
 	/** @var null|int user identifier */
 	public $ID = null;
@@ -11,17 +13,13 @@ class User extends Instanceable {
 	/** @var array user groups (list) */
 	public $GROUPS = [];
 
-	public function __construct($ID = null) {
-		$this->Load($ID ?: $_SESSION['USER']['ID'] ?: null);
-	}
-
 	/**
 	 * Load the data about user
 	 *
 	 * @param null|int $ID null or user identifier
 	 * @throws Exception User not found
 	 */
-	public function Load($ID) {
+	public function Init($ID) {
 		$this->ID = $ID;
 		$this->FIELDS = [];
 		$this->GROUPS = [];
@@ -104,12 +102,12 @@ class User extends Instanceable {
 			'MESSAGE' => 'Successful authorization',
 		]);
 		$_SESSION['USER']['ID'] = $ID;
-		$this->Load($ID);
+		$this->Init($ID);
 	}
 
 	public function Logout() {
 		unset($_SESSION['USER']);
-		$this->Load(null);
+		$this->Init(null);
 	}
 
 	public function IsAuthorized() {

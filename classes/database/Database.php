@@ -2,11 +2,13 @@
 
 namespace BlackFox;
 
-abstract class Database extends Instanceable {
+abstract class Database {
+
+	use Instance;
 
 	public $database;
 
-	abstract function __construct($params);
+	abstract function Init(array $params);
 
 	/**
 	 * Execute SQL query and return a result as array

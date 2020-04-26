@@ -2,11 +2,11 @@
 
 namespace BlackFox;
 
-class DatabaseDriverPostgres extends Database {
+class Postgres extends Database {
 
 	private $link;
 
-	public function __construct($params = []) {
+	public function Init(array $params) {
 
 		$this->database = $params['DATABASE'];
 

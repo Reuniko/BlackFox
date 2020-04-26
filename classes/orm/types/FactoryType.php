@@ -2,7 +2,9 @@
 
 namespace BlackFox;
 
-class FactoryType extends Instanceable {
+class FactoryType {
+
+	use Instance;
 
 	public $TYPES = [];
 

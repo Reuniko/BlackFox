@@ -20,13 +20,15 @@ namespace BlackFox;
  * - при необходимости переопределить другие методы (например проверки целостности при создании или редактировании записи)
  * - при необходимости добавить дополнительный функционал, описывающий бизнес-логику работы с данными
  */
-abstract class SCRUD extends Instanceable {
+abstract class SCRUD {
+
+	use Instance;
 
 	/** @var string последний выполненный SQL-запрос (для отладки) */
 	public $SQL;
 	/** @var array части от последнего SQL-запроса (для отладки) */
 	public $parts;
-	/** @var \BlackFox\Database коннектор базы данных */
+	/** @var Database коннектор базы данных */
 	protected $DB;
 
 	/** @var string имя источника данных или таблицы или сущностей в ней */
@@ -60,10 +62,9 @@ abstract class SCRUD extends Instanceable {
 	];
 
 
-	public function __construct() {
-		/** @var \BlackFox\Database $DB */
-		$DB = Database::I();
-		$this->DB = $DB;
+	public function __construct(Database $Database = null) {
+		/** @var Database $DB */
+		$this->DB = $Database ?: Database::I();
 		$this->code = strtolower(implode('_', array_filter(explode('\\', static::class))));
 		$this->Init();
 		$this->ProvideIntegrity();

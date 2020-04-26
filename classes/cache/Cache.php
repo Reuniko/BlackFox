@@ -7,7 +7,9 @@ namespace BlackFox;
  * To replace classes go to config, section 'redirects'.
  * @package BlackFox
  */
-class Cache extends Instanceable {
+class Cache {
+
+	use Instance;
 
 	/**
 	 * Method tries to get cached value(s) by it's\their's key(s):

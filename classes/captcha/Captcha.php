@@ -1,7 +1,9 @@
 <?php
 
 namespace BlackFox;
-class Captcha extends Instanceable {
+class Captcha {
+
+	use Instance;
 
 	public function Show($params = []) {
 		return;
