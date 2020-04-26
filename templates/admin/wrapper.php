@@ -30,11 +30,11 @@
 
 	<div class="float-right">
 
-		<? if ($this->USER->IsAuthorized()): ?>
+		<? if ($this->User->IsAuthorized()): ?>
 			<span class="btn-group">
-				<a class="btn btn-secondary" href="/admin/BlackFox/Users.php?ID=<?= $this->USER->ID ?>">
+				<a class="btn btn-secondary" href="/admin/BlackFox/Users.php?ID=<?= $this->User->ID ?>">
 					<i class="fa fa-user"></i>
-					<span class="d-none d-md-inline-block"><?= $this->USER->FIELDS['LOGIN'] ?></span>
+					<span class="d-none d-md-inline-block"><?= $this->User->FIELDS['LOGIN'] ?></span>
 				</a>
 				<a class="btn btn-secondary" href="/admin/logout.php" title="<?= T([
 					'en' => 'Logout',

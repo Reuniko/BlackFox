@@ -29,10 +29,10 @@ class Engine {
 
 	public $url = [];
 
-	/** @var Database $DB */
-	public $DB;
-	/** @var User $USER */
-	public $USER;
+	/** @var Database $Database */
+	public $Database;
+	/** @var User $User */
+	public $User;
 	/** @var Cache $Cache */
 	public $Cache;
 
@@ -103,8 +103,8 @@ class Engine {
 	 * Initializes the main connection to the default database
 	 */
 	public function InitDatabase() {
-		$this->DB = Database::I();
-		$this->DB->Init($this->config['database']);
+		$this->Database = Database::I();
+		$this->Database->Init($this->config['database']);
 	}
 
 	public function InitCache() {
@@ -135,19 +135,19 @@ class Engine {
 		unset($rules['*']);
 
 		if ($rules['@'] === true) {
-			if ($this->USER->IsAuthorized()) {
+			if ($this->User->IsAuthorized()) {
 				return;
 			}
 		}
 
 		foreach ($rules as $rule_group => $rule_right) {
 			if ($rule_right === true) {
-				if (in_array($rule_group, $this->USER->GROUPS ?: [])) {
+				if (in_array($rule_group, $this->User->GROUPS ?: [])) {
 					return;
 				}
 			}
 		}
-		if ($this->USER->IsAuthorized()) {
+		if ($this->User->IsAuthorized()) {
 			throw new ExceptionAccessDenied('This section requires higher privileges');
 		} else {
 			throw new ExceptionAuthRequired('This section requires authorization');
@@ -266,8 +266,8 @@ class Engine {
 	 */
 	public function InitUser() {
 		/** @var User $USER */
-		$this->USER = User::I();
-		$this->USER->Init($_SESSION['USER']['ID'] ?: null);
+		$this->User = User::I();
+		$this->User->Init($_SESSION['USER']['ID'] ?: null);
 	}
 
 	/**
@@ -684,8 +684,8 @@ class Engine {
 		$_lang = &$_SESSION['USER']['LANGUAGE'];
 		if (!empty($_lang)) return $_lang;
 
-		if (is_object($this->USER) and $this->USER->IsAuthorized()) {
-			$_lang = $this->USER->FIELDS['LANGUAGE'];
+		if (is_object($this->User) and $this->User->IsAuthorized()) {
+			$_lang = $this->User->FIELDS['LANGUAGE'];
 		} else {
 			$_lang = $this->GetDefaultLanguage();
 		}
@@ -725,8 +725,8 @@ class Engine {
 			]));
 		}
 		$_SESSION['USER']['LANGUAGE'] = $language;
-		if ($this->USER->IsAuthorized()) {
-			Users::I()->Update($this->USER->ID, ['LANGUAGE' => $language]);
+		if ($this->User->IsAuthorized()) {
+			Users::I()->Update($this->User->ID, ['LANGUAGE' => $language]);
 		}
 	}
 }
