@@ -15,7 +15,7 @@ class TypeArray extends TypeText {
 		$code = $this->info['CODE'];
 		$element[$code] = json_decode($element[$code], true);
 		if (json_last_error()) {
-			$element[$code] = [];
+			$element[$code] = null;
 		}
 		return $element;
 	}

@@ -51,7 +51,7 @@ class Engine {
 
 	public $DELAYED = [];
 
-	public function GetConfig() : array {
+	public function GetConfig(): array {
 		return require($_SERVER['DOCUMENT_ROOT'] . '/config.php');
 	}
 
@@ -117,8 +117,10 @@ class Engine {
 	 * Initializes the main connection to the default cache
 	 */
 	public function InitCache() {
-		$this->Cache = Cache::I();
-		$this->Cache->Init($this->config['cache']);
+		if (!empty($this->config['cache'])) {
+			$this->Cache = Cache::I();
+			$this->Cache->Init($this->config['cache']);
+		}
 	}
 
 	/**
