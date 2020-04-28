@@ -5,7 +5,7 @@ namespace BlackFox;
 class TypeText extends Type {
 
 	public function PrintValue($value) {
-		if ($this->info['WYSIWYG']) {
+		if ($this->field['WYSIWYG']) {
 			$value = htmlspecialchars_decode($value);
 			$value = strip_tags($value);
 		}
@@ -21,9 +21,9 @@ class TypeText extends Type {
 			class="<?= $class ?>"
 			id="<?= $name ?>"
 			name="<?= $name ?>"
-			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+			<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 			rows="5"
-			<? if ($this->info['WYSIWYG']): ?>
+			<? if ($this->field['WYSIWYG']): ?>
 				data-wysiwyg=""
 				data-wysiwyg-height="300"
 			<? endif; ?>
@@ -32,7 +32,7 @@ class TypeText extends Type {
 	}
 
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		?>
 		<input
 			type="text"

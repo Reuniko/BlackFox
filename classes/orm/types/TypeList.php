@@ -12,7 +12,7 @@ class TypeList extends TypeText {
 	}
 
 	public function FormatOutputValue($element) {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		$element[$code] = json_decode($element[$code], true);
 		if (json_last_error()) {
 			$element[$code] = [];
@@ -80,7 +80,7 @@ class TypeList extends TypeText {
 						class="<?= $class ?>"
 						name="<?= $name ?>[]"
 						value="<?= $element ?>"
-						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+						<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 					>
 					<div class="input-group-append">
 						<button class="btn btn-secondary" type="button" data-delete="">

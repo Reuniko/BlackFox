@@ -11,7 +11,7 @@ class TypeDate extends Type {
 	}
 
 	public function FormatOutputValue($element) {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		$element[$code . '|TIMESTAMP'] = strtotime($element[$code]);
 		return $element;
 	}
@@ -25,14 +25,14 @@ class TypeDate extends Type {
 			name="<?= $name ?>"
 			placeholder=""
 			value="<?= $value ?>"
-			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+			<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 			data-datepicker=""
 		/>
 		<?
 	}
 
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		?>
 		<div class="row no-gutters">
 			<div class="col-6">

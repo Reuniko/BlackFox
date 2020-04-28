@@ -5,8 +5,8 @@ namespace BlackFox;
 class TypeFile extends TypeOuter {
 
 	public function ProvideInfoIntegrity() {
-		if (empty($this->info['LINK'])) {
-			$this->info['LINK'] = 'BlackFox\Files';
+		if (empty($this->field['LINK'])) {
+			$this->field['LINK'] = 'BlackFox\Files';
 		}
 	}
 
@@ -15,7 +15,7 @@ class TypeFile extends TypeOuter {
 			return (int)$value;
 		}
 		if (is_array($value)) {
-			return $this->info['LINK']::I()->Create($value);
+			return $this->field['LINK']::I()->Create($value);
 		}
 		return null;
 	}
@@ -26,7 +26,7 @@ class TypeFile extends TypeOuter {
 			<? if (User::I()->InGroup('root')): ?>
 				<?
 				/** @var \BlackFox\Files $Link */
-				$Link = $this->info['LINK']::I();
+				$Link = $this->field['LINK']::I();
 				?>
 				[<a target="_blank" href="<?= $Link->GetAdminUrl() ?>?ID=<?= $value['ID'] ?>"><?= $value['ID'] ?></a>]
 			<? endif; ?>
@@ -38,7 +38,7 @@ class TypeFile extends TypeOuter {
 	public function PrintFormControl($value, $name, $class = 'form-control') {
 		Engine::I()->AddHeaderScript(Engine::I()->GetRelativePath(__DIR__ . '/TypeFile.js'));
 		/** @var \BlackFox\Files $Link */
-		$Link = $this->info['LINK']::I();
+		$Link = $this->field['LINK']::I();
 		$url = $Link->GetAdminUrl();
 		$ID = isset($value['ID']) ? $value['ID'] : null;
 		?>

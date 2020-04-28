@@ -163,13 +163,13 @@ class Users extends SCRUD {
 				]),
 			],
 			'GROUPS'          => [
-				'TYPE'  => 'INNER',
-				'NAME'  => T([
+				'TYPE'      => 'INNER',
+				'NAME'      => T([
 					'en' => 'Groups',
 					'ru' => 'Группы',
 				]),
-				'LINK'  => 'BlackFox\Users2Groups',
-				'FIELD' => 'USER',
+				'LINK'      => 'BlackFox\Users2Groups',
+				'INNER_KEY' => 'USER',
 			],
 		];
 	}

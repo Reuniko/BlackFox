@@ -12,7 +12,7 @@ class TypePassword extends TypeString {
 			id="<?= $name ?>"
 			name="<?= $name ?>"
 			value=""
-			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+			<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 		/>
 		<?
 	}

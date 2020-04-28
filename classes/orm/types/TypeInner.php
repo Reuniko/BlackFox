@@ -7,10 +7,10 @@ class TypeInner extends Type {
 	public $virtual = true;
 
 	public function ProvideInfoIntegrity() {
-		if (empty($this->info['FIELD'])) {
+		if (empty($this->field['INNER_KEY'])) {
 			throw new Exception(T([
-				'en' => "For '{$this->info['CODE']}' field of type INNER you must specify FIELD info",
-				'ru' => "Для поля '{$this->info['CODE']}' типа INNER необходимо указать инфо FIELD",
+				'en' => "For field '{$this->field['CODE']}' (of type INNER) you must specify key 'INNER_KEY'",
+				'ru' => "Для поля '{$this->field['CODE']}' (тип INNER) необходимо указать ключ 'INNER_KEY'",
 			]));
 		}
 	}
@@ -24,35 +24,35 @@ class TypeInner extends Type {
 	public function HookExternalField($elements, $subfields, $subsort) {
 		if (empty($elements)) return $elements;
 
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		$ids = array_keys($elements);
 
 		foreach ($elements as $id => $element) {
 			$elements[$id][$code] = [];
 		}
 		/** @var SCRUD $Link */
-		$Link = $this->info['LINK']::I();
-		$link_key_to_source = $this->info['FIELD'];
+		$Link = $this->field['LINK']::I();
+		$target_key = $this->field['INNER_KEY'];
 		try {
 			$link_key_primary = $Link->key();
 		} catch (Exception $error) {
-			$link_key_primary = $link_key_to_source;
+			$link_key_primary = $target_key;
 		}
 
 		if (empty($subfields)) {
 			$subfields = [$link_key_primary];
 		}
-		$subfields[$link_key_to_source] = $link_key_to_source;
+		$subfields[$target_key] = $target_key;
 
 		$data = $Link->Select([
-			'FILTER' => [$link_key_to_source => $ids],
+			'FILTER' => [$target_key => $ids],
 			'FIELDS' => $subfields,
 			'SORT'   => $subsort,
 		]);
 
 		foreach ($data as $associative) {
-			$ID = $associative[$link_key_to_source];
-			unset($associative[$link_key_to_source]); // remove looking back identifier
+			$ID = $associative[$target_key];
+			unset($associative[$target_key]); // remove looking back identifier
 			$elements[$ID][$code][$associative[$link_key_primary]] = $associative;
 		}
 
@@ -61,15 +61,15 @@ class TypeInner extends Type {
 
 	public function GenerateJoinAndGroupStatements(SCRUD $Current, $prefix) {
 		/** @var SCRUD $Target */
-		$Target = $this->info['LINK']::I();
+		$Target = $this->field['LINK']::I();
 
 		$current_alias = $prefix . $Current->code;
 		$current_key = $Current->key();
-		$target_alias = $prefix . $this->info['CODE'] . '__' . $Target->code;
-		$target_key = $this->info['FIELD'];
+		$target_alias = $prefix . $this->field['CODE'] . '__' . $Target->code;
+		$target_key = $this->field['INNER_KEY'];
 
-		$join_statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
-		$group_statement = "{$Current->code}." . $this->Quote($current_key);
+		$join_statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->DB->Quote($current_key) . " = {$target_alias}." . $this->DB->Quote($target_key);
+		$group_statement = "{$Current->code}." . $this->DB->Quote($current_key);
 
 		return [
 			'JOIN'  => [$target_alias => $join_statement],
@@ -79,7 +79,7 @@ class TypeInner extends Type {
 
 	public function PrintValue($value) {
 		/** @var \BlackFox\SCRUD $Link */
-		$Link = $this->info['LINK']::I();
+		$Link = $this->field['LINK']::I();
 		$url = $Link->GetAdminUrl();
 		?>
 		<ul>

@@ -17,13 +17,13 @@ class TypeFloat extends Type {
 			id="<?= $name ?>"
 			name="<?= $name ?>"
 			value="<?= $value ?>"
-			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+			<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 		>
 		<?
 	}
 
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		?>
 		<div class="row no-gutters">
 			<div class="col-6">

@@ -5,7 +5,7 @@ namespace BlackFox;
 class TypeBoolean extends Type {
 
 	public function FormatOutputValue($element) {
-		$value = &$element[$this->info['CODE']];
+		$value = &$element[$this->field['CODE']];
 		if ($value === 'f') {
 			$value = false;
 		} else {
@@ -19,8 +19,8 @@ class TypeBoolean extends Type {
 	}
 
 	public function ProvideInfoIntegrity() {
-		$this->info['NOT_NULL'] = true;
-		$this->info['DEFAULT'] = (bool)($this->info['DEFAULT'] ?: false);
+		$this->field['NOT_NULL'] = true;
+		$this->field['DEFAULT'] = (bool)($this->field['DEFAULT'] ?: false);
 	}
 
 	public function PrintValue($value) {
@@ -48,13 +48,13 @@ class TypeBoolean extends Type {
 			placeholder=""
 			value="1"
 			<?= ($value) ? 'checked' : '' ?>
-			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+			<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 		/>
 		<?
 	}
 
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		?>
 		<select
 			class="<?= $class ?>"

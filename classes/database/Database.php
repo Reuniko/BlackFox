@@ -65,10 +65,10 @@ abstract class Database {
 
 	/**
 	 * @param $table
-	 * @param $structure
+	 * @param $fields
 	 * @throws Exception
 	 */
-	abstract public function CreateTableConstraints($table, $structure);
+	abstract public function CreateTableConstraints($table, $fields);
 
 	abstract public function CompileSQLSelect(array $parts);
 

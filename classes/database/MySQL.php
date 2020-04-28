@@ -281,16 +281,15 @@ class MySQL extends Database {
 
 	}
 
-	public function CreateTableConstraints($table, $structure) {
-		foreach ($structure as $code => $Info) {
-			/** @var Type $Info */
-			if (!isset($Info['FOREIGN'])) {
+	public function CreateTableConstraints($table, $fields) {
+		foreach ($fields as $code => $field) {
+			if (!isset($field['FOREIGN'])) {
 				continue;
 			}
-			$action = is_string($Info['FOREIGN']) ? $Info['FOREIGN'] : 'RESTRICT';
+			$action = is_string($field['FOREIGN']) ? $field['FOREIGN'] : 'RESTRICT';
 			/** @var SCRUD $Link */
-			$Link = $Info['LINK']::I();
-			$link_key = $Info['FIELD'] ?: $Link->key();
+			$Link = $field['LINK']::I();
+			$link_key = $field['INNER_KEY'] ?: $Link->key();
 			$this->Query("ALTER TABLE `{$table}` ADD FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}");
 		}
 	}

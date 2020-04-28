@@ -7,8 +7,8 @@ class TypeOuter extends Type {
 	public function FormatInputValue($value) {
 		if (!is_numeric($value)) {
 			throw new ExceptionType(T([
-				'en' => "Expected numerical value for '{$this->info['CODE']}', received: '{$value}'",
-				'ru' => "Ожидалось числовое значение для '{$this->info['CODE']}', получено: '{$value}'",
+				'en' => "Expected numerical value for '{$this->field['CODE']}', received: '{$value}'",
+				'ru' => "Ожидалось числовое значение для '{$this->field['CODE']}', получено: '{$value}'",
 			]));
 		}
 		return (int)$value;
@@ -16,8 +16,8 @@ class TypeOuter extends Type {
 
 	public function FormatOutputValue($element) {
 		/** @var SCRUD $Link */
-		$Link = $this->info['LINK'];
-		$code = $this->info['CODE'];
+		$Link = $this->field['LINK'];
+		$code = $this->field['CODE'];
 		if (empty($Link)) {
 			throw new ExceptionType("Field '{$code}': link must be specified");
 		}
@@ -32,13 +32,13 @@ class TypeOuter extends Type {
 		if (empty($subfields)) {
 			return parent::PrepareSelectAndJoinByField($table, $prefix, null);
 		}
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		/** @var SCRUD $Link */
-		$Link = $this->info['LINK']::I();
+		$Link = $this->field['LINK']::I();
 		$external_prefix = $prefix . $code . "__";
 		$raw_link_code = $external_prefix . $Link->code;
 
-		$join = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}." . $this->Quote($code) . " = {$raw_link_code}." . $this->Quote($Link->key());
+		$join = "LEFT JOIN {$Link->code} AS {$raw_link_code} ON {$prefix}{$table}." . $this->DB->Quote($code) . " = {$raw_link_code}." . $this->DB->Quote($Link->key());
 		$RESULT = $Link->PreparePartsByFields($subfields, $external_prefix);
 		$RESULT['JOIN'] = array_merge([$raw_link_code => $join], $RESULT['JOIN']);
 		return $RESULT;
@@ -47,14 +47,14 @@ class TypeOuter extends Type {
 	public function GenerateJoinAndGroupStatements(SCRUD $Current, $prefix) {
 		// debug($this->info, '$this->info');
 		/** @var SCRUD $Target */
-		$Target = $this->info['LINK']::I();
+		$Target = $this->field['LINK']::I();
 
 		$current_alias = $prefix . $Current->code;
-		$current_key = $this->info['CODE'];
-		$target_alias = $prefix . $this->info['CODE'] . '__' . $Target->code;
+		$current_key = $this->field['CODE'];
+		$target_alias = $prefix . $this->field['CODE'] . '__' . $Target->code;
 		$target_key = $Target->key();
 
-		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->Quote($current_key) . " = {$target_alias}." . $this->Quote($target_key);
+		$statement = "LEFT JOIN {$Target->code} AS {$target_alias} ON {$current_alias}." . $this->DB->Quote($current_key) . " = {$target_alias}." . $this->DB->Quote($target_key);
 		return [
 			'JOIN'  => [$target_alias => $statement],
 			'GROUP' => [],
@@ -63,7 +63,7 @@ class TypeOuter extends Type {
 
 	public function PrintValue($value) {
 		/** @var \BlackFox\SCRUD $Link */
-		$Link = $this->info['LINK']::I();
+		$Link = $this->field['LINK']::I();
 		$url = $Link->GetAdminUrl();
 		$ID = is_array($value) ? $value['ID'] : $value;
 		?>
@@ -77,8 +77,8 @@ class TypeOuter extends Type {
 	public function PrintFormControl($value, $name, $class = 'form-control') {
 		// TODO move to Adminer ?
 		/** @var \BlackFox\SCRUD $Link */
-		$Link = $this->info['LINK']::I();
-		$code = $this->info['CODE'];
+		$Link = $this->field['LINK']::I();
+		$code = $this->field['CODE'];
 		$ID = is_array($value) ? $value['ID'] : $value;
 		if (!is_array($value) and !empty($value)) {
 			$value = $Link->Read($value, ['@@']);
@@ -103,11 +103,11 @@ class TypeOuter extends Type {
 					id="<?= $name ?>"
 					name="<?= $name ?>"
 					data-link-input="<?= $name ?>"
-					<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+					<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 					data-type="OUTER"
 					data-code="<?= $code ?>"
 				>
-					<? if (!$this->info['NOT_NULL']): ?>
+					<? if (!$this->field['NOT_NULL']): ?>
 						<option value=""></option>
 					<? endif; ?>
 
@@ -119,7 +119,7 @@ class TypeOuter extends Type {
 					<? endif; ?>
 				</select>
 			</div>
-			<? if (!$this->info['DISABLED'] and !$this->info['NOT_NULL']): ?>
+			<? if (!$this->field['DISABLED'] and !$this->field['NOT_NULL']): ?>
 				<button
 					type="button"
 					class="btn btn-secondary flex-shrink-1"
@@ -135,8 +135,8 @@ class TypeOuter extends Type {
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
 
 		/** @var \BlackFox\SCRUD $Link */
-		$Link = $this->info['LINK']::I();
-		$code = $this->info['CODE'];
+		$Link = $this->field['LINK']::I();
+		$code = $this->field['CODE'];
 		$IDs = $filter[$code];
 
 		if (is_array($IDs) and count($IDs) === 1) {

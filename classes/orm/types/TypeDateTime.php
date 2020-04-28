@@ -14,7 +14,7 @@ class TypeDateTime extends Type {
 	}
 
 	public function FormatOutputValue($element) {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		$element[$code . '|TIMESTAMP'] = strtotime($element[$code]);
 		return $element;
 	}
@@ -35,9 +35,9 @@ class TypeDateTime extends Type {
 
 	public function PrepareConditions($table, $operator, $values) {
 		if ($operator === '~') {
-			$code = $this->info['CODE'];
+			$code = $this->field['CODE'];
 			$data = date('Y-m-d', strtotime($values));
-			$condition = "DATE({$table}." . $this->Quote($code) . ") = '{$data}'";
+			$condition = "DATE({$table}." . $this->DB->Quote($code) . ") = '{$data}'";
 			return ['~' => $condition];
 		}
 		return parent::PrepareConditions($table, $operator, $values);
@@ -52,14 +52,14 @@ class TypeDateTime extends Type {
 			name="<?= $name ?>"
 			placeholder=""
 			value="<?= $value ?>"
-			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+			<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 			data-datetimepicker=""
 		/>
 		<?
 	}
 
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		?>
 		<div class="row no-gutters">
 			<div class="col-6">

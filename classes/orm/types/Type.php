@@ -10,19 +10,15 @@ abstract class Type {
 
 	public $virtual = false;
 
-	protected function Quote($id) {
-		return $this->DB->Quote($id);
-	}
-
 	/** @var Database */
 	public $DB;
 
 	/** @var array Settings of specific field */
-	public $info;
+	public $field;
 
-	public function __construct(array &$info, Database $DB) {
+	public function __construct(array &$field, Database $DB) {
 		$this->DB = $DB;
-		$this->info = &$info;
+		$this->field = &$field;
 		$this->ProvideInfoIntegrity();
 	}
 
@@ -120,7 +116,7 @@ abstract class Type {
 		}
 
 		foreach ($conditions as $key => $condition) {
-			$conditions[$key] = $table . "." . $this->Quote($this->info['CODE']) . $condition;
+			$conditions[$key] = $table . "." . $this->DB->Quote($this->field['CODE']) . $condition;
 		}
 
 		return $conditions;
@@ -142,8 +138,8 @@ abstract class Type {
 	 * @return array
 	 */
 	public function PrepareSelectAndJoinByField($table, $prefix, $subfields) {
-		$code = $this->info['CODE'];
-		$select["{$prefix}{$code}"] = "{$prefix}{$table}" . "." . $this->Quote("{$code}") . " as " . $this->Quote("{$prefix}{$code}");
+		$code = $this->field['CODE'];
+		$select["{$prefix}{$code}"] = "{$prefix}{$table}" . "." . $this->DB->Quote("{$code}") . " as " . $this->DB->Quote("{$prefix}{$code}");
 		return ['SELECT' => $select];
 	}
 
@@ -225,7 +221,7 @@ abstract class Type {
 	 * @param string $class
 	 */
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		?>
 		<input
 			type="text"

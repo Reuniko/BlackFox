@@ -9,8 +9,8 @@ class TypeSet extends Type {
 			$values = [$values];
 		}
 		foreach ($values as $value) {
-			if (!isset($this->info['VALUES'][$value])) {
-				throw new ExceptionType("Unknown set value '{$value}' for field '{$this->info['NAME']}'");
+			if (!isset($this->field['VALUES'][$value])) {
+				throw new ExceptionType("Unknown set value '{$value}' for field '{$this->field['NAME']}'");
 			}
 		}
 		$value = implode(',', $values);
@@ -18,7 +18,7 @@ class TypeSet extends Type {
 	}
 
 	public function FormatOutputValue($element) {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		if (empty($element[$code])) {
 			$element[$code] = [];
 		} else {
@@ -26,7 +26,7 @@ class TypeSet extends Type {
 		}
 		$element["$code|VALUES"] = [];
 		foreach ($element["$code"] as $key) {
-			$element["$code|VALUES"][$key] = $this->info['VALUES'][$key];
+			$element["$code|VALUES"][$key] = $this->field['VALUES'][$key];
 		}
 		return $element;
 	}
@@ -36,7 +36,7 @@ class TypeSet extends Type {
 		?>
 		<ul class="set">
 			<? foreach ($value as $code): ?>
-				<li><?= $this->info['VALUES'][$code] ?></li>
+				<li><?= $this->field['VALUES'][$code] ?></li>
 			<? endforeach; ?>
 		</ul>
 		<?
@@ -49,7 +49,7 @@ class TypeSet extends Type {
 			name="<?= $name ?>"
 			value=""
 		/>
-		<? foreach ($this->info['VALUES'] as $code => $display): ?>
+		<? foreach ($this->field['VALUES'] as $code => $display): ?>
 			<div>
 				<label class="enum">
 					<input
@@ -58,7 +58,7 @@ class TypeSet extends Type {
 						name="<?= $name ?>[]"
 						value="<?= $code ?>"
 						<?= (in_array($code, $value ?: [])) ? 'checked' : '' ?>
-						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+						<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 					>
 					<span class="dashed"><?= $display ?></span>
 				</label>
@@ -68,14 +68,14 @@ class TypeSet extends Type {
 	}
 
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		?>
 		<input
 			type="hidden"
 			name="<?= $group ?>[<?= $code ?>]"
 			value=""
 		/>
-		<? foreach ($this->info['VALUES'] as $value => $display): ?>
+		<? foreach ($this->field['VALUES'] as $value => $display): ?>
 			<div class="col-xs-3">
 				<label class="enum">
 					<input
@@ -84,7 +84,7 @@ class TypeSet extends Type {
 						name="<?= $group ?>[<?= $code ?>][]"
 						value="<?= $value ?>"
 						<?= (in_array($value, $filter[$code] ?: [])) ? 'checked' : '' ?>
-						<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+						<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 					>
 					<span class="dashed"><?= $display ?></span>
 				</label>

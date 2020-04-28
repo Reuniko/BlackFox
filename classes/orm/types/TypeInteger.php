@@ -7,8 +7,8 @@ class TypeInteger extends Type {
 	public function FormatInputValue($value) {
 		if (!is_numeric($value)) {
 			throw new ExceptionType(T([
-			    'en' => "Expected numerical value for '{$this->info['CODE']}', received: '{$value}'",
-			    'ru' => "Ожидалось числовое значение для '{$this->info['CODE']}', получено: '{$value}'",
+			    'en' => "Expected numerical value for '{$this->field['CODE']}', received: '{$value}'",
+			    'ru' => "Ожидалось числовое значение для '{$this->field['CODE']}', получено: '{$value}'",
 			]));
 		}
 		return (int)$value;
@@ -29,13 +29,13 @@ class TypeInteger extends Type {
 			name="<?= $name ?>"
 			placeholder=""
 			value="<?= $value ?>"
-			<?= ($this->info['DISABLED']) ? 'disabled' : '' ?>
+			<?= ($this->field['DISABLED']) ? 'disabled' : '' ?>
 		>
 		<?
 	}
 
 	public function PrintFilterControl($filter, $group = 'FILTER', $class = 'form-control') {
-		$code = $this->info['CODE'];
+		$code = $this->field['CODE'];
 		?>
 		<div class="row no-gutters">
 			<div class="col-6">
