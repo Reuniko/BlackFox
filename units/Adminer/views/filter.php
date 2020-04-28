@@ -18,7 +18,7 @@
 				]) ?></div>
 			<div class="card-body" id="filter">
 				<? foreach ($RESULT['STRUCTURE']['FILTERS'] as $code => $field): ?>
-					<? if (!isset($this->SCRUD->structure[$code])) continue; ?>
+					<? if (!isset($this->SCRUD->fields[$code])) continue; ?>
 					<div class="form-group row">
 						<label
 							class="col-sm-3 col-form-label text-sm-right"
@@ -29,7 +29,7 @@
 						<div class="col-sm-8">
 							<?
 							// -------------------------------------------------------------------------------
-							$this->SCRUD->structure[$code]->PrintFilterControl($RESULT['FILTER'], 'FILTER');
+							$this->SCRUD->fields[$code]->PrintFilterControl($RESULT['FILTER'], 'FILTER');
 							// -------------------------------------------------------------------------------
 							?>
 						</div>

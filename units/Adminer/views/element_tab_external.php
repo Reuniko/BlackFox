@@ -2,9 +2,9 @@
 <?php /** @var array $RESULT */ ?>
 <?
 /** @var \BlackFox\Type $Type */
-$Type = $this->SCRUD->structure[$RESULT['TAB']['CODE']];
+$Type = $this->SCRUD->fields[$RESULT['TAB']['CODE']];
 /** @var \BlackFox\SCRUD $Link */
-$Link = new $Type->info['LINK'];
+$Link = $Type->info['LINK']::N();
 $url = $Link->GetAdminUrl();
 $params = http_build_query([
 	'FRAME'  => $Type->info['FIELD'],

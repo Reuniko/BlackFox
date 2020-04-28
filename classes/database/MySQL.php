@@ -81,9 +81,9 @@ class MySQL extends Database {
 			case 'TEXT':
 			case 'LIST':
 				return "text";
-			case 'BOOL':
+			case 'BOOLEAN':
 				return "bool";
-			case 'NUMBER':
+			case 'INTEGER':
 			case 'OUTER':
 			case 'FILE':
 				return "int";
@@ -92,7 +92,7 @@ class MySQL extends Database {
 				$decimals = $Info['DECIMALS'] ?: 2;
 				return "float({$length},{$decimals})";
 			case 'INNER':
-				throw new ExceptionType("No structure required");
+				throw new ExceptionType("No fields required");
 			case 'TIME':
 				return "time";
 			case 'DATE':
@@ -159,19 +159,19 @@ class MySQL extends Database {
 				$this->Query("ALTER TABLE `{$table}` DROP FOREIGN KEY `{$db_constraint['CONSTRAINT_NAME']}`");
 	}
 
-	public function SynchronizeTable($table, $structure) {
+	public function SynchronizeTable($table, $fields) {
 		$strict = true;
-		if (empty($structure)) {
-			throw new Exception("Synchronize of '{$table}' failed: structure is empty");
+		if (empty($fields)) {
+			throw new Exception("Synchronize of '{$table}' failed: fields is empty");
 		}
 		$tables = $this->Query("SHOW TABLES LIKE '{$table}'");
-		$structure = array_change_key_case($structure, CASE_UPPER);
+		$fields = array_change_key_case($fields, CASE_UPPER);
 
 		$rows = [];
 		$keys = [];
 
 		if (empty($tables)) {
-			foreach ($structure as $code => $Info) {
+			foreach ($fields as $code => $Info) {
 				/** @var Type $Info */
 				if ($Info['PRIMARY']) {
 					$keys[] = $code;
@@ -199,7 +199,7 @@ class MySQL extends Database {
 			}
 
 			$last_after_code = '';
-			foreach ($structure as $code => $Info) {
+			foreach ($fields as $code => $Info) {
 				/** @var Type $Info */
 				if ($Info['PRIMARY']) {
 					$keys[] = $code;
@@ -240,7 +240,7 @@ class MySQL extends Database {
 
 		// INDEXES:
 		$db_indexes = $this->Query("SHOW INDEX FROM `{$table}`", 'Column_name');
-		foreach ($structure as $code => $Info) {
+		foreach ($fields as $code => $Info) {
 			/** @var Type $Info */
 			if (in_array($code, $keys)) {
 				continue;

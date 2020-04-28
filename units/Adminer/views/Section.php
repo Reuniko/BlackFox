@@ -43,7 +43,7 @@
 				$url = $this->SanitizeUrl('?' . http_build_query($get));
 				?>
 				<? foreach ($RESULT['STRUCTURE']['FIELDS'] as $structure_code => $field): ?>
-					<? if (!isset($this->SCRUD->structure[$structure_code])) continue; ?>
+					<? if (!isset($this->SCRUD->fields[$structure_code])) continue; ?>
 					<?
 					$direction = (($RESULT['SORT'][$structure_code] === 'ASC') ? 'DESC' : 'ASC');
 					$sort_href = $url . "&SORT[{$structure_code}]={$direction}";
@@ -97,17 +97,17 @@
 						</td>
 					<? endif; ?>
 					<? foreach ($RESULT['STRUCTURE']['FIELDS'] as $code => $field): ?>
-						<? if (!isset($this->SCRUD->structure[$code])) continue; ?>
+						<? if (!isset($this->SCRUD->fields[$code])) continue; ?>
 						<td>
-							<div class="table-content table-content-<?= $this->SCRUD->structure[$code]['TYPE'] ?>">
+							<div class="table-content table-content-<?= $this->SCRUD->fields[$code]['TYPE'] ?>">
 								<?
 								ob_start();
 								// -------------------------------------------------
-								$this->SCRUD->structure[$code]->PrintValue($row[$code]);
+								$this->SCRUD->fields[$code]->PrintValue($row[$code]);
 								// -------------------------------------------------
 								$content = ob_get_clean();
 								?>
-								<? if ($this->SCRUD->structure[$code]['PRIMARY']): ?>
+								<? if ($this->SCRUD->fields[$code]['PRIMARY']): ?>
 									<a href="<?= $href ?>"><?= $content ?></a>
 								<? else: ?>
 									<?= $content ?>

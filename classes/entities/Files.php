@@ -19,7 +19,7 @@ class Files extends SCRUD {
 				'ru' => 'Файл',
 			]),
 		];
-		$this->structure += [
+		$this->fields += [
 			'ID'          => self::ID + ['GROUP' => 'SYSTEM'],
 			'CREATE_DATE' => [
 				'TYPE'     => 'DATETIME',
@@ -50,7 +50,7 @@ class Files extends SCRUD {
 				'GROUP' => 'FILE',
 			],
 			'SIZE'        => [
-				'TYPE'  => 'NUMBER',
+				'TYPE'  => 'INTEGER',
 				'NAME'  => T([
 					'en' => 'Size',
 					'ru' => 'Размер',

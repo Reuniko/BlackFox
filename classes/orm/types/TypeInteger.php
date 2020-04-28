@@ -2,7 +2,7 @@
 
 namespace BlackFox;
 
-class TypeNumber extends Type {
+class TypeInteger extends Type {
 	public static $TYPE = 'NUMBER';
 
 	public function FormatInputValue($value) {

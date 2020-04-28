@@ -77,7 +77,7 @@ class Registration extends Unit {
 			],
 		];
 
-		foreach (Users::I()->structure as $code => $field) {
+		foreach (Users::I()->fields as $code => $field) {
 			if ($code === 'ID') {
 				continue;
 			}

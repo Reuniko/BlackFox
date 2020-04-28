@@ -49,7 +49,7 @@ class Form extends \BlackFox\Unit {
 		$fields = [];
 		foreach ($R['FIELDS'] as $key => $value) {
 			if (is_string($value)) {
-				$fields[$value] = $R['SCRUD']->structure[$value];
+				$fields[$value] = $R['SCRUD']->fields[$value];
 			} else {
 				$fields[$key] = $value;
 			}

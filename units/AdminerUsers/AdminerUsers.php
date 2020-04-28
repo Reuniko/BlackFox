@@ -10,9 +10,9 @@ class AdminerUsers extends Adminer {
 	}
 
 	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@@']) {
-		unset($this->SCRUD->structure['SALT']);
+		unset($this->SCRUD->fields['SALT']);
 		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['HASH']);
-		unset($this->SCRUD->structure['PASSWORD']);
+		unset($this->SCRUD->fields['PASSWORD']);
 		return parent::Section($FILTER, $PAGE, $SORT, $FIELDS);
 	}
 

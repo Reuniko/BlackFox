@@ -103,7 +103,7 @@ class Adminer extends \BlackFox\Unit {
 
 	public function GetDefaultValues() {
 		$values = [];
-		foreach ($this->SCRUD->structure as $code => $field) {
+		foreach ($this->SCRUD->fields as $code => $field) {
 			if (isset($field['DEFAULT'])) {
 				$values[$code] = $field['DEFAULT'];
 			}
@@ -134,7 +134,7 @@ class Adminer extends \BlackFox\Unit {
 		$R['TABS'] = $this->GetTabsOfCreate();
 
 		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
-			$this->SCRUD->structure[$code]['DISABLED'] = true;
+			$this->SCRUD->fields[$code]['DISABLED'] = true;
 		}
 
 		$this->ENGINE->AddBreadcrumb(T([
@@ -161,7 +161,7 @@ class Adminer extends \BlackFox\Unit {
 		$R['TABS'] = $this->GetTabsOfUpdate();
 
 		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
-			$this->SCRUD->structure[$code]['DISABLED'] = true;
+			$this->SCRUD->fields[$code]['DISABLED'] = true;
 		}
 
 		$this->ENGINE->AddBreadcrumb(T([
@@ -264,7 +264,7 @@ class Adminer extends \BlackFox\Unit {
 		]);
 		if (empty($settings)) {
 			$settings = [];
-			foreach ($this->SCRUD->structure as $code => $info) {
+			foreach ($this->SCRUD->fields as $code => $info) {
 				if ($info['VITAL'] or $info['PRIMARY']) {
 					$settings['FILTERS'][] = $code;
 				}
@@ -297,7 +297,7 @@ class Adminer extends \BlackFox\Unit {
 				'ACTIVE' => true,
 			],
 		];
-		foreach ($this->SCRUD->structure as $code => $info) {
+		foreach ($this->SCRUD->fields as $code => $info) {
 			if ($info['TYPE'] === 'INNER') {
 				unset($this->SCRUD->composition[$info['GROUP']]['FIELDS'][$code]);
 			}
@@ -316,7 +316,7 @@ class Adminer extends \BlackFox\Unit {
 				'ACTIVE' => true,
 			],
 		];
-		foreach ($this->SCRUD->structure as $code => $info) {
+		foreach ($this->SCRUD->fields as $code => $info) {
 			if ($info['TYPE'] === 'INNER') {
 				$tabs[$code] = [
 					'NAME' => $info['NAME'],
@@ -332,7 +332,7 @@ class Adminer extends \BlackFox\Unit {
 		$this->json = true;
 
 		try {
-			$field = $this->SCRUD->structure[$code];
+			$field = $this->SCRUD->fields[$code];
 			if (empty($field)) {
 				throw new Exception("[{$code}] not found");
 			}
@@ -346,7 +346,7 @@ class Adminer extends \BlackFox\Unit {
 
 			if (!empty($search)) {
 				$filter = ['LOGIC' => 'OR'];
-				foreach ($Link->structure as $code => $field) {
+				foreach ($Link->fields as $code => $field) {
 					if (!$field['VITAL']) continue;
 					if ($field['TYPE'] === 'STRING') {
 						$filter["~{$code}"] = $search;

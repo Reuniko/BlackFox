@@ -29,11 +29,11 @@
 
 <ul class="sortable" data-connected-sortable="settings-<?= $NAME ?>" id="settings-<?= $NAME ?>">
 
-	<? $unselected = $this->SCRUD->structure; ?>
+	<? $unselected = $this->SCRUD->fields; ?>
 	<? foreach ($SELECTED as $code): ?>
-		<? $field = $this->SCRUD->structure[$code] ?>
+		<? $field = $this->SCRUD->fields[$code] ?>
 		<? unset($unselected[$code]) ?>
-		<li data-order="<?= array_search($code, array_keys($this->SCRUD->structure)) ?>">
+		<li data-order="<?= array_search($code, array_keys($this->SCRUD->fields)) ?>">
 			<label class="m-0">
 				<input
 					type="checkbox"
@@ -46,7 +46,7 @@
 		</li>
 	<? endforeach; ?>
 	<? foreach ($unselected as $code => $field): ?>
-		<li data-order="<?= array_search($code, array_keys($this->SCRUD->structure)) ?>">
+		<li data-order="<?= array_search($code, array_keys($this->SCRUD->fields)) ?>">
 			<label class="m-0">
 				<input
 					type="checkbox"

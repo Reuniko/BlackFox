@@ -82,9 +82,9 @@ class Postgres extends Database {
 			case 'TEXT':
 			case 'LIST':
 				return "text";
-			case 'BOOL':
+			case 'BOOLEAN':
 				return "bool";
-			case 'NUMBER':
+			case 'INTEGER':
 			case 'OUTER':
 			case 'FILE':
 				return "int";
@@ -93,7 +93,7 @@ class Postgres extends Database {
 				$decimals = $Info['DECIMALS'] ?: 2;
 				return "numeric({$length},{$decimals})";
 			case 'INNER':
-				throw new ExceptionType("No structure required");
+				throw new ExceptionType("No fields required");
 			case 'TIME':
 				return "time";
 			case 'DATE':
@@ -138,14 +138,14 @@ class Postgres extends Database {
 				$this->Query("ALTER TABLE \"{$table}\" DROP CONSTRAINT \"{$db_constraint['constraint_name']}\"");
 	}
 
-	public function SynchronizeTable($table, $structure) {
+	public function SynchronizeTable($table, $fields) {
 		if (empty($table)) {
 			throw new Exception("Synchronize failed: no code of table");
 		}
-		if (empty($structure)) {
-			throw new Exception("Synchronize of '{$table}' failed: structure is empty");
+		if (empty($fields)) {
+			throw new Exception("Synchronize of '{$table}' failed: fields is empty");
 		}
-		$structure = array_change_key_case($structure, CASE_UPPER);
+		$fields = array_change_key_case($fields, CASE_UPPER);
 
 		$check = $this->Query("SELECT * FROM pg_catalog.pg_tables WHERE tablename='{$table}'");
 
@@ -153,7 +153,7 @@ class Postgres extends Database {
 
 			$rows = [];
 			$keys = [];
-			foreach ($structure as $code => $Info) {
+			foreach ($fields as $code => $Info) {
 				/** @var Type $Info */
 				if ($Info['PRIMARY']) {
 					$keys[] = $code;
@@ -189,7 +189,7 @@ class Postgres extends Database {
 			$keys = [];
 			$renames = [];
 
-			foreach ($structure as $code => $Info) {
+			foreach ($fields as $code => $Info) {
 				$code_id = $this->Quote($code);
 				/** @var Type $Info */
 				if ($Info['PRIMARY']) {
@@ -304,7 +304,7 @@ class Postgres extends Database {
 		$indexes = $this->Query($SQL, 'column_name');
 		//debug($indexes, '$indexes');
 
-		foreach ($structure as $code => $Info) {
+		foreach ($fields as $code => $Info) {
 			if (in_array($code, $keys)) {
 				continue;
 			}

@@ -58,10 +58,10 @@ abstract class Database {
 
 	/**
 	 * @param string $table code of the table
-	 * @param array $structure
+	 * @param array $fields
 	 * @throws Exception
 	 */
-	abstract public function SynchronizeTable($table, $structure);
+	abstract public function SynchronizeTable($table, $fields);
 
 	/**
 	 * @param $table

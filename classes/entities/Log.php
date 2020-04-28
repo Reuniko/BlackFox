@@ -8,7 +8,7 @@ class Log extends SCRUD {
 			'en' => 'Log',
 			'ru' => 'Журнал',
 		]);
-		$this->structure = [
+		$this->fields = [
 			'ID'      => self::ID,
 			'MOMENT'  => [
 				'TYPE'     => 'DATETIME',

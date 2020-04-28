@@ -3,14 +3,15 @@
 namespace BlackFox;
 /**
  * Class Type
- * @package BlackFox
  *
  * Parent for all data types for using in database.
  */
 abstract class Type implements \ArrayAccess {
 
+	public $virtual = false;
+
 	protected function Quote($id) {
-		return Database::I()->Quote($id);
+		return $this->DB->Quote($id);
 	}
 
 	// -------------------------------------------------------------------------------------------------------------- //
@@ -38,10 +39,14 @@ abstract class Type implements \ArrayAccess {
 	/** @var string Mnemonic code of the type */
 	public static $TYPE;
 
+	/** @var Database */
+	public $DB;
+
 	/** @var array Settings of specific field */
 	public $info;
 
-	public function __construct(array &$info) {
+	public function __construct(array &$info, Database $DB) {
+		$this->DB = $DB;
 		$this->info = &$info;
 		$this->ProvideInfoIntegrity();
 	}
@@ -90,7 +95,7 @@ abstract class Type implements \ArrayAccess {
 				unset($values[$key]);
 			} else {
 				$values[$key] = $this->FormatInputValue($values[$key]);
-				$values[$key] = Database::I()->Escape($values[$key]);
+				$values[$key] = $this->DB->Escape($values[$key]);
 			}
 		}
 

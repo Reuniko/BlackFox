@@ -7,7 +7,7 @@ class Users2Groups extends SCRUD {
 		    'en' => 'Users in groups',
 		    'ru' => 'Пользователи в группах',
 		]);
-		$this->structure = [
+		$this->fields = [
 			'ID'    => self::ID,
 			'USER'  => [
 				'TYPE'    => 'OUTER',

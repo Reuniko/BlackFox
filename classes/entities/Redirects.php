@@ -9,7 +9,7 @@ class Redirects extends \BlackFox\SCRUD {
 			'en' => 'Redirects',
 			'ru' => 'Редиректы',
 		]);
-		$this->structure = [
+		$this->fields = [
 			'ID'       => self::ID,
 			'URL'      => [
 				'TYPE'     => 'STRING',
@@ -30,7 +30,7 @@ class Redirects extends \BlackFox\SCRUD {
 				'NOT_NULL' => true,
 			],
 			'COUNT'    => [
-				'TYPE'     => 'NUMBER',
+				'TYPE'     => 'INTEGER',
 				'NAME'     => T([
 					'en' => 'Click counter',
 					'ru' => 'Количество переходов',

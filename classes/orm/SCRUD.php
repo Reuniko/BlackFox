@@ -3,7 +3,6 @@
 namespace BlackFox;
 /**
  * Class SCRUD -- Search, Create, Read, Update, Delete
- * @package BlackFox
  *
  * Предоставляет функционал для работы с источниками данных [с таблицами в базе данных]:
  * - синхронизация структуры таблицы со структурой, описанной в классе-наследнике (включая создание таблицы)
@@ -15,7 +14,7 @@ namespace BlackFox;
  *
  * Чтобы создать новый источник данных нужно:
  * - создать класс-наследник от SCRUD
- * - переопределить метод Init, определить в нем структуру данных $this->structure
+ * - переопределить метод Init, определить в нем структуру данных $this->fields
  * - однократно запустить $this->Synchronize(), например в установщике модуля
  * - при необходимости переопределить другие методы (например проверки целостности при создании или редактировании записи)
  * - при необходимости добавить дополнительный функционал, описывающий бизнес-логику работы с данными
@@ -37,10 +36,10 @@ abstract class SCRUD {
 	public $code;
 
 	/** @var Type[] массив полей базы данных */
-	public $structure = [];
+	public $fields = [];
 	/** @var array массив групп полей базы данных */
 	public $groups = [];
-	/** @var array композиция групп полей и полей базы данных, формируется автоматически на основе $this->structure и $this->groups */
+	/** @var array композиция групп полей и полей базы данных, формируется автоматически на основе $this->fields и $this->groups */
 	public $composition = [];
 	/** @var array массив первичных ключей, формируется автоматически */
 	public $keys = [];
@@ -51,7 +50,8 @@ abstract class SCRUD {
 	 * Идентификатор
 	 */
 	const ID = [
-		'TYPE'           => 'NUMBER',
+		'TYPE'           => 'INTEGER',
+		// 'UNSIGNED'       => true, // todo UNSIGNED
 		'NAME'           => 'ID',
 		'INDEX'          => true,
 		'PRIMARY'        => true,
@@ -88,23 +88,23 @@ abstract class SCRUD {
 	}
 
 	/**
-	 * Обеспечивает целостность данных между свойствами: structure, groups, composition, keys.
-	 * - формирует keys перебором structure,
-	 * - дополняет groups перебором structure,
-	 * - формирует composition перебором groups и structure,
-	 * - переопределяет structure объектами Type
+	 * Обеспечивает целостность данных между свойствами: fields, groups, composition, keys.
+	 * - формирует keys перебором fields,
+	 * - дополняет groups перебором fields,
+	 * - формирует composition перебором groups и fields,
+	 * - переопределяет fields объектами Type
 	 */
 	public function ProvideIntegrity() {
 
-		foreach ($this->structure as $code => $info) {
+		foreach ($this->fields as $code => $info) {
 			$info['CODE'] = $code;
-			$this->structure[$code] = FactoryType::I()->Get(is_object($info) ? $info->info : $info);
+			$this->fields[$code] = FactoryType::I()->Get($info, $this->DB);
 		}
 
 		$this->composition = [];
 		$this->keys = [];
 
-		foreach ($this->structure as $code => $field) {
+		foreach ($this->fields as $code => $field) {
 			if ($field['PRIMARY']) {
 				$this->keys[] = $code;
 			}
@@ -112,7 +112,7 @@ abstract class SCRUD {
 				$this->increment = $code;
 			}
 			if (empty($field['GROUP'])) {
-				$this->structure[$code]['GROUP'] = 'OUTSIDE';
+				$this->fields[$code]['GROUP'] = 'OUTSIDE';
 				$this->groups['OUTSIDE'] = $this->groups['OUTSIDE'] ?: '-';
 				continue;
 			}
@@ -126,7 +126,7 @@ abstract class SCRUD {
 				'NAME'   => $group_name,
 				'FIELDS' => [],
 			];
-			foreach ($this->structure as $code => &$field) {
+			foreach ($this->fields as $code => &$field) {
 				if ($field['GROUP'] === $group_code) {
 					$this->composition[$group_code]['FIELDS'][$code] = &$field;
 				}
@@ -141,7 +141,7 @@ abstract class SCRUD {
 		}
 
 		// Auto-completion of LINK attributes without namespaces
-		foreach ($this->structure as $code => &$info) {
+		foreach ($this->fields as $code => &$info) {
 			if (!empty($info['LINK']) && !class_exists($info['LINK'])) {
 				$link_namespace = (new \ReflectionClass($this))->getNamespaceName();
 				$link = $link_namespace . '\\' . $info['LINK'];
@@ -160,7 +160,7 @@ abstract class SCRUD {
 	/**
 	 * Инициализатор объекта, объявляется в классе-наследнике.
 	 * Может использовать другие объекты для формирования структуры.
-	 * Должен определить собственные поля: name, structure
+	 * Должен определить собственные поля: name, fields
 	 * Может определить собственные поля: groups, code
 	 */
 	public function Init() {
@@ -172,11 +172,11 @@ abstract class SCRUD {
 	}
 
 	public function Synchronize() {
-		$this->DB->SynchronizeTable($this->code, $this->structure);
+		$this->DB->SynchronizeTable($this->code, $this->fields);
 	}
 
 	public function CreateConstraints() {
-		$this->DB->CreateTableConstraints($this->code, $this->structure);
+		$this->DB->CreateTableConstraints($this->code, $this->fields);
 	}
 
 	/**
@@ -194,8 +194,8 @@ abstract class SCRUD {
 	 * - GROUP -- группировка, лист, значение - код поля
 	 *
 	 * @param array $params
-	 * @throws Exception
 	 * @return array - ассоциативный массив с двумя ключами: ELEMENTS:[[]], PAGER:[TOTAL, CURRENT, LIMIT, SELECTED]
+	 * @throws Exception
 	 */
 	public function Search($params = []) {
 		$params['LIMIT'] = isset($params['LIMIT']) ? $params['LIMIT'] : 100;
@@ -234,8 +234,8 @@ abstract class SCRUD {
 	 * - GROUP -- группировка, лист, значение - код поля
 	 *
 	 * @param array $params
-	 * @throws Exception
 	 * @return array список выбранных элементов
+	 * @throws Exception
 	 */
 	public function Select($params = []) {
 		$this->_controlParams($params, ['KEY', 'SORT', 'FILTER', 'CONDITIONS', 'FIELDS', 'LIMIT', 'PAGE', 'ESCAPE', 'GROUP']);
@@ -378,7 +378,7 @@ abstract class SCRUD {
 	 * @return mixed значение искомого поля
 	 * @throws Exception
 	 */
-	public function Get($filter, $field, $sort = [], $escape = true) {
+	public function GetCell($filter, $field, $sort = [], $escape = true) {
 		return $this->Read($filter, [$field], $sort, $escape)[$field];
 	}
 
@@ -416,19 +416,6 @@ abstract class SCRUD {
 			$rows[$key] = $element[$field];
 		}
 		return $rows;
-	}
-
-	/**
-	 * Выбирает первое значение из списка идентификаторов\значений указанной колонки.
-	 *
-	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
-	 * @param string $field символьный код выбираемой колонки (не обязательно, по умолчанию - идентификатор)
-	 * @param array $sort сортировка (не обязательно)
-	 * @return mixed
-	 * @throws Exception
-	 */
-	public function Pick($filter = [], $field = null, $sort = []) {
-		return reset($this->GetColumn($filter, $field, $sort));
 	}
 
 	/**
@@ -509,7 +496,7 @@ abstract class SCRUD {
 	 */
 	private function _prepareSet($code, $value) {
 		$hasInformation = $this->_hasInformation($value);
-		if (($this->structure[$code]['NOT_NULL'] || $this->structure[$code]['TYPE'] == 'BOOL') && !$hasInformation) {
+		if (($this->fields[$code]['NOT_NULL'] || $this->fields[$code]['TYPE'] == 'BOOL') && !$hasInformation) {
 			throw new Exception(T([
 				'en' => "Field '{$this->structure[$code]['NAME']}' can not be empty",
 				'ru' => "Поле '{$this->structure[$code]['NAME']}' не может быть пустым",
@@ -529,77 +516,95 @@ abstract class SCRUD {
 	}
 
 	/**
-	 * Проверяет массив полей, передаваемый в Create и Update методы.
-	 * Проверка идет независимо от идентификатора (ID).
-	 * Переопределяется в классах-наследниках для реализации логики контроля за полями.
+	 * Создает новые строки в таблице
 	 *
-	 * @param array $fields поля
-	 * @return array поля
+	 * @param array $elements лист ассоциативных массивов полей для новых строк
+	 * @throws Exception
 	 */
-	public function ControlFields($fields = []) {
-		return $fields;
+	public function Insert($elements) {
+
+		$errors = [];
+		foreach ($elements as $element)
+			foreach ($this->fields as $code => $field)
+				if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT']))
+					if (!$this->_hasInformation($element[$code]))
+						$errors[] = "Field must be specified: '{$field['NAME']}'";
+		if ($errors) throw new Exception($errors);
+
+		$codes = [];
+		foreach ($this->fields as $code => $field)
+			if (!$field->virtual)
+				$codes[] = $this->DB->Quote($code);
+
+		$rows = [];
+		foreach ($elements as $element) {
+			$values = [];
+			foreach ($this->fields as $code => $field) {
+				if ($field->virtual) continue;
+				if (array_key_exists($code, $element)) {
+					$value = $this->_formatFieldValue($code, $element[$code]);
+					$values[] = is_null($value) ? 'NULL' : "'{$value}'";
+				} else {
+					$values[] = 'DEFAULT';
+				}
+			}
+			$rows[] = "\r\n" . '(' . implode(', ', $values) . ')';
+		}
+
+		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ") \r\n VALUES " . implode(', ', $rows);
+		$this->DB->Query($this->SQL);
 	}
 
 	/**
 	 * Создает новую строку в таблице и возвращает ее идентификатор
 	 *
-	 * @param array $fields ассоциативный массив полей для новой строки
+	 * @param array $element ассоциативный массив полей для новой строки
 	 * @return int|string идентификатор созданной строки
 	 * @throws Exception
 	 */
-	public function Create($fields) {
+	public function Create($element) {
 
-		$fields = $this->ControlFields($fields);
-
-		if (empty($fields)) {
+		if (empty($element)) {
 			$this->SQL = "INSERT INTO {$this->code} VALUES ()";
-			return $this->DB->QuerySingleInsert($this->SQL);
+			return $this->DB->QuerySingleInsert($this->SQL, $this->increment);
 		}
 
 		$errors = [];
-		foreach ($this->structure as $code => $field) {
-			if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT'])) {
-				if (!$this->_hasInformation($fields[$code])) {
+		foreach ($this->fields as $code => $field)
+			if ($field['NOT_NULL'] && !$field['AUTO_INCREMENT'] && !isset($field['DEFAULT']))
+				if (!$this->_hasInformation($element[$code]))
 					$errors[] = T([
 						'en' => "Field must be specified: '{$field['NAME']}'",
 						'ru' => "Не указано обязательное поле '{$field['NAME']}'",
 					]);
-				}
-			}
-		}
-		if ($errors) {
-			throw new Exception($errors);
-		}
-
+		if ($errors) throw new Exception($errors);
 
 		$codes = [];
 		$values = [];
 
-		foreach ($this->structure as $code => $field) {
-			if (array_key_exists($code, $fields)) {
+		foreach ($this->fields as $code => $field) {
+			if (array_key_exists($code, $element)) {
 				$codes[] = $this->DB->Quote($code);
-				$value = $this->_formatFieldValue($code, $fields[$code]);
+				$value = $this->_formatFieldValue($code, $element[$code]);
 				$values[] = is_null($value) ? 'NULL' : "'{$value}'";
 			}
 		}
+
 		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ") \r\n VALUES (" . implode(', ', $values) . ')';
-		$ID = $this->DB->QuerySingleInsert($this->SQL, $this->increment);
-		return $ID;
+		return $this->DB->QuerySingleInsert($this->SQL, $this->increment);
 	}
 
 	/**
 	 * Изменяет значения указанных элементов.
 	 *
 	 * @param mixed $filter идентификатор | список идентификаторов | ассоциатив фильтров
-	 * @param array $fields ассоциативный массив изменяемых полей
+	 * @param array $element ассоциативный массив изменяемых полей
 	 * @throws Exception Нет информации для обновления
 	 * @throws Exception Поле ... не может быть пустым
 	 */
-	public function Update($filter = [], $fields = []) {
+	public function Update($filter = [], $element = []) {
 
-		$fields = $this->ControlFields($fields);
-
-		if (empty($fields)) {
+		if (empty($element)) {
 			throw new Exception(T([
 				'en' => "No data to update",
 				'ru' => 'Нет данных для обновления',
@@ -609,9 +614,9 @@ abstract class SCRUD {
 		$this->SQL = "UPDATE {$this->code} SET ";
 
 		$rows = [];
-		foreach ($this->structure as $code => $field) {
-			if (array_key_exists($code, $fields)) {
-				$rows[] = $this->_prepareSet($code, $fields[$code]);
+		foreach ($this->fields as $code => $field) {
+			if (array_key_exists($code, $element)) {
+				$rows[] = $this->_prepareSet($code, $element[$code]);
 			}
 		}
 		if (empty($rows)) {
@@ -664,13 +669,13 @@ abstract class SCRUD {
 			}
 			unset($content);
 
-			if (empty($this->structure[$code])) {
+			if (empty($this->fields[$code])) {
 				throw new Exception(T([
 					'en' => "Unknown field code: '{$code}' in table '{$this->code}'",
 					'ru' => "Неизвестный код поля: '{$code}' в таблице '{$this->code}'",
 				]));
 			}
-			$result = $this->structure[$code]->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
+			$result = $this->fields[$code]->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
 			$select += (array)$result['SELECT'];
 			$join += (array)$result['JOIN'];
 		}
@@ -795,10 +800,10 @@ abstract class SCRUD {
 			$join += $result['JOIN'];
 			$group += $result['GROUP'];
 
-			if (empty($Object->structure[$code])) {
+			if (empty($Object->fields[$code])) {
 				throw new Exception("Can't form filter: unknown field '{$code}'");
 			}
-			$conditions = $Object->structure[$code]->PrepareConditions($table, $operator, $values);
+			$conditions = $Object->fields[$code]->PrepareConditions($table, $operator, $values);
 
 			$conditions = "(" . implode(' OR ', $conditions) . ")";
 			$where[] = $conditions;
@@ -848,7 +853,7 @@ abstract class SCRUD {
 		$group = [];
 
 		foreach ($path as $external) {
-			$structure = &$Object->structure;
+			$structure = &$Object->fields;
 			$Info = $structure[$external];
 
 			if (empty($Info)) {
@@ -898,7 +903,7 @@ abstract class SCRUD {
 			if (count($result['PATH']) > 0) {
 				$path = $result['PATH'];
 				$first_path = array_shift($path);
-				$FirstInfo = $this->structure[$first_path];
+				$FirstInfo = $this->fields[$first_path];
 				if (is_a($FirstInfo, 'BlackFox\TypeInner')) {
 					$inner_path = implode('.', array_merge($path, [$result['CODE']]));
 					$inner_sort[$first_path][$inner_path] = $sort;
@@ -956,7 +961,7 @@ abstract class SCRUD {
 	 */
 	protected function _formatFieldValue($code, $value) {
 		$code = strtoupper($code);
-		if (!isset($this->structure[$code])) {
+		if (!isset($this->fields[$code])) {
 			throw new Exception(T([
 				'en' => "Unknown field code: '{$code}'",
 				'ru' => "Неизвестный код поля: '{$code}'",
@@ -967,7 +972,7 @@ abstract class SCRUD {
 			return null;
 		}
 
-		$value = $this->structure[$code]->FormatInputValue($value);
+		$value = $this->fields[$code]->FormatInputValue($value);
 
 		return $this->DB->Escape($value);
 	}
@@ -1019,10 +1024,10 @@ abstract class SCRUD {
 			$o_key = is_numeric($key) ? $value : $key;
 
 			if (is_array($value)) {
-				if (!isset($this->structure[$key])) {
+				if (!isset($this->fields[$key])) {
 					throw new Exception("{$this->name}->ExplainFields: Unknown field with code '{$key}'");
 				}
-				$output[$o_key] = $this->GetLink($this->structure[$key])->ExplainFields($value);
+				$output[$o_key] = $this->GetLink($this->fields[$key])->ExplainFields($value);
 				continue;
 			}
 
@@ -1035,7 +1040,7 @@ abstract class SCRUD {
 
 			// if (in_array($first_symbol, ['*', '@'])):
 			$last_symbols = substr($value, 1);
-			foreach ($this->structure as $code => $info) {
+			foreach ($this->fields as $code => $info) {
 				if ($first_symbol === '@' and !$info['VITAL']) {
 					continue;
 				}
@@ -1090,7 +1095,7 @@ abstract class SCRUD {
 			return $element;
 		}
 		foreach ($element as $code => $value) {
-			$info = $this->structure[$code];
+			$info = $this->fields[$code];
 			if (empty($info)) {
 				throw new Exception(T([
 					'en' => "Unknown field code '{$code}'",
@@ -1098,7 +1103,7 @@ abstract class SCRUD {
 				]));
 			}
 
-			$element = $this->structure[$code]->FormatOutputValue($element);
+			$element = $this->fields[$code]->FormatOutputValue($element);
 		}
 		return $element;
 	}
@@ -1128,36 +1133,7 @@ abstract class SCRUD {
 	 * @throws Exception
 	 */
 	public function Query($SQL, $key = null) {
-		try {
-			return $this->DB->Query($SQL, $key);
-		} catch (ExceptionSQL $ExceptionSQL) {
-			$need_sync = substr($ExceptionSQL->error, 0, 14) === 'Unknown column';
-			$need_sync |= substr($ExceptionSQL->error, -13) === 'doesn\'t exist';
-			if ($need_sync) {
-				$this->Synchronize();
-				return $this->DB->Query($SQL, $key);
-			} else {
-				throw $ExceptionSQL;
-			}
-		}
-	}
-
-	/**
-	 * В текстовом виде печатает композицию объекта.
-	 * Используется для составления документации.
-	 */
-	public function PrintComposition() {
-		foreach ($this->composition as $group) {
-			echo "\r\n" . $group['NAME'];
-			foreach ($group['FIELDS'] as $field) {
-				echo "\r\n - " . $field['NAME'];
-				if ($field['VALUES']) {
-					foreach ($field['VALUES'] as $code => $name) {
-						echo "\r\n -- " . $code . " - " . $name;
-					}
-				}
-			}
-		}
+		return $this->DB->Query($SQL, $key);
 	}
 
 	/**
@@ -1170,8 +1146,8 @@ abstract class SCRUD {
 	public function ExtractStructure($codes = []) {
 		$structure = [];
 		foreach ($codes as $code) {
-			if (isset($this->structure[$code])) {
-				$structure[$code] = $this->structure[$code];
+			if (isset($this->fields[$code])) {
+				$structure[$code] = $this->fields[$code];
 			}
 		}
 		return $structure;
@@ -1186,6 +1162,8 @@ abstract class SCRUD {
 	public function GetElementTitle($element = []) {
 		return $element['TITLE'] ?: $element['ID'] ?: null;
 	}
+
+
 
 	/**
 	 * Для всех полей в выборке запускает метод HookExternalField.
@@ -1208,7 +1186,7 @@ abstract class SCRUD {
 				$subfields = $value;
 			}
 			$subsort = $sort[$code] ?: [];
-			$elements = $this->structure[$code]->HookExternalField($elements, $subfields, $subsort);
+			$elements = $this->fields[$code]->HookExternalField($elements, $subfields, $subsort);
 		}
 		return $elements;
 	}

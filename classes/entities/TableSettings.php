@@ -9,7 +9,7 @@ class TableSettings extends SCRUD {
 			'en' => 'Personal table settings',
 			'ru' => 'Персональные настройки таблиц',
 		]);
-		$this->structure = [
+		$this->fields = [
 			'ID'      => self::ID,
 			'USER'    => [
 				'TYPE' => 'OUTER',

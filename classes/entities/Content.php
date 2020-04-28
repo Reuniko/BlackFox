@@ -9,7 +9,7 @@ class Content extends SCRUD {
 			'en' => 'Content pages',
 			'ru' => 'Контентные страницы',
 		]);
-		$this->structure = [
+		$this->fields = [
 			'ID'          => self::ID,
 			'URL'         => [
 				'TYPE'        => 'STRING',

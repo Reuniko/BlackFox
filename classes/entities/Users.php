@@ -19,7 +19,7 @@ class Users extends SCRUD {
 				'ru' => 'Контент',
 			]),
 		];
-		$this->structure += [
+		$this->fields += [
 			'ID'              => self::ID + ['GROUP' => 'SYSTEM'],
 			'LOGIN'           => [
 				'TYPE'     => 'STRING',

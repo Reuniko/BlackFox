@@ -2,7 +2,7 @@
 
 namespace BlackFox;
 
-class TypeBool extends Type {
+class TypeBoolean extends Type {
 	public static $TYPE = 'BOOL';
 
 	public function FormatOutputValue($element) {

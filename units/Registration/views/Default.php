@@ -9,7 +9,7 @@
 				<div class="form-group text-center">
 					<?
 					// -------------------------------------------------------------------------------------------
-					\BlackFox\Users::I()->structure[$code]->PrintFormControl($RESULT['VALUES'][$code], "VALUES[{$code}]");
+					\BlackFox\Users::I()->fields[$code]->PrintFormControl($RESULT['VALUES'][$code], "VALUES[{$code}]");
 					// -------------------------------------------------------------------------------------------
 					?>
 					<label for="VALUES[<?= $code ?>]" class="m-0">
@@ -27,15 +27,15 @@
 					<div class="col-sm-8">
 						<?
 						// -------------------------------------------------------------------------------------------
-						\BlackFox\Users::I()->structure[$code]->PrintFormControl($RESULT['VALUES'][$code], "VALUES[{$code}]");
+						\BlackFox\Users::I()->fields[$code]->PrintFormControl($RESULT['VALUES'][$code], "VALUES[{$code}]");
 						// -------------------------------------------------------------------------------------------
 						?>
 					</div>
-					<? if (\BlackFox\Users::I()->structure[$code]['DESCRIPTION']): ?>
+					<? if (\BlackFox\Users::I()->fields[$code]['DESCRIPTION']): ?>
 						<div class="col-sm-1 form-control-plaintext sm-hidden">
 							<i
 								class="fa fa-question"
-								title="<?= \BlackFox\Users::I()->structure[$code]['DESCRIPTION'] ?>"
+								title="<?= \BlackFox\Users::I()->fields[$code]['DESCRIPTION'] ?>"
 							></i>
 						</div>
 					<? endif; ?>

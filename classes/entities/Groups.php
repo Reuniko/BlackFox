@@ -9,7 +9,7 @@ class Groups extends SCRUD {
 			'en' => 'User groups',
 			'ru' => 'Группы пользователей',
 		]);
-		$this->structure += [
+		$this->fields += [
 			'ID'          => self::ID,
 			'CODE'        => [
 				'TYPE'     => 'STRING',
