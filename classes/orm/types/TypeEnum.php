@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeEnum extends Type {
-	public static $TYPE = 'ENUM';
 
 	public function FormatInputValue($value) {
 		if (!isset($this->info['VALUES'][$value])) {

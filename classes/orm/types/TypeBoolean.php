@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeBoolean extends Type {
-	public static $TYPE = 'BOOL';
 
 	public function FormatOutputValue($element) {
 		$value = &$element[$this->info['CODE']];

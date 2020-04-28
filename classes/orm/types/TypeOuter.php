@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeOuter extends Type {
-	public static $TYPE = 'OUTER';
 
 	public function FormatInputValue($value) {
 		if (!is_numeric($value)) {

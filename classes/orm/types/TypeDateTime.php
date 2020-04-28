@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeDateTime extends Type {
-	public static $TYPE = 'DATETIME';
 
 	public function FormatInputValue($value) {
 		if (is_numeric($value)) {

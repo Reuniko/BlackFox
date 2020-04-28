@@ -6,8 +6,6 @@ class TypeInner extends Type {
 
 	public $virtual = true;
 
-	public static $TYPE = 'INNER';
-
 	public function ProvideInfoIntegrity() {
 		if (empty($this->info['FIELD'])) {
 			throw new Exception(T([

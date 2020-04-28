@@ -6,38 +6,13 @@ namespace BlackFox;
  *
  * Parent for all data types for using in database.
  */
-abstract class Type implements \ArrayAccess {
+abstract class Type {
 
 	public $virtual = false;
 
 	protected function Quote($id) {
 		return $this->DB->Quote($id);
 	}
-
-	// -------------------------------------------------------------------------------------------------------------- //
-	public function offsetSet($offset, $value) {
-		if (is_null($offset)) {
-			$this->info[] = $value;
-		} else {
-			$this->info[$offset] = $value;
-		}
-	}
-
-	public function offsetExists($offset) {
-		return isset($this->info[$offset]);
-	}
-
-	public function offsetUnset($offset) {
-		unset($this->info[$offset]);
-	}
-
-	public function offsetGet($offset) {
-		return isset($this->info[$offset]) ? $this->info[$offset] : null;
-	}
-	// -------------------------------------------------------------------------------------------------------------- //
-
-	/** @var string Mnemonic code of the type */
-	public static $TYPE;
 
 	/** @var Database */
 	public $DB;

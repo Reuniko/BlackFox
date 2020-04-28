@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeFile extends TypeOuter {
-	public static $TYPE = 'FILE';
 
 	public function ProvideInfoIntegrity() {
 		if (empty($this->info['LINK'])) {

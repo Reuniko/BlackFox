@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeList extends TypeText {
-	public static $TYPE = 'LIST';
 
 	public function FormatInputValue($value) {
 		$value = is_array($value) ? $value : [$value];

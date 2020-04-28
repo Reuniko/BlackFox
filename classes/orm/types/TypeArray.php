@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeArray extends TypeText {
-	public static $TYPE = 'ARRAY';
 
 	public function FormatInputValue($value) {
 		$value = is_array($value) ? $value : [$value];

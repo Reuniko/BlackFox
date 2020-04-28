@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeSet extends Type {
-	public static $TYPE = 'SET';
 
 	public function FormatInputValue($values) {
 		if (!is_array($values)) {

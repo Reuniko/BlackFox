@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeTime extends Type {
-	public static $TYPE = 'TIME';
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
 		?>

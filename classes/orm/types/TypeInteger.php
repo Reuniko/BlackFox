@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeInteger extends Type {
-	public static $TYPE = 'NUMBER';
 
 	public function FormatInputValue($value) {
 		if (!is_numeric($value)) {

@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypePassword extends TypeString {
-	public static $TYPE = 'PASSWORD';
 
 	public function PrintFormControl($value, $name, $class = 'form-control') {
 		?>

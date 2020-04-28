@@ -3,8 +3,6 @@
 namespace BlackFox;
 
 class TypeString extends Type {
-	public static $TYPE = 'STRING';
-	const DEFAULT_LENGTH = 255;
 
 	/**
 	 * Deleting all extra spaces

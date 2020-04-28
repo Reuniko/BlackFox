@@ -3,7 +3,6 @@
 namespace BlackFox;
 
 class TypeText extends Type {
-	public static $TYPE = 'TEXT';
 
 	public function PrintValue($value) {
 		if ($this->info['WYSIWYG']) {
