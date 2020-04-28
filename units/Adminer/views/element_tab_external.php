@@ -2,7 +2,7 @@
 <?php /** @var array $RESULT */ ?>
 <?
 /** @var \BlackFox\Type $Type */
-$Type = $this->SCRUD->fields[$RESULT['TAB']['CODE']];
+$Type = $this->SCRUD->Types[$RESULT['TAB']['CODE']];
 /** @var \BlackFox\SCRUD $Link */
 $Link = $Type->info['LINK']::N();
 $url = $Link->GetAdminUrl();

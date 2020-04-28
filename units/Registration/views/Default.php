@@ -9,7 +9,7 @@
 				<div class="form-group text-center">
 					<?
 					// -------------------------------------------------------------------------------------------
-					\BlackFox\Users::I()->fields[$code]->PrintFormControl($RESULT['VALUES'][$code], "VALUES[{$code}]");
+					\BlackFox\Users::I()->Types[$code]->PrintFormControl($RESULT['VALUES'][$code], "VALUES[{$code}]");
 					// -------------------------------------------------------------------------------------------
 					?>
 					<label for="VALUES[<?= $code ?>]" class="m-0">
@@ -27,7 +27,7 @@
 					<div class="col-sm-8">
 						<?
 						// -------------------------------------------------------------------------------------------
-						\BlackFox\Users::I()->fields[$code]->PrintFormControl($RESULT['VALUES'][$code], "VALUES[{$code}]");
+						\BlackFox\Users::I()->Types[$code]->PrintFormControl($RESULT['VALUES'][$code], "VALUES[{$code}]");
 						// -------------------------------------------------------------------------------------------
 						?>
 					</div>

@@ -264,11 +264,11 @@ class Adminer extends \BlackFox\Unit {
 		]);
 		if (empty($settings)) {
 			$settings = [];
-			foreach ($this->SCRUD->fields as $code => $info) {
-				if ($info['VITAL'] or $info['PRIMARY']) {
+			foreach ($this->SCRUD->fields as $code => $field) {
+				if ($field['VITAL'] or $field['PRIMARY']) {
 					$settings['FILTERS'][] = $code;
 				}
-				if (!$info['DISABLED'] or $info['PRIMARY']) {
+				if (!$field['DISABLED'] or $field['PRIMARY']) {
 					$settings['FIELDS'][] = $code;
 				}
 			}
@@ -297,9 +297,9 @@ class Adminer extends \BlackFox\Unit {
 				'ACTIVE' => true,
 			],
 		];
-		foreach ($this->SCRUD->fields as $code => $info) {
-			if ($info['TYPE'] === 'INNER') {
-				unset($this->SCRUD->composition[$info['GROUP']]['FIELDS'][$code]);
+		foreach ($this->SCRUD->fields as $code => $field) {
+			if ($field['TYPE'] === 'INNER') {
+				unset($this->SCRUD->composition[$field['GROUP']]['FIELDS'][$code]);
 			}
 		}
 		return $tabs;
@@ -316,13 +316,13 @@ class Adminer extends \BlackFox\Unit {
 				'ACTIVE' => true,
 			],
 		];
-		foreach ($this->SCRUD->fields as $code => $info) {
-			if ($info['TYPE'] === 'INNER') {
+		foreach ($this->SCRUD->fields as $code => $field) {
+			if ($field['TYPE'] === 'INNER') {
 				$tabs[$code] = [
-					'NAME' => $info['NAME'],
+					'NAME' => $field['NAME'],
 					'VIEW' => 'element_tab_external',
 				];
-				unset($this->SCRUD->composition[$info['GROUP']]['FIELDS'][$code]);
+				unset($this->SCRUD->composition[$field['GROUP']]['FIELDS'][$code]);
 			}
 		}
 		return $tabs;

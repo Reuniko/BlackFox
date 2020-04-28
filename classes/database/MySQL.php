@@ -68,14 +68,14 @@ class MySQL extends Database {
 		return 'rand()';
 	}
 
-	public function GetStructureStringType(Type $Info) {
-		if (empty($Info['TYPE'])) {
+	public function GetStructureStringType(array $field) {
+		if (empty($field['TYPE'])) {
 			throw new ExceptionType("Empty data type");
 		}
-		switch ($Info['TYPE']) {
+		switch ($field['TYPE']) {
 			case 'STRING':
 			case 'PASSWORD':
-				return "varchar(" . ((int)$Info['LENGTH'] ?: 255) . ")";
+				return "varchar(" . ((int)$field['LENGTH'] ?: 255) . ")";
 				break;
 			case 'ARRAY':
 			case 'TEXT':
@@ -88,8 +88,8 @@ class MySQL extends Database {
 			case 'FILE':
 				return "int";
 			case 'FLOAT':
-				$length = $Info['LENGTH'] ?: 13;
-				$decimals = $Info['DECIMALS'] ?: 2;
+				$length = $field['LENGTH'] ?: 13;
+				$decimals = $field['DECIMALS'] ?: 2;
 				return "float({$length},{$decimals})";
 			case 'INNER':
 				throw new ExceptionType("No fields required");
@@ -100,39 +100,39 @@ class MySQL extends Database {
 			case 'DATETIME':
 				return "datetime";
 			case 'ENUM':
-				return 'enum' . '("' . implode('", "', array_keys($Info['VALUES'])) . '")';
+				return 'enum' . '("' . implode('", "', array_keys($field['VALUES'])) . '")';
 			case 'SET':
-				return 'set' . '("' . implode('", "', array_keys($Info['VALUES'])) . '")';
+				return 'set' . '("' . implode('", "', array_keys($field['VALUES'])) . '")';
 			default:
-				throw new ExceptionType("Unknown data type: " . $Info['TYPE']);
+				throw new ExceptionType("Unknown data type: " . $field['TYPE']);
 		}
 	}
 
-	public function GetStructureString(Type $Info) {
-		$type = $this->GetStructureStringType($Info);
+	public function GetStructureString(array $field) {
+		$type = $this->GetStructureStringType($field);
 
-		$null = ($Info["NOT_NULL"] || $Info['PRIMARY']) ? "NOT NULL" : "NULL";
+		$null = ($field["NOT_NULL"] || $field['PRIMARY']) ? "NOT NULL" : "NULL";
 
 		$default = "";
-		if (isset($Info['DEFAULT'])) {
-			if (is_bool($Info['DEFAULT'])) {
-				$default = "DEFAULT " . ($Info['DEFAULT'] ? 'true' : 'false');
-			} elseif (is_array($Info['DEFAULT'])) {
-				$default = "DEFAULT '" . implode(',', $Info['DEFAULT']) . "'";
-			} elseif (is_string($Info['DEFAULT'])) {
-				$default = "DEFAULT '{$Info['DEFAULT']}'";
-			} elseif (is_numeric($Info['DEFAULT'])) {
-				$default = "DEFAULT {$Info['DEFAULT']}";
+		if (isset($field['DEFAULT'])) {
+			if (is_bool($field['DEFAULT'])) {
+				$default = "DEFAULT " . ($field['DEFAULT'] ? 'true' : 'false');
+			} elseif (is_array($field['DEFAULT'])) {
+				$default = "DEFAULT '" . implode(',', $field['DEFAULT']) . "'";
+			} elseif (is_string($field['DEFAULT'])) {
+				$default = "DEFAULT '{$field['DEFAULT']}'";
+			} elseif (is_numeric($field['DEFAULT'])) {
+				$default = "DEFAULT {$field['DEFAULT']}";
 			} else {
-				throw new Exception("Unknown default value type of '{$Info->info['CODE']}'");
+				throw new Exception("Unknown default value type of '{$field['CODE']}'");
 			}
 		}
 
-		$auto_increment = ($Info["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
+		$auto_increment = ($field["AUTO_INCREMENT"]) ? "AUTO_INCREMENT" : "";
 
-		$comment = ($Info["NAME"]) ? " COMMENT '{$Info["NAME"]}'" : "";
+		$comment = ($field["NAME"]) ? " COMMENT '{$field["NAME"]}'" : "";
 
-		$structure_string = $this->Quote($Info['CODE']) . " $type $null $default $auto_increment $comment";
+		$structure_string = $this->Quote($field['CODE']) . " $type $null $default $auto_increment $comment";
 
 		return $structure_string;
 	}

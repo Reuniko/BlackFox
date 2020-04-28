@@ -3,6 +3,9 @@
 namespace BlackFox;
 
 class TypeInner extends Type {
+
+	public $virtual = true;
+
 	public static $TYPE = 'INNER';
 
 	public function ProvideInfoIntegrity() {

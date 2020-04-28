@@ -103,7 +103,7 @@
 								<?
 								ob_start();
 								// -------------------------------------------------
-								$this->SCRUD->fields[$code]->PrintValue($row[$code]);
+								$this->SCRUD->Types[$code]->PrintValue($row[$code]);
 								// -------------------------------------------------
 								$content = ob_get_clean();
 								?>

@@ -29,7 +29,7 @@
 						<div class="col-sm-8">
 							<?
 							// -------------------------------------------------------------------------------
-							$this->SCRUD->fields[$code]->PrintFilterControl($RESULT['FILTER'], 'FILTER');
+							$this->SCRUD->Types[$code]->PrintFilterControl($RESULT['FILTER'], 'FILTER');
 							// -------------------------------------------------------------------------------
 							?>
 						</div>

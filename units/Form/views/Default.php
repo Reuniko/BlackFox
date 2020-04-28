@@ -15,7 +15,7 @@
 		<div class="<?= $RESULT['CLASS_BLOCK'] ?>">
 			<?
 			// -------------------------------------------------------------------------------------------
-			$SCRUD->fields[$code]->PrintFormControl($RESULT['DATA'][$code], "{$RESULT['ELEMENT']}[{$code}]", $RESULT['CLASS_CONTROL']);
+			$SCRUD->Types[$code]->PrintFormControl($RESULT['DATA'][$code], "{$RESULT['ELEMENT']}[{$code}]", $RESULT['CLASS_CONTROL']);
 			// -------------------------------------------------------------------------------------------
 			?>
 		</div>

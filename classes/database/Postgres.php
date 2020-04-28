@@ -67,16 +67,16 @@ class Postgres extends Database {
 		return 'random()';
 	}
 
-	public function GetStructureStringType(Type $Info) {
-		if (empty($Info['TYPE'])) {
+	public function GetStructureStringType(array $field) {
+		if (empty($field['TYPE'])) {
 			throw new ExceptionType("Empty data type");
 		}
-		switch ($Info['TYPE']) {
+		switch ($field['TYPE']) {
 			case 'STRING':
 			case 'ENUM':
 			case 'SET':
 			case 'PASSWORD':
-				return "varchar(" . ((int)$Info['LENGTH'] ?: 255) . ")";
+				return "varchar(" . ((int)$field['LENGTH'] ?: 255) . ")";
 				break;
 			case 'ARRAY':
 			case 'TEXT':
@@ -89,8 +89,8 @@ class Postgres extends Database {
 			case 'FILE':
 				return "int";
 			case 'FLOAT':
-				$length = $Info['LENGTH'] ?: 13;
-				$decimals = $Info['DECIMALS'] ?: 2;
+				$length = $field['LENGTH'] ?: 13;
+				$decimals = $field['DECIMALS'] ?: 2;
 				return "numeric({$length},{$decimals})";
 			case 'INNER':
 				throw new ExceptionType("No fields required");
@@ -101,7 +101,7 @@ class Postgres extends Database {
 			case 'DATETIME':
 				return "timestamp";
 			default:
-				throw new ExceptionType("Unknown data type: " . $Info['TYPE']);
+				throw new ExceptionType("Unknown data type: " . $field['TYPE']);
 		}
 	}
 
@@ -153,26 +153,25 @@ class Postgres extends Database {
 
 			$rows = [];
 			$keys = [];
-			foreach ($fields as $code => $Info) {
-				/** @var Type $Info */
-				if ($Info['PRIMARY']) {
+			foreach ($fields as $code => $field) {
+				if ($field['PRIMARY']) {
 					$keys[] = $code;
 				}
 				try {
-					$db_type = $this->GetStructureStringType($Info);
+					$db_type = $this->GetStructureStringType($field);
 				} catch (\Exception $error) {
 					continue;
 				}
-				$null = ($Info["NOT_NULL"] || $Info['PRIMARY']) ? "NOT NULL" : "NULL";
+				$null = ($field["NOT_NULL"] || $field['PRIMARY']) ? "NOT NULL" : "NULL";
 				$default = "";
-				if (isset($Info['DEFAULT'])) {
-					$default = !is_array($Info['DEFAULT']) ? $Info['DEFAULT'] : implode(',', $Info['DEFAULT']);
+				if (isset($field['DEFAULT'])) {
+					$default = !is_array($field['DEFAULT']) ? $field['DEFAULT'] : implode(',', $field['DEFAULT']);
 					$default = "DEFAULT '{$default}'";
 				}
-				if ($Info["AUTO_INCREMENT"]) {
+				if ($field["AUTO_INCREMENT"]) {
 					$db_type = 'serial';
 				}
-				$rows[] = $this->Quote($Info['CODE']) . " $db_type $null $default";
+				$rows[] = $this->Quote($field['CODE']) . " $db_type $null $default";
 			}
 			if (!empty($keys)) {
 				$rows[] = "PRIMARY KEY (" . implode(", ", array_map([$this, 'Quote'], $keys)) . ")";
@@ -189,41 +188,40 @@ class Postgres extends Database {
 			$keys = [];
 			$renames = [];
 
-			foreach ($fields as $code => $Info) {
+			foreach ($fields as $code => $field) {
 				$code_id = $this->Quote($code);
-				/** @var Type $Info */
-				if ($Info['PRIMARY']) {
+				if ($field['PRIMARY']) {
 					$keys[] = $code;
 				}
 
 				// renames
-				if ($Info['CHANGE'] and !empty($columns[$Info['CHANGE']])) {
-					$renames[] = "RENAME \"{$Info['CHANGE']}\" TO {$code_id}";
-					$columns[$code] = $columns[$Info['CHANGE']];
-					unset($columns[$Info['CHANGE']]);
+				if ($field['CHANGE'] and !empty($columns[$field['CHANGE']])) {
+					$renames[] = "RENAME \"{$field['CHANGE']}\" TO {$code_id}";
+					$columns[$code] = $columns[$field['CHANGE']];
+					unset($columns[$field['CHANGE']]);
 				}
 
 				// type
 				try {
-					$db_type = $this->GetStructureStringType($Info);
+					$db_type = $this->GetStructureStringType($field);
 				} catch (Exception $error) {
 					continue;
 				}
 
 				// ADD COLUMN:
 				if (!isset($columns[$code])) {
-					if ($Info["AUTO_INCREMENT"]) {
+					if ($field["AUTO_INCREMENT"]) {
 						$db_type = 'serial';
 					}
 					$default = '';
-					if (isset($Info['DEFAULT'])) {
-						if (is_bool($Info['DEFAULT'])) {
-							$default = "DEFAULT " . ($Info['DEFAULT'] ? 'true' : 'false');
+					if (isset($field['DEFAULT'])) {
+						if (is_bool($field['DEFAULT'])) {
+							$default = "DEFAULT " . ($field['DEFAULT'] ? 'true' : 'false');
 						} else {
-							$default = "DEFAULT '{$Info['DEFAULT']}'";
+							$default = "DEFAULT '{$field['DEFAULT']}'";
 						}
 					}
-					$not_null = $Info['NOT_NULL'] ? 'NOT NULL' : '';
+					$not_null = $field['NOT_NULL'] ? 'NOT NULL' : '';
 					$rows[] = "ADD COLUMN {$code_id} {$db_type} {$default} {$not_null}";
 
 					unset($columns[$code]);
@@ -235,21 +233,21 @@ class Postgres extends Database {
 				$rows[] = "ALTER COLUMN {$code_id} TYPE {$db_type}";
 
 				// $not_null
-				if (($Info["NOT_NULL"] || $Info['PRIMARY'])) {
+				if (($field["NOT_NULL"] || $field['PRIMARY'])) {
 					$rows[] = "ALTER COLUMN {$code_id} SET NOT NULL";
 				} else {
 					$rows[] = "ALTER COLUMN {$code_id} DROP NOT NULL";
 				}
 
 				// $default
-				if ($Info["AUTO_INCREMENT"]) {
+				if ($field["AUTO_INCREMENT"]) {
 					$seq_name = "{$table}_{$code}_seq";
 					$this->Query("CREATE SEQUENCE IF NOT EXISTS {$seq_name}");
 					$this->Query("SELECT setval('{$seq_name}', COALESCE((SELECT MAX({$code_id})+1 FROM {$table}), 1), false)");
 					$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT nextval('{$seq_name}')";
 				} else {
-					if (isset($Info['DEFAULT'])) {
-						$default = !is_array($Info['DEFAULT']) ? $Info['DEFAULT'] : implode(',', $Info['DEFAULT']);
+					if (isset($field['DEFAULT'])) {
+						$default = !is_array($field['DEFAULT']) ? $field['DEFAULT'] : implode(',', $field['DEFAULT']);
 						$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT '{$default}'";
 					} else {
 						$rows[] = "ALTER COLUMN {$code_id} DROP DEFAULT";
@@ -304,38 +302,38 @@ class Postgres extends Database {
 		$indexes = $this->Query($SQL, 'column_name');
 		//debug($indexes, '$indexes');
 
-		foreach ($fields as $code => $Info) {
+		foreach ($fields as $code => $field) {
 			if (in_array($code, $keys)) {
 				continue;
 			}
-			if ($Info['FOREIGN']) {
-				$Info['INDEX'] = true;
+			if ($field['FOREIGN']) {
+				$field['INDEX'] = true;
 			}
-			if ($Info['UNIQUE']) {
-				$Info['INDEX'] = true;
+			if ($field['UNIQUE']) {
+				$field['INDEX'] = true;
 			}
-			if ($Info['INDEX'] === 'UNIQUE') {
-				$Info['INDEX'] = true;
-				$Info['UNIQUE'] = true;
+			if ($field['INDEX'] === 'UNIQUE') {
+				$field['INDEX'] = true;
+				$field['UNIQUE'] = true;
 			}
-			$unique = ($Info['UNIQUE']) ? 'UNIQUE' : '';
+			$unique = ($field['UNIQUE']) ? 'UNIQUE' : '';
 			$index = $indexes[$code];
 
 			// index is: present in database, missing in code - drop it
-			if (isset($index) and !$Info['INDEX']) {
+			if (isset($index) and !$field['INDEX']) {
 				$this->Query("DROP INDEX " . $this->Quote($index['index_name']));
 				continue;
 			}
 
 			// index is: missing in database, present in code - create it
-			if ($Info['INDEX'] and !isset($index)) {
+			if ($field['INDEX'] and !isset($index)) {
 				$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
 				continue;
 			}
 
 			// index is: present in database, present in code - check unique
 			if (isset($index)) {
-				if (($Info['UNIQUE'] and $index['index_unique']) or (!$Info['UNIQUE'] and !$index['index_unique'])) {
+				if (($field['UNIQUE'] and $index['index_unique']) or (!$field['UNIQUE'] and !$index['index_unique'])) {
 					$this->Query("DROP INDEX " . $this->Quote($index['index_name']));
 					$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
 					continue;

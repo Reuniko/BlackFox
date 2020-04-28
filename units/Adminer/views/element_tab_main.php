@@ -24,7 +24,7 @@
 				<div class="col-sm-8">
 					<?
 					// -------------------------------------------------------------------------------------------
-					$this->SCRUD->fields[$code]->PrintFormControl($RESULT['DATA'][$code], "FIELDS[{$code}]");
+					$this->SCRUD->Types[$code]->PrintFormControl($RESULT['DATA'][$code], "FIELDS[{$code}]");
 					// -------------------------------------------------------------------------------------------
 					?>
 				</div>

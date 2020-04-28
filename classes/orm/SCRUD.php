@@ -35,8 +35,10 @@ abstract class SCRUD {
 	/** @var string символьный код таблицы, формируется автоматически, возможно переопределить */
 	public $code;
 
-	/** @var Type[] массив полей базы данных */
+	/** @var array массив полей базы данных */
 	public $fields = [];
+	/** @var Type[] массив полей базы данных */
+	public $Types = [];
 	/** @var array массив групп полей базы данных */
 	public $groups = [];
 	/** @var array композиция групп полей и полей базы данных, формируется автоматически на основе $this->fields и $this->groups */
@@ -63,7 +65,6 @@ abstract class SCRUD {
 
 
 	public function __construct(Database $Database = null) {
-		/** @var Database $DB */
 		$this->DB = $Database ?: Database::I();
 		$this->code = strtolower(implode('_', array_filter(explode('\\', static::class))));
 		$this->Init();
@@ -96,14 +97,10 @@ abstract class SCRUD {
 	 */
 	public function ProvideIntegrity() {
 
-		foreach ($this->fields as $code => $info) {
-			$info['CODE'] = $code;
-			$this->fields[$code] = FactoryType::I()->Get($info, $this->DB);
-		}
-
 		$this->composition = [];
 		$this->keys = [];
 
+		// init keys, increment
 		foreach ($this->fields as $code => $field) {
 			if ($field['PRIMARY']) {
 				$this->keys[] = $code;
@@ -112,8 +109,11 @@ abstract class SCRUD {
 				$this->increment = $code;
 			}
 			if (empty($field['GROUP'])) {
-				$this->fields[$code]['GROUP'] = 'OUTSIDE';
-				$this->groups['OUTSIDE'] = $this->groups['OUTSIDE'] ?: '-';
+				$this->fields[$code]['GROUP'] = 'ELEMENT';
+				$this->groups['ELEMENT'] = $this->groups['ELEMENT'] ?: T([
+					'en' => 'Element',
+					'ru' => 'Элемент',
+				]);
 				continue;
 			}
 			if (empty($this->groups[$field['GROUP']])) {
@@ -121,6 +121,7 @@ abstract class SCRUD {
 			}
 		}
 
+		// init composition
 		foreach ($this->groups as $group_code => $group_name) {
 			$this->composition[$group_code] = [
 				'NAME'   => $group_name,
@@ -140,13 +141,14 @@ abstract class SCRUD {
 			]));
 		}
 
-		// Auto-completion of LINK attributes without namespaces
-		foreach ($this->fields as $code => &$info) {
-			if (!empty($info['LINK']) && !class_exists($info['LINK'])) {
+		foreach ($this->fields as $code => &$field) {
+			$field['CODE'] = $code;
+			// auto-completion of LINK attributes without namespaces
+			if (!empty($field['LINK']) && !class_exists($field['LINK'])) {
 				$link_namespace = (new \ReflectionClass($this))->getNamespaceName();
-				$link = $link_namespace . '\\' . $info['LINK'];
+				$link = $link_namespace . '\\' . $field['LINK'];
 				if (class_exists($link)) {
-					$info['LINK'] = $link;
+					$field['LINK'] = $link;
 				} else {
 					throw new Exception(T([
 						'en' => "Valid class name required for LINK of field '{$code}' of class " . static::class,
@@ -154,6 +156,8 @@ abstract class SCRUD {
 					]));
 				}
 			}
+			// init types
+			$this->Types[$code] = FactoryType::I()->Get($field, $this->DB);
 		}
 	}
 
@@ -675,7 +679,7 @@ abstract class SCRUD {
 					'ru' => "Неизвестный код поля: '{$code}' в таблице '{$this->code}'",
 				]));
 			}
-			$result = $this->fields[$code]->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
+			$result = $this->Types[$code]->PrepareSelectAndJoinByField($this->code, $prefix, $subfields);
 			$select += (array)$result['SELECT'];
 			$join += (array)$result['JOIN'];
 		}
@@ -803,7 +807,7 @@ abstract class SCRUD {
 			if (empty($Object->fields[$code])) {
 				throw new Exception("Can't form filter: unknown field '{$code}'");
 			}
-			$conditions = $Object->fields[$code]->PrepareConditions($table, $operator, $values);
+			$conditions = $Object->Types[$code]->PrepareConditions($table, $operator, $values);
 
 			$conditions = "(" . implode(' OR ', $conditions) . ")";
 			$where[] = $conditions;
@@ -821,6 +825,7 @@ abstract class SCRUD {
 	 * Возвращает структуру с ключами:
 	 * - OBJECT - объект-наследник SCRUD для обработки поля
 	 * - TABLE - псевдоним для таблицы (alias)
+	 * - PATH -
 	 * - CODE - код поля
 	 * - JOIN - ассоциативный массив уникальных SQL-строк, описывающий присоединяемые таблицы
 	 * - GROUP - ассоциативный массив уникальных SQL-строк, описывающий группировку
@@ -853,29 +858,33 @@ abstract class SCRUD {
 		$group = [];
 
 		foreach ($path as $external) {
-			$structure = &$Object->fields;
-			$Info = $structure[$external];
 
-			if (empty($Info)) {
+			$fields = &$Object->fields;
+			$types = &$Object->Types;
+
+			$field = $fields[$external];
+			$Type = $types[$external];
+
+			if (empty($field)) {
 				throw new Exception(T([
 					'en' => "Unknown external field code: '{$external}'",
 					'ru' => "Передан код неизвестного внешнего поля: '{$external}'",
 				]));
 			}
-			if (empty($Info['LINK'])) {
+			if (empty($field['LINK'])) {
 				throw new Exception(T([
 					'en' => "Field is not external: '{$external}'",
 					'ru' => "Поле не является внешним: '{$external}'",
 				]));
 			}
 
-			$answer = $Info->GenerateJoinAndGroupStatements($Object, $prefix);
+			$answer = $Type->GenerateJoinAndGroupStatements($Object, $prefix);
 			$join += $answer['JOIN'];
 			$group += $answer['GROUP'];
 
 			// for next iteration
 			$prefix .= $external . "__";
-			$Object = $Info['LINK']::I();
+			$Object = $field['LINK']::I();
 		}
 		return [
 			'OBJECT' => $Object,
@@ -903,8 +912,8 @@ abstract class SCRUD {
 			if (count($result['PATH']) > 0) {
 				$path = $result['PATH'];
 				$first_path = array_shift($path);
-				$FirstInfo = $this->fields[$first_path];
-				if (is_a($FirstInfo, 'BlackFox\TypeInner')) {
+				$Type = $this->Types[$first_path];
+				if (is_a($Type, 'BlackFox\TypeInner')) {
 					$inner_path = implode('.', array_merge($path, [$result['CODE']]));
 					$inner_sort[$first_path][$inner_path] = $sort;
 					continue;
@@ -972,7 +981,7 @@ abstract class SCRUD {
 			return null;
 		}
 
-		$value = $this->fields[$code]->FormatInputValue($value);
+		$value = $this->Types[$code]->FormatInputValue($value);
 
 		return $this->DB->Escape($value);
 	}
@@ -991,26 +1000,26 @@ abstract class SCRUD {
 	/**
 	 * Возвращает экземпляр класса SCRUD, на который ссылается поле
 	 *
-	 * @param mixed $info массив, описывающий поле (с ключем LINK)
+	 * @param mixed $field массив, описывающий поле (с ключем LINK)
 	 * @return SCRUD экземпляр
 	 * @throws ExceptionNotAllowed
 	 */
-	private function GetLink($info) {
-		if (!class_exists($info['LINK'])) {
+	private function GetLink($field) {
+		if (!class_exists($field['LINK'])) {
 			throw new ExceptionNotAllowed(T([
-				'en' => "You must set class name to LINK info of field '{$info['NAME']}'",
-				'ru' => "Необходимо установить имя класса в ключ LINK поля '{$info['NAME']}'",
+				'en' => "You must set class name to LINK info of field '{$field['CODE']}' of table '{$this->code}'; now: '{$field['LINK']}'",
+				'ru' => "Необходимо установить имя класса в ключ LINK поля '{$field['CODE']}' таблицы '{$this->code}'; установлено: '{$field['LINK']}'",
 			]));
 		}
-		$parents = class_parents($info['LINK']);
+		$parents = class_parents($field['LINK']);
 		if (!in_array('BlackFox\SCRUD', $parents)) {
 			throw new ExceptionNotAllowed(T([
-				'en' => "You must set class (child of SCRUD) name to LINK info of field '{$info['NAME']}'",
-				'ru' => "Необходимо установить имя класса (наследник от SCRUD) в ключ LINK поля '{$info['NAME']}'",
+				'en' => "You must set class (child of SCRUD) name to LINK info of field '{$field['CODE']}' of table '{$this->code}'; now: '{$field['LINK']}'",
+				'ru' => "Необходимо установить имя класса (наследник от SCRUD) в ключ LINK поля '{$field['CODE']}' таблицы '{$this->code}'; установлено: '{$field['LINK']}'",
 			]));
 		}
 		/** @var SCRUD $Link */
-		$Link = $info['LINK']::I();
+		$Link = $field['LINK']::I();
 		return $Link;
 	}
 
@@ -1040,11 +1049,11 @@ abstract class SCRUD {
 
 			// if (in_array($first_symbol, ['*', '@'])):
 			$last_symbols = substr($value, 1);
-			foreach ($this->fields as $code => $info) {
-				if ($first_symbol === '@' and !$info['VITAL']) {
+			foreach ($this->fields as $code => $field) {
+				if ($first_symbol === '@' and !$field['VITAL']) {
 					continue;
 				}
-				if (!isset($info['LINK'])) {
+				if (!isset($field['LINK'])) {
 					$output[$code] = $code;
 					continue;
 				}
@@ -1053,7 +1062,7 @@ abstract class SCRUD {
 					continue;
 				}
 
-				$output[$code] = $this->GetLink($info)->ExplainFields([$last_symbols]);
+				$output[$code] = $this->GetLink($field)->ExplainFields([$last_symbols]);
 				continue;
 			}
 		}
@@ -1095,15 +1104,15 @@ abstract class SCRUD {
 			return $element;
 		}
 		foreach ($element as $code => $value) {
-			$info = $this->fields[$code];
-			if (empty($info)) {
+			$field = $this->fields[$code];
+			if (empty($field)) {
 				throw new Exception(T([
 					'en' => "Unknown field code '{$code}'",
 					'ru' => "Неизвестный код поля '{$code}'",
 				]));
 			}
 
-			$element = $this->fields[$code]->FormatOutputValue($element);
+			$element = $this->Types[$code]->FormatOutputValue($element);
 		}
 		return $element;
 	}
@@ -1164,7 +1173,6 @@ abstract class SCRUD {
 	}
 
 
-
 	/**
 	 * Для всех полей в выборке запускает метод HookExternalField.
 	 * Это позволяет типу поля подцеплять внешние данные к элементам выборки (если это требуется).
@@ -1186,7 +1194,7 @@ abstract class SCRUD {
 				$subfields = $value;
 			}
 			$subsort = $sort[$code] ?: [];
-			$elements = $this->fields[$code]->HookExternalField($elements, $subfields, $subsort);
+			$elements = $this->Types[$code]->HookExternalField($elements, $subfields, $subsort);
 		}
 		return $elements;
 	}
