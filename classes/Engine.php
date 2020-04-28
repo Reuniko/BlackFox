@@ -68,6 +68,7 @@ class Engine {
 		$this->InitConfig($this->GetConfig());
 		$this->InitUserSession();
 		$this->InitAutoloadClasses();
+		$this->InitExceptionHandler();
 		$this->RegisterCoreClasses('BlackFox');
 		$this->InitDatabase();
 		$this->InitCache();
@@ -103,6 +104,19 @@ class Engine {
 	 */
 	public function InitAutoloadClasses() {
 		spl_autoload_register([$this, 'AutoloadClass']);
+	}
+
+	public function InitExceptionHandler() {
+		set_exception_handler([$this, 'ExceptionHandler']);
+	}
+
+	public function ExceptionHandler(\Throwable $Exception) {
+		debug($Exception, '$Exception');
+		echo '<xmp>';
+		echo $Exception->getMessage();
+		echo "\r\n\r\n";
+		echo $Exception->getTraceAsString();
+		echo '</xmp>';
 	}
 
 	/**
