@@ -502,8 +502,8 @@ abstract class SCRUD {
 		$hasInformation = $this->_hasInformation($value);
 		if (($this->fields[$code]['NOT_NULL'] || $this->fields[$code]['TYPE'] == 'BOOL') && !$hasInformation) {
 			throw new Exception(T([
-				'en' => "Field '{$this->structure[$code]['NAME']}' can not be empty",
-				'ru' => "Поле '{$this->structure[$code]['NAME']}' не может быть пустым",
+				'en' => "Field '{$this->fields[$code]['NAME']}' can not be empty",
+				'ru' => "Поле '{$this->fields[$code]['NAME']}' не может быть пустым",
 			]));
 		}
 		if ($hasInformation) {
@@ -1146,20 +1146,20 @@ abstract class SCRUD {
 	}
 
 	/**
-	 * Извлекает набор структуры, состоящий из указанных полей.
+	 * Извлекает набор полей, состоящий из указанных полей.
 	 * Используется в компонентах для подготовки форм.
 	 *
 	 * @param array $codes линейный массив символьных кодов полей
 	 * @return array структура
 	 */
-	public function ExtractStructure($codes = []) {
-		$structure = [];
+	public function ExtractFields($codes = []) {
+		$fields = [];
 		foreach ($codes as $code) {
 			if (isset($this->fields[$code])) {
-				$structure[$code] = $this->fields[$code];
+				$fields[$code] = $this->fields[$code];
 			}
 		}
-		return $structure;
+		return $fields;
 	}
 
 	public function GetAdminUrl() {

@@ -89,7 +89,7 @@ class Registration extends Unit {
 	}
 
 	public function Default($VALUES = []) {
-		$RESULT['FIELDS'] = Users::I()->ExtractStructure($this->PARAMS['FIELDS']);
+		$RESULT['FIELDS'] = Users::I()->ExtractFields($this->PARAMS['FIELDS']);
 		$RESULT['VALUES'] = $VALUES;
 		$this->ENGINE->TITLE = $this->PARAMS['TITLE'];
 		return $RESULT;

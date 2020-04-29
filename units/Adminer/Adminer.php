@@ -83,8 +83,8 @@ class Adminer extends \BlackFox\Unit {
 		$R['FILTER'] = $FILTER;
 		$R['SORT'] = $SORT;
 		$R['SETTINGS'] = $this->LoadTableSettings();
-		$R['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractStructure($R['SETTINGS']['FILTERS']);
-		$R['STRUCTURE']['FIELDS'] = $this->SCRUD->ExtractStructure($R['SETTINGS']['FIELDS']);
+		$R['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractFields($R['SETTINGS']['FILTERS']);
+		$R['STRUCTURE']['FIELDS'] = $this->SCRUD->ExtractFields($R['SETTINGS']['FIELDS']);
 
 		// unset column if frame-mode
 		if ($this->frame) {
@@ -197,7 +197,7 @@ class Adminer extends \BlackFox\Unit {
 		]));
 	}
 
-	private function GetLinkForRedirect($ID, $REDIRECT) {
+	public function GetLinkForRedirect($ID, $REDIRECT) {
 		$get = $_GET;
 		unset($get['NEW']);
 		$variants = [
