@@ -82,11 +82,11 @@ class MySQL extends Database {
 			case 'LIST':
 				return "text";
 			case 'BOOLEAN':
-				return "bool";
+				return "tinyint(1)";
 			case 'INTEGER':
 			case 'OUTER':
 			case 'FILE':
-				return "int";
+				return "int(" . ((int)$field['LENGTH'] ?: 11) . ")";
 			case 'FLOAT':
 				$length = $field['LENGTH'] ?: 13;
 				$decimals = $field['DECIMALS'] ?: 2;
@@ -100,9 +100,9 @@ class MySQL extends Database {
 			case 'DATETIME':
 				return "datetime";
 			case 'ENUM':
-				return 'enum' . '("' . implode('", "', array_keys($field['VALUES'])) . '")';
+				return 'enum' . '(\'' . implode('\',\'', array_keys($field['VALUES'])) . '\')';
 			case 'SET':
-				return 'set' . '("' . implode('", "', array_keys($field['VALUES'])) . '")';
+				return 'set' . '(\'' . implode('\',\'', array_keys($field['VALUES'])) . '\')';
 			default:
 				throw new ExceptionType("Unknown data type: " . $field['TYPE']);
 		}
@@ -133,6 +133,7 @@ class MySQL extends Database {
 		$comment = ($field["NAME"]) ? " COMMENT '{$field["NAME"]}'" : "";
 
 		$structure_string = $this->Quote($field['CODE']) . " $type $null $default $auto_increment $comment";
+		$structure_string = preg_replace('/\s+/', ' ', $structure_string);
 
 		return $structure_string;
 	}
@@ -171,13 +172,12 @@ class MySQL extends Database {
 		$keys = [];
 
 		if (empty($tables)) {
-			foreach ($fields as $code => $Info) {
-				/** @var Type $Info */
-				if ($Info['PRIMARY']) {
+			foreach ($fields as $code => $field) {
+				if ($field['PRIMARY']) {
 					$keys[] = $code;
 				}
 				try {
-					$rows[] = $this->GetStructureString($Info);
+					$rows[] = $this->GetStructureString($field);
 				} catch (\Exception $error) {
 					continue;
 				}
@@ -199,24 +199,29 @@ class MySQL extends Database {
 			}
 
 			$last_after_code = '';
-			foreach ($fields as $code => $Info) {
-				/** @var Type $Info */
-				if ($Info['PRIMARY']) {
+			foreach ($fields as $code => $field) {
+				if ($field['PRIMARY']) {
 					$keys[] = $code;
 				}
+
 				try {
-					$structure_string = $this->GetStructureString($Info);
+					$structure_string = $this->GetStructureString($field);
 				} catch (\Exception $error) {
 					continue;
 				}
+
 				if ($strict && !empty($last_after_code)) {
 					$structure_string .= " AFTER " . $this->Quote($last_after_code);
 				}
+
 				if (!empty($columns[$code])) {
-					$rows[] = "MODIFY COLUMN $structure_string";
-				} elseif (!empty($Info['CHANGE']) && !empty($columns[$Info['CHANGE']])) {
-					$rows[] = "CHANGE COLUMN `{$Info['CHANGE']}` $structure_string";
-					unset($columns[$Info['CHANGE']]);
+					$is_diff = $this->IsFieldDifferentFromColumn($field, $columns[$code]);
+					if ($is_diff) {
+						$rows[] = "MODIFY COLUMN $structure_string";
+					}
+				} elseif (!empty($field['CHANGE']) && !empty($columns[$field['CHANGE']])) {
+					$rows[] = "CHANGE COLUMN `{$field['CHANGE']}` $structure_string";
+					unset($columns[$field['CHANGE']]);
 				} else {
 					$rows[] = "ADD COLUMN $structure_string";
 				}
@@ -235,50 +240,82 @@ class MySQL extends Database {
 				$rows[] = "ADD PRIMARY KEY (" . implode(", ", array_map([$this, 'Quote'], $keys)) . ")";
 			}
 			$SQL = "ALTER TABLE `{$table}` \r\n" . implode(",\r\n", $rows) . ";";
-			$this->Query($SQL);
+			if (!empty($rows)) {
+				$this->Query($SQL);
+			}
 		}
 
 		// INDEXES:
 		$db_indexes = $this->Query("SHOW INDEX FROM `{$table}`", 'Column_name');
-		foreach ($fields as $code => $Info) {
-			/** @var Type $Info */
+		foreach ($fields as $code => $field) {
+			/** @var Type $field */
 			if (in_array($code, $keys)) {
 				continue;
 			}
-			if ($Info['FOREIGN']) {
-				$Info['INDEX'] = true;
+			if ($field['FOREIGN']) {
+				$field['INDEX'] = true;
 			}
-			if ($Info['UNIQUE']) {
-				$Info['INDEX'] = true;
+			if ($field['UNIQUE']) {
+				$field['INDEX'] = true;
 			}
-			if ($Info['INDEX'] === 'UNIQUE') {
-				$Info['INDEX'] = true;
-				$Info['UNIQUE'] = true;
+			if ($field['INDEX'] === 'UNIQUE') {
+				$field['INDEX'] = true;
+				$field['UNIQUE'] = true;
 			}
-			$unique = ($Info['UNIQUE']) ? 'UNIQUE' : '';
+			$unique = ($field['UNIQUE']) ? 'UNIQUE' : '';
 			$db_index = $db_indexes[$code];
 
 			// index is: present in database, missing in code - drop it
-			if (isset($db_index) and !$Info['INDEX']) {
+			if (isset($db_index) and !$field['INDEX']) {
 				$this->Query("ALTER TABLE `{$table}` DROP INDEX `{$code}`;");
 				continue;
 			}
 
 			// index is: missing in database, present in code - create it
-			if ($Info['INDEX'] and !isset($db_index)) {
+			if ($field['INDEX'] and !isset($db_index)) {
 				$this->Query("ALTER TABLE `{$table}` ADD {$unique} INDEX `{$code}` (`{$code}`);");
 				continue;
 			}
 
 			// index is: present in database, present in code - check unique
 			if (isset($db_index)) {
-				if (($Info['UNIQUE'] and $db_index['Non_unique']) or (!$Info['UNIQUE'] and !$db_index['Non_unique'])) {
+				if (($field['UNIQUE'] and $db_index['Non_unique']) or (!$field['UNIQUE'] and !$db_index['Non_unique'])) {
 					$this->Query("ALTER TABLE `{$table}` DROP INDEX `{$code}`, ADD {$unique} INDEX `{$code}` (`{$code}`);");
 					continue;
 				}
 			}
 		}
 
+	}
+
+	public function IsFieldDifferentFromColumn(array $field, array $column) {
+		// type
+		$type = $this->GetStructureStringType($field);
+		if ($type <> $column['Type'])
+			return true;
+
+		// not null
+		if ($field['NOT_NULL'] and $column['Null'] == 'YES')
+			return true;
+		if (!$field['NOT_NULL'] and $column['Null'] <> 'YES')
+			return true;
+
+		// auto increment
+		if ($field['AUTO_INCREMENT'] and false === strpos($column['Extra'], 'auto_increment'))
+			return true;
+
+		// name = comment
+		if ($field['NAME'] <> $column['Comment'])
+			return true;
+
+		// default
+		$default = $field['DEFAULT'];
+		if (is_array($default))
+			$default = implode(',', $default);
+		if ($default <> $column['Default'])
+			return true;
+
+		return false;
 	}
 
 	public function CreateTableConstraints($table, $fields) {
