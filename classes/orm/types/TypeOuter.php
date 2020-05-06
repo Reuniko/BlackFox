@@ -4,6 +4,16 @@ namespace BlackFox;
 
 class TypeOuter extends Type {
 
+	public function ProvideInfoIntegrity() {
+		parent::ProvideInfoIntegrity();
+		if (empty($this->field['LINK'])) {
+			throw new ExceptionNotAllowed(T([
+				'en' => "You must set class name to LINK info of field '{$this->field['CODE']}'",
+				'ru' => "Необходимо установить имя класса в ключ LINK поля '{$this->field['CODE']}'",
+			]));
+		}
+	}
+
 	public function FormatInputValue($value) {
 		if (!is_numeric($value)) {
 			throw new ExceptionType(T([
