@@ -22,8 +22,10 @@ body.frame {
 .page-header {
 	color: #444;
 	font-size: 2.0rem;
+	margin-bottom: 1rem;
 }
 
+/*
 .dl-horizontal dt {
 	float: left;
 	width: 35%;
@@ -41,6 +43,7 @@ body.frame {
 .dl-horizontal dd:after {
 	content: '\00A0';
 }
+*/
 
 .separator {
 	border-bottom: 1px solid rgba(0, 0, 0, .1);
@@ -57,8 +60,4 @@ body.frame {
 .card-header {
 	font-weight: 500;
 	font-size: 110%;
-}
-
-h1 {
-	margin-bottom: 1rem;
 }
