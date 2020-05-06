@@ -18,17 +18,19 @@ if ($RESULT['MODE'] === 'Create') {
 <div class="adminer">
 
 	<!-- Nav tabs -->
-	<ul class="nav nav-tabs" id="tabs" role="tablist">
-		<? foreach ($RESULT['TABS'] as $tab_code => $tab): ?>
-			<li class="nav-item">
-				<a
-					class="nav-link <?= ($tab['ACTIVE'] ? 'active' : '') ?>"
-					data-toggle="tab"
-					href="#<?= strtolower($tab_code) ?>"
-				><?= $tab['NAME'] ?></a>
-			</li>
-		<? endforeach; ?>
-	</ul>
+	<? if (count($RESULT['TABS']) > 1): ?>
+		<ul class="nav nav-tabs" id="tabs" role="tablist">
+			<? foreach ($RESULT['TABS'] as $tab_code => $tab): ?>
+				<li class="nav-item">
+					<a
+						class="nav-link <?= ($tab['ACTIVE'] ? 'active' : '') ?>"
+						data-toggle="tab"
+						href="#<?= strtolower($tab_code) ?>"
+					><?= $tab['NAME'] ?></a>
+				</li>
+			<? endforeach; ?>
+		</ul>
+	<? endif; ?>
 
 	<!-- Tab panes -->
 	<div class="tab-content">

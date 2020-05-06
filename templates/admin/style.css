@@ -58,3 +58,7 @@ body.frame {
 	font-weight: 500;
 	font-size: 110%;
 }
+
+h1 {
+	margin-bottom: 1rem;
+}
