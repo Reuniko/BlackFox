@@ -52,7 +52,7 @@ class Authorization extends Unit {
 					'en' => 'Where to redirect the user upon successful authorization',
 					'ru' => 'Куда переадресовать пользователя при успешной авторизации',
 				]),
-				'DEFAULT'     => '/',
+				'DEFAULT'     => null,
 			],
 			'REGISTRATION' => [
 				'TYPE'        => 'STRING',

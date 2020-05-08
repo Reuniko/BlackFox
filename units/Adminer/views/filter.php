@@ -35,7 +35,7 @@
 						</div>
 					</div>
 				<? endforeach; ?>
-				<div class="form-group row">
+				<div class="form-group row mb-0">
 					<div class="col-sm-8 offset-sm-3">
 
 						<div class="buttons">
