@@ -1,5 +1,8 @@
 <?php /** @var \BlackFox\Adminer $this */ ?>
 <?php /** @var array $RESULT */ ?>
+
+<? @include($this->PathInclude('element_actions.php')); ?>
+
 <form method="post" enctype="multipart/form-data" class="form-horizontal">
 
 	<input type="hidden" name="ACTION" value="<?= $RESULT['MODE'] ?>"/>

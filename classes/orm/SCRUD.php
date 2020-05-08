@@ -63,6 +63,8 @@ abstract class SCRUD {
 		'VITAL'          => true,
 	];
 
+	public $actions = [];
+
 
 	public function __construct(Database $Database = null) {
 		$this->DB = $Database ?: Database::I();

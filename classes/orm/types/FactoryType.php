@@ -37,14 +37,14 @@ class FactoryType {
 	 * @return Type instance of class
 	 * @throws Exception
 	 */
-	public static function Get(array $field, Database $Database) {
+	public static function Get(array $field, Database $Database = null) {
 		$field['TYPE'] = strtoupper($field['TYPE']);
 		if (!isset(self::$TYPES[$field['TYPE']])) {
 			throw new Exception("Class for type '{$field['TYPE']}' not found, field code: '{$field['CODE']}'");
 		}
 		/** @var Type $class */
 		$class = self::$TYPES[$field['TYPE']];
-		return new $class($field, $Database);
+		return new $class($field, $Database ?: Database::I());
 	}
 
 }

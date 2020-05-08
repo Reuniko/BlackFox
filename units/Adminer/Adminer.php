@@ -141,7 +141,7 @@ class Adminer extends \BlackFox\Unit {
 			'en' => 'Add element',
 			'ru' => 'Добавление элемента',
 		]));
-		$this->view = 'element';
+		$this->view = 'Element';
 		return $R;
 	}
 
@@ -160,6 +160,8 @@ class Adminer extends \BlackFox\Unit {
 		$R['BACK'] = $this->GetBackLink();
 		$R['TABS'] = $this->GetTabsOfUpdate();
 
+		$R['ACTIONS'] = $this->SCRUD->actions;
+
 		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
 			$this->SCRUD->fields[$code]['DISABLED'] = true;
 		}
@@ -168,7 +170,7 @@ class Adminer extends \BlackFox\Unit {
 			'en' => "Edit element #{$ID}",
 			'ru' => "Редактирование элемента №{$ID}",
 		]));
-		$this->view = 'element';
+		$this->view = 'Element';
 		return $R;
 	}
 
@@ -365,6 +367,7 @@ class Adminer extends \BlackFox\Unit {
 				'PAGE'   => $page,
 				'FIELDS' => ['@@'],
 				'LIMIT'  => 5,
+				'ESCAPE' => false,
 			]);
 
 			$results = [];
@@ -385,6 +388,30 @@ class Adminer extends \BlackFox\Unit {
 		} catch (Exception $error) {
 			return ['ERROR' => $error->GetArray()];
 		}
+	}
+
+	public function ExecuteAction($ID, $action_id, $action_params = []) {
+		$action_params['ID'] = $ID;
+		$ReflectionClass = new \ReflectionClass($this->SCRUD);
+		if (!$ReflectionClass->hasMethod($action_id)) {
+			throw new Exception(T([
+				'en' => "Unknown method: '{$action_id}'",
+				'ru' => "Неизвестный метод: '{$action_id}'",
+			]));
+		}
+
+		$ReflectionMethod = $ReflectionClass->getMethod($action_id);
+		$ReflectionParameters = $ReflectionMethod->getParameters();
+		$args = [];
+		foreach ($ReflectionParameters as $ReflectionParameter) {
+			$args[$ReflectionParameter->name] = $action_params[$ReflectionParameter->name];
+		}
+		$ReflectionMethod->invokeArgs($this->SCRUD, $args);
+
+		$this->Redirect(null, T([
+			'en' => "'{$this->SCRUD->actions[$action_id]['NAME']}' executed",
+			'ru' => "'{$this->SCRUD->actions[$action_id]['NAME']}' выполнено",
+		]));
 	}
 
 } 
