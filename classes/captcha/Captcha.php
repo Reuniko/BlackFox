@@ -14,11 +14,7 @@ class Captcha {
 	}
 
 	public function Check() {
-		return;
-		throw new ExceptionCaptcha(T([
-			'en' => 'Override default class "Captcha" with driver',
-			'ru' => 'Переопределите класс "Captcha" драйвером',
-		]));
+		return false;
 	}
 
 }

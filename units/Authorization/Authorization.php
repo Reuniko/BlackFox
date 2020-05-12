@@ -64,7 +64,7 @@ class Authorization extends Unit {
 					'en' => 'Link to registration',
 					'ru' => 'Ссылка на регистрацию',
 				]),
-				'DEFAULT'     => '/',
+				'DEFAULT'     => null,
 			],
 		];
 		$this->allow_ajax_request = true;
@@ -94,7 +94,12 @@ class Authorization extends Unit {
 
 	public function Login($login = null, $password = null) {
 		if ($this->PARAMS['CAPTCHA']) {
-			Captcha::I()->Check();
+			if (!Captcha::I()->Check()) {
+				throw new ExceptionCaptcha(T([
+					'en' => 'You must pass the captcha',
+					'ru' => 'Необходимо пройти капчу',
+				]));
+			}
 		}
 		User::I()->Authorization($login, $password);
 

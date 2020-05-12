@@ -173,9 +173,15 @@ class Engine {
 			}
 		}
 		if ($this->User->IsAuthorized()) {
-			throw new ExceptionAccessDenied('This section requires higher privileges');
+			throw new ExceptionAccessDenied(T([
+				'en' => 'This section requires higher privileges',
+				'ru' => 'Доступ запрещен',
+			]));
 		} else {
-			throw new ExceptionAuthRequired('This section requires authorization');
+			throw new ExceptionAuthRequired(T([
+				'en' => 'This section requires authorization',
+				'ru' => 'Для доступа в этот раздел необходима авторизация',
+			]));
 		}
 	}
 

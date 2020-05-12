@@ -38,13 +38,7 @@ class CaptchaDriverGoogleRecaptchaV2 extends Captcha {
 		]]);
 		$result = file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
 		$result = json_decode($result, true);
-		// return $result['success'];
-		if ($result['success'] <> true) {
-			throw new ExceptionCaptcha(T([
-				'en' => 'You must pass the captcha',
-				'ru' => 'Необходимо пройти капчу',
-			]));
-		}
+		return $result['success'];
 	}
 
 }

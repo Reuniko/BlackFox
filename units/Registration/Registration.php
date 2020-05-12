@@ -97,7 +97,12 @@ class Registration extends Unit {
 
 	public function Registration($VALUES = []) {
 		if ($this->PARAMS['CAPTCHA']) {
-			Captcha::I()->Check();
+			if (!Captcha::I()->Check()) {
+				throw new ExceptionCaptcha(T([
+					'en' => 'You must pass the captcha',
+					'ru' => 'Необходимо пройти капчу',
+				]));
+			}
 		}
 		$ID = Users::I()->Create($VALUES);
 		User::I()->Login($ID);
