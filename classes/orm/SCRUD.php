@@ -102,6 +102,17 @@ abstract class SCRUD {
 		$this->composition = [];
 		$this->keys = [];
 
+		if (empty($this->name)) {
+			$this->name = static::class;
+		}
+
+		if (empty($this->fields)) {
+			throw new Exception(T([
+				'en' => "Specify fields for '{$this->name}'",
+				'ru' => "Отсутствуют поля у '{$this->name}'",
+			]));
+		}
+
 		// init keys, increment
 		foreach ($this->fields as $code => $field) {
 			if ($field['PRIMARY']) {
