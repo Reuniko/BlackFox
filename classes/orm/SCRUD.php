@@ -66,8 +66,8 @@ abstract class SCRUD {
 	public $actions = [];
 
 
-	public function __construct(Database $Database = null) {
-		$this->DB = $Database ?: Database::I();
+	public function __construct(Database $DB) {
+		$this->DB = $DB;
 		$this->code = strtolower(implode('_', array_filter(explode('\\', static::class))));
 		$this->Init();
 		$this->ProvideIntegrity();

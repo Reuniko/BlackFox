@@ -3,8 +3,8 @@
 namespace BlackFox;
 
 class User {
-use Instance;
 
+	use Instance;
 
 	/** @var null|int user identifier */
 	public $ID = null;

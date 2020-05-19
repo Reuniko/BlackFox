@@ -123,18 +123,14 @@ class Engine {
 	 * Initializes the main connection to the default database
 	 */
 	public function InitDatabase() {
-		$this->Database = Database::I();
-		$this->Database->Init($this->config['database']);
+		$this->Database = Database::I(['params' => $this->config['database']]);
 	}
 
 	/**
 	 * Initializes the main connection to the default cache
 	 */
 	public function InitCache() {
-		if (!empty($this->config['cache'])) {
-			$this->Cache = Cache::I();
-			$this->Cache->Init($this->config['cache']);
-		}
+		$this->Cache = Cache::I(['params' => $this->config['cache']]);
 	}
 
 	/**
