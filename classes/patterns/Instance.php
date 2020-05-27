@@ -17,19 +17,19 @@ trait Instance {
 			if ($old_class_name === $new_class_name) {
 				throw new Exception("Wrong override: '{$old_class_name}' => '{$new_class_name}'");
 			}
-			self::$overrides[$old_class_name] = $new_class_name;
+			Instance::$overrides[$old_class_name] = $new_class_name;
 		}
 	}
 
 	/**
-	 * @var self[] $overrides array of classes to be overridden:
+	 * @var Instance[] $overrides array of classes to be overridden:
 	 * key - string, name of the interface or abstract class or concrete class (which should be overridden);
 	 * value - string, name of the final class (with trait Instance);
 	 */
-	private static $overrides = [];
+	public static $overrides = [];
 
-	/** @var self[] array of instantiated classes: key - class name, value - Object */
-	private static $instances = [];
+	/** @var Instance[] array of instantiated classes: key - class name, value - Object */
+	public static $instances = [];
 
 	/** @var bool if the class has been instanced - in most cases it is required to prohibit a change in its internal state */
 	public $is_global_instance = false;
@@ -44,23 +44,24 @@ trait Instance {
 	 * @param array $params
 	 * @return static global instance
 	 * @throws Exception
+	 * @throws \ReflectionException
 	 */
 	public static function I($params = []) {
-		/** @var self|string $class */
+		/** @var Instance|string $class */
 		$class = get_called_class();
-		if (self::$overrides[$class]) {
-			return self::$overrides[$class]::I($params);
+		if (Instance::$overrides[$class]) {
+			return Instance::$overrides[$class]::I($params);
 		}
-		if (isset(self::$instances[$class])) {
+		if (isset(Instance::$instances[$class])) {
 			if (empty($params)) {
-				return self::$instances[$class];
+				return Instance::$instances[$class];
 			} else {
 				throw new Exception("Can't initiate global instance of class '{$class}': global instance already exist");
 			}
 		}
-		self::$instances[$class] = $class::N($params);
-		self::$instances[$class]->is_global_instance = true;
-		return self::$instances[$class];
+		Instance::$instances[$class] = $class::N($params);
+		Instance::$instances[$class]->is_global_instance = true;
+		return Instance::$instances[$class];
 	}
 
 	/**
@@ -81,8 +82,8 @@ trait Instance {
 	 */
 	public static function N($params = []) {
 		$class = get_called_class();
-		if (self::$overrides[$class]) {
-			return self::$overrides[$class]::N();
+		if (Instance::$overrides[$class]) {
+			return Instance::$overrides[$class]::N();
 		}
 
 		$ReflectionClass = new \ReflectionClass(get_called_class());
@@ -121,7 +122,7 @@ trait Instance {
 			// $Parameter has a non-builtin type
 			$p_class = $ParameterType->getName();
 			$traits = (new \ReflectionClass($p_class))->getTraits();
-			if(isset($traits['BlackFox\Instance'])) {
+			if (isset($traits['BlackFox\Instance'])) {
 				/**@var string|self $p_class */
 				$args[$p_class] = $p_class::I();
 			} else {
