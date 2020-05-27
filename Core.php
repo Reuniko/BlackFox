@@ -15,7 +15,7 @@ class Core extends \BlackFox\ACore {
 		Files::I()->Synchronize();
 		Groups::I()->Synchronize();
 		Users2Groups::I()->Synchronize();
-		Content::I()->Synchronize();
+		Pages::I()->Synchronize();
 		Redirects::I()->Synchronize();
 		Log::I()->Synchronize();
 
