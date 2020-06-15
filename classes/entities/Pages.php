@@ -2,7 +2,7 @@
 
 namespace BlackFox;
 
-class Content extends SCRUD {
+class Pages extends SCRUD {
 
 	public function Init() {
 		$this->name = T([

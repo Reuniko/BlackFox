@@ -66,8 +66,8 @@ abstract class SCRUD {
 	public $actions = [];
 
 
-	public function __construct(Database $Database = null) {
-		$this->DB = $Database ?: Database::I();
+	public function __construct(Database $DB) {
+		$this->DB = $DB;
 		$this->code = strtolower(implode('_', array_filter(explode('\\', static::class))));
 		$this->Init();
 		$this->ProvideIntegrity();
@@ -101,6 +101,17 @@ abstract class SCRUD {
 
 		$this->composition = [];
 		$this->keys = [];
+
+		if (empty($this->name)) {
+			$this->name = static::class;
+		}
+
+		if (empty($this->fields)) {
+			throw new Exception(T([
+				'en' => "Specify fields for '{$this->name}'",
+				'ru' => "Отсутствуют поля у '{$this->name}'",
+			]));
+		}
 
 		// init keys, increment
 		foreach ($this->fields as $code => $field) {

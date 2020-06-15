@@ -8,8 +8,6 @@ abstract class Database {
 
 	public $database;
 
-	abstract function Init(array $params);
-
 	/**
 	 * Execute SQL query and return a result as array
 	 *

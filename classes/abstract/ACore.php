@@ -41,6 +41,7 @@ abstract class ACore {
 	 * Method returns classes of this module.
 	 *
 	 * @return array dictionary: key - class name (with namespace), value - absolute path to php-file with class
+	 * @throws \ReflectionException
 	 */
 	public function GetClasses() {
 		$ReflectionClass = new \ReflectionClass(get_called_class());

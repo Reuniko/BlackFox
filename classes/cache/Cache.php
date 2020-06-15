@@ -10,7 +10,7 @@ class Cache {
 
 	use Instance;
 
-	public function Init(array $params) {
+	public function __construct(array $params = []) {
 	}
 
 	/**

@@ -63,6 +63,7 @@ class Engine {
 	 * - Loads module 'BlackFox'
 	 * - Initializes the main connection to the default database
 	 * @throws Exception
+	 * @throws \ReflectionException
 	 */
 	public function __construct() {
 		$this->InitConfig($this->GetConfig());
@@ -123,18 +124,14 @@ class Engine {
 	 * Initializes the main connection to the default database
 	 */
 	public function InitDatabase() {
-		$this->Database = Database::I();
-		$this->Database->Init($this->config['database']);
+		$this->Database = Database::I(['params' => $this->config['database']]);
 	}
 
 	/**
 	 * Initializes the main connection to the default cache
 	 */
 	public function InitCache() {
-		if (!empty($this->config['cache'])) {
-			$this->Cache = Cache::I();
-			$this->Cache->Init($this->config['cache']);
-		}
+		$this->Cache = Cache::I(['params' => $this->config['cache']]);
 	}
 
 	/**
@@ -442,21 +439,11 @@ class Engine {
 	 * @throws Exception
 	 */
 	public function MakeContent() {
-		$lang = $this->GetLanguage();
-
 		// request for specific file or directory with 'index.php'
 		foreach ($this->roots as $root_absolute_folder) {
 			$request_path = $root_absolute_folder . $this->url['path'];
 			if (is_dir($request_path)) {
 				$request_path .= 'index.php';
-			}
-			if ($lang) {
-				$pathinfo = pathinfo($request_path);
-				$requested_path_lang = "{$pathinfo['dirname']}/{$pathinfo['filename']}.{$lang}.{$pathinfo['extension']}";
-				if (file_exists($requested_path_lang)) {
-					require($requested_path_lang);
-					return;
-				}
 			}
 			if (file_exists($request_path)) {
 				require($request_path);
@@ -480,7 +467,7 @@ class Engine {
 		}
 
 		// content from database
-		$page = Content::I()->Read(['URL' => $this->url['path']]);
+		$page = Pages::I()->Read(['URL' => $this->url['path']]);
 		if ($page) {
 			$this->TITLE = $page['TITLE'];
 			$this->KEYWORDS = $page['KEYWORDS'];
@@ -603,6 +590,7 @@ class Engine {
 	 *
 	 * @param string $namespace symbolic code of the core/namespace
 	 * @throws Exception
+	 * @throws \ReflectionException
 	 */
 	public function RegisterCoreClasses($namespace) {
 		$Core = "{$namespace}\\Core";

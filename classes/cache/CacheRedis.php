@@ -21,7 +21,8 @@ class CacheRedis extends Cache {
 	/**@var \Redis $Redis */
 	private $Redis;
 
-	public function Init(array $params) {
+	public function __construct(array $params = []) {
+		parent::__construct($params);
 		$this->Redis = new \Redis();
 		foreach ($params['hosts'] as $host) {
 			@$result = $this->Redis->connect(

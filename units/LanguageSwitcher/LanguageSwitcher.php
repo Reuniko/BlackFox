@@ -24,7 +24,7 @@ class LanguageSwitcher extends Unit {
 	public function SwitchLanguage($SwitchLanguage) {
 		$this->ENGINE->SetLanguage($SwitchLanguage);
 		$request = array_diff($_GET, ['SwitchLanguage' => $SwitchLanguage]);
-		$this->Redirect(empty($request) ? '.' : '?' . http_build_query($request));
+		$this->Redirect('?' . http_build_query($request));
 	}
 
 }

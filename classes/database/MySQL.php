@@ -6,7 +6,7 @@ class MySQL extends Database {
 
 	private $link;
 
-	public function Init(array $params) {
+	public function __construct(array $params) {
 
 		$this->database = $params['DATABASE'];
 
