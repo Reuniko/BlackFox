@@ -9,23 +9,41 @@ class AdminerUsers extends Adminer {
 		parent::Execute($PARAMS, $REQUEST);
 	}
 
-	public function Section($FILTER = [], $PAGE = 1, $SORT = ['ID' => 'DESC'], $FIELDS = ['*@@']) {
+	public function Init($PARAMS = []) {
+		parent::Init($PARAMS);
+
 		unset($this->SCRUD->fields['SALT']);
-		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['HASH']);
+		unset($this->SCRUD->fields['HASH']);
 		unset($this->SCRUD->fields['PASSWORD']);
-		return parent::Section($FILTER, $PAGE, $SORT, $FIELDS);
-	}
+		$this->SCRUD->ProvideIntegrity();
 
-	public function CreateForm($FILTER = [], $FIELDS = []) {
-		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['SALT']);
-		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['HASH']);
-		return parent::CreateForm($FILTER, $FIELDS);
-	}
-
-	public function UpdateForm($ID = null, $FIELDS = []) {
-		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['SALT']);
-		unset($this->SCRUD->composition['SYSTEM']['FIELDS']['HASH']);
-		return parent::UpdateForm($ID, $FIELDS);
+		$this->actions += [
+			'Login'       => [
+				'NAME'        => T([
+					'en' => 'Authorize',
+					'ru' => 'Авторизоваться',
+				]),
+				'ICON'        => 'fa fa-key',
+				'DESCRIPTION' => T([
+					'en' => 'Authorize by this user',
+					'ru' => 'Авторизоваться под этим пользователем',
+				]),
+			],
+			'SetPassword' => [
+				'NAME'   => T([
+					'en' => 'Set new password',
+					'ru' => 'Установить новый пароль',
+				]),
+				'ICON'   => 'fa fa-key',
+				'PARAMS' => [
+					'password' => [
+						'TYPE'     => 'PASSWORD',
+						'NAME'     => 'Пароль',
+						'NOT_NULL' => true,
+					],
+				],
+			],
+		];
 	}
 
 	public function Login($ID) {
@@ -33,15 +51,11 @@ class AdminerUsers extends Adminer {
 		$this->Redirect('/');
 	}
 
-	public function GetTabsOfUpdate() {
-		return parent::GetTabsOfUpdate() + [
-				'actions' => [
-					'NAME' => T([
-						'en' => 'Actions',
-						'ru' => 'Действия',
-					]),
-					'VIEW' => 'element_tab_actions',
-				],
-			];
+	public function SetPassword($ID, $password) {
+		Users::I()->SetPassword($ID, $password);
+		return T([
+		    'en' => 'New password set',
+		    'ru' => 'Новый пароль установлен',
+		]);
 	}
 }

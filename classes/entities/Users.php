@@ -80,8 +80,8 @@ class Users extends SCRUD {
 				'TYPE'     => 'DATETIME',
 				'GROUP'    => 'SYSTEM',
 				'NAME'     => T([
-					'en' => 'Last authorization moment',
-					'ru' => 'Последнее время авторизации',
+					'en' => 'Authorization',
+					'ru' => 'Авторизация',
 				]),
 				'DISABLED' => true,
 			],
@@ -89,8 +89,8 @@ class Users extends SCRUD {
 				'TYPE'     => 'DATETIME',
 				'GROUP'    => 'SYSTEM',
 				'NAME'     => T([
-					'en' => 'Registration moment',
-					'ru' => 'Время регистрации',
+					'en' => 'Registration',
+					'ru' => 'Регистрация',
 				]),
 				'DISABLED' => true,
 			],

@@ -12,6 +12,7 @@ $params = http_build_query([
 		$Type->field['INNER_KEY'] => $RESULT['DATA']['ID'],
 	],
 ]);
+$params = $this->SanitizeUrl($params);
 ?>
 <iframe
 	class="external"

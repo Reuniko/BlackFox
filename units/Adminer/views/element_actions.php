@@ -44,7 +44,12 @@
 							<? if (!empty($action['PARAMS'])): ?>
 								<? foreach ($action['PARAMS'] as $param_id => $param): ?>
 									<div class="form-group">
-										<label class="col-form-label"><?= $param['NAME'] ?>:</label>
+										<label class="col-form-label">
+											<?= $param['NAME'] ?>
+											<? if ($param['NOT_NULL']): ?>
+												<span class="red">*</span>
+											<? endif; ?>
+										</label>
 										<?
 										\BlackFox\FactoryType::Get($param)->PrintFormControl(null, "ACTION_PARAMS[{$param_id}]");
 										?>

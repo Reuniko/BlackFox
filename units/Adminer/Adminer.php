@@ -6,7 +6,10 @@ class Adminer extends \BlackFox\Unit {
 
 	/** @var \BlackFox\SCRUD */
 	public $SCRUD;
+	/** @var bool is in frame mode */
 	public $frame = false;
+	/**@var [] possible actions for single element: buttons on the top of the form with popup modals */
+	public $actions = [];
 
 	public $options = [
 		'SCRUD'        => [
@@ -40,7 +43,7 @@ class Adminer extends \BlackFox\Unit {
 		if (is_object($PARAMS['SCRUD'])) {
 			$this->SCRUD = $PARAMS['SCRUD'];
 		} elseif (class_exists($PARAMS['SCRUD'])) {
-			$this->SCRUD = $PARAMS['SCRUD']::I();
+			$this->SCRUD = $PARAMS['SCRUD']::N();
 		}
 		$this->ControlUrl();
 
@@ -160,7 +163,7 @@ class Adminer extends \BlackFox\Unit {
 		$R['BACK'] = $this->GetBackLink();
 		$R['TABS'] = $this->GetTabsOfUpdate();
 
-		$R['ACTIONS'] = $this->SCRUD->actions;
+		$R['ACTIONS'] = $this->actions;
 
 		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
 			$this->SCRUD->fields[$code]['DISABLED'] = true;
@@ -392,7 +395,7 @@ class Adminer extends \BlackFox\Unit {
 
 	public function ExecuteAction($ID, $action_id, $action_params = []) {
 		$action_params['ID'] = $ID;
-		$ReflectionClass = new \ReflectionClass($this->SCRUD);
+		$ReflectionClass = new \ReflectionClass($this);
 		if (!$ReflectionClass->hasMethod($action_id)) {
 			throw new Exception(T([
 				'en' => "Unknown method: '{$action_id}'",
@@ -406,11 +409,12 @@ class Adminer extends \BlackFox\Unit {
 		foreach ($ReflectionParameters as $ReflectionParameter) {
 			$args[$ReflectionParameter->name] = $action_params[$ReflectionParameter->name];
 		}
-		$ReflectionMethod->invokeArgs($this->SCRUD, $args);
 
-		$this->Redirect(null, T([
-			'en' => "'{$this->SCRUD->actions[$action_id]['NAME']}' executed",
-			'ru' => "'{$this->SCRUD->actions[$action_id]['NAME']}' выполнено",
+		$result = $ReflectionMethod->invokeArgs($this, $args);
+
+		$this->Redirect(null, (!empty($result) and is_string($result)) ? $result : T([
+			'en' => "Action '{$this->actions[$action_id]['NAME']}' executed",
+			'ru' => "Действие '{$this->actions[$action_id]['NAME']}' выполнено",
 		]));
 	}
 
