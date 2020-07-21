@@ -26,7 +26,7 @@ trait Instance {
 	 * key - string, name of the interface or abstract class or concrete class (which should be overridden);
 	 * value - string, name of the final class (with trait Instance);
 	 */
-	public static $overrides = [];
+	public static $overrides = null;
 
 	/** @var Instance[] array of instantiated classes: key - class name, value - Object */
 	public static $instances = [];
@@ -47,6 +47,12 @@ trait Instance {
 	 * @throws \ReflectionException
 	 */
 	public static function I($params = []) {
+		if (Instance::$overrides === null) {
+			Instance::$overrides = [];
+			$config = Engine::GetConfig();
+			Instance::AddOverrides($config['overrides'] ?: []);
+		}
+
 		/** @var Instance|string $class */
 		$class = get_called_class();
 		if (Instance::$overrides[$class]) {

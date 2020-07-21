@@ -51,22 +51,24 @@ class Engine {
 
 	public $DELAYED = [];
 
-	public function GetConfig(): array {
+	public static function GetConfig(): array {
 		return require($_SERVER['DOCUMENT_ROOT'] . '/config.php');
 	}
 
 	/**
 	 * Engine constructor:
+	 * - Initializes configuration
 	 * - Initializes (and prolongs) user session
-	 * - Reads main config into $this->config, $this->roots and $this->cores
 	 * - Links autoload class system to $this->AutoloadClass()
+	 * - Links unhandled exception handler to $this->ExceptionHandler()
 	 * - Loads module 'BlackFox'
 	 * - Initializes the main connection to the default database
+	 * - Initializes the main connection to the default cache
 	 * @throws Exception
 	 * @throws \ReflectionException
 	 */
 	public function __construct() {
-		$this->InitConfig($this->GetConfig());
+		$this->InitConfig(static::GetConfig());
 		$this->InitUserSession();
 		$this->InitAutoloadClasses();
 		$this->InitExceptionHandler();
@@ -77,9 +79,7 @@ class Engine {
 
 	/**
 	 * Parses main config into props: config, roots, cores, templates, languages.
-	 * Adds overrides from $config['overrides'].
 	 * @param array $config
-	 * @throws Exception
 	 */
 	public function InitConfig(array $config) {
 		$this->config = $config;
@@ -87,22 +87,14 @@ class Engine {
 		$this->cores = $config['cores'];
 		$this->templates = $config['templates'];
 		$this->languages = $config['languages'];
-		Instance::AddOverrides($config['overrides'] ?: []);
 	}
 
-	/**
-	 * Initializes and prolongs a user's session
-	 */
 	public function InitUserSession() {
 		session_start();
 		$lifetime = 7 * 24 * 60 * 60;
 		setcookie(session_name(), session_id(), time() + $lifetime, '/');
 	}
 
-
-	/**
-	 * Links autoload class system to $this->AutoloadClass()
-	 */
 	public function InitAutoloadClasses() {
 		spl_autoload_register([$this, 'AutoloadClass']);
 	}
@@ -112,12 +104,17 @@ class Engine {
 	}
 
 	public function ExceptionHandler(\Throwable $Exception) {
-		debug($Exception, '$Exception');
-		echo '<xmp>';
+		if (php_sapi_name() <> 'cli')
+			echo '<xmp>';
+
 		echo $Exception->getMessage();
-		echo "\r\n\r\n";
-		echo $Exception->getTraceAsString();
-		echo '</xmp>';
+
+		if ($this->config['debug']) {
+			echo "\r\n\r\n";
+			echo $Exception->getTraceAsString();
+			echo "\r\n\r\n";
+			print_r($Exception);
+		}
 	}
 
 	/**
