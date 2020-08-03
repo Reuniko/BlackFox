@@ -2,7 +2,7 @@
 
 namespace BlackFox;
 
-class CaptchaDriverGoogleRecaptchaV2 extends Captcha {
+class CaptchaGoogleRecaptchaV2 extends Captcha {
 
 	public $key;
 	private $secret;

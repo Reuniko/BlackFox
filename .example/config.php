@@ -4,6 +4,7 @@
  *
  * Tasks:
  * - replace word 'Site' with the unique name of your project's folder\namespace
+ * - select database engine
  * - configure key 'database'
  * - delete this comment
  */
@@ -26,9 +27,16 @@ return [
 		//'ru' => 'Русский',
 	],
 	'overrides' => [
-		// 'BlackFox\Engine' => 'Site\Engine',
+		// pick one:
+		// 'BlackFox\Database' => 'BlackFox\MySQL',
+		// 'BlackFox\Database' => 'BlackFox\Postgres',
+
+		// pick none or one:
+		// 'BlackFox\Captcha' => 'BlackFox\KCaptcha',
+		// 'BlackFox\Captcha' => 'BlackFox\CaptchaGoogleRecaptchaV2',
+
+		// pick none or one:
 		// 'BlackFox\Cache' => 'BlackFox\CacheRedis',
-		'BlackFox\Database' => 'BlackFox\MySQL',
 	],
 	'database'  => [
 		'HOST'     => 'localhost',

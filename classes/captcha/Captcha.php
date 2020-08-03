@@ -1,6 +1,7 @@
 <?php
 
 namespace BlackFox;
+
 class Captcha {
 
 	use Instance;
@@ -10,7 +11,7 @@ class Captcha {
 	}
 
 	public function Check() {
-		return false;
+		return true;
 	}
 
 }
