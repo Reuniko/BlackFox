@@ -610,7 +610,7 @@ class Engine {
 	 * @param string $relative_path relative path
 	 * @return string absolute path
 	 */
-	public function GetAbsolutePath($relative_path) {
+	public function GetAbsolutePath(string $relative_path) {
 		return $_SERVER['DOCUMENT_ROOT'] . $relative_path;
 	}
 
@@ -622,16 +622,16 @@ class Engine {
 	 * @return string relative path
 	 * @throws Exception
 	 */
-	public function GetRelativePath($absolute_path, $root_path = null) {
+	public function GetRelativePath(string $absolute_path, string $root_path = null) {
 		$root_path = $root_path ?: $_SERVER['DOCUMENT_ROOT'];
 
 		$root_path = str_replace('\\', '/', $root_path);
 		$absolute_path = str_replace('\\', '/', $absolute_path);
 
-		if (strpos($absolute_path, $root_path) === false) {
+		if (strpos(strtolower($absolute_path), strtolower($root_path)) === false) {
 			throw new Exception("Can't find relative path for absolute path '{$absolute_path}' with root '{$root_path}'");
 		}
-		$relative_path = str_replace($root_path, '', $absolute_path);
+		$relative_path = substr($absolute_path, strlen($root_path));
 		return $relative_path;
 	}
 
