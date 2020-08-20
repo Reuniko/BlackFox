@@ -61,6 +61,8 @@ abstract class Database {
 	 */
 	abstract public function SynchronizeTable($table, $fields);
 
+	abstract public function CompareTable(SCRUD $Table);
+
 	/**
 	 * @param $table
 	 * @param $fields

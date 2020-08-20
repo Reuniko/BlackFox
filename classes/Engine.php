@@ -107,7 +107,9 @@ class Engine {
 		if (php_sapi_name() <> 'cli')
 			echo '<xmp>';
 
-		echo $Exception->getMessage();
+		echo "\r\nMessage: " . $Exception->getMessage();
+		echo "\r\nFile: " .$Exception->getFile();
+		echo "\r\nLine: " .$Exception->getLine();
 
 		if ($this->config['debug']) {
 			echo "\r\n\r\n";

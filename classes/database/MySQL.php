@@ -139,18 +139,21 @@ class MySQL extends Database {
 	}
 
 	private function GetConstraints($table) {
-		$this->Query("
+		return $this->Query("
 			SELECT 
-			KEY_COLUMN_USAGE.CONSTRAINT_NAME,
+			KEY_COLUMN_USAGE.CONSTRAINT_NAME, 
 			KEY_COLUMN_USAGE.COLUMN_NAME, 
+			KEY_COLUMN_USAGE.REFERENCED_TABLE_NAME, 
+			KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME, 
 			REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
-			REFERENTIAL_CONSTRAINTS.DELETE_RULE,
-			-1 FROM information_schema.KEY_COLUMN_USAGE
+			REFERENTIAL_CONSTRAINTS.DELETE_RULE
+			FROM information_schema.KEY_COLUMN_USAGE
 			INNER JOIN information_schema.REFERENTIAL_CONSTRAINTS
 				ON REFERENTIAL_CONSTRAINTS.CONSTRAINT_NAME = KEY_COLUMN_USAGE.CONSTRAINT_NAME
+				AND REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA = KEY_COLUMN_USAGE.TABLE_SCHEMA
 			WHERE KEY_COLUMN_USAGE.TABLE_SCHEMA = '{$this->database}'
 			AND KEY_COLUMN_USAGE.TABLE_NAME = '{$table}'
-		", 'COLUMN_NAME');
+		", 'CONSTRAINT_NAME');
 	}
 
 	public function DropTableConstraints($table) {
@@ -161,97 +164,145 @@ class MySQL extends Database {
 	}
 
 	public function SynchronizeTable($table, $fields) {
-		$strict = true;
-		if (empty($fields)) {
-			throw new Exception("Synchronize of '{$table}' failed: fields is empty");
-		}
-		$tables = $this->Query("SHOW TABLES LIKE '{$table}'");
-		$fields = array_change_key_case($fields, CASE_UPPER);
+		// TODO: Remove SynchronizeTable() method.
+	}
 
-		$rows = [];
-		$keys = [];
+	public function CompareTable(SCRUD $Table) {
+		$diff = [];
+		$diff = array_merge($diff, $this->CompareTableFieldsAndPrimaryKeys($Table));
+		$diff = array_merge($diff, $this->CompareTableIndexes($Table));
+		$diff = array_merge($diff, $this->CompareTableConstraints($Table));
+		return $diff;
+	}
+
+	public function CompareTableFieldsAndPrimaryKeys(SCRUD $Table) {
+		if (empty($Table->fields))
+			throw new Exception("Can't compare table fields: no fields found, table '{$Table->name}' [{$Table->code}]");
+
+		$diff = [];
+		$tables = $this->Query("SHOW TABLES LIKE '{$Table->code}'");
+
 
 		if (empty($tables)) {
-			foreach ($fields as $code => $field) {
-				if ($field['PRIMARY']) {
-					$keys[] = $code;
-				}
-				try {
-					$rows[] = $this->GetStructureString($field);
-				} catch (\Exception $error) {
-					continue;
-				}
+			// no table found: creating a new one with fields and primary keys
+			$data = [];
+			foreach ($Table->fields as $code => $field) {
+				if ($Table->Types[$code]->virtual) continue;
+				$data[] = [
+					'MESSAGE' => 'Add column',
+					'FIELD'   => $code,
+					'SQL'     => $this->GetStructureString($field),
+				];
 			}
-			if (!empty($keys)) {
-				$rows[] = "PRIMARY KEY (" . implode(", ", $keys) . ")";
+			if (!empty($Table->keys)) {
+				$data[] = [
+					'MESSAGE' => 'Add primary keys',
+					'SQL'     => "PRIMARY KEY (" . implode(", ", $Table->keys) . ")",
+				];
 			}
-			$SQL = "CREATE TABLE `{$table}` \r\n" . "(" . implode(",\r\n", $rows) . ");";
-			$this->Query($SQL);
+			$SQL = "CREATE TABLE `{$Table->code}` (\r\n" . implode(",\r\n", array_column($data, 'SQL')) . "\r\n);";
+			$diff[] = [
+				'MESSAGE' => 'Create a new table',
+				'TABLE'   => $Table->code,
+				'SQL'     => $SQL,
+				'DATA'    => $data,
+			];
 		} else {
-			$columns = $this->Query("SHOW FULL COLUMNS FROM " . $table, 'Field');
+			// table exist: comparing fields and primary keys
+			$data = [];
+			$columns = $this->Query("SHOW FULL COLUMNS FROM " . $Table->code, 'Field');
 			$columns = array_change_key_case($columns, CASE_UPPER);
 
 			$db_keys = [];
-			foreach ($columns as $code => $column) {
-				if ($column['Key'] === 'PRI') {
+			foreach ($columns as $code => $column)
+				if ($column['Key'] === 'PRI')
 					$db_keys[] = $code;
-				}
-			}
 
 			$last_after_code = '';
-			foreach ($fields as $code => $field) {
+			foreach ($Table->fields as $code => $field) {
 				if ($field['PRIMARY']) {
 					$keys[] = $code;
 				}
 
-				try {
-					$structure_string = $this->GetStructureString($field);
-				} catch (\Exception $error) {
-					continue;
-				}
+				if ($Table->Types[$code]->virtual) continue;
+				$structure_string = $this->GetStructureString($field);
 
-				if ($strict && !empty($last_after_code)) {
+				if (!empty($last_after_code))
 					$structure_string .= " AFTER " . $this->Quote($last_after_code);
-				}
 
 				if (!empty($columns[$code])) {
-					$is_diff = $this->IsFieldDifferentFromColumn($field, $columns[$code]);
-					if ($is_diff) {
-						$rows[] = "MODIFY COLUMN $structure_string";
+					$reason = $this->IsFieldDifferentFromColumn($field, $columns[$code]);
+					if ($reason) {
+						$data[] = [
+							'MESSAGE' => 'Modify column',
+							'FIELD'   => $code,
+							'REASON'  => $reason,
+							'SQL'     => "MODIFY COLUMN $structure_string",
+						];
 					}
 				} elseif (!empty($field['CHANGE']) && !empty($columns[$field['CHANGE']])) {
-					$rows[] = "CHANGE COLUMN `{$field['CHANGE']}` $structure_string";
+					$data[] = [
+						'MESSAGE' => 'Rename and modify column',
+						'FIELD'   => $code,
+						'SQL'     => "CHANGE COLUMN `{$field['CHANGE']}` $structure_string",
+					];
 					unset($columns[$field['CHANGE']]);
 				} else {
-					$rows[] = "ADD COLUMN $structure_string";
+					$data[] = [
+						'MESSAGE' => 'Add column',
+						'FIELD'   => $code,
+						'SQL'     => "ADD COLUMN $structure_string",
+					];
 				}
 				$last_after_code = $code;
 				unset($columns[$code]);
 			}
-			if ($strict) {
-				foreach ($columns as $code => $column) {
-					$rows[] = "DROP COLUMN `{$code}`";
+			foreach ($columns as $code => $column) {
+				$data[] = [
+					'MESSAGE' => 'Drop column',
+					'FIELD'   => $code,
+					'SQL'     => "DROP COLUMN `{$code}`",
+				];
+			}
+
+			if ($Table->keys <> $db_keys) {
+				if (!empty($Table->keys)) {
+					$data[] = [
+						'MESSAGE' => 'Modify primary keys',
+						'SQL'     => "DROP PRIMARY KEY, ADD PRIMARY KEY (" . implode(", ", array_map([$this, 'Quote'], $Table->keys)) . ")",
+					];
+				} else {
+					$data[] = [
+						'MESSAGE' => 'Drop primary keys',
+						'SQL'     => "DROP PRIMARY KEY",
+					];
 				}
 			}
-			if (!empty($keys) and ($keys <> $db_keys)) {
-				if (!empty($db_keys)) {
-					$rows[] = "DROP PRIMARY KEY";
-				}
-				$rows[] = "ADD PRIMARY KEY (" . implode(", ", array_map([$this, 'Quote'], $keys)) . ")";
-			}
-			$SQL = "ALTER TABLE `{$table}` \r\n" . implode(",\r\n", $rows) . ";";
-			if (!empty($rows)) {
-				$this->Query($SQL);
+
+			if (!empty($data)) {
+				$SQL = "ALTER TABLE `{$Table->code}` \r\n" . implode(",\r\n", array_column($data, 'SQL'));
+				$diff[] = [
+					'MESSAGE' => 'Modify table (fields and/or pkeys)',
+					'TABLE'   => $Table->code,
+					'DATA'    => $data,
+					'SQL'     => $SQL,
+				];
 			}
 		}
+		return $diff;
+	}
 
-		// INDEXES:
-		$db_indexes = $this->Query("SHOW INDEX FROM `{$table}`", 'Column_name');
-		foreach ($fields as $code => $field) {
-			/** @var Type $field */
-			if (in_array($code, $keys)) {
-				continue;
-			}
+	public function CompareTableIndexes(SCRUD $Table) {
+		$diff = [];
+		$db_indexes = $this->Query("SHOW INDEX FROM `{$Table->code}`", 'Column_name');
+
+		if(!empty($db_indexes)) debug($db_indexes, '$db_indexes');
+
+		foreach ($Table->fields as $code => $field) {
+
+			if ($field['PRIMARY'])
+				continue; // skip primary keys
+
 			if ($field['FOREIGN']) {
 				$field['INDEX'] = true;
 			}
@@ -262,60 +313,112 @@ class MySQL extends Database {
 				$field['INDEX'] = true;
 				$field['UNIQUE'] = true;
 			}
+
 			$unique = ($field['UNIQUE']) ? 'UNIQUE' : '';
 			$db_index = $db_indexes[$code];
 
 			// index is: present in database, missing in code - drop it
 			if (isset($db_index) and !$field['INDEX']) {
-				$this->Query("ALTER TABLE `{$table}` DROP INDEX `{$code}`;");
+				$diff[] = [
+					'MESSAGE' => 'Drop index',
+					'FIELD'   => $code,
+					'SQL'     => "ALTER TABLE `{$Table->code}` DROP INDEX `{$db_index['Key_name']}`",
+				];
 				continue;
 			}
 
 			// index is: missing in database, present in code - create it
 			if ($field['INDEX'] and !isset($db_index)) {
-				$this->Query("ALTER TABLE `{$table}` ADD {$unique} INDEX `{$code}` (`{$code}`);");
+				$diff[] = [
+					'MESSAGE' => 'Add index',
+					'FIELD'   => $code,
+					'SQL'     => "ALTER TABLE `{$Table->code}` ADD {$unique} INDEX `{$code}` (`{$code}`)",
+				];
 				continue;
 			}
 
 			// index is: present in database, present in code - check unique
 			if (isset($db_index)) {
 				if (($field['UNIQUE'] and $db_index['Non_unique']) or (!$field['UNIQUE'] and !$db_index['Non_unique'])) {
-					$this->Query("ALTER TABLE `{$table}` DROP INDEX `{$code}`, ADD {$unique} INDEX `{$code}` (`{$code}`);");
+					$diff[] = [
+						'MESSAGE' => 'Modify index',
+						'FIELD'   => $code,
+						'SQL'     => "ALTER TABLE `{$Table->code}` DROP INDEX `{$code}`, ADD {$unique} INDEX `{$code}` (`{$code}`)",
+					];
 					continue;
 				}
 			}
-		}
 
+		}
+		return $diff;
 	}
 
-	public function IsFieldDifferentFromColumn(array $field, array $column) {
-		// type
-		$type = $this->GetStructureStringType($field);
-		if ($type <> $column['Type'])
-			return true;
+	public function CompareTableConstraints(SCRUD $Table) {
+		$diff = [];
+		$db_constraints = $this->GetConstraints($Table->code);
 
-		// not null
-		if ($field['NOT_NULL'] and $column['Null'] == 'YES')
-			return true;
-		if (!$field['NOT_NULL'] and $column['Null'] <> 'YES')
-			return true;
+		foreach ($Table->fields as $code => $field) {
+			if (!isset($field['FOREIGN']))
+				continue;
 
-		// auto increment
-		if ($field['AUTO_INCREMENT'] and false === strpos($column['Extra'], 'auto_increment'))
-			return true;
+			$action = is_string($field['FOREIGN']) ? $field['FOREIGN'] : 'RESTRICT';
+			/** @var SCRUD $Link */
+			$Link = $field['LINK']::I();
+			$link_key = $field['INNER_KEY'] ?: $Link->key();
 
-		// name = comment
-		if ($field['NAME'] <> $column['Comment'])
-			return true;
+			$fkey = "fkey {$Table->code}.{$code} ref {$Link->code}.{$link_key}";
 
-		// default
-		$default = $field['DEFAULT'];
-		if (is_array($default))
-			$default = implode(',', $default);
-		if ($default <> $column['Default'])
-			return true;
+			if (!isset($db_constraints[$fkey])) {
+				$diff[] = [
+					'MESSAGE'  => 'Add constraint',
+					'PRIORITY' => 1,
+					'TABLE'    => $Table->code,
+					'FIELD'    => $code,
+					'SQL'      => "ALTER TABLE `{$Table->code}` ADD CONSTRAINT `{$fkey}` FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}",
+				];
+				continue;
+			}
 
-		return false;
+			$constraint = $db_constraints[$fkey];
+
+			$changed = false;
+			$changed |= $constraint['COLUMN_NAME'] <> $code;
+			$changed |= $constraint['REFERENCED_TABLE_NAME'] <> $Link->code;
+			$changed |= $constraint['REFERENCED_COLUMN_NAME'] <> $link_key;
+			$changed |= $constraint['UPDATE_RULE'] <> $action;
+			$changed |= $constraint['DELETE_RULE'] <> $action;
+
+			if ($changed) {
+				$diff[] = [
+					'MESSAGE'  => 'Alter constraint (drop)',
+					'PRIORITY' => -1,
+					'TABLE'    => $Table->code,
+					'FIELD'    => $code,
+					'SQL'      => "ALTER TABLE `{$Table->code}` DROP CONSTRAINT `{$fkey}`",
+				];
+				$diff[] = [
+					'MESSAGE'  => 'Alter constraint (add)',
+					'PRIORITY' => 1,
+					'TABLE'    => $Table->code,
+					'FIELD'    => $code,
+					'SQL'      => "ALTER TABLE `{$Table->code}` ADD CONSTRAINT `{$fkey}` FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}",
+				];
+			}
+
+			unset($db_constraints[$fkey]);
+		}
+
+		foreach ($db_constraints as $db_constraint) {
+			$diff[] = [
+				'MESSAGE'  => 'Drop constraint',
+				'PRIORITY' => -1,
+				'TABLE'    => $Table->code,
+				'FIELD'    => $code,
+				'SQL'      => "ALTER TABLE `{$Table->code}` DROP FOREIGN KEY `{$db_constraint['CONSTRAINT_NAME']}`",
+			];
+		}
+
+		return $diff;
 	}
 
 	public function CreateTableConstraints($table, $fields) {
@@ -329,6 +432,32 @@ class MySQL extends Database {
 			$link_key = $field['INNER_KEY'] ?: $Link->key();
 			$this->Query("ALTER TABLE `{$table}` ADD FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}");
 		}
+	}
+
+	public function IsFieldDifferentFromColumn(array $field, array $column) {
+		// type
+		$type = $this->GetStructureStringType($field);
+		if ($type <> $column['Type'])
+			return 'Change type';
+
+		// not null
+		if ($field['NOT_NULL'] and $column['Null'] == 'YES')
+			return 'NULL -> NOT_NULL';
+		if (!$field['NOT_NULL'] and $column['Null'] <> 'YES')
+			return 'NOT_NULL -> NULL';
+
+		// auto increment
+		if ($field['AUTO_INCREMENT'] and false === strpos($column['Extra'], 'auto_increment'))
+			return 'Add auto increment';
+
+		// default
+		$default = $field['DEFAULT'];
+		if (is_array($default))
+			$default = implode(',', $default);
+		if ($default <> $column['Default'])
+			return 'Change default value';
+
+		return false;
 	}
 
 	public function CompileSQLSelect(array $parts) {

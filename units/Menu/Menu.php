@@ -16,8 +16,9 @@ class Menu extends Unit {
 	}
 
 	protected function GetMenu() {
+		$id = 'admin_menu_' . $this->ENGINE->GetLanguage();
 		try {
-			$MENU = \BlackFox\Cache::I()->Get('admin_menu');
+			$MENU = \BlackFox\Cache::I()->Get($id);
 		} catch (\BlackFox\ExceptionCache $error) {
 			$MENU = [];
 			foreach ($this->ENGINE->cores as $namespace => $core_absolute_folder) {
@@ -25,7 +26,7 @@ class Menu extends Unit {
 				/**@var ACore $Core */
 				$MENU = array_merge($MENU, $Core::I()->Menu());
 			}
-			\BlackFox\Cache::I()->Set('admin_menu', $MENU);
+			\BlackFox\Cache::I()->Set($id, $MENU);
 		}
 		return $MENU;
 	}

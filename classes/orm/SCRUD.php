@@ -192,6 +192,10 @@ abstract class SCRUD {
 		$this->DB->SynchronizeTable($this->code, $this->fields);
 	}
 
+	public function Compare() {
+		return $this->DB->CompareTable($this);
+	}
+
 	public function CreateConstraints() {
 		$this->DB->CreateTableConstraints($this->code, $this->fields);
 	}

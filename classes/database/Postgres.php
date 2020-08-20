@@ -138,6 +138,10 @@ class Postgres extends Database {
 				$this->Query("ALTER TABLE \"{$table}\" DROP CONSTRAINT \"{$db_constraint['constraint_name']}\"");
 	}
 
+	public function CompareTable($table, $fields) {
+
+	}
+
 	public function SynchronizeTable($table, $fields) {
 		if (empty($table)) {
 			throw new Exception("Synchronize failed: no code of table");

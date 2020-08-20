@@ -61,6 +61,13 @@ abstract class ACore {
 	}
 
 	/**
+	 * @return Scheme
+	 */
+	public function GetScheme() {
+		return null;
+	}
+
+	/**
 	 * Use this method to synchronize table structures
 	 * See children for examples
 	 */
