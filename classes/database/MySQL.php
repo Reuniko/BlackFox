@@ -294,7 +294,12 @@ class MySQL extends Database {
 
 	public function CompareTableIndexes(SCRUD $Table) {
 		$diff = [];
-		$db_indexes = $this->Query("SHOW INDEX FROM `{$Table->code}`", 'Column_name');
+
+		try {
+			$db_indexes = $this->Query("SHOW INDEX FROM `{$Table->code}`", 'Column_name');
+		} catch (\Exception $error) {
+			$db_indexes = [];
+		}
 
 		foreach ($Table->fields as $code => $field) {
 
