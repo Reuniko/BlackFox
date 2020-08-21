@@ -77,9 +77,9 @@ class CacheRedis extends Cache {
 		$this->Redis->del("val|{$key}");
 		if ($this->Redis->exists("key|{$key}")) {
 			$tags = $this->Redis->sMembers("key|{$key}");
-			$this->Redis->delete("key|{$key}");
+			$this->Redis->del("key|{$key}");
 			foreach ($tags as $tag) {
-				$this->Redis->sRemove("tag|{$tag}", $key);
+				$this->Redis->sRem("tag|{$tag}", $key);
 			}
 		}
 	}
@@ -89,7 +89,7 @@ class CacheRedis extends Cache {
 		foreach ($tags as $tag) {
 			if ($this->Redis->exists("tag|{$tag}")) {
 				$keys = $this->Redis->sMembers("tag|{$tag}");
-				$this->Redis->delete("tag|{$tag}");
+				$this->Redis->del("tag|{$tag}");
 				foreach ($keys as $key) {
 					$this->Delete($key);
 				}
