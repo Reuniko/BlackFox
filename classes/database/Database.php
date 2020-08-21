@@ -52,23 +52,7 @@ abstract class Database {
 		$this->Query('COMMIT');
 	}
 
-	abstract public function DropTableConstraints($table);
-
-	/**
-	 * @param string $table code of the table
-	 * @param array $fields
-	 * @throws Exception
-	 */
-	abstract public function SynchronizeTable($table, $fields);
-
 	abstract public function CompareTable(SCRUD $Table);
-
-	/**
-	 * @param $table
-	 * @param $fields
-	 * @throws Exception
-	 */
-	abstract public function CreateTableConstraints($table, $fields);
 
 	abstract public function CompileSQLSelect(array $parts);
 

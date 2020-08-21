@@ -184,20 +184,25 @@ abstract class SCRUD {
 
 	}
 
-	public function DropConstraints() {
-		$this->DB->DropTableConstraints($this->code);
-	}
-
+	/**
+	 * Synchronize table fields structure from this class to database
+	 *
+	 * @return array
+	 * @throws Exception
+	 * @deprecated use class Scheme
+	 */
 	public function Synchronize() {
-		$this->DB->SynchronizeTable($this->code, $this->fields);
+		return (new Scheme([$this]))->Synchronize();
 	}
 
+	/**
+	 * Calculates difference between this class and database structure,
+	 * provides SQL code to update database structure
+	 *
+	 * @return array
+	 */
 	public function Compare() {
 		return $this->DB->CompareTable($this);
-	}
-
-	public function CreateConstraints() {
-		$this->DB->CreateTableConstraints($this->code, $this->fields);
 	}
 
 	/**
@@ -662,8 +667,12 @@ abstract class SCRUD {
 	 * @throws ExceptionSQL
 	 */
 	public function Delete($filter = []) {
-		$answer = $this->PreparePartsByFilter($filter);
-		$this->SQL = "DELETE FROM {$this->code} WHERE " . implode(' AND ', $answer['WHERE']);
+		if (empty($filter)) {
+			$this->SQL = "DELETE FROM {$this->code}";
+		} else {
+			$answer = $this->PreparePartsByFilter($filter);
+			$this->SQL = "DELETE FROM {$this->code} WHERE " . implode(' AND ', $answer['WHERE']);
+		}
 		$this->Query($this->SQL);
 	}
 

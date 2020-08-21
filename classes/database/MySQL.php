@@ -156,17 +156,6 @@ class MySQL extends Database {
 		", 'CONSTRAINT_NAME');
 	}
 
-	public function DropTableConstraints($table) {
-		$db_constraints = $this->GetConstraints($table);
-		if (!empty($db_constraints))
-			foreach ($db_constraints as $db_constraint)
-				$this->Query("ALTER TABLE `{$table}` DROP FOREIGN KEY `{$db_constraint['CONSTRAINT_NAME']}`");
-	}
-
-	public function SynchronizeTable($table, $fields) {
-		// TODO: Remove SynchronizeTable() method.
-	}
-
 	public function CompareTable(SCRUD $Table) {
 		$diff = [];
 		$diff = array_merge($diff, $this->CompareTableFieldsAndPrimaryKeys($Table));
@@ -435,19 +424,6 @@ class MySQL extends Database {
 		}
 
 		return $diff;
-	}
-
-	public function CreateTableConstraints($table, $fields) {
-		foreach ($fields as $code => $field) {
-			if (!isset($field['FOREIGN'])) {
-				continue;
-			}
-			$action = is_string($field['FOREIGN']) ? $field['FOREIGN'] : 'RESTRICT';
-			/** @var SCRUD $Link */
-			$Link = $field['LINK']::I();
-			$link_key = $field['INNER_KEY'] ?: $Link->key();
-			$this->Query("ALTER TABLE `{$table}` ADD FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}");
-		}
 	}
 
 	public function IsFieldDifferentFromColumn(array $field, array $column) {
