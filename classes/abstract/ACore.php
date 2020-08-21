@@ -61,17 +61,18 @@ abstract class ACore {
 	}
 
 	/**
-	 * @return null|Scheme
+	 * @return Scheme
+	 * @throws Exception
 	 */
 	public function GetScheme() {
-		return null;
+		throw new Exception(T([
+			'en' => 'No scheme found',
+			'ru' => 'Схема не найдена',
+		]));
 	}
 
-	/**
-	 * Use this method to synchronize table structures
-	 * See children for examples
-	 */
 	public function Upgrade() {
+		$this->GetScheme()->Synchronize();
 		// override
 	}
 

@@ -4,11 +4,15 @@ namespace BlackFox;
 
 class Scheme {
 
+	/** @var Database */
+	public $Database;
+
 	/** @var SCRUD[] */
 	public $Tables = [];
 
 	/**
 	 * @param SCRUD|string[] $Tables
+	 * @throws Exception
 	 */
 	public function __construct(array $Tables) {
 		foreach ($Tables as $Table) {
@@ -17,6 +21,14 @@ class Scheme {
 			} else {
 				$this->Tables[$Table] = $Table::I();
 			}
+		}
+
+		foreach ($this->Tables as $code => $Table) {
+			if (empty($this->Database))
+				$this->Database = $Table->DB;
+
+			if ($this->Database !== $Table->DB)
+				throw new Exception("Can't construct scheme: table '{$code}' has different database than table '" . reset($this->Tables)->code . "'");
 		}
 	}
 
@@ -35,7 +47,7 @@ class Scheme {
 		$diff = $this->Compare();
 		foreach ($diff as &$instruction) {
 			try {
-				Database::I()->Query($instruction['SQL']);
+				$this->Database->Query($instruction['SQL']);
 				$instruction['STATUS'] = 'SUCCESS';
 			} catch (\Exception $error) {
 				$instruction['STATUS'] = 'ERROR';

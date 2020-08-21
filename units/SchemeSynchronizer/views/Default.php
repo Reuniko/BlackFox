@@ -7,39 +7,44 @@ $this->ENGINE->TITLE = T([
 ]);
 ?>
 
+	<form method="post" class="~float-right">
+		<a
+			class="btn btn-secondary"
+			href="?"
+		>
+			<i class="fa fa-sync"></i>
+			<?= T([
+				'en' => 'Refresh',
+				'ru' => 'Обновить',
+			]) ?>
+		</a>
+		<button
+			type="submit"
+			name="ACTION"
+			value="SynchronizeAll"
+			class="btn btn-primary"
+		>
+			<i class="fa fa-terminal"></i>
+			<?= T([
+				'en' => 'Synchronize all',
+				'ru' => 'Синхронизировать всё',
+			]) ?>
+		</button>
+	</form>
 
-<form method="post" class="float-right">
-	<a
-		class="btn btn-secondary"
-		href="?"
-	>
-		<i class="fa fa-sync"></i>
-		<?= T([
-			'en' => 'Refresh',
-			'ru' => 'Обновить',
-		]) ?>
-	</a>
-	<button
-		type="submit"
-		name="ACTION"
-		value="SynchronizeAll"
-		class="btn btn-primary"
-	>
-		<i class="fa fa-terminal"></i>
-		<?= T([
-			'en' => 'Synchronize all',
-			'ru' => 'Синхронизировать всё',
-		]) ?>
-	</button>
-</form>
+	<hr/>
 
-<? foreach ($RESULT['CORES'] as $namespace => $diffs): ?>
+<? foreach ($RESULT['CORES'] as $namespace => $CORE): ?>
 	<h2>
 		<i class="fa fa-folder-open"></i>
 		<?= $namespace ?>
 	</h2>
 
-	<? if (empty($diffs)): ?>
+	<? if (!empty($CORE['ERROR'])): ?>
+		<div class="alert alert-danger">
+			<?= $CORE['ERROR'] ?>
+		</div>
+	<? elseif (empty($CORE['DIFFS'])): ?>
 		<div class="alert alert-success">
 			<i class="fa fa-check"></i>
 			<?= T([
@@ -50,12 +55,12 @@ $this->ENGINE->TITLE = T([
 	<? else: ?>
 		<table class="table table-bordered table-hover bg-white">
 			<tr>
-				<th>Message + table</th>
+				<th>...</th>
 				<th>SQL</th>
 				<th width="1%"></th>
 			</tr>
 
-			<? foreach ($diffs as $diff): ?>
+			<? foreach ($CORE['DIFFS'] as $diff): ?>
 				<tr>
 					<td>
 						<?= $diff['MESSAGE'] ?>
@@ -68,6 +73,13 @@ $this->ENGINE->TITLE = T([
 											<li><?= $diff['FIELD'] ?></li>
 										</ul>
 									<? endif; ?>
+									<? if (!empty($diff['DATA'])): ?>
+										<ul>
+											<? foreach ($diff['DATA'] as $data): ?>
+												<li><?= $data['FIELD'] ?></li>
+											<? endforeach; ?>
+										</ul>
+									<? endif; ?>
 								</li>
 							</ul>
 						<? endif; ?>
@@ -75,11 +87,11 @@ $this->ENGINE->TITLE = T([
 					<td>
 						<pre class="mb-0"><?= $diff['SQL'] ?></pre>
 						<? if (!empty($diff['DATA'])): ?>
-							<hr/>
+							<br/>
 							<table class="table-bordered">
 								<tr>
 									<th>Message</th>
-									<th>Field</th>
+									<th>Column</th>
 									<th>Reason</th>
 									<th>SQL</th>
 								</tr>
@@ -127,19 +139,4 @@ $this->ENGINE->TITLE = T([
 			<? endforeach; ?>
 		</table>
 	<? endif; ?>
-<? endforeach; ?>
-
-
-<? foreach ($RESULT['CORES_OFF'] as $namespace => $diffs): ?>
-	<h2>
-		<i class="fa fa-folder-open"></i>
-		<?= $namespace ?>
-	</h2>
-	<div class="alert alert-warning">
-		<i class="fa fa-check"></i>
-		<?= T([
-			'en' => 'No scheme found',
-			'ru' => 'Схема не найдена',
-		]) ?>
-	</div>
 <? endforeach; ?>

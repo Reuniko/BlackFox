@@ -26,6 +26,30 @@ body.frame {
 	margin-bottom: 1rem;
 }
 
+h1 {
+	font-size: 2.0rem
+}
+
+h2 {
+	font-size: 1.5rem
+}
+
+h3 {
+	font-size: 1.25rem
+}
+
+h4 {
+	font-size: 1rem
+}
+
+h5 {
+	font-size: 0.75rem
+}
+
+h6 {
+	font-size: 0.5rem
+}
+
 /*
 .dl-horizontal dt {
 	float: left;

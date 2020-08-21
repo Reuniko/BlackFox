@@ -28,7 +28,7 @@ abstract class SCRUD {
 	/** @var array части от последнего SQL-запроса (для отладки) */
 	public $parts;
 	/** @var Database коннектор базы данных */
-	protected $DB;
+	public $DB;
 
 	/** @var string имя источника данных или таблицы или сущностей в ней */
 	public $name;
