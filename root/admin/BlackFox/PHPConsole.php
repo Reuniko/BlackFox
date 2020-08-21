@@ -9,9 +9,9 @@ $this->TITLE = T([
 	<div class="form-group">
 		<textarea
 			class="form-control"
-			name="CODE"
-			rows="10"
-		><?= htmlspecialchars($_REQUEST['CODE']) ?></textarea>
+			name="PHP"
+			rows="5"
+		><?= htmlspecialchars($_REQUEST['PHP']) ?></textarea>
 	</div>
 	<input
 		type="submit"
@@ -24,7 +24,7 @@ $this->TITLE = T([
 </form>
 <?php
 // todo: move to iframe
-if (!empty($_REQUEST['CODE'])) {
+if (!empty($_REQUEST['PHP'])) {
 	echo '<hr/>';
-	eval($_REQUEST['CODE']);
+	eval($_REQUEST['PHP']);
 }

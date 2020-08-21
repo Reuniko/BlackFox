@@ -34,83 +34,91 @@ class Core extends \BlackFox\ACore {
 				]),
 				'EXPANDER' => true,
 				'CHILDREN' => [
-					'index'                 => [
+					'index'                  => [
 						'NAME'     => T([
 							'en' => 'Control panel',
 							'ru' => 'Панель управления',
 						]),
 						'LINK'     => '/admin/BlackFox/',
-						/*
 						'CHILDREN' => [
-							'~upgrade' => [
-								'NAME' => '~upgrade',
-								'LINK' => '/admin/_upgrade.php',
+							'SchemeSynchronizer' => [
+								'NAME' => T([
+									'en' => 'Scheme synchronizer',
+									'ru' => 'Синхронизатор схем',
+								]),
+								'LINK' => '/admin/BlackFox/SchemeSynchronizer.php',
+							],
+							'PHPConsole'         => [
+								'NAME' => T([
+									'en' => 'PHP console',
+									'ru' => 'PHP консоль',
+								]),
+								'LINK' => '/admin/BlackFox/PHPConsole.php',
+							],
+							'SQLConsole'         => [
+								'NAME' => T([
+									'en' => 'SQL console',
+									'ru' => 'SQL консоль',
+								]),
+								'LINK' => '/admin/BlackFox/SQLConsole.php',
 							],
 						],
-						*/
 					],
-					'BlackFox_Content'      => [
+					'BlackFox_Content'       => [
 						'NAME' => T([
 							'en' => 'Content pages',
 							'ru' => 'Контентные страницы',
 						]),
 						'LINK' => '/admin/BlackFox/Pages.php',
 					],
-					'BlackFox_Redirects'    => [
+					'BlackFox_Redirects'     => [
 						'NAME' => T([
 							'en' => 'Redirects',
 							'ru' => 'Редиректы',
 						]),
 						'LINK' => '/admin/BlackFox/Redirects.php',
 					],
-					'BlackFox_Users'        => [
+					'BlackFox_Users'         => [
 						'NAME' => T([
 							'en' => 'Users',
 							'ru' => 'Пользователи',
 						]),
 						'LINK' => '/admin/BlackFox/Users.php',
 					],
-					'BlackFox_Groups'       => [
+					'BlackFox_Groups'        => [
 						'NAME' => T([
 							'en' => 'Groups',
 							'ru' => 'Группы',
 						]),
 						'LINK' => '/admin/BlackFox/Groups.php',
 					],
-					'BlackFox_Users2Groups' => [
+					'BlackFox_Users2Groups'  => [
 						'NAME' => T([
 							'en' => 'Users in groups',
 							'ru' => 'Пользователи в группах',
 						]),
 						'LINK' => '/admin/BlackFox/Users2Groups.php',
 					],
-					'BlackFox_Files'        => [
+					'BlackFox_Files'         => [
 						'NAME' => T([
 							'en' => 'Files',
 							'ru' => 'Файлы',
 						]),
 						'LINK' => '/admin/BlackFox/Files.php',
 					],
-					'BlackFox_Log'          => [
+					'BlackFox_Log'           => [
 						'NAME' => T([
 							'en' => 'Log',
 							'ru' => 'Журнал',
 						]),
 						'LINK' => '/admin/BlackFox/Log.php',
 					],
-					'Admin_TableSettings'   => [
+					'BlackFox_TableSettings' => [
 						'NAME' => T([
 							'en' => 'Table settings',
 							'ru' => 'Настройки таблиц',
 						]),
 						'LINK' => '/admin/BlackFox/TableSettings.php',
-					],
-					'Admin_PHPConsole'      => [
-						'NAME' => T([
-							'en' => 'PHP console',
-							'ru' => 'PHP консоль',
-						]),
-						'LINK' => '/admin/BlackFox/PHPConsole.php',
 					],
 				],
 			],

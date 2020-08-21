@@ -61,7 +61,7 @@ abstract class ACore {
 	}
 
 	/**
-	 * @return Scheme
+	 * @return null|Scheme
 	 */
 	public function GetScheme() {
 		return null;

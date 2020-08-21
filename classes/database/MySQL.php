@@ -282,7 +282,7 @@ class MySQL extends Database {
 			if (!empty($data)) {
 				$SQL = "ALTER TABLE `{$Table->code}` \r\n" . implode(",\r\n", array_column($data, 'SQL'));
 				$diff[] = [
-					'MESSAGE' => 'Modify table (fields and/or pkeys)',
+					'MESSAGE' => 'Modify table',
 					'TABLE'   => $Table->code,
 					'DATA'    => $data,
 					'SQL'     => $SQL,
@@ -295,8 +295,6 @@ class MySQL extends Database {
 	public function CompareTableIndexes(SCRUD $Table) {
 		$diff = [];
 		$db_indexes = $this->Query("SHOW INDEX FROM `{$Table->code}`", 'Column_name');
-
-		if(!empty($db_indexes)) debug($db_indexes, '$db_indexes');
 
 		foreach ($Table->fields as $code => $field) {
 
@@ -320,9 +318,11 @@ class MySQL extends Database {
 			// index is: present in database, missing in code - drop it
 			if (isset($db_index) and !$field['INDEX']) {
 				$diff[] = [
-					'MESSAGE' => 'Drop index',
-					'FIELD'   => $code,
-					'SQL'     => "ALTER TABLE `{$Table->code}` DROP INDEX `{$db_index['Key_name']}`",
+					'MESSAGE'  => 'Drop index',
+					'TABLE'    => $Table->code,
+					'FIELD'    => $code,
+					'PRIORITY' => -1,
+					'SQL'      => "ALTER TABLE `{$Table->code}` DROP INDEX `{$db_index['Key_name']}`",
 				];
 				continue;
 			}
@@ -330,9 +330,11 @@ class MySQL extends Database {
 			// index is: missing in database, present in code - create it
 			if ($field['INDEX'] and !isset($db_index)) {
 				$diff[] = [
-					'MESSAGE' => 'Add index',
-					'FIELD'   => $code,
-					'SQL'     => "ALTER TABLE `{$Table->code}` ADD {$unique} INDEX `{$code}` (`{$code}`)",
+					'MESSAGE'  => 'Add index',
+					'TABLE'    => $Table->code,
+					'FIELD'    => $code,
+					'PRIORITY' => 1,
+					'SQL'      => "ALTER TABLE `{$Table->code}` ADD {$unique} INDEX `{$code}` (`{$code}`)",
 				];
 				continue;
 			}
@@ -341,9 +343,18 @@ class MySQL extends Database {
 			if (isset($db_index)) {
 				if (($field['UNIQUE'] and $db_index['Non_unique']) or (!$field['UNIQUE'] and !$db_index['Non_unique'])) {
 					$diff[] = [
-						'MESSAGE' => 'Modify index',
-						'FIELD'   => $code,
-						'SQL'     => "ALTER TABLE `{$Table->code}` DROP INDEX `{$code}`, ADD {$unique} INDEX `{$code}` (`{$code}`)",
+						'MESSAGE'  => 'Modify index (drop)',
+						'TABLE'    => $Table->code,
+						'FIELD'    => $code,
+						'PRIORITY' => -1,
+						'SQL'      => "ALTER TABLE `{$Table->code}` DROP INDEX `{$db_index['Key_name']}`",
+					];
+					$diff[] = [
+						'MESSAGE'  => 'Modify index (add)',
+						'TABLE'    => $Table->code,
+						'FIELD'    => $code,
+						'PRIORITY' => 1,
+						'SQL'      => "ALTER TABLE `{$Table->code}` ADD {$unique} INDEX `{$code}` (`{$code}`)",
 					];
 					continue;
 				}
@@ -371,10 +382,10 @@ class MySQL extends Database {
 			if (!isset($db_constraints[$fkey])) {
 				$diff[] = [
 					'MESSAGE'  => 'Add constraint',
-					'PRIORITY' => 1,
+					'PRIORITY' => 2,
 					'TABLE'    => $Table->code,
 					'FIELD'    => $code,
-					'SQL'      => "ALTER TABLE `{$Table->code}` ADD CONSTRAINT `{$fkey}` FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}",
+					'SQL'      => "ALTER TABLE `{$Table->code}` ADD CONSTRAINT `{$fkey}` \r\n FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}",
 				];
 				continue;
 			}
@@ -391,17 +402,17 @@ class MySQL extends Database {
 			if ($changed) {
 				$diff[] = [
 					'MESSAGE'  => 'Alter constraint (drop)',
-					'PRIORITY' => -1,
+					'PRIORITY' => -2,
 					'TABLE'    => $Table->code,
 					'FIELD'    => $code,
 					'SQL'      => "ALTER TABLE `{$Table->code}` DROP CONSTRAINT `{$fkey}`",
 				];
 				$diff[] = [
 					'MESSAGE'  => 'Alter constraint (add)',
-					'PRIORITY' => 1,
+					'PRIORITY' => 2,
 					'TABLE'    => $Table->code,
 					'FIELD'    => $code,
-					'SQL'      => "ALTER TABLE `{$Table->code}` ADD CONSTRAINT `{$fkey}` FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}",
+					'SQL'      => "ALTER TABLE `{$Table->code}` ADD CONSTRAINT `{$fkey}` \r\n FOREIGN KEY (`{$code}`) REFERENCES `{$Link->code}` (`{$link_key}`) ON DELETE {$action} ON UPDATE {$action}",
 				];
 			}
 
@@ -411,7 +422,7 @@ class MySQL extends Database {
 		foreach ($db_constraints as $db_constraint) {
 			$diff[] = [
 				'MESSAGE'  => 'Drop constraint',
-				'PRIORITY' => -1,
+				'PRIORITY' => -2,
 				'TABLE'    => $Table->code,
 				'FIELD'    => $code,
 				'SQL'      => "ALTER TABLE `{$Table->code}` DROP FOREIGN KEY `{$db_constraint['CONSTRAINT_NAME']}`",
@@ -438,7 +449,7 @@ class MySQL extends Database {
 		// type
 		$type = $this->GetStructureStringType($field);
 		if ($type <> $column['Type'])
-			return 'Change type';
+			return "Change type: {$column['Type']} -> {$type}";
 
 		// not null
 		if ($field['NOT_NULL'] and $column['Null'] == 'YES')

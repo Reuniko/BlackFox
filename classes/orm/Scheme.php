@@ -5,7 +5,7 @@ namespace BlackFox;
 class Scheme {
 
 	/** @var SCRUD[] */
-	public $Tables;
+	public $Tables = [];
 
 	/**
 	 * @param SCRUD|string[] $Tables
