@@ -19,24 +19,23 @@ class User {
 	 * @param null|int $ID null or user identifier
 	 * @throws Exception User not found
 	 */
-	public function Init($ID) {
-		$this->ID = $ID;
-		$this->FIELDS = [];
-		$this->GROUPS = [];
+	public function __construct($ID) {
+		$this->ID = $ID ?: null;
+		if (empty($this->ID))
+			return;
 
-		if (is_null($this->ID)) return;
+		try {
 
-		$this->FIELDS = Users::I()->Read($this->ID);
-		if (empty($this->FIELDS))
-			throw new Exception(T([
-				'en' => "User #{$ID} not found",
-				'ru' => "Пользователь №{$ID} не найден",
-			]));
+			$this->FIELDS = Users::I()->Read($this->ID);
+			if (!empty($this->FIELDS))
+				$_SESSION['USER']['LANG'] = $this->FIELDS['LANG'];
 
-		$group_ids = Users2Groups::I()->GetColumn(['USER' => $this->ID], 'GROUP');
-		$this->GROUPS = Groups::I()->GetColumn(['ID' => $group_ids], 'CODE');
+			$group_ids = Users2Groups::I()->GetColumn(['USER' => $this->ID], 'GROUP');
+			if (!empty($group_ids))
+				$this->GROUPS = Groups::I()->GetColumn($group_ids, 'CODE');
 
-		$_SESSION['USER']['LANG'] = $this->FIELDS['LANG'];
+		} catch (ExceptionSQL $error) {
+		}
 	}
 
 	/**

@@ -44,7 +44,6 @@ trait Instance {
 	 * @param array $params
 	 * @return static global instance
 	 * @throws Exception
-	 * @throws \ReflectionException
 	 */
 	public static function I($params = []) {
 		if (Instance::$overrides === null) {
@@ -84,57 +83,61 @@ trait Instance {
 	 * @param array $params
 	 * @return static local instance
 	 * @throws Exception
-	 * @throws \ReflectionException
 	 */
 	public static function N($params = []) {
-		$class = get_called_class();
-		if (Instance::$overrides[$class]) {
-			return Instance::$overrides[$class]::N();
-		}
-
-		$ReflectionClass = new \ReflectionClass(get_called_class());
 		try {
-			$Parameters = $ReflectionClass->getMethod('__construct')->getParameters();
-		} catch (\ReflectionException $error) {
-			$Parameters = [];
-		}
+			$class = get_called_class();
+			if (Instance::$overrides[$class]) {
+				return Instance::$overrides[$class]::N();
+			}
 
-		$args = [];
-		foreach ($Parameters as $Parameter) {
-			// $params is set: $args from $params
-			if (isset($params[$Parameter->getName()])) {
-				$args[$Parameter->getName()] = $params[$Parameter->getName()];
-				continue;
+			$ReflectionClass = new \ReflectionClass(get_called_class());
+
+			try {
+				$Parameters = $ReflectionClass->getMethod('__construct')->getParameters();
+			} catch (\ReflectionException $error) {
+				$Parameters = [];
 			}
-			// $Parameter has no type: $args from default value
-			if (!$Parameter->hasType()) {
-				if ($Parameter->isOptional()) {
-					$args[$Parameter->getName()] = $Parameter->getDefaultValue();
+
+			$args = [];
+			foreach ($Parameters as $Parameter) {
+				// $params is set: $args from $params
+				if (isset($params[$Parameter->getName()])) {
+					$args[$Parameter->getName()] = $params[$Parameter->getName()];
 					continue;
+				}
+				// $Parameter has no type: $args from default value
+				if (!$Parameter->hasType()) {
+					if ($Parameter->isOptional()) {
+						$args[$Parameter->getName()] = $Parameter->getDefaultValue();
+						continue;
+					} else {
+						throw new Exception("Can't construct class '{$class}': non-optional parameter '{$Parameter->getName()}' doesn't have a type");
+					}
+				}
+				// $Parameter has a type
+				$ParameterType = $Parameter->getType();
+				if ($ParameterType->isBuiltin()) {
+					if ($Parameter->isOptional()) {
+						$args[$Parameter->getName()] = $Parameter->getDefaultValue();
+						continue;
+					} else {
+						throw new Exception("Can't construct class '{$class}': non-optional parameter '{$Parameter->getName()}' has a builtin type");
+					}
+				}
+				// $Parameter has a non-builtin type
+				$p_class = $ParameterType->getName();
+				$traits = (new \ReflectionClass($p_class))->getTraits();
+				if (isset($traits['BlackFox\Instance'])) {
+					/**@var string|self $p_class */
+					$args[$p_class] = $p_class::I();
 				} else {
-					throw new Exception("Can't construct class '{$class}': non-optional parameter '{$Parameter->getName()}' doesn't have a type");
+					throw new Exception("Can't construct class '{$class}': non-optional parameter '{$Parameter->getName()}' of type '{$p_class}' doesn't have 'BlackFox\Instance' trait");
 				}
 			}
-			// $Parameter has a type
-			$ParameterType = $Parameter->getType();
-			if ($ParameterType->isBuiltin()) {
-				if ($Parameter->isOptional()) {
-					$args[$Parameter->getName()] = $Parameter->getDefaultValue();
-					continue;
-				} else {
-					throw new Exception("Can't construct class '{$class}': non-optional parameter '{$Parameter->getName()}' has a builtin type");
-				}
-			}
-			// $Parameter has a non-builtin type
-			$p_class = $ParameterType->getName();
-			$traits = (new \ReflectionClass($p_class))->getTraits();
-			if (isset($traits['BlackFox\Instance'])) {
-				/**@var string|self $p_class */
-				$args[$p_class] = $p_class::I();
-			} else {
-				throw new Exception("Can't construct class '{$class}': non-optional parameter '{$Parameter->getName()}' of type '{$p_class}' doesn't have 'BlackFox\Instance' trait");
-			}
+			return $ReflectionClass->newInstanceArgs($args);
+		} catch (\ReflectionException $error) {
+			throw new Exception($error->GetMessage());
 		}
-		return $ReflectionClass->newInstanceArgs($args);
 	}
 }

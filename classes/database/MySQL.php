@@ -169,14 +169,14 @@ class MySQL extends Database {
 			throw new Exception("Can't compare table fields: no fields found, table '{$Table->name}' [{$Table->code}]");
 
 		$diff = [];
-		$tables = $this->Query("SHOW TABLES LIKE '{$Table->code}'");
+		$check = $this->Query("SHOW TABLES LIKE '{$Table->code}'");
 
-
-		if (empty($tables)) {
+		if (empty($check)) {
 			// no table found: creating a new one with fields and primary keys
 			$data = [];
 			foreach ($Table->fields as $code => $field) {
-				if ($Table->Types[$code]->virtual) continue;
+				if ($Table->Types[$code]->virtual)
+					continue;
 				$data[] = [
 					'MESSAGE' => 'Add column',
 					'FIELD'   => $code,
@@ -213,7 +213,8 @@ class MySQL extends Database {
 					$keys[] = $code;
 				}
 
-				if ($Table->Types[$code]->virtual) continue;
+				if ($Table->Types[$code]->virtual)
+					continue;
 				$structure_string = $this->GetStructureString($field);
 
 				if (!empty($last_after_code))
@@ -231,7 +232,7 @@ class MySQL extends Database {
 					}
 				} elseif (!empty($field['CHANGE']) && !empty($columns[$field['CHANGE']])) {
 					$data[] = [
-						'MESSAGE' => 'Rename and modify column',
+						'MESSAGE' => 'Rename column',
 						'FIELD'   => $code,
 						'SQL'     => "CHANGE COLUMN `{$field['CHANGE']}` $structure_string",
 					];

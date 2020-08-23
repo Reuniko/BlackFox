@@ -44,7 +44,6 @@ class Users extends SCRUD {
 					'en' => 'Database contains sha1 hash of the password',
 					'ru' => 'В базе хранится sha1 хеш пароля',
 				]),
-				'NOT_NULL'    => true,
 			],
 			'SALT'            => [
 				'TYPE'     => 'STRING',
@@ -53,7 +52,6 @@ class Users extends SCRUD {
 					'en' => 'Salt',
 					'ru' => 'Соль',
 				]),
-				'NOT_NULL' => true,
 			],
 			'HASH'            => [
 				'TYPE'        => 'STRING',

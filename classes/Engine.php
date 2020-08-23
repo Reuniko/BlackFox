@@ -69,7 +69,7 @@ class Engine {
 	 */
 	public function __construct() {
 		$this->InitConfig(static::GetConfig());
-		$this->InitUserSession();
+		$this->InitSession();
 		$this->InitAutoloadClasses();
 		$this->InitExceptionHandler();
 		$this->RegisterCoreClasses('BlackFox');
@@ -89,7 +89,7 @@ class Engine {
 		$this->languages = $config['languages'];
 	}
 
-	public function InitUserSession() {
+	public function InitSession() {
 		session_start();
 		$lifetime = 7 * 24 * 60 * 60;
 		setcookie(session_name(), session_id(), time() + $lifetime, '/');
@@ -293,8 +293,7 @@ class Engine {
 	 */
 	public function InitUser() {
 		/** @var User $USER */
-		$this->User = User::I();
-		$this->User->Init($_SESSION['USER']['ID'] ?: null);
+		$this->User = User::I(['ID' => $_SESSION['USER']['ID']]);
 	}
 
 	/**

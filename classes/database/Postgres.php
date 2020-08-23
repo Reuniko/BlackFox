@@ -87,7 +87,7 @@ class Postgres extends Database {
 			case 'INTEGER':
 			case 'OUTER':
 			case 'FILE':
-				return "int";
+				return "int4";
 			case 'FLOAT':
 				$length = $field['LENGTH'] ?: 13;
 				$decimals = $field['DECIMALS'] ?: 2;
@@ -138,34 +138,27 @@ class Postgres extends Database {
 				$this->Query("ALTER TABLE \"{$table}\" DROP CONSTRAINT \"{$db_constraint['constraint_name']}\"");
 	}
 
-	public function CompareTable($table, $fields) {
 
+	public function CompareTable(SCRUD $Table) {
+		$diff = [];
+		$diff = array_merge($diff, $this->CompareTableFieldsAndPrimaryKeys($Table));
+//		$diff = array_merge($diff, $this->CompareTableIndexes($Table));
+//		$diff = array_merge($diff, $this->CompareTableConstraints($Table));
+		return $diff;
 	}
 
-	public function SynchronizeTable($table, $fields) {
-		if (empty($table)) {
-			throw new Exception("Synchronize failed: no code of table");
-		}
-		if (empty($fields)) {
-			throw new Exception("Synchronize of '{$table}' failed: fields is empty");
-		}
-		$fields = array_change_key_case($fields, CASE_UPPER);
+	public function CompareTableFieldsAndPrimaryKeys(SCRUD $Table) {
 
-		$check = $this->Query("SELECT * FROM pg_catalog.pg_tables WHERE tablename='{$table}'");
+		$diff = [];
+		$check = $this->Query("SELECT * FROM pg_catalog.pg_tables WHERE tablename='{$Table->code}'");
 
 		if (empty($check)) {
-
-			$rows = [];
-			$keys = [];
-			foreach ($fields as $code => $field) {
-				if ($field['PRIMARY']) {
-					$keys[] = $code;
-				}
-				try {
-					$db_type = $this->GetStructureStringType($field);
-				} catch (\Exception $error) {
+			// no table found: creating a new one with fields and primary keys
+			$data = [];
+			foreach ($Table->fields as $code => $field) {
+				if ($Table->Types[$code]->virtual)
 					continue;
-				}
+				$type = $this->GetStructureStringType($field);
 				$null = ($field["NOT_NULL"] || $field['PRIMARY']) ? "NOT NULL" : "NULL";
 				$default = "";
 				if (isset($field['DEFAULT'])) {
@@ -173,49 +166,61 @@ class Postgres extends Database {
 					$default = "DEFAULT '{$default}'";
 				}
 				if ($field["AUTO_INCREMENT"]) {
-					$db_type = 'serial';
+					$type = 'serial';
 				}
-				$rows[] = $this->Quote($field['CODE']) . " $db_type $null $default";
+				$data[] = [
+					'MESSAGE' => 'Add column',
+					'FIELD'   => $code,
+					'SQL'     => $this->Quote($field['CODE']) . " $type $null $default",
+				];
 			}
-			if (!empty($keys)) {
-				$rows[] = "PRIMARY KEY (" . implode(", ", array_map([$this, 'Quote'], $keys)) . ")";
+			if (!empty($Table->keys)) {
+				$data[] = [
+					'MESSAGE' => 'Add primary keys',
+					'SQL'     => "PRIMARY KEY (" . implode(", ", array_map([$this, 'Quote'], $Table->keys)) . ")",
+				];
 			}
-			$rows = "CREATE TABLE IF NOT EXISTS {$table} \r\n" . "(" . implode(",\r\n", $rows) . ");";
-			$this->Query($rows);
-
+			$SQL = "CREATE TABLE {$Table->code} (\r\n" . implode(",\r\n", array_column($data, 'SQL')) . "\r\n);";
+			$diff[] = [
+				'MESSAGE' => 'Create a new table',
+				'TABLE'   => $Table->code,
+				'SQL'     => $SQL,
+				'DATA'    => $data,
+			];
 		} else {
-
-			$columns = $this->Query("SELECT * FROM information_schema.columns WHERE table_name ='{$table}';", 'column_name');
+			// table exist: comparing fields and primary keys
+			$data = [];
+			$columns = $this->Query("SELECT * FROM information_schema.columns WHERE table_catalog='{$this->database}' AND table_name ='{$Table->code}' ORDER BY ordinal_position;", 'column_name');
 			$columns = array_change_key_case($columns, CASE_UPPER);
+
+			debug($columns, '$columns');
 
 			$rows = [];
 			$keys = [];
 			$renames = [];
 
-			foreach ($fields as $code => $field) {
-				$code_id = $this->Quote($code);
+			foreach ($Table->fields as $code => $field) {
+				$code_quoted = $this->Quote($code);
 				if ($field['PRIMARY']) {
 					$keys[] = $code;
 				}
 
 				// renames
 				if ($field['CHANGE'] and !empty($columns[$field['CHANGE']])) {
-					$renames[] = "RENAME \"{$field['CHANGE']}\" TO {$code_id}";
+					$renames[] = "RENAME \"{$field['CHANGE']}\" TO {$code_quoted}";
 					$columns[$code] = $columns[$field['CHANGE']];
 					unset($columns[$field['CHANGE']]);
 				}
 
 				// type
-				try {
-					$db_type = $this->GetStructureStringType($field);
-				} catch (Exception $error) {
+				if ($Table->Types[$code]->virtual)
 					continue;
-				}
+				$type = $this->GetStructureStringType($field);
 
 				// ADD COLUMN:
 				if (!isset($columns[$code])) {
 					if ($field["AUTO_INCREMENT"]) {
-						$db_type = 'serial';
+						$type = 'serial';
 					}
 					$default = '';
 					if (isset($field['DEFAULT'])) {
@@ -226,36 +231,74 @@ class Postgres extends Database {
 						}
 					}
 					$not_null = $field['NOT_NULL'] ? 'NOT NULL' : '';
-					$rows[] = "ADD COLUMN {$code_id} {$db_type} {$default} {$not_null}";
+
+					$data[] = [
+						'MESSAGE' => 'Add column',
+						'FIELD'   => $code,
+						'SQL'     => "ADD COLUMN {$code_quoted} {$type} {$default} {$not_null}",
+					];
 
 					unset($columns[$code]);
 					continue;
 				}
 
 				// ALTER COLUMN:
-				// todo не делать лишней работы
-				$rows[] = "ALTER COLUMN {$code_id} TYPE {$db_type}";
+				// todo не делать лишней работы если тип не изменился
+				if ($type <> $columns[$code]['udt_name']) {
+					$data[] = [
+						'MESSAGE' => 'Change type',
+						'FIELD'   => $code,
+						'REASON'  => "{$columns[$code]['udt_name']} -> $type",
+						'SQL'     => "ALTER COLUMN {$code_quoted} TYPE {$type}",
+					];
+				}
 
-				// $not_null
-				if (($field["NOT_NULL"] || $field['PRIMARY'])) {
-					$rows[] = "ALTER COLUMN {$code_id} SET NOT NULL";
-				} else {
-					$rows[] = "ALTER COLUMN {$code_id} DROP NOT NULL";
+				// NULL -> NOT NULL
+				if ($field["NOT_NULL"] and $columns[$code]['is_nullable'] == 'YES') {
+					$data[] = [
+						'MESSAGE' => 'Set not null',
+						'FIELD'   => $code,
+						'SQL'     => "ALTER COLUMN {$code_quoted} SET NOT NULL",
+					];
+				}
+				// NOT NULL -> NULL
+				if (!$field["NOT_NULL"] and $columns[$code]['is_nullable'] == 'NO') {
+					$data[] = [
+						'MESSAGE' => 'Drop not null',
+						'FIELD'   => $code,
+						'SQL'     => "ALTER COLUMN {$code_quoted} DROP NOT NULL",
+					];
 				}
 
 				// $default
-				if ($field["AUTO_INCREMENT"]) {
-					$seq_name = "{$table}_{$code}_seq";
-					$this->Query("CREATE SEQUENCE IF NOT EXISTS {$seq_name}");
-					$this->Query("SELECT setval('{$seq_name}', COALESCE((SELECT MAX({$code_id})+1 FROM {$table}), 1), false)");
-					$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT nextval('{$seq_name}')";
-				} else {
-					if (isset($field['DEFAULT'])) {
+				if (!$field["AUTO_INCREMENT"]) {
+
+					if (!empty($field['DEFAULT'])) {
 						$default = !is_array($field['DEFAULT']) ? $field['DEFAULT'] : implode(',', $field['DEFAULT']);
-						$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT '{$default}'";
+						if ($default <> $columns[$code]['column_default']) {
+							$data[] = [
+								'MESSAGE' => 'Set default',
+								'FIELD'   => $code,
+								'SQL'     => "ALTER COLUMN {$code_quoted} SET DEFAULT '{$default}'",
+							];
+						}
 					} else {
-						$rows[] = "ALTER COLUMN {$code_id} DROP DEFAULT";
+						if (!empty($columns[$code]['column_default'])) {
+							$data[] = [
+								'MESSAGE' => 'Drop default',
+								'FIELD'   => $code,
+								'SQL'     => "ALTER COLUMN {$code_quoted} DROP DEFAULT",
+							];
+						}
 					}
+
+				} else {
+					/* TODO
+					$seq_name = "{$Table->code}_{$code}_seq";
+					$this->Query("CREATE SEQUENCE IF NOT EXISTS {$seq_name}");
+					$this->Query("SELECT setval('{$seq_name}', COALESCE((SELECT MAX({$code_id})+1 FROM {$Table->code}), 1), false)");
+					$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT nextval('{$seq_name}')";
+					*/
 				}
 
 				unset($columns[$code]);
@@ -263,24 +306,42 @@ class Postgres extends Database {
 
 			// DROP COLUMN:
 			foreach ($columns as $code => $column) {
-				$rows[] = "DROP COLUMN " . $this->Quote($code);
+				$data[] = [
+					'MESSAGE' => 'Drop default',
+					'FIELD'   => $code,
+					'SQL'     => "DROP COLUMN " . $this->Quote($code),
+				];
 				unset($columns[$code]);
 			}
 
+			/* TODO
 			if (!empty($keys)) {
-				$rows[] = "DROP CONSTRAINT IF EXISTS \"{$table}_pkey\", ADD CONSTRAINT \"{$table}_pkey\" PRIMARY KEY (\"" . implode("\", \"", $keys) . "\")";
+				$rows[] = "DROP CONSTRAINT IF EXISTS \"{$Table->code}_pkey\", ADD CONSTRAINT \"{$Table->code}_pkey\" PRIMARY KEY (\"" . implode("\", \"", $keys) . "\")";
 			}
 
 			if (!empty($renames)) {
-				$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $renames) . ";";
+				$SQL = "ALTER TABLE {$Table->code}\r\n" . implode(",\r\n", $renames) . ";";
 				$this->Query($SQL);
 			}
 
 			if (!empty($rows)) {
-				$SQL = "ALTER TABLE {$table}\r\n" . implode(",\r\n", $rows) . ";";
+				$SQL = "ALTER TABLE {$Table->code}\r\n" . implode(",\r\n", $rows) . ";";
 				$this->Query($SQL);
 			}
+			*/
+
+			if (!empty($data)) {
+				$SQL = "ALTER TABLE {$Table->code} \r\n" . implode(",\r\n", array_column($data, 'SQL'));
+				$diff[] = [
+					'MESSAGE' => 'Modify table',
+					'TABLE'   => $Table->code,
+					'DATA'    => $data,
+					'SQL'     => $SQL,
+				];
+			}
 		}
+
+		return $diff;
 
 		// Indexes:
 		$SQL = "SELECT
@@ -298,7 +359,7 @@ class Postgres extends Database {
 			    and a.attrelid = t.oid
 			    and a.attnum = ANY(ix.indkey)
 			    and t.relkind = 'r'
-			    and t.relname ='{$table}'
+			    and t.relname ='{$Table->code}'
 			ORDER BY
 			    t.relname,
 			    i.relname
@@ -306,7 +367,7 @@ class Postgres extends Database {
 		$indexes = $this->Query($SQL, 'column_name');
 		//debug($indexes, '$indexes');
 
-		foreach ($fields as $code => $field) {
+		foreach ($Table->fields as $code => $field) {
 			if (in_array($code, $keys)) {
 				continue;
 			}
@@ -331,7 +392,7 @@ class Postgres extends Database {
 
 			// index is: missing in database, present in code - create it
 			if ($field['INDEX'] and !isset($index)) {
-				$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
+				$this->Query("CREATE {$unique} INDEX ON {$Table->code} (" . $this->Quote($code) . ")");
 				continue;
 			}
 
@@ -339,7 +400,7 @@ class Postgres extends Database {
 			if (isset($index)) {
 				if (($field['UNIQUE'] and $index['index_unique']) or (!$field['UNIQUE'] and !$index['index_unique'])) {
 					$this->Query("DROP INDEX " . $this->Quote($index['index_name']));
-					$this->Query("CREATE {$unique} INDEX ON {$table} (" . $this->Quote($code) . ")");
+					$this->Query("CREATE {$unique} INDEX ON {$Table->code} (" . $this->Quote($code) . ")");
 					continue;
 				}
 			}

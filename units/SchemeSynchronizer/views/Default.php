@@ -57,35 +57,46 @@ $this->ENGINE->TITLE = T([
 			<tr>
 				<th>...</th>
 				<th>SQL</th>
-				<th width="1%"></th>
+				<th></th>
 			</tr>
 
 			<? foreach ($CORE['DIFFS'] as $diff): ?>
 				<tr>
 					<td>
-						<?= $diff['MESSAGE'] ?>
+						<?= $diff['MESSAGE'] ?><!--
 						<? if ($diff['TABLE']): ?>
+							-->:
+						<strong><?= $diff['TABLE'] ?></strong>
+						<? if ($diff['FIELD']): ?>
 							<ul class="mb-0">
-								<li>
-									<?= $diff['TABLE'] ?>
-									<? if ($diff['FIELD']): ?>
-										<ul class="mb-0">
-											<li><?= $diff['FIELD'] ?></li>
-										</ul>
-									<? endif; ?>
-									<? if (!empty($diff['DATA'])): ?>
-										<ul>
-											<? foreach ($diff['DATA'] as $data): ?>
-												<li><?= $data['FIELD'] ?></li>
-											<? endforeach; ?>
-										</ul>
-									<? endif; ?>
-								</li>
+								<li><?= $diff['FIELD'] ?></li>
 							</ul>
 						<? endif; ?>
+						<? if (!empty($diff['DATA'])): ?>
+							<ul>
+								<? foreach ($diff['DATA'] as $data): ?>
+									<li>
+										<?= $data['MESSAGE'] ?><!--
+											<? if ($data['FIELD']): ?>
+												-->:
+										<strong><?= $data['FIELD'] ?></strong>
+										<? if ($data['REASON']): ?>
+											<?= $data['REASON'] ?>
+										<? endif; ?>
+										<!--
+											<? endif; ?>
+											-->
+									</li>
+								<? endforeach; ?>
+							</ul>
+						<? endif; ?>
+						<!--
+						<? endif; ?>
+						-->
 					</td>
 					<td>
-						<pre class="mb-0"><?= $diff['SQL'] ?></pre>
+						<div class="mb-0" style="white-space: pre-line; font-family: monospace; font-size: 16px;"><?= $diff['SQL'] ?></div>
+						<? /*
 						<? if (!empty($diff['DATA'])): ?>
 							<br/>
 							<table class="table-bordered">
@@ -107,6 +118,7 @@ $this->ENGINE->TITLE = T([
 								<? endforeach; ?>
 							</table>
 						<? endif; ?>
+						*/ ?>
 					</td>
 					<td>
 						<? if ($RESULT['MODE'] === 'Compare'): ?>
@@ -114,7 +126,7 @@ $this->ENGINE->TITLE = T([
 								<input
 									type="hidden"
 									name="SQL"
-									value="<?= $diff['SQL'] ?>"
+									value="<?= htmlspecialchars($diff['SQL']) ?>"
 								/>
 								<button
 									type="submit"
