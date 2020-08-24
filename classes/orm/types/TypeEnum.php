@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeEnum extends Type {
 
+	public $db_type = 'enum';
+
 	public function FormatInputValue($value) {
 		if (!isset($this->field['VALUES'][$value])) {
 			throw new ExceptionType("Unknown enum value '{$value}' for field '{$this->field['NAME']}'");

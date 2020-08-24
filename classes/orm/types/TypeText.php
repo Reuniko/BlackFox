@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeText extends Type {
 
+	public $db_type = 'text';
+
 	public function PrintValue($value) {
 		if ($this->field['WYSIWYG']) {
 			$value = htmlspecialchars_decode($value);

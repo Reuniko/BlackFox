@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeSet extends Type {
 
+	public $db_type = 'set';
+
 	public function FormatInputValue($values) {
 		if (!is_array($values)) {
 			$values = [$values];

@@ -8,6 +8,10 @@ namespace BlackFox;
  */
 abstract class Type {
 
+	/** @var string $db_type symbolic code of database type */
+	public $db_type = null;
+
+	/** @var bool indicates that the field is virtual: it is not present in the database, will be generating dynamically */
 	public $virtual = false;
 
 	/** @var Database */

@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeDateTime extends Type {
 
+	public $db_type = 'datetime';
+
 	public function FormatInputValue($value) {
 		if (is_numeric($value)) {
 			$value = date('Y-m-d H:i:s', $value);

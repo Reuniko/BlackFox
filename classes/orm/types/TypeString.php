@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeString extends Type {
 
+	public $db_type = 'varchar';
+
 	/**
 	 * Deleting all extra spaces
 	 *

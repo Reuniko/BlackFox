@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeOuter extends Type {
 
+	public $db_type = 'int';
+
 	public function ProvideInfoIntegrity() {
 		parent::ProvideInfoIntegrity();
 		if (empty($this->field['LINK'])) {

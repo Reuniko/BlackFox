@@ -22,6 +22,56 @@ class MySQL extends Database {
 			throw new Exception(mysqli_connect_error());
 		}
 		mysqli_set_charset($this->link, $params['CHARSET'] ?: 'utf8');
+
+		$this->db_types = [
+			// -----------------------------------------
+			'bool'     => [
+				'type'      => 'tinyint',
+				'getParams' => function (array $field) {
+					return [1];
+				},
+			],
+			'int'      => [
+				'type'      => 'int',
+				'getParams' => function (array $field) {
+					return [$field['LENGTH'] ?: 11];
+				},
+			],
+			'float'    => [
+				'type'      => 'float',
+				'getParams' => function (array $field) {
+					return [$field['LENGTH'] ?: 13, $field['DECIMALS'] ?: 2];
+				},
+			],
+			// -----------------------------------------
+			'varchar'  => [
+				'type'      => 'varchar',
+				'getParams' => function (array $field) {
+					return [$field['LENGTH'] ?: 255];
+				},
+			],
+			'text'     => [
+				'type' => 'text',
+			],
+			// -----------------------------------------
+			'enum'     => [
+				'type'      => 'enum',
+				'getParams' => function (array $field) {
+					return ['\'' . implode('\',\'', array_keys($field['VALUES'])) . '\''];
+				},
+			],
+			'set'      => [
+				'type'      => 'set',
+				'getParams' => function (array $field) {
+					return ['\'' . implode('\',\'', array_keys($field['VALUES'])) . '\''];
+				},
+			],
+			// -----------------------------------------
+			'time'     => ['type' => 'time'],
+			'date'     => ['type' => 'date'],
+			'datetime' => ['type' => 'datetime'],
+			// -----------------------------------------
+		];
 	}
 
 	public function Query($SQL, $key = null) {

@@ -11,8 +11,8 @@ abstract class Database {
 	/**
 	 * Execute SQL query and return a result as array
 	 *
-	 * @param string $SQL
-	 * @param string $key
+	 * @param string $SQL SQL statement
+	 * @param string $key optional, indicates which column to form array keys
 	 * @return mixed
 	 * @throws ExceptionSQL
 	 */
@@ -63,4 +63,7 @@ abstract class Database {
 	public function Drop($table) {
 		$this->Query("DROP TABLE IF EXISTS {$table}");
 	}
+
+	/** @var array */
+	public $db_types = [];
 }

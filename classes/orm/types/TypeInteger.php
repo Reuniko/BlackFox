@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeInteger extends Type {
 
+	public $db_type = 'int';
+
 	public function FormatInputValue($value) {
 		if (!is_numeric($value)) {
 			throw new ExceptionType(T([

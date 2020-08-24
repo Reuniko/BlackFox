@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeFloat extends Type {
 
+	public $db_type = 'float';
+
 	public function FormatInputValue($value) {
 		return str_replace(',', '.', (float)$value);
 	}

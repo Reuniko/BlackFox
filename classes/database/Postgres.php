@@ -23,6 +23,68 @@ class Postgres extends Database {
 		if ($this->link === false) {
 			throw new Exception(pg_last_error());
 		}
+
+		$this->db_types = [
+			// -----------------------------------------
+			'bool'     => [
+				'type' => 'bool',
+			],
+			'int'      => [
+				'type'      => 'numeric',
+				'params'    => ['numeric_precision', 'numeric_scale'],
+				'getParams' => function (array $field) {
+					return [$field['LENGTH'] ?: 11, 0];
+				},
+			],
+			'float'    => [
+				'type'      => 'numeric',
+				'params'    => ['numeric_precision', 'numeric_scale'],
+				'getParams' => function (array $field) {
+					return [$field['LENGTH'] ?: 13, $field['DECIMALS'] ?: 2];
+				},
+			],
+			// -----------------------------------------
+			'varchar'  => [
+				'type'      => 'varchar',
+				'params'    => ['character_maximum_length'],
+				'getParams' => function (array $field) {
+					return [$field['LENGTH'] ?: 255];
+				},
+			],
+			'text'     => [
+				'type' => 'text',
+			],
+			// -----------------------------------------
+			'enum'     => [
+				'type'      => 'varchar',
+				'params'    => ['character_maximum_length'],
+				'getParams' => function (array $field) {
+					// returning max string length from values
+					$max = max(array_map('strlen', array_keys($field['VALUES'])));
+					return [$max];
+				},
+			],
+			'set'      => [
+				'type'      => 'varchar',
+				'params'    => ['character_maximum_length'],
+				'getParams' => function (array $field) {
+					// returning sum of string lengths from values + commas
+					$sum = strlen(implode(',', array_keys($field['VALUES'])));
+					return [$sum];
+				},
+			],
+			// -----------------------------------------
+			'time'     => [
+				'type' => 'time',
+			],
+			'date'     => [
+				'type' => 'date',
+			],
+			'datetime' => [
+				'type' => 'timestamp',
+			],
+			// -----------------------------------------
+		];
 	}
 
 	public function QuerySingleInsert($SQL, $increment = null) {
@@ -67,42 +129,19 @@ class Postgres extends Database {
 		return 'random()';
 	}
 
-	public function GetStructureStringType(array $field) {
-		if (empty($field['TYPE'])) {
-			throw new ExceptionType("Empty data type");
+	public function GetStructureStringType(Type $Type) {
+		if (empty($Type->db_type))
+			throw new Exception("Empty db_type in Type: " . get_class($Type));
+		if (!isset($this->db_types[$Type->db_type]))
+			throw new Exception("Unknown db_type: " . $Type->db_type);
+
+		$db_type = $this->db_types[$Type->db_type];
+		$string = $db_type['type'];
+		if (is_callable($db_type['getParams'])) {
+			$params = $db_type['getParams']($Type->field);
+			$string .= '(' . implode(',', $params) . ')';
 		}
-		switch ($field['TYPE']) {
-			case 'STRING':
-			case 'ENUM':
-			case 'SET':
-			case 'PASSWORD':
-				return "varchar(" . ((int)$field['LENGTH'] ?: 255) . ")";
-				break;
-			case 'ARRAY':
-			case 'TEXT':
-			case 'LIST':
-				return "text";
-			case 'BOOLEAN':
-				return "bool";
-			case 'INTEGER':
-			case 'OUTER':
-			case 'FILE':
-				return "int4";
-			case 'FLOAT':
-				$length = $field['LENGTH'] ?: 13;
-				$decimals = $field['DECIMALS'] ?: 2;
-				return "numeric({$length},{$decimals})";
-			case 'INNER':
-				throw new ExceptionType("No fields required");
-			case 'TIME':
-				return "time";
-			case 'DATE':
-				return "date";
-			case 'DATETIME':
-				return "timestamp";
-			default:
-				throw new ExceptionType("Unknown data type: " . $field['TYPE']);
-		}
+		return $string;
 	}
 
 	private function GetConstraints($table) {
@@ -148,7 +187,6 @@ class Postgres extends Database {
 	}
 
 	public function CompareTableFieldsAndPrimaryKeys(SCRUD $Table) {
-
 		$diff = [];
 		$check = $this->Query("SELECT * FROM pg_catalog.pg_tables WHERE tablename='{$Table->code}'");
 
@@ -158,7 +196,7 @@ class Postgres extends Database {
 			foreach ($Table->fields as $code => $field) {
 				if ($Table->Types[$code]->virtual)
 					continue;
-				$type = $this->GetStructureStringType($field);
+				$type = $this->GetStructureStringType($Table->Types[$code]);
 				$null = ($field["NOT_NULL"] || $field['PRIMARY']) ? "NOT NULL" : "NULL";
 				$default = "";
 				if (isset($field['DEFAULT'])) {
@@ -166,12 +204,26 @@ class Postgres extends Database {
 					$default = "DEFAULT '{$default}'";
 				}
 				if ($field["AUTO_INCREMENT"]) {
-					$type = 'serial';
+					$sequence_name = strtolower($Table->code . '_' . $code . '_seq');
+					$sequences = $this->Query("
+						SELECT * FROM information_schema.sequences 
+						WHERE sequence_catalog='{$this->database}' 
+						AND sequence_name='{$sequence_name}'
+					", 'sequence_name');
+					if (empty($sequences[$sequence_name])) {
+						$diff[] = [
+							'MESSAGE'  => 'Create a sequence',
+							'PRIORITY' => -1,
+							'TABLE'    => $Table->code,
+							'SQL'      => "CREATE SEQUENCE {$sequence_name};",
+						];
+					}
+					$default = "DEFAULT nextval('{$sequence_name}')";
 				}
 				$data[] = [
 					'MESSAGE' => 'Add column',
 					'FIELD'   => $code,
-					'SQL'     => $this->Quote($field['CODE']) . " $type $null $default",
+					'SQL'     => trim($this->Quote($field['CODE']) . " $type $null $default"),
 				];
 			}
 			if (!empty($Table->keys)) {
@@ -195,7 +247,6 @@ class Postgres extends Database {
 
 			debug($columns, '$columns');
 
-			$rows = [];
 			$keys = [];
 			$renames = [];
 
@@ -215,13 +266,10 @@ class Postgres extends Database {
 				// type
 				if ($Table->Types[$code]->virtual)
 					continue;
-				$type = $this->GetStructureStringType($field);
 
 				// ADD COLUMN:
 				if (!isset($columns[$code])) {
-					if ($field["AUTO_INCREMENT"]) {
-						$type = 'serial';
-					}
+					$type = $this->GetStructureStringType($Table->Types[$code]);
 					$default = '';
 					if (isset($field['DEFAULT'])) {
 						if (is_bool($field['DEFAULT'])) {
@@ -230,6 +278,25 @@ class Postgres extends Database {
 							$default = "DEFAULT '{$field['DEFAULT']}'";
 						}
 					}
+
+					if ($field['AUTO_INCREMENT']) {
+						$sequence_name = strtolower($Table->code . '_' . $code . '_seq');
+						$sequences = $this->Query("
+							SELECT * FROM information_schema.sequences 
+							WHERE sequence_catalog='{$this->database}' 
+							AND sequence_name='{$sequence_name}'
+						", 'sequence_name');
+						if (empty($sequences[$sequence_name])) {
+							$diff[] = [
+								'MESSAGE'  => 'Create a sequence',
+								'PRIORITY' => -1,
+								'TABLE'    => $Table->code,
+								'SQL'      => "CREATE SEQUENCE {$sequence_name};",
+							];
+						}
+						$default = "DEFAULT nextval('{$sequence_name}')";
+					}
+
 					$not_null = $field['NOT_NULL'] ? 'NOT NULL' : '';
 
 					$data[] = [
@@ -243,8 +310,9 @@ class Postgres extends Database {
 				}
 
 				// ALTER COLUMN:
-				// todo не делать лишней работы если тип не изменился
-				if ($type <> $columns[$code]['udt_name']) {
+				$db_type = $this->db_types[$Table->Types[$code]->db_type];
+				if ($db_type['type'] <> $columns[$code]['udt_name']) {
+					$type = $this->GetStructureStringType($Table->Types[$code]);
 					$data[] = [
 						'MESSAGE' => 'Change type',
 						'FIELD'   => $code,
@@ -252,6 +320,7 @@ class Postgres extends Database {
 						'SQL'     => "ALTER COLUMN {$code_quoted} TYPE {$type}",
 					];
 				}
+				// TODO check $db_type params
 
 				// NULL -> NOT NULL
 				if ($field["NOT_NULL"] and $columns[$code]['is_nullable'] == 'YES') {
@@ -272,10 +341,14 @@ class Postgres extends Database {
 
 				// $default
 				if (!$field["AUTO_INCREMENT"]) {
-
-					if (!empty($field['DEFAULT'])) {
+					if (isset($field['DEFAULT'])) {
 						$default = !is_array($field['DEFAULT']) ? $field['DEFAULT'] : implode(',', $field['DEFAULT']);
-						if ($default <> $columns[$code]['column_default']) {
+						if ($columns[$code]['data_type'] == 'boolean') {
+							$pg_default = $default ? 'true' : 'false';
+						} else {
+							$pg_default = "'{$default}'::{$columns[$code]['data_type']}";
+						}
+						if ($pg_default <> $columns[$code]['column_default']) {
 							$data[] = [
 								'MESSAGE' => 'Set default',
 								'FIELD'   => $code,
@@ -286,39 +359,65 @@ class Postgres extends Database {
 						if (!empty($columns[$code]['column_default'])) {
 							$data[] = [
 								'MESSAGE' => 'Drop default',
+								'REASON'  => $columns[$code]['column_default'],
 								'FIELD'   => $code,
 								'SQL'     => "ALTER COLUMN {$code_quoted} DROP DEFAULT",
 							];
 						}
 					}
-
 				} else {
-					/* TODO
-					$seq_name = "{$Table->code}_{$code}_seq";
-					$this->Query("CREATE SEQUENCE IF NOT EXISTS {$seq_name}");
-					$this->Query("SELECT setval('{$seq_name}', COALESCE((SELECT MAX({$code_id})+1 FROM {$Table->code}), 1), false)");
-					$rows[] = "ALTER COLUMN {$code_id} SET DEFAULT nextval('{$seq_name}')";
-					*/
+					$sequence_name = strtolower($Table->code . '_' . $code . '_seq');
+					// check if sequence exists
+					$sequences = $this->Query("
+						SELECT * FROM information_schema.sequences 
+						WHERE sequence_catalog='{$this->database}' 
+						AND sequence_name='{$sequence_name}'
+					", 'sequence_name');
+					if (empty($sequences[$sequence_name])) {
+						$diff[] = [
+							'MESSAGE'  => 'Create a sequence',
+							'PRIORITY' => -1,
+							'TABLE'    => $Table->code,
+							'SQL'      => "CREATE SEQUENCE {$sequence_name};",
+						];
+						$diff[] = [
+							'MESSAGE'  => 'Set sequence last value',
+							'PRIORITY' => -1,
+							'TABLE'    => $Table->code,
+							'SQL'      => "SELECT setval('{$sequence_name}', COALESCE((SELECT MAX({$code_quoted})+1 FROM {$Table->code}), 1), false);",
+						];
+					}
+					// check if default is correct
+					if ("nextval('{$sequence_name}'::regclass)" <> $columns[$code]['column_default']) {
+						$data[] = [
+							'MESSAGE' => 'Link to sequence',
+							'REASON'  => $columns[$code]['column_default'],
+							'FIELD'   => $code,
+							'SQL'     => "ALTER COLUMN {$code_quoted} SET DEFAULT nextval('{$sequence_name}')",
+						];
+					}
 				}
 
 				unset($columns[$code]);
 			}
+
+			// TODO: primary keys
+			// $rows[] = "DROP CONSTRAINT IF EXISTS \"{$Table->code}_pkey\", ADD CONSTRAINT \"{$Table->code}_pkey\" PRIMARY KEY (\"" . implode("\", \"", $keys) . "\")";
 
 			// DROP COLUMN:
 			foreach ($columns as $code => $column) {
 				$data[] = [
 					'MESSAGE' => 'Drop default',
 					'FIELD'   => $code,
-					'SQL'     => "DROP COLUMN " . $this->Quote($code),
+					'SQL'     => "DROP COLUMN " . $code_quoted,
 				];
 				unset($columns[$code]);
 			}
 
-			/* TODO
-			if (!empty($keys)) {
-				$rows[] = "DROP CONSTRAINT IF EXISTS \"{$Table->code}_pkey\", ADD CONSTRAINT \"{$Table->code}_pkey\" PRIMARY KEY (\"" . implode("\", \"", $keys) . "\")";
-			}
 
+			// TODO: renames
+
+			/*
 			if (!empty($renames)) {
 				$SQL = "ALTER TABLE {$Table->code}\r\n" . implode(",\r\n", $renames) . ";";
 				$this->Query($SQL);
@@ -342,6 +441,11 @@ class Postgres extends Database {
 		}
 
 		return $diff;
+	}
+
+	public function CompareTableIndexes(SCRUD $Table) {
+		return [];
+		// TODO
 
 		// Indexes:
 		$SQL = "SELECT

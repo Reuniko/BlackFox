@@ -4,6 +4,8 @@ namespace BlackFox;
 
 class TypeBoolean extends Type {
 
+	public $db_type = 'bool';
+
 	public function FormatOutputValue($element) {
 		$value = &$element[$this->field['CODE']];
 		if ($value === 'f') {
