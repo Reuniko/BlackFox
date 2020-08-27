@@ -181,7 +181,7 @@ class Postgres extends Database {
 	public function CompareTable(SCRUD $Table) {
 		$diff = [];
 		$diff = array_merge($diff, $this->CompareTableFieldsAndPrimaryKeys($Table));
-//		$diff = array_merge($diff, $this->CompareTableIndexes($Table));
+		$diff = array_merge($diff, $this->CompareTableIndexes($Table));
 //		$diff = array_merge($diff, $this->CompareTableConstraints($Table));
 		return $diff;
 	}
@@ -517,10 +517,7 @@ class Postgres extends Database {
 	}
 
 	public function CompareTableIndexes(SCRUD $Table) {
-		return [];
-		// TODO
-
-		// Indexes:
+		$diff = [];
 		$SQL = "SELECT
 			    a.attname as column_name,
 			    i.relname as index_name,
@@ -542,10 +539,9 @@ class Postgres extends Database {
 			    i.relname
 			    ";
 		$indexes = $this->Query($SQL, 'column_name');
-		//debug($indexes, '$indexes');
 
 		foreach ($Table->fields as $code => $field) {
-			if (in_array($code, $keys)) {
+			if (in_array($code, $Table->keys)) {
 				continue;
 			}
 			if ($field['FOREIGN']) {
@@ -563,25 +559,46 @@ class Postgres extends Database {
 
 			// index is: present in database, missing in code - drop it
 			if (isset($index) and !$field['INDEX']) {
-				$this->Query("DROP INDEX " . $this->Quote($index['index_name']));
+				$diff[] = [
+					'MESSAGE'  => 'Drop index',
+					'PRIORITY' => -1,
+					'TABLE'    => $Table->code,
+					'SQL'      => "DROP INDEX " . $this->Quote($index['index_name']),
+				];
 				continue;
 			}
 
 			// index is: missing in database, present in code - create it
 			if ($field['INDEX'] and !isset($index)) {
-				$this->Query("CREATE {$unique} INDEX ON {$Table->code} (" . $this->Quote($code) . ")");
+				$diff[] = [
+					'MESSAGE'  => 'Create index',
+					'PRIORITY' => +1,
+					'TABLE'    => $Table->code,
+					'SQL'      => "CREATE {$unique} INDEX ON {$Table->code} (" . $this->Quote($code) . ")",
+				];
 				continue;
 			}
 
 			// index is: present in database, present in code - check unique
 			if (isset($index)) {
-				if (($field['UNIQUE'] and $index['index_unique']) or (!$field['UNIQUE'] and !$index['index_unique'])) {
-					$this->Query("DROP INDEX " . $this->Quote($index['index_name']));
-					$this->Query("CREATE {$unique} INDEX ON {$Table->code} (" . $this->Quote($code) . ")");
+				if (($field['UNIQUE'] and $index['index_unique'] == 'f') or (!$field['UNIQUE'] and $index['index_unique'] == 't')) {
+					$diff[] = [
+						'MESSAGE'  => 'Change index (drop)',
+						'PRIORITY' => -1,
+						'TABLE'    => $Table->code,
+						'SQL'      => "DROP INDEX " . $this->Quote($index['index_name']),
+					];
+					$diff[] = [
+						'MESSAGE'  => 'Change index (create)',
+						'PRIORITY' => +1,
+						'TABLE'    => $Table->code,
+						'SQL'      => "CREATE {$unique} INDEX ON {$Table->code} (" . $this->Quote($code) . ")",
+					];
 					continue;
 				}
 			}
 		}
+		return $diff;
 	}
 
 	public function CreateTableConstraints($table, $fields) {
