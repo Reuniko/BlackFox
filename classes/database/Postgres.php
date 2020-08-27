@@ -460,9 +460,9 @@ class Postgres extends Database {
 			// DROP COLUMN
 			foreach ($columns as $code => $column) {
 				$data[] = [
-					'MESSAGE' => 'Drop column',
-					'FIELD'   => $code,
-					'SQL'     => "DROP COLUMN " . $this->Quote($code),
+					'MESSAGE' => 'Drop superfluous column',
+					'FIELD'   => $column['column_name'],
+					'SQL'     => "DROP COLUMN " . $this->Quote($column['column_name']),
 				];
 				unset($columns[$code]);
 			}
