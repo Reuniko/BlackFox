@@ -451,10 +451,7 @@ class Postgres extends Database {
 				unset($columns[$code]);
 			}
 
-			// TODO: primary keys
-			// $rows[] = "DROP CONSTRAINT IF EXISTS \"{$Table->code}_pkey\", ADD CONSTRAINT \"{$Table->code}_pkey\" PRIMARY KEY (\"" . implode("\", \"", $keys) . "\")";
-
-			// DROP COLUMN:
+			// DROP COLUMN
 			foreach ($columns as $code => $column) {
 				$data[] = [
 					'MESSAGE' => 'Drop column',
@@ -462,6 +459,41 @@ class Postgres extends Database {
 					'SQL'     => "DROP COLUMN " . $code_quoted,
 				];
 				unset($columns[$code]);
+			}
+
+			// PRIMARY KEYS
+			$rows = $this->Query("
+				SELECT * FROM information_schema.key_column_usage 
+				WHERE table_catalog='{$this->database}' 
+				AND table_name='{$Table->code}' 
+				AND constraint_name = (
+					SELECT constraint_name FROM information_schema.table_constraints
+					WHERE table_catalog = '{$this->database}'
+					AND table_name = '{$Table->code}'
+					AND constraint_type = 'PRIMARY KEY'
+				)
+				ORDER BY ordinal_position");
+			$db_pkey_name = '';
+			$db_pkey_cols = [];
+			foreach ($rows as $row) {
+				$db_pkey_name = $row['constraint_name'];
+				$db_pkey_cols[] = $row['column_name'];
+			}
+			if ($Table->keys <> $db_pkey_cols) {
+				if (!empty($db_pkey_name))
+					$diff[] = [
+						'MESSAGE'  => 'Drop primary',
+						'PRIORITY' => -1,
+						'TABLE'    => $Table->code,
+						'SQL'      => "ALTER TABLE {$Table->code} DROP CONSTRAINT {$db_pkey_name};",
+					];
+				if (!empty($Table->keys))
+					$diff[] = [
+						'MESSAGE'  => 'Add primary',
+						'PRIORITY' => +1,
+						'TABLE'    => $Table->code,
+						'SQL'      => "ALTER TABLE {$Table->code} ADD PRIMARY KEY (" . implode(',', array_map([$this, 'Quote'], $Table->keys)) . ");",
+					];
 			}
 
 
