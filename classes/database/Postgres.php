@@ -462,7 +462,7 @@ class Postgres extends Database {
 				$data[] = [
 					'MESSAGE' => 'Drop column',
 					'FIELD'   => $code,
-					'SQL'     => "DROP COLUMN " . $code_quoted,
+					'SQL'     => "DROP COLUMN " . $this->Quote($code),
 				];
 				unset($columns[$code]);
 			}
