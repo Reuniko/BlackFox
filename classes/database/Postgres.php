@@ -260,18 +260,24 @@ class Postgres extends Database {
 				$code_quoted = $this->Quote($code);
 				$column = $columns[$code];
 
-				// renames
-				/*
-				if ($field['CHANGE'] and !empty($columns[$field['CHANGE']])) {
-					$renames[] = "RENAME \"{$field['CHANGE']}\" TO {$code_quoted}";
-					$column = $columns[$field['CHANGE']];
-					unset($columns[$field['CHANGE']]);
-				}
-				*/
 
 				if ($Table->Types[$code]->virtual) continue;
 
-				// ADD COLUMN:
+				// RENAME COLUMN
+				if ($field['CHANGE'] and !empty($columns[$field['CHANGE']]) and empty($column)) {
+					$diff[] = [
+						'MESSAGE'  => 'Rename column',
+						'PRIORITY' => -1,
+						'TABLE'    => $Table->code,
+						'FIELD'    => $code,
+						'REASON'   => "{$field['CHANGE']} -> {$code}",
+						'SQL'      => "ALTER TABLE {$Table->code} RENAME COLUMN " . $this->Quote($field['CHANGE']) . " TO {$code_quoted}",
+					];
+					$column = $columns[$field['CHANGE']];
+					unset($columns[$field['CHANGE']]);
+				}
+
+				// ADD COLUMN
 				if (!isset($column)) {
 					$type = $this->GetStructureStringType($Table->Types[$code]);
 
@@ -495,21 +501,6 @@ class Postgres extends Database {
 						'SQL'      => "ALTER TABLE {$Table->code} ADD PRIMARY KEY (" . implode(',', array_map([$this, 'Quote'], $Table->keys)) . ");",
 					];
 			}
-
-
-			// TODO: renames
-
-			/*
-			if (!empty($renames)) {
-				$SQL = "ALTER TABLE {$Table->code}\r\n" . implode(",\r\n", $renames) . ";";
-				$this->Query($SQL);
-			}
-
-			if (!empty($rows)) {
-				$SQL = "ALTER TABLE {$Table->code}\r\n" . implode(",\r\n", $rows) . ";";
-				$this->Query($SQL);
-			}
-			*/
 
 			if (!empty($data)) {
 				$SQL = "ALTER TABLE {$Table->code} \r\n" . implode(",\r\n", array_column($data, 'SQL'));
