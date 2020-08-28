@@ -144,49 +144,15 @@ class Postgres extends Database {
 		return $string;
 	}
 
-	private function GetConstraints($table) {
-		return $this->Query("
-			SELECT
-		    tc.table_schema, 
-		    tc.constraint_name, 
-		    tc.table_name, 
-		    kcu.column_name, 
-		    ccu.table_schema AS foreign_table_schema,
-		    ccu.table_name AS foreign_table_name,
-		    ccu.column_name AS foreign_column_name,
-			rc.update_rule,
-			rc.delete_rule,
-			-1 FROM 
-		    information_schema.table_constraints AS tc 
-		    JOIN information_schema.key_column_usage AS kcu
-		      ON tc.constraint_name = kcu.constraint_name
-		      AND tc.table_schema = kcu.table_schema
-		    JOIN information_schema.constraint_column_usage AS ccu
-		      ON ccu.constraint_name = tc.constraint_name
-		      AND ccu.table_schema = tc.table_schema
-			JOIN information_schema.referential_constraints AS rc
-			  ON rc.constraint_name =  tc.constraint_name
-		WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='{$table}';
-		", 'column_name');
-	}
-
-	public function DropTableConstraints($table) {
-		$db_constraints = $this->GetConstraints($table);
-		if (!empty($db_constraints))
-			foreach ($db_constraints as $db_constraint)
-				$this->Query("ALTER TABLE \"{$table}\" DROP CONSTRAINT \"{$db_constraint['constraint_name']}\"");
-	}
-
-
-	public function CompareTable(SCRUD $Table) {
+	public function CompareTable(SCRUD $Table): array {
 		$diff = [];
 		$diff = array_merge($diff, $this->CompareTableFieldsAndPrimaryKeys($Table));
 		$diff = array_merge($diff, $this->CompareTableIndexes($Table));
-//		$diff = array_merge($diff, $this->CompareTableConstraints($Table));
+		$diff = array_merge($diff, $this->CompareTableConstraints($Table));
 		return $diff;
 	}
 
-	public function CompareTableFieldsAndPrimaryKeys(SCRUD $Table) {
+	public function CompareTableFieldsAndPrimaryKeys(SCRUD $Table): array {
 		$diff = [];
 		$check = $this->Query("SELECT * FROM pg_catalog.pg_tables WHERE tablename='{$Table->code}'");
 
@@ -516,7 +482,7 @@ class Postgres extends Database {
 		return $diff;
 	}
 
-	public function CompareTableIndexes(SCRUD $Table) {
+	public function CompareTableIndexes(SCRUD $Table): array {
 		$diff = [];
 		$SQL = "SELECT
 			    a.attname as column_name,
@@ -598,6 +564,90 @@ class Postgres extends Database {
 				}
 			}
 		}
+		return $diff;
+	}
+
+	public function CompareTableConstraints(SCRUD $Table): array {
+		$diff = [];
+
+		$db_constraints = $this->Query("
+			SELECT
+		    tc.table_schema, 
+		    tc.constraint_name, 
+		    tc.table_name, 
+		    kcu.column_name, 
+		    ccu.table_schema AS foreign_table_schema,
+		    ccu.table_name AS foreign_table_name,
+		    ccu.column_name AS foreign_column_name,
+			rc.update_rule,
+			rc.delete_rule,
+			-1 FROM 
+		    information_schema.table_constraints AS tc 
+		    JOIN information_schema.key_column_usage AS kcu
+		      ON tc.constraint_name = kcu.constraint_name
+		      AND tc.table_schema = kcu.table_schema
+		    JOIN information_schema.constraint_column_usage AS ccu
+		      ON ccu.constraint_name = tc.constraint_name
+		      AND ccu.table_schema = tc.table_schema
+			JOIN information_schema.referential_constraints AS rc
+			  ON rc.constraint_name =  tc.constraint_name
+		WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='{$Table->code}';
+		", 'constraint_name');
+
+		foreach ($Table->fields as $code => $field) {
+			if (!$field['FOREIGN'] or $field['TYPE'] <> 'OUTER') continue;
+
+			$action = is_string($field['FOREIGN']) ? $field['FOREIGN'] : 'RESTRICT';
+			/** @var SCRUD $Link */
+			$Link = $field['LINK']::I();
+			$link_key = $field['INNER_KEY'] ?: $Link->key();
+
+			$db_constraint_name = "fkey {$Table->code}.{$code} ref {$Link->code}.{$link_key}";
+			$db_constraint = $db_constraints[$db_constraint_name];
+
+			if (empty($db_constraint)) {
+				$diff[] = [
+					'MESSAGE'  => 'Create constraint',
+					'PRIORITY' => +2,
+					'TABLE'    => $Table->code,
+					'SQL'      => "ALTER TABLE {$Table->code} ADD CONSTRAINT \"{$db_constraint_name}\" FOREIGN KEY (\"{$code}\") REFERENCES \"{$Link->code}\" (\"{$link_key}\") ON DELETE {$action} ON UPDATE {$action};",
+				];
+				continue;
+			}
+
+			$is_different = (
+				false
+				or $Link->code <> $db_constraint['foreign_table_name']
+				or $link_key <> $db_constraint['foreign_column_name']
+				or $action <> $db_constraint['update_rule']
+				or $action <> $db_constraint['delete_rule']
+			);
+			if ($is_different) {
+				$diff[] = [
+					'MESSAGE'  => 'Change constraint (drop)',
+					'PRIORITY' => -2,
+					'TABLE'    => $Table->code,
+					'SQL'      => "ALTER TABLE {$Table->code} DROP CONSTRAINT \"{$db_constraint['constraint_name']}\";",
+				];
+				$diff[] = [
+					'MESSAGE'  => 'Change constraint (add)',
+					'PRIORITY' => +2,
+					'TABLE'    => $Table->code,
+					'SQL'      => "ALTER TABLE {$Table->code} ADD CONSTRAINT \"{$db_constraint_name}\" FOREIGN KEY (\"{$code}\") REFERENCES \"{$Link->code}\" (\"{$link_key}\") ON DELETE {$action} ON UPDATE {$action};",
+				];
+			}
+			unset($db_constraints[$db_constraint_name]);
+		}
+
+		foreach ($db_constraints as $db_constraint) {
+			$diff[] = [
+				'MESSAGE'  => 'Drop constraint',
+				'PRIORITY' => -2,
+				'TABLE'    => $Table->code,
+				'SQL'      => "ALTER TABLE {$Table->code} DROP CONSTRAINT \"{$db_constraint['constraint_name']}\";",
+			];
+		}
+
 		return $diff;
 	}
 
