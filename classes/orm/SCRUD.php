@@ -27,8 +27,9 @@ abstract class SCRUD {
 	public $SQL;
 	/** @var array части от последнего SQL-запроса (для отладки) */
 	public $parts;
+
 	/** @var Database коннектор базы данных */
-	public $DB;
+	public $Database;
 
 	/** @var string имя источника данных или таблицы или сущностей в ней */
 	public $name;
@@ -66,8 +67,8 @@ abstract class SCRUD {
 	public $actions = [];
 
 
-	public function __construct(Database $DB) {
-		$this->DB = $DB;
+	public function __construct(Database $Database) {
+		$this->Database = $Database;
 		$this->code = strtolower(implode('_', array_filter(explode('\\', static::class))));
 		$this->Init();
 		$this->ProvideIntegrity();
@@ -170,7 +171,7 @@ abstract class SCRUD {
 				}
 			}
 			// init types
-			$this->Types[$code] = FactoryType::I()->Get($field, $this->DB);
+			$this->Types[$code] = FactoryType::I()->Get($field, $this->Database);
 		}
 	}
 
@@ -202,7 +203,7 @@ abstract class SCRUD {
 	 * @return array
 	 */
 	public function Compare() {
-		return $this->DB->CompareTable($this);
+		return $this->Database->CompareTable($this);
 	}
 
 	/**
@@ -233,14 +234,14 @@ abstract class SCRUD {
 		$result['PAGER']['LIMIT'] = $params['LIMIT'];
 		$result['PAGER']['SELECTED'] = count($result['ELEMENTS']);
 
-		$SQL_for_total = $this->DB->CompileSQLSelect([
+		$SQL_for_total = $this->Database->CompileSQLSelect([
 			'SELECT' => ['COUNT(*) as total'],
 			'TABLE'  => $this->parts['TABLE'],
 			'JOIN'   => $this->parts['JOIN'],
 			'WHERE'  => $this->parts['WHERE'],
 		]);
 		$this->SQL = [$this->SQL, $SQL_for_total];
-		$result['PAGER']['TOTAL'] = (int)$this->DB->Query($SQL_for_total)[0]['total'];
+		$result['PAGER']['TOTAL'] = (int)$this->Database->Query($SQL_for_total)[0]['total'];
 
 		return $result;
 	}
@@ -331,7 +332,7 @@ abstract class SCRUD {
 			];
 		}
 
-		$this->SQL = $this->DB->CompileSQLSelect($this->parts);
+		$this->SQL = $this->Database->CompileSQLSelect($this->parts);
 
 		$elements = $this->Query($this->SQL, $params['KEY']);
 
@@ -453,14 +454,14 @@ abstract class SCRUD {
 	 */
 	public function Count($filter = []) {
 		$answer = $this->PreparePartsByFilter($filter);
-		$SQL = $this->DB->CompileSQLSelect([
+		$SQL = $this->Database->CompileSQLSelect([
 			'SELECT' => ['COUNT(*) as total'],
 			'TABLE'  => $this->code,
 			'JOIN'   => $answer['JOIN'],
 			'WHERE'  => $answer['WHERE'],
 			// 'GROUP'  => $answer['GROUP'], // ???
 		]);
-		return (int)$this->DB->Query($SQL)[0]['total'];
+		return (int)$this->Database->Query($SQL)[0]['total'];
 	}
 
 	/**
@@ -473,14 +474,14 @@ abstract class SCRUD {
 	 */
 	public function Sum($filter = [], $field = '') {
 		$answer = $this->PreparePartsByFilter($filter);
-		$SQL = $this->DB->CompileSQLSelect([
-			'SELECT' => ['SUM(' . $this->DB->Quote($field) . ') as total'],
+		$SQL = $this->Database->CompileSQLSelect([
+			'SELECT' => ['SUM(' . $this->Database->Quote($field) . ') as total'],
 			'TABLE'  => $this->code,
 			'JOIN'   => $answer['JOIN'],
 			'WHERE'  => $answer['WHERE'],
 			// 'GROUP'  => $answer['GROUP'], // ???
 		]);
-		return (int)$this->DB->Query($SQL)[0]['total'];
+		return (int)$this->Database->Query($SQL)[0]['total'];
 	}
 
 	/**
@@ -531,12 +532,12 @@ abstract class SCRUD {
 		if ($hasInformation) {
 			$value = $this->_formatFieldValue($code, $value);
 			if (!is_null($value)) {
-				$set = $this->DB->Quote($code) . " = '{$value}'";
+				$set = $this->Database->Quote($code) . " = '{$value}'";
 			} else {
-				$set = $this->DB->Quote($code) . " = NULL";
+				$set = $this->Database->Quote($code) . " = NULL";
 			}
 		} else {
-			$set = $this->DB->Quote($code) . " = NULL";
+			$set = $this->Database->Quote($code) . " = NULL";
 		}
 		return $set;
 	}
@@ -560,7 +561,7 @@ abstract class SCRUD {
 		$codes = [];
 		foreach ($this->fields as $code => $field)
 			if (!$field->virtual)
-				$codes[] = $this->DB->Quote($code);
+				$codes[] = $this->Database->Quote($code);
 
 		$rows = [];
 		foreach ($elements as $element) {
@@ -578,7 +579,7 @@ abstract class SCRUD {
 		}
 
 		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ") \r\n VALUES " . implode(', ', $rows);
-		$this->DB->Query($this->SQL);
+		$this->Database->Query($this->SQL);
 	}
 
 	/**
@@ -592,7 +593,7 @@ abstract class SCRUD {
 
 		if (empty($element)) {
 			$this->SQL = "INSERT INTO {$this->code} VALUES ()";
-			return $this->DB->QuerySingleInsert($this->SQL, $this->increment);
+			return $this->Database->QuerySingleInsert($this->SQL, $this->increment);
 		}
 
 		$errors = [];
@@ -610,14 +611,14 @@ abstract class SCRUD {
 
 		foreach ($this->fields as $code => $field) {
 			if (array_key_exists($code, $element)) {
-				$codes[] = $this->DB->Quote($code);
+				$codes[] = $this->Database->Quote($code);
 				$value = $this->_formatFieldValue($code, $element[$code]);
 				$values[] = is_null($value) ? 'NULL' : "'{$value}'";
 			}
 		}
 
 		$this->SQL = "INSERT INTO {$this->code} (" . implode(', ', $codes) . ") \r\n VALUES (" . implode(', ', $values) . ')';
-		return $this->DB->QuerySingleInsert($this->SQL, $this->increment);
+		return $this->Database->QuerySingleInsert($this->SQL, $this->increment);
 	}
 
 	/**
@@ -929,7 +930,7 @@ abstract class SCRUD {
 		$inner_sort = [];
 		foreach ($array as $field_path => $sort) {
 			if ('{RANDOM}' === $field_path) {
-				$order[] = $this->DB->Random();
+				$order[] = $this->Database->Random();
 				continue;
 			}
 
@@ -946,7 +947,7 @@ abstract class SCRUD {
 				}
 			}
 
-			$order[] = "{$result['TABLE']}." . $this->DB->Quote($result['CODE']) . " {$sort}";
+			$order[] = "{$result['TABLE']}." . $this->Database->Quote($result['CODE']) . " {$sort}";
 			$join += $result['JOIN'];
 			$group += $result['GROUP'];
 		}
@@ -971,7 +972,7 @@ abstract class SCRUD {
 		$join = [];
 		foreach ($array as $field_path) {
 			$result = $this->_treatFieldPath($field_path);
-			$group[] = $this->DB->Quote($result['TABLE']) . '.' . $this->DB->Quote($result['CODE']);
+			$group[] = $this->Database->Quote($result['TABLE']) . '.' . $this->Database->Quote($result['CODE']);
 			$join += $result['JOIN'];
 		}
 		return [
@@ -1009,7 +1010,7 @@ abstract class SCRUD {
 
 		$value = $this->Types[$code]->FormatInputValue($value);
 
-		return $this->DB->Escape($value);
+		return $this->Database->Escape($value);
 	}
 
 
@@ -1147,14 +1148,14 @@ abstract class SCRUD {
 	 * Удаляет все данные из таблицы не затрагивая структуру.
 	 */
 	public function Truncate() {
-		$this->DB->Truncate($this->code);
+		$this->Database->Truncate($this->code);
 	}
 
 	/**
 	 * Удаляет таблицу.
 	 */
 	public function Drop() {
-		$this->DB->Drop($this->code);
+		$this->Database->Drop($this->code);
 	}
 
 	/**
@@ -1168,7 +1169,7 @@ abstract class SCRUD {
 	 * @throws Exception
 	 */
 	public function Query($SQL, $key = null) {
-		return $this->DB->Query($SQL, $key);
+		return $this->Database->Query($SQL, $key);
 	}
 
 	/**

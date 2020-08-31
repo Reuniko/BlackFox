@@ -25,9 +25,9 @@ class Scheme {
 
 		foreach ($this->Tables as $code => $Table) {
 			if (empty($this->Database))
-				$this->Database = $Table->DB;
+				$this->Database = $Table->Database;
 
-			if ($this->Database !== $Table->DB)
+			if ($this->Database !== $Table->Database)
 				throw new Exception("Can't construct scheme: table '{$code}' has different database than table '" . reset($this->Tables)->code . "'");
 		}
 	}
