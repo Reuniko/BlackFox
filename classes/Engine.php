@@ -294,6 +294,9 @@ class Engine {
 	public function InitUser() {
 		/** @var User $USER */
 		$this->User = User::I(['ID' => $_SESSION['USER']['ID']]);
+
+		if (!empty($this->User->FIELDS))
+			$_SESSION['USER']['LANG'] = $this->User->FIELDS['LANG'];
 	}
 
 	/**

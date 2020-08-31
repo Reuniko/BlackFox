@@ -13,22 +13,28 @@ class User {
 	/** @var array user groups (list) */
 	public $GROUPS = [];
 
+	public function __construct($ID) {
+		$this->Init($ID);
+	}
+
 	/**
 	 * Load the data about user
 	 *
 	 * @param null|int $ID null or user identifier
 	 * @throws Exception User not found
 	 */
-	public function __construct($ID) {
+	public function Init($ID) {
+
 		$this->ID = $ID ?: null;
+		$this->FIELDS = [];
+		$this->GROUPS = [];
+
 		if (empty($this->ID))
 			return;
 
 		try {
 
 			$this->FIELDS = Users::I()->Read($this->ID);
-			if (!empty($this->FIELDS))
-				$_SESSION['USER']['LANG'] = $this->FIELDS['LANG'];
 
 			$group_ids = Users2Groups::I()->GetColumn(['USER' => $this->ID], 'GROUP');
 			if (!empty($group_ids))
@@ -121,5 +127,15 @@ class User {
 	 */
 	public function InGroup(string $group) {
 		return in_array($group, $this->GROUPS);
+	}
+
+	/**
+	 * Check groups affiliation
+	 *
+	 * @param array $groups list of codes of groups
+	 * @return bool
+	 */
+	public function InAnyOfGroups(array $groups) {
+		return (bool)array_intersect($groups, $this->GROUPS);
 	}
 }

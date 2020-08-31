@@ -102,7 +102,7 @@ trait Instance {
 			$args = [];
 			foreach ($Parameters as $Parameter) {
 				// $params is set: $args from $params
-				if (isset($params[$Parameter->getName()])) {
+				if (array_key_exists($Parameter->getName(), $params)) {
 					$args[$Parameter->getName()] = $params[$Parameter->getName()];
 					continue;
 				}
