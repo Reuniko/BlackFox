@@ -23,7 +23,9 @@ class Postgres extends Database {
 		if ($this->link === false) {
 			throw new Exception(pg_last_error());
 		}
+	}
 
+	public function InitDBTypes() {
 		$this->db_types = [
 			// -----------------------------------------
 			'bool'     => [
@@ -277,7 +279,7 @@ class Postgres extends Database {
 
 				// ALTER COLUMN:
 
-				$db_type = $this->db_types[$Table->Types[$code]->db_type];
+				$db_type = $this->GetDBType($Table->Types[$code]->db_type);
 				if ($db_type['type'] <> $column['udt_name']) {
 					$type = $this->GetStructureStringType($Table->Types[$code]);
 					$data[] = [

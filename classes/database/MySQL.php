@@ -22,7 +22,9 @@ class MySQL extends Database {
 			throw new Exception(mysqli_connect_error());
 		}
 		mysqli_set_charset($this->link, $params['CHARSET'] ?: 'utf8');
+	}
 
+	public function InitDBTypes() {
 		$this->db_types = [
 			// -----------------------------------------
 			'bool'     => [

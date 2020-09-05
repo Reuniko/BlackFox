@@ -64,16 +64,26 @@ abstract class Database {
 		$this->Query("DROP TABLE IF EXISTS {$table}");
 	}
 
-	/** @var array */
-	public $db_types = [];
+	/** @var array dict of dicts with keys: type, params, getParams */
+	public $db_types = null;
+
+	public function InitDBTypes() {
+		$this->db_types = [];
+	}
+
+	public function GetDBType($code) {
+		if (is_null($this->db_types))
+			$this->InitDBTypes();
+		if (empty($this->db_types[$code]))
+			throw new Exception("Unknown db_type: " . $code);
+		return $this->db_types[$code];
+	}
 
 	public function GetStructureStringType(Type $Type) {
 		if (empty($Type->db_type))
 			throw new Exception("Empty db_type in Type: " . get_class($Type));
-		if (!isset($this->db_types[$Type->db_type]))
-			throw new Exception("Unknown db_type: " . $Type->db_type);
 
-		$db_type = $this->db_types[$Type->db_type];
+		$db_type = $this->GetDBType($Type->db_type);
 		$string = $db_type['type'];
 		if (is_callable($db_type['getParams'])) {
 			$params = $db_type['getParams']($Type->field);
