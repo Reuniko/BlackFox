@@ -28,7 +28,7 @@ class MySQL extends Database {
 		$this->db_types = [
 			// -----------------------------------------
 			'bool'     => [
-				'type'      => 'bit',
+				'type'      => 'tinyint',
 				'getParams' => function (array $field) {
 					return [1];
 				},
@@ -461,8 +461,6 @@ class MySQL extends Database {
 		$default = $field['DEFAULT'];
 		if (is_array($default))
 			$default = implode(',', $default);
-		if (is_bool($default))
-			$default = 'b\'' . (int)$default . '\'';
 		if ($default <> $column['Default'])
 			return "Change default: {$column['Default']} -> {$default}";
 
