@@ -129,21 +129,6 @@ class Postgres extends Database {
 		return 'random()';
 	}
 
-	public function GetStructureStringType(Type $Type) {
-		if (empty($Type->db_type))
-			throw new Exception("Empty db_type in Type: " . get_class($Type));
-		if (!isset($this->db_types[$Type->db_type]))
-			throw new Exception("Unknown db_type: " . $Type->db_type);
-
-		$db_type = $this->db_types[$Type->db_type];
-		$string = $db_type['type'];
-		if (is_callable($db_type['getParams'])) {
-			$params = $db_type['getParams']($Type->field);
-			$string .= '(' . implode(',', $params) . ')';
-		}
-		return $string;
-	}
-
 	public function CompareTable(SCRUD $Table): array {
 		$diff = [];
 		$diff = array_merge($diff, $this->CompareTableFieldsAndPrimaryKeys($Table));

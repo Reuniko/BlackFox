@@ -26,7 +26,7 @@ class MySQL extends Database {
 		$this->db_types = [
 			// -----------------------------------------
 			'bool'     => [
-				'type'      => 'tinyint',
+				'type'      => 'bit',
 				'getParams' => function (array $field) {
 					return [1];
 				},
@@ -118,48 +118,9 @@ class MySQL extends Database {
 		return 'rand()';
 	}
 
-	public function GetStructureStringType(array $field) {
-		if (empty($field['TYPE'])) {
-			throw new ExceptionType("Empty data type");
-		}
-		switch ($field['TYPE']) {
-			case 'STRING':
-			case 'PASSWORD':
-				return "varchar(" . ((int)$field['LENGTH'] ?: 255) . ")";
-				break;
-			case 'ARRAY':
-			case 'TEXT':
-			case 'LIST':
-				return "text";
-			case 'BOOLEAN':
-				return "tinyint(1)";
-			case 'INTEGER':
-			case 'OUTER':
-			case 'FILE':
-				return "int(" . ((int)$field['LENGTH'] ?: 11) . ")";
-			case 'FLOAT':
-				$length = $field['LENGTH'] ?: 13;
-				$decimals = $field['DECIMALS'] ?: 2;
-				return "float({$length},{$decimals})";
-			case 'INNER':
-				throw new ExceptionType("No fields required");
-			case 'TIME':
-				return "time";
-			case 'DATE':
-				return "date";
-			case 'DATETIME':
-				return "datetime";
-			case 'ENUM':
-				return 'enum' . '(\'' . implode('\',\'', array_keys($field['VALUES'])) . '\')';
-			case 'SET':
-				return 'set' . '(\'' . implode('\',\'', array_keys($field['VALUES'])) . '\')';
-			default:
-				throw new ExceptionType("Unknown data type: " . $field['TYPE']);
-		}
-	}
-
-	public function GetStructureString(array $field) {
-		$type = $this->GetStructureStringType($field);
+	public function GetStructureString(Type $Type) {
+		$field = $Type->field;
+		$structure_string = $this->GetStructureStringType($Type);
 
 		$null = ($field["NOT_NULL"] || $field['PRIMARY']) ? "NOT NULL" : "NULL";
 
@@ -182,7 +143,7 @@ class MySQL extends Database {
 
 		$comment = ($field["NAME"]) ? " COMMENT '{$field["NAME"]}'" : "";
 
-		$structure_string = $this->Quote($field['CODE']) . " $type $null $default $auto_increment $comment";
+		$structure_string = $this->Quote($field['CODE']) . " $structure_string $null $default $auto_increment $comment";
 		$structure_string = preg_replace('/\s+/', ' ', $structure_string);
 
 		return $structure_string;
@@ -230,7 +191,7 @@ class MySQL extends Database {
 				$data[] = [
 					'MESSAGE' => 'Add column',
 					'FIELD'   => $code,
-					'SQL'     => $this->GetStructureString($field),
+					'SQL'     => $this->GetStructureString($Table->Types[$code]),
 				];
 			}
 			if (!empty($Table->keys)) {
@@ -265,13 +226,13 @@ class MySQL extends Database {
 
 				if ($Table->Types[$code]->virtual)
 					continue;
-				$structure_string = $this->GetStructureString($field);
+				$structure_string = $this->GetStructureString($Table->Types[$code]);
 
 				if (!empty($last_after_code))
 					$structure_string .= " AFTER " . $this->Quote($last_after_code);
 
 				if (!empty($columns[$code])) {
-					$reason = $this->IsFieldDifferentFromColumn($field, $columns[$code]);
+					$reason = $this->IsFieldDifferentFromColumn($Table->Types[$code], $columns[$code]);
 					if ($reason) {
 						$data[] = [
 							'MESSAGE' => 'Modify column',
@@ -280,7 +241,7 @@ class MySQL extends Database {
 							'SQL'     => "MODIFY COLUMN $structure_string",
 						];
 					}
-				} elseif (!empty($field['CHANGE']) && !empty($columns[$field['CHANGE']])) {
+				} elseif (!empty($field['CHANGE']) and !empty($columns[$field['CHANGE']])) {
 					$data[] = [
 						'MESSAGE' => 'Rename column',
 						'FIELD'   => $code,
@@ -477,11 +438,12 @@ class MySQL extends Database {
 		return $diff;
 	}
 
-	public function IsFieldDifferentFromColumn(array $field, array $column) {
+	public function IsFieldDifferentFromColumn(Type $Type, array $column) {
+		$field = $Type->field;
 		// type
-		$type = $this->GetStructureStringType($field);
-		if ($type <> $column['Type'])
-			return "Change type: {$column['Type']} -> {$type}";
+		$structure_string = $this->GetStructureStringType($Type);
+		if ($structure_string <> $column['Type'])
+			return "Change type: {$column['Type']} -> {$structure_string}";
 
 		// not null
 		if ($field['NOT_NULL'] and $column['Null'] == 'YES')
@@ -497,8 +459,10 @@ class MySQL extends Database {
 		$default = $field['DEFAULT'];
 		if (is_array($default))
 			$default = implode(',', $default);
+		if (is_bool($default))
+			$default = 'b\'' . (int)$default . '\'';
 		if ($default <> $column['Default'])
-			return 'Change default value';
+			return "Change default: {$column['Default']} -> {$default}";
 
 		return false;
 	}
