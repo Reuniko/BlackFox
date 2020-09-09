@@ -351,7 +351,7 @@ class Engine {
 
 	/**
 	 * Adds style file to headers.
-	 * @param string $path relative/full path to the style file
+	 * @param string $path relative/http path to the style file
 	 */
 	public function AddHeaderStyle($path) {
 		$path_absolute = $_SERVER['DOCUMENT_ROOT'] . $path;
@@ -365,7 +365,7 @@ class Engine {
 
 	/**
 	 * Adds script file to headers.
-	 * @param string $path relative/full path to the script file
+	 * @param string $path relative/http path to the script file
 	 */
 	public function AddHeaderScript($path) {
 		$path_absolute = $_SERVER['DOCUMENT_ROOT'] . $path;

@@ -38,7 +38,10 @@ class AdminerUsers extends Adminer {
 				'PARAMS' => [
 					'password' => [
 						'TYPE'     => 'PASSWORD',
-						'NAME'     => 'Пароль',
+						'NAME'     => T([
+							'en' => 'Password',
+							'ru' => 'Пароль',
+						]),
 						'NOT_NULL' => true,
 					],
 				],
@@ -54,8 +57,8 @@ class AdminerUsers extends Adminer {
 	public function SetPassword($ID, $password) {
 		Users::I()->SetPassword($ID, $password);
 		return T([
-		    'en' => 'New password set',
-		    'ru' => 'Новый пароль установлен',
+			'en' => 'New password has been set',
+			'ru' => 'Новый пароль установлен',
 		]);
 	}
 }
