@@ -107,6 +107,7 @@ class Engine {
 		if (php_sapi_name() <> 'cli')
 			echo '<xmp>';
 
+		echo "\r\nFATAL ERROR!";
 		echo "\r\nMessage: " . $Exception->getMessage();
 		echo "\r\nFile: " .$Exception->getFile();
 		echo "\r\nLine: " .$Exception->getLine();
@@ -130,7 +131,7 @@ class Engine {
 	 * Initializes the main connection to the default cache
 	 */
 	public function InitCache() {
-		$this->Cache = Cache::I(['params' => $this->config['cache']]);
+		$this->Cache = Cache::I(['params' => $this->config['cache'] ?: []]);
 	}
 
 	/**

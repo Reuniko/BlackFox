@@ -32,16 +32,10 @@ class User {
 		if (empty($this->ID))
 			return;
 
-		try {
-
-			$this->FIELDS = Users::I()->Read($this->ID);
-
-			$group_ids = Users2Groups::I()->GetColumn(['USER' => $this->ID], 'GROUP');
-			if (!empty($group_ids))
-				$this->GROUPS = Groups::I()->GetColumn($group_ids, 'CODE');
-
-		} catch (ExceptionSQL $error) {
-		}
+		$this->FIELDS = Users::I()->Read($this->ID);
+		$group_ids = Users2Groups::I()->GetColumn(['USER' => $this->ID], 'GROUP');
+		if (!empty($group_ids))
+			$this->GROUPS = Groups::I()->GetColumn($group_ids, 'CODE');
 	}
 
 	/**
