@@ -79,7 +79,7 @@ class TypeOuter extends Type {
 		$url = $Link->GetAdminUrl();
 		$ID = is_array($value) ? $value['ID'] : $value;
 		?>
-		<? if (User::I()->InGroup('root')): ?>
+		<? if ($ID and User::I()->InGroup('root')): ?>
 			<nobr>[<a target="_top" href="<?= $url ?>?ID=<?= $ID ?>"><?= $ID ?></a>]</nobr>
 		<? endif; ?>
 		<?= $Link->GetElementTitle($value); ?>
