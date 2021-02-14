@@ -418,4 +418,7 @@ class Adminer extends \BlackFox\Unit {
 		]));
 	}
 
-} 
+	public function GetHref(array $element) {
+		return '?' . http_build_query(array_merge($_GET, ['ID' => $element['ID']]));
+	}
+}

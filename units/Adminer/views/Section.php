@@ -83,7 +83,7 @@
 			<? endif; ?>
 			<? foreach ($RESULT['DATA']['ELEMENTS'] as $row): ?>
 				<?
-				$href = '?' . http_build_query(array_merge($_GET, ['ID' => $row['ID']]));
+				$href = $this->GetHref($row);
 				$ondblclick = "window.location.href='{$href}'";
 				?>
 				<tr ondblclick="<?= $ondblclick ?>">
