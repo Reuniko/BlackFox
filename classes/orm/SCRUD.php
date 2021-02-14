@@ -454,14 +454,14 @@ abstract class SCRUD {
 	 */
 	public function Count($filter = []) {
 		$answer = $this->PreparePartsByFilter($filter);
-		$SQL = $this->Database->CompileSQLSelect([
+		$this->SQL = $this->Database->CompileSQLSelect([
 			'SELECT' => ['COUNT(*) as total'],
 			'TABLE'  => $this->code,
 			'JOIN'   => $answer['JOIN'],
 			'WHERE'  => $answer['WHERE'],
 			// 'GROUP'  => $answer['GROUP'], // ???
 		]);
-		return (int)$this->Database->Query($SQL)[0]['total'];
+		return (int)$this->Database->Query($this->SQL)[0]['total'];
 	}
 
 	/**
@@ -474,14 +474,14 @@ abstract class SCRUD {
 	 */
 	public function Sum($filter = [], $field = '') {
 		$answer = $this->PreparePartsByFilter($filter);
-		$SQL = $this->Database->CompileSQLSelect([
+		$this->SQL = $this->Database->CompileSQLSelect([
 			'SELECT' => ['SUM(' . $this->Database->Quote($field) . ') as total'],
 			'TABLE'  => $this->code,
 			'JOIN'   => $answer['JOIN'],
 			'WHERE'  => $answer['WHERE'],
 			// 'GROUP'  => $answer['GROUP'], // ???
 		]);
-		return (int)$this->Database->Query($SQL)[0]['total'];
+		return (int)$this->Database->Query($this->SQL)[0]['total'];
 	}
 
 	/**
