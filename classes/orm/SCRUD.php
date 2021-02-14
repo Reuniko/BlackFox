@@ -430,7 +430,7 @@ abstract class SCRUD {
 	 * @return array массив идентификаторов элементов
 	 * @throws Exception
 	 */
-	public function GetColumn($filter = [], $field = null, $sort = [], $escape = false) {
+	public function GetColumn($filter = [], string $field = null, array $sort = [], bool $escape = false) {
 		$field = $field ?: $this->key();
 		$elements = $this->Select([
 			'FILTER' => $filter,
@@ -923,7 +923,7 @@ abstract class SCRUD {
 		];
 	}
 
-	public function PreparePartsBySort($array) {
+	public function PreparePartsBySort(array $array) {
 		$order = [];
 		$join = [];
 		$group = [];

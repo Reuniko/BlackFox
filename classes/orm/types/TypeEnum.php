@@ -53,7 +53,7 @@ class TypeEnum extends Type {
 			value=""
 		/>
 		<? foreach ($this->field['VALUES'] as $value => $display): ?>
-			<label class="enum p-2">
+			<label class="enum">
 				<input
 					type="checkbox"
 					class="<?= $class ?>"

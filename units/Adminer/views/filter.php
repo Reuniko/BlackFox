@@ -55,8 +55,8 @@
 							>
 								<i class="fa fa-ban"></i>
 								<?= T([
-									'en' => 'Cancel',
-									'ru' => 'Отменить',
+									'en' => 'Clear',
+									'ru' => 'Сбросить',
 								]) ?>
 							</a>
 						</div>

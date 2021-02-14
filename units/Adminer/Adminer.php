@@ -77,7 +77,8 @@ class Adminer extends \BlackFox\Unit {
 		$FILTER = [],
 		$PAGE = 1,
 		$SORT = ['ID' => 'DESC'],
-		$FIELDS = ['*@@']
+		$FIELDS = ['*@@'],
+		$LIMIT = 100
 	) {
 		$R['MODE'] = 'SECTION';
 
@@ -86,7 +87,7 @@ class Adminer extends \BlackFox\Unit {
 		$R['FILTER'] = $FILTER;
 		$R['SORT'] = $SORT;
 		$R['SETTINGS'] = $this->LoadTableSettings();
-		$R['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractFields($R['SETTINGS']['FILTERS']);
+		$R['STRUCTURE']['FILTERS'] = $this->SCRUD->ExtractFields(array_merge($R['SETTINGS']['FILTERS'], array_keys($FILTER)));
 		$R['STRUCTURE']['FIELDS'] = $this->SCRUD->ExtractFields($R['SETTINGS']['FIELDS']);
 
 		// unset column if frame-mode
@@ -99,6 +100,7 @@ class Adminer extends \BlackFox\Unit {
 			'FIELDS' => $FIELDS,
 			'PAGE'   => $PAGE,
 			'SORT'   => $SORT,
+			'LIMIT'  => $LIMIT,
 		]);
 		debug($this->SCRUD->SQL, 'SQL');
 		return $R;
