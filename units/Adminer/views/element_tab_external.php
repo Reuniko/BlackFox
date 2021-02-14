@@ -16,5 +16,6 @@ $params = $this->SanitizeUrl($params);
 ?>
 <iframe
 	class="external"
+	data-iframe-external=""
 	src="<?= $url ?>?<?= $params ?>"
 ></iframe>

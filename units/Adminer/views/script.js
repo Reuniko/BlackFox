@@ -130,5 +130,8 @@ $(function () {
         ;
     });
 
+    $('[data-iframe-external]').each(function () {
+        $(this).height(window.innerHeight - 270);
+    });
 
 });

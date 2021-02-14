@@ -113,6 +113,9 @@
 	background-color: white;
 	padding: 4px;
 	border: 1px solid #ddd;
+}
+
+.adminer .tab-content.tab-content-no-top-border {
 	border-top: none;
 }
 
@@ -138,7 +141,7 @@
 .adminer iframe.external {
 	border: none;
 	width: 100%;
-	min-height: 600px;
+	min-height: 400px;
 }
 
 .adminer ul {

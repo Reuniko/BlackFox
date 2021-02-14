@@ -33,7 +33,7 @@ if ($RESULT['MODE'] === 'Create') {
 	<? endif; ?>
 
 	<!-- Tab panes -->
-	<div class="tab-content">
+	<div class="tab-content <?= (count($RESULT['TABS']) > 1) ? 'tab-content-no-top-border' : '' ?>">
 		<? foreach ($RESULT['TABS'] as $tab_code => $tab): ?>
 			<div
 				class="tab-pane tab-element <?= ($tab['ACTIVE'] ? 'active' : '') ?>"
