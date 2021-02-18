@@ -65,11 +65,8 @@
 	direction: ltr;
 	-webkit-font-feature-settings: 'liga';
 	-webkit-font-smoothing: antialiased;
-}
-
-.btn .material-icons{
-	font-size: 150%;
 	vertical-align: bottom;
+	font-size: 150%;
 }
 
 /* Rules for sizing the icon. */
