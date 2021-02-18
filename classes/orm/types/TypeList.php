@@ -44,14 +44,14 @@ class TypeList extends TypeText {
 			/>
 
 			<button class="btn btn-secondary" type="button" data-add="">
-				<i class="fa fa-plus"></i>
+				<span class="material-icons">add</span>
 				Добавить
 			</button>
 
 			<div class="input-group" data-template="" style="display: none;">
 				<div class="input-group-prepend" data-sort="">
 					<span class="input-group-text">
-						<i class="fa fa-arrows-alt"></i>
+						<span class="material-icons">open_with</span>
 					</span>
 				</div>
 				<input
@@ -63,7 +63,7 @@ class TypeList extends TypeText {
 				>
 				<div class="input-group-append">
 					<button class="btn btn-secondary" type="button" data-delete="">
-						<i class="fa fa-trash"></i>
+						<span class="material-icons">delete</span>
 					</button>
 				</div>
 			</div>
@@ -72,7 +72,7 @@ class TypeList extends TypeText {
 				<div class="input-group" data-element="">
 					<div class="input-group-prepend" data-sort="">
 						<span class="input-group-text">
-							<i class="fa fa-arrows-alt"></i>
+							<span class="material-icons">open_with</span>
 						</span>
 					</div>
 					<input
@@ -84,7 +84,7 @@ class TypeList extends TypeText {
 					>
 					<div class="input-group-append">
 						<button class="btn btn-secondary" type="button" data-delete="">
-							<i class="fa fa-trash"></i>
+							<span class="material-icons">delete</span>
 						</button>
 					</div>
 				</div>

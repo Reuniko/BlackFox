@@ -43,7 +43,7 @@
 								class="btn btn-primary"
 								type="submit"
 							>
-								<i class="fa fa-filter"></i>
+								<span class="material-icons">filter_alt</span>
 								<?= T([
 									'en' => 'Apply',
 									'ru' => 'Фильтровать',
@@ -53,7 +53,7 @@
 								class="btn btn-secondary"
 								href="?"
 							>
-								<i class="fa fa-ban"></i>
+								<span class="material-icons">block</span>
 								<?= T([
 									'en' => 'Clear',
 									'ru' => 'Сбросить',

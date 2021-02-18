@@ -2,7 +2,7 @@
 <?php /** @var array $RESULT */ ?>
 <div class="dropdown d-inline-block">
 	<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-		<i class="fa fa-language"></i>
+		<span class="material-icons">language</span>
 	</button>
 	<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
 		<? foreach ($RESULT['LANGUAGES'] as $code => $display): ?>

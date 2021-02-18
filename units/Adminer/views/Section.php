@@ -15,12 +15,16 @@
 			data-toggle="modal"
 			data-target="#section-settings"
 		>
-			<i class="fa fa-cog"></i>
+			<span class="material-icons">settings</span>
+			<?= T([
+				'en' => 'Settings',
+				'ru' => 'Настройки',
+			]) ?>
 		</a>
 
 		<? if (in_array($RESULT['MODE'], ['SECTION'])): ?>
 			<a class="btn btn-success" href="?NEW&<?= http_build_query($_GET) ?>">
-				<i class="fa fa-plus"></i>
+				<span class="material-icons">add</span>
 				<?= T([
 					'en' => 'Add',
 					'ru' => 'Создать',
@@ -52,17 +56,17 @@
 						'FLOAT',
 						'LINK',
 					]);
-					$icon_class = $is_numeric ? 'numeric' : 'alpha';
+					// $icon_class = $is_numeric ? 'numeric' : 'alpha';
 					?>
 					<th class="sort<?= isset($RESULT['SORT'][$structure_code]) ? ' active' : '' ?>">
 						<a href="<?= $sort_href ?>">
 							<? if ($RESULT['SORT'][$structure_code]): ?>
 								<div class="sort-icon">
 									<? if ($RESULT['SORT'][$structure_code] === 'ASC'): ?>
-										<i class="fa fa-sort-<?= $icon_class ?>-down"></i>
+										⇩
 									<? endif; ?>
 									<? if ($RESULT['SORT'][$structure_code] === 'DESC'): ?>
-										<i class="fa fa-sort-<?= $icon_class ?>-up"></i>
+										⇧
 									<? endif; ?>
 								</div>
 							<? endif; ?>
@@ -130,7 +134,7 @@
 								'ru' => 'Подтвердите удаление выделенных элементов',
 							]) ?>"
 						>
-							<i class="fa fa-trash"></i>
+							<span class="material-icons">delete</span>
 							<?= T([
 								'en' => 'Delete selected',
 								'ru' => 'Удалить выделенные',

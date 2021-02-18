@@ -33,11 +33,11 @@
 				</div>
 				<div class="col-sm-1 col-form-label d-none d-sm-inline-block">
 					<? if ($field['DESCRIPTION']): ?>
-						<i
-							class="far fa-question-circle"
+						<span
+							class="material-icons"
 							title="<?= $field['DESCRIPTION'] ?>"
 							data-toggle="tooltip"
-						></i>
+						>info</span>
 					<? endif; ?>
 				</div>
 			</div>

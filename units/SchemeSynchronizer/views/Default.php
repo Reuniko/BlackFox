@@ -12,7 +12,7 @@ $this->ENGINE->TITLE = T([
 			class="btn btn-secondary"
 			href="?"
 		>
-			<i class="fa fa-sync"></i>
+			<span class="material-icons">sync</span>
 			<?= T([
 				'en' => 'Refresh',
 				'ru' => 'Обновить',
@@ -24,7 +24,7 @@ $this->ENGINE->TITLE = T([
 			value="SynchronizeAll"
 			class="btn btn-primary"
 		>
-			<i class="fa fa-terminal"></i>
+			<span class="material-icons">sync_problem</span>
 			<?= T([
 				'en' => 'Synchronize all',
 				'ru' => 'Синхронизировать всё',
@@ -36,7 +36,7 @@ $this->ENGINE->TITLE = T([
 
 <? foreach ($RESULT['CORES'] as $namespace => $CORE): ?>
 	<h2>
-		<i class="fa fa-folder-open"></i>
+		<span class="material-icons">folder_open</span>
 		<?= $namespace ?>
 	</h2>
 
@@ -46,7 +46,7 @@ $this->ENGINE->TITLE = T([
 		</div>
 	<? elseif (empty($CORE['DIFFS'])): ?>
 		<div class="alert alert-success">
-			<i class="fa fa-check"></i>
+			<span class="material-icons">download_done</span>
 			<?= T([
 				'en' => 'Everything is synchronized',
 				'ru' => 'Всё синхронизированно',
@@ -134,7 +134,7 @@ $this->ENGINE->TITLE = T([
 									value="RunSQL"
 									class="btn btn-primary"
 								>
-									<i class="fa fa-terminal"></i>
+									<span class="material-icons">mediation</span>
 								</button>
 							</form>
 						<? else: ?>

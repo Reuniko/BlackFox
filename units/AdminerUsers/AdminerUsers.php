@@ -23,7 +23,7 @@ class AdminerUsers extends Adminer {
 					'en' => 'Authorize',
 					'ru' => 'Авторизоваться',
 				]),
-				'ICON'        => 'fa fa-key',
+				'ICON'        => 'vpn_key',
 				'DESCRIPTION' => T([
 					'en' => 'Authorize by this user',
 					'ru' => 'Авторизоваться под этим пользователем',
@@ -34,7 +34,7 @@ class AdminerUsers extends Adminer {
 					'en' => 'Set new password',
 					'ru' => 'Установить новый пароль',
 				]),
-				'ICON'   => 'fa fa-key',
+				'ICON'   => 'password',
 				'PARAMS' => [
 					'password' => [
 						'TYPE'     => 'PASSWORD',

@@ -137,7 +137,7 @@ class TypeOuter extends Type {
 					class="btn btn-secondary flex-shrink-1"
 					data-outer-clean=""
 				>
-					<i class="fa fa-eraser"></i>
+					<span class="material-icons">link_off</span>
 				</button>
 			<? endif; ?>
 		</div>
@@ -177,7 +177,7 @@ class TypeOuter extends Type {
 						'ru' => 'Выбрать несколько',
 					]) ?>"
 				>
-					<i class="fa fa-ellipsis-h"></i>
+					<span class="material-icons">add_link</span>
 				</button>
 
 				<div class="flex-grow-1">
@@ -206,7 +206,7 @@ class TypeOuter extends Type {
 						'ru' => 'Очистить',
 					]) ?>"
 				>
-					<i class="fa fa-eraser"></i>
+					<span class="material-icons">link_off</span>
 				</button>
 
 

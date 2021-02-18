@@ -47,7 +47,7 @@
 
 			<div class="form-group text-center mb-0">
 				<button type="submit" class="btn btn-primary" name="ACTION" value="Login">
-					<i class="fa fa-door-open"></i>
+					<span class="material-icons">login</span>
 					<?= T([
 						'en' => 'Sing in',
 						'ru' => 'Войти',

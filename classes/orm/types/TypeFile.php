@@ -75,7 +75,7 @@ class TypeFile extends TypeOuter {
 			>
 				<label for="<?= $name ?>">
 					<span class="btn btn-info">
-						<i class="fa fa-file"></i>
+						<span class="material-icons">upload_file</span>
 						<span data-file-name=""><?= T([
 								'en' => 'Select file',
 								'ru' => 'Выбрать файл',

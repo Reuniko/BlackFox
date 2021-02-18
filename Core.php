@@ -62,6 +62,13 @@ class Core extends \BlackFox\ACore {
 								]),
 								'LINK' => '/admin/BlackFox/SQLConsole.php',
 							],
+							'MaterialDesignIcons'         => [
+								'NAME' => T([
+									'en' => 'Material Design Icons',
+									'ru' => 'Material Design Icons',
+								]),
+								'LINK' => '/admin/BlackFox/MaterialDesignIcons.php',
+							],
 						],
 					],
 					'BlackFox_Content'       => [

@@ -13,7 +13,7 @@
 		class="btn btn-info d-inline-block d-md-none"
 		data-toggle-sidebar=""
 	>
-		<i class="fa fa-bars"></i>
+		<span class="material-icons">menu</span>
 		<span class="d-none d-md-inline-block"><?= T([
 				'en' => 'Menu',
 				'ru' => 'Меню',
@@ -21,7 +21,7 @@
 	</button>
 
 	<a class="btn btn-secondary" href="/">
-		<i class="fa fa-desktop"></i>
+		<span class="material-icons">desktop_windows</span>
 		<span class="d-none d-md-inline-block"><?= T([
 				'en' => 'Site',
 				'ru' => 'Сайт',
@@ -33,13 +33,15 @@
 		<? if ($this->User->IsAuthorized()): ?>
 			<span class="btn-group">
 				<a class="btn btn-secondary" href="/admin/BlackFox/Users.php?ID=<?= $this->User->ID ?>">
-					<i class="fa fa-user"></i>
+					<span class="material-icons">person</span>
 					<span class="d-none d-md-inline-block"><?= $this->User->FIELDS['LOGIN'] ?></span>
 				</a>
 				<a class="btn btn-secondary" href="/admin/logout.php" title="<?= T([
 					'en' => 'Logout',
 					'ru' => 'Выход',
-				]) ?>"><i class="fa fa-sign-out-alt"></i></a>
+				]) ?>">
+					<span class="material-icons">logout</span>
+				</a>
 			</span>
 		<? else: ?>
 

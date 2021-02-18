@@ -6,7 +6,7 @@
 	name="REDIRECT"
 	value="Back"
 >
-	<i class="fa fa-save"></i>
+	<span class="material-icons">save</span>
 	<span class="d-none d-md-inline-block"><?= T([
 			'en' => 'Save',
 			'ru' => 'Сохранить',
@@ -19,7 +19,7 @@
 	name="REDIRECT"
 	value="Stay"
 >
-	<i class="fa fa-check"></i>
+	<span class="material-icons">save_alt</span>
 	<span class="d-none d-md-inline-block"><?= T([
 			'en' => 'Apply',
 			'ru' => 'Применить',
@@ -30,7 +30,7 @@
 	href="<?= $RESULT['BACK'] ?>"
 	class="btn btn-secondary"
 >
-	<i class="fa fa-ban"></i>
+	<span class="material-icons">block</span>
 	<span class="d-none d-md-inline-block"><?= T([
 			'en' => 'Cancel',
 			'ru' => 'Отмена',
@@ -48,7 +48,7 @@
 			'ru' => 'Подтвердите удаление',
 		]) ?>"
 	>
-		<i class="fa fa-trash"></i>
+		<span class="material-icons">delete_outline</span>
 		<span class="d-none d-md-inline-block"><?= T([
 				'en' => 'Delete',
 				'ru' => 'Удалить',

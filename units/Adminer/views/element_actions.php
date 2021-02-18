@@ -11,7 +11,7 @@
 				data-target="#action_<?= $action_id ?>"
 			>
 				<? if ($action['ICON']): ?>
-					<i class="<?= $action['ICON'] ?>"></i>
+					<span class="material-icons"><?= $action['ICON'] ?></span>
 				<? endif; ?>
 				<?= $action['NAME'] ?>
 			</button>

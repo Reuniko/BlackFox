@@ -3,23 +3,23 @@
 <? /** @var array $SELECTED */ ?>
 <? /** @var string $NAME */ ?>
 
-<div class="mb-2 text-center">
-	<button type="button" class="btn btn-outline-secondary" data-settings-select="settings-<?= $NAME ?>">
-		<i class="fa fa-check"></i>
+<div class="mb-2 d-flex justify-content-center">
+	<button type="button" class="btn btn-outline-secondary text-nowrap" data-settings-select="settings-<?= $NAME ?>">
+		<span class="material-icons">done_all</span>
 		<span class="d-none d-md-inline-block"><?= T([
 				'en' => 'Select all',
 				'ru' => 'Выбрать все',
 			]) ?></span>
 	</button>
-	<button type="button" class="btn btn-outline-secondary" data-settings-unselect="settings-<?= $NAME ?>">
-		<i class="fa fa-times"></i>
+	<button type="button" class="btn btn-outline-secondary text-nowrap" data-settings-unselect="settings-<?= $NAME ?>">
+		<span class="material-icons">remove_done</span>
 		<span class="d-none d-md-inline-block"><?= T([
 				'en' => 'Unselect all',
 				'ru' => 'Снять все',
 			]) ?></span>
 	</button>
-	<button type="button" class="btn btn-outline-secondary" data-settings-sort="settings-<?= $NAME ?>">
-		<i class="fa fa-sort"></i>
+	<button type="button" class="btn btn-outline-secondary text-nowrap" data-settings-sort="settings-<?= $NAME ?>">
+		<span class="material-icons">sort</span>
 		<span class="d-none d-md-inline-block"><?= T([
 				'en' => 'Sort by default',
 				'ru' => 'Сортировать',

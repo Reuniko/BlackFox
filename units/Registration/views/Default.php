@@ -33,10 +33,7 @@
 					</div>
 					<? if (\BlackFox\Users::I()->fields[$code]['DESCRIPTION']): ?>
 						<div class="col-sm-1 form-control-plaintext sm-hidden">
-							<i
-								class="fa fa-question"
-								title="<?= \BlackFox\Users::I()->fields[$code]['DESCRIPTION'] ?>"
-							></i>
+							<span class="material-icons" title="<?= \BlackFox\Users::I()->fields[$code]['DESCRIPTION'] ?>">info</span>
 						</div>
 					<? endif; ?>
 				</div>
@@ -52,7 +49,7 @@
 		<div class="form-group text-center">
 
 			<button class="btn btn-primary" type="submit" name="ACTION" value="Registration">
-				<i class="fa fa-user-plus"></i>
+				<span class="material-icons">person_add</span>
 				<?= T([
 					'en' => 'Sign up',
 					'ru' => 'Зарегистрироваться',

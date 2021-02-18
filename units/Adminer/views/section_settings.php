@@ -7,7 +7,7 @@
 	tabindex="-1"
 	role="dialog"
 >
-	<div class="modal-dialog modal-lg" role="document" style="max-width: 815px; width: 95%;">
+	<div class="modal-dialog modal-lg" role="document" style="max-width: 852px; width: 95%;">
 		<div class="modal-content">
 			<form method="post">
 				<div class="modal-header">
@@ -24,7 +24,7 @@
 					<!-- Tab panes -->
 					<div class="row">
 						<div class="col-sm-6">
-							<h4><?= T([
+							<h4 class="text-center"><?= T([
 									'en' => 'Filters',
 									'ru' => 'Фильтры',
 								]) ?></h4>
@@ -36,7 +36,7 @@
 
 						</div>
 						<div class="col-sm-6">
-							<h4><?= T([
+							<h4 class="text-center"><?= T([
 									'en' => 'Columns',
 									'ru' => 'Колонки',
 								]) ?></h4>

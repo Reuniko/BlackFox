@@ -18,8 +18,9 @@ $this->AddHeaderStyle('https://fonts.googleapis.com/css?family=Roboto:300,400,50
 $this->AddHeaderStyle($path . '/lib/bootstrap/css/bootstrap.min.css');
 $this->AddHeaderScript($path . '/lib/bootstrap/js/bootstrap.bundle.min.js');
 
-// fontawesome
-$this->AddHeaderStyle($path . '/lib/fontawesome/css/all.min.css');
+// material-design-icons
+// $this->AddHeaderStyle('https://fonts.googleapis.com/css2?family=Material+Icons');
+$this->AddHeaderStyle($path . '/lib/material-design-icons/all.css');
 
 // summernote
 $this->AddHeaderStyle($path . '/lib/summernote/dist/summernote-bs4.css');
