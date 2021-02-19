@@ -1195,7 +1195,7 @@ abstract class SCRUD {
 		return "/admin/{$name}.php";
 	}
 
-	public function GetElementTitle($element = []) {
+	public function GetElementTitle(array $element) {
 		return $element['TITLE'] ?: $element['ID'] ?: null;
 	}
 

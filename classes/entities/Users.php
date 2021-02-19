@@ -283,8 +283,12 @@ class Users extends SCRUD {
 		return $string;
 	}
 
-	public function GetElementTitle($element = []) {
-		return $element['LOGIN'];
+	public function GetElementTitle(array $element) {
+		$name = trim("{$element['FIRST_NAME']} {$element['LAST_NAME']}");
+		if (empty($name)) $name = $element['LOGIN'];
+		if (empty($name)) $name = "№{$element['ID']}";
+		if (empty($element['ID'])) $name = "";
+		return $name;
 	}
 
 }

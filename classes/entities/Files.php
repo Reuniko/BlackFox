@@ -145,7 +145,7 @@ class Files extends SCRUD {
 	}
 
 
-	public function GetElementTitle($element = []) {
+	public function GetElementTitle(array $element = []) {
 		return $element['NAME'];
 	}
 
