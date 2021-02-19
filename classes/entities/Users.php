@@ -46,9 +46,9 @@ class Users extends SCRUD {
 				]),
 			],
 			'SALT'            => [
-				'TYPE'     => 'STRING',
-				'GROUP'    => 'SYSTEM',
-				'NAME'     => T([
+				'TYPE'  => 'STRING',
+				'GROUP' => 'SYSTEM',
+				'NAME'  => T([
 					'en' => 'Salt',
 					'ru' => 'Соль',
 				]),
@@ -238,22 +238,11 @@ class Users extends SCRUD {
 	 * @param int $ID user identifier
 	 * @param string $password password to check
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function CheckPassword($ID, $password) {
 		$user = $this->Read($ID, ['PASSWORD', 'SALT']);
 		return ($user['PASSWORD'] === sha1($user['SALT'] . ':' . $password));
-	}
-
-
-	public function Update($ids = [], $fields = []) {
-		$ids = is_array($ids) ? $ids : [$ids];
-		if (!empty($fields['PASSWORD'])) {
-			foreach ($ids as $ID) {
-				$this->SetPassword($ID, $fields['PASSWORD']);
-			}
-		}
-		unset($fields['PASSWORD']);
-		return parent::Update($ids, $fields);
 	}
 
 	public function AddGroup($ID, $group) {
@@ -281,10 +270,16 @@ class Users extends SCRUD {
 		]);
 	}
 
-	public function GetRecoveryString($ID) {
+	public function GetRecoveryString(int $ID) {
+		if (empty($ID)) {
+			throw new Exception(T([
+				'en' => 'User ID not specified to generate password recovery string',
+				'ru' => 'Не указан идентификатор пользователя для генерации строки для восстановления пароля',
+			]));
+		}
 		$string = sha1(random_bytes(32));
 		$hash = sha1($string);
-		$this->Update($ID, ['HASH' => $hash]);
+		parent::Update($ID, ['HASH' => $hash]);
 		return $string;
 	}
 
