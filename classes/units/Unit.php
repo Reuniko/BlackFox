@@ -479,7 +479,7 @@ abstract class Unit {
 	 * @param string|null $url URL-адрес (null = $_SERVER['REQUEST_URI'])
 	 * @param string|array $alerts строка, уведомление об успехе
 	 * | массив строк, уведомлений об успехе
-	 * | массив массивов, представляющих собой уведомления в формате [TEXT, TYPE]
+	 * | массив массивов, представляющих собой уведомления в формате [TEXT => '...', TYPE => (success|info|warning|danger)]
 	 */
 	public function Redirect($url, $alerts = []) {
 		$url = is_null($url) ? $_SERVER['REQUEST_URI'] : $url;
