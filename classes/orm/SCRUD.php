@@ -207,22 +207,17 @@ abstract class SCRUD {
 	}
 
 	/**
-	 * Формирует данные для вывода страницы элементов.
+	 * Эта функция -- обертка над функцией Select().
+	 * Формирует данные для вывода страницы элементов вместе с постраничной навигацией.
+	 * По умолчанию устанавливает LIMIT = 100, PAGE = 1.
+	 * Возвращает ассоциативный массив с двумя ключами:
+	 * - ELEMENTS - массив элементов (массивов), то что вернула бы функция Select(),
+	 * - PAGER - массив для постраничной навигации с ключами: TOTAL, CURRENT, LIMIT, SELECTED
 	 *
-	 * $params - массив с ключами:
-	 * - SORT -- сортировка, массив, ключ - поле, значение - ASC|DESC
-	 * - FILTER -- пользовательский фильтр (можно передавать небезопасные данные)
-	 * - CONDITIONS -- произвольные SQL условия для фильтрации (нельзя передавать небезопасные данные)
-	 * - FIELDS -- выбираемые поля, составной массив
-	 * - LIMIT -- количество элементов на странице (по умолчанию: *100*, нельзя не ограничивать выборку в этом методе, для неограниченной выборки используйте метод Select)
-	 * - PAGE -- номер страницы (по умолчанию: *1*)
-	 * - KEY -- по какому полю нумеровать элементы (по умолчанию: *$this->key()*, укажите *null* чтобы нумеровать по возрастанию)
-	 * - ESCAPE -- автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию: *true*)
-	 * - GROUP -- группировка, лист, значение - код поля
-	 *
-	 * @param array $params
-	 * @return array - ассоциативный массив с двумя ключами: ELEMENTS:[[]], PAGER:[TOTAL, CURRENT, LIMIT, SELECTED]
+	 * @param array $params same as Select()
+	 * @return array
 	 * @throws Exception
+	 * @see \BlackFox\SCRUD::Select()
 	 */
 	public function Search($params = []) {
 		$params['LIMIT'] = isset($params['LIMIT']) ? $params['LIMIT'] : 100;
@@ -250,8 +245,9 @@ abstract class SCRUD {
 	 * Выбирает данные из таблицы
 	 *
 	 * $params - массив с ключами:
-	 * - SORT -- сортировка, массив, ключ - поле, значение - ASC|DESC
-	 * - FILTER -- пользовательский фильтр (можно передавать небезопасные данные)
+	 * (можно передавать небезопасные данные, если не указано иное)
+	 * - SORT -- сортировка, одноуровневый ассоциативный массив, ключ - поле, значение - ASC|DESC
+	 * - FILTER -- пользовательский фильтр, многоуровневый смешанный массив
 	 * - CONDITIONS -- произвольные SQL условия для фильтрации (нельзя передавать небезопасные данные)
 	 * - FIELDS -- выбираемые поля, составной массив
 	 * - LIMIT -- количество элементов на странице (по умолчанию: *false*)
@@ -259,22 +255,24 @@ abstract class SCRUD {
 	 * - KEY -- по какому полю нумеровать элементы (по умолчанию: *$this->key()*, укажите *null* чтобы нумеровать по возрастанию)
 	 * - ESCAPE -- автоматически обрабатывать поля с выбором формата text/html в HTML-безопасный вид? (по умолчанию: *true*)
 	 * - GROUP -- группировка, лист, значение - код поля
+	 * - INNER_SORTS -- сортировки подцепляемых полей (тип Inner), ключ - код подцепляемого поля, значение - массив сортировки (аналогично SORT)
 	 *
 	 * @param array $params
 	 * @return array список выбранных элементов
 	 * @throws Exception
 	 */
 	public function Select($params = []) {
-		$this->_controlParams($params, ['KEY', 'SORT', 'FILTER', 'CONDITIONS', 'FIELDS', 'LIMIT', 'PAGE', 'ESCAPE', 'GROUP']);
+		$this->_controlParams($params, ['KEY', 'SORT', 'FILTER', 'CONDITIONS', 'FIELDS', 'LIMIT', 'PAGE', 'ESCAPE', 'GROUP', 'INNER_SORTS']);
 		$defParams = [
-			'SORT'       => [],
-			'FILTER'     => [],
-			'CONDITIONS' => [],
-			'FIELDS'     => ['*@@'],
-			'LIMIT'      => false,
-			'PAGE'       => 1,
-			'ESCAPE'     => true,
-			'GROUP'      => [],
+			'SORT'        => [],
+			'FILTER'      => [],
+			'CONDITIONS'  => [],
+			'FIELDS'      => ['*@@'],
+			'LIMIT'       => false,
+			'PAGE'        => 1,
+			'ESCAPE'      => true,
+			'GROUP'       => [],
+			'INNER_SORTS' => [],
 		];
 		try {
 			$defParams['KEY'] = $this->key();
@@ -323,7 +321,6 @@ abstract class SCRUD {
 		$this->parts['ORDER'] += $answer['ORDER'];
 		$this->parts['JOIN'] += $answer['JOIN'];
 		$this->parts['GROUP'] += $answer['GROUP'];
-		$inner_sort = $answer['INNER_SORT'];
 
 		if ($params['LIMIT'] > 0) {
 			$this->parts['LIMIT'] = [
@@ -347,7 +344,7 @@ abstract class SCRUD {
 			}
 		}
 
-		$elements = $this->HookExternalFields($elements, $params['FIELDS'], $inner_sort);
+		$elements = $this->HookExternalFields($elements, $params['FIELDS'], $params['INNER_SORTS']);
 
 		return $elements;
 	}
@@ -852,8 +849,8 @@ abstract class SCRUD {
 	 * Возвращает структуру с ключами:
 	 * - OBJECT - объект-наследник SCRUD для обработки поля
 	 * - TABLE - псевдоним для таблицы (alias)
-	 * - PATH -
-	 * - CODE - код поля
+	 * - PATH - путь к полю в виде простого списка кодов полей (не включая код финального поля)
+	 * - CODE - код финального поля
 	 * - JOIN - ассоциативный массив уникальных SQL-строк, описывающий присоединяемые таблицы
 	 * - GROUP - ассоциативный массив уникальных SQL-строк, описывающий группировку
 	 *
@@ -927,36 +924,40 @@ abstract class SCRUD {
 		$order = [];
 		$join = [];
 		$group = [];
-		$inner_sort = [];
 		foreach ($array as $field_path => $sort) {
+
 			if ('{RANDOM}' === $field_path) {
 				$order[] = $this->Database->Random();
 				continue;
 			}
 
+			if (!in_array($sort, ['ASC', 'DESC'])) {
+				throw new Exception(T([
+					'en' => 'Unknown sort: ' . $sort,
+					'ru' => 'Неизвестная сортировка: ' . $sort,
+				]));
+			}
+
 			$result = $this->_treatFieldPath($field_path);
 
+			$join += $result['JOIN'];
+			$group += $result['GROUP'];
+
 			if (count($result['PATH']) > 0) {
-				$path = $result['PATH'];
-				$first_path = array_shift($path);
-				$Type = $this->Types[$first_path];
-				if (is_a($Type, 'BlackFox\TypeInner')) {
-					$inner_path = implode('.', array_merge($path, [$result['CODE']]));
-					$inner_sort[$first_path][$inner_path] = $sort;
+				if (is_a($this->Types[$result['PATH'][0]], 'BlackFox\TypeInner')) {
+					$func = ['ACS' => 'MIN', 'DESC' => 'MAX'][$sort];
+					$order[] = "{$func}({$result['TABLE']}." . $this->Database->Quote($result['CODE']) . ") {$sort}";
 					continue;
 				}
 			}
 
 			$order[] = "{$result['TABLE']}." . $this->Database->Quote($result['CODE']) . " {$sort}";
-			$join += $result['JOIN'];
-			$group += $result['GROUP'];
 		}
 
 		return [
-			'ORDER'      => $order,
-			'JOIN'       => $join,
-			'GROUP'      => $group,
-			'INNER_SORT' => $inner_sort,
+			'ORDER' => $order,
+			'JOIN'  => $join,
+			'GROUP' => $group,
 		];
 	}
 
@@ -1207,10 +1208,10 @@ abstract class SCRUD {
 	 *
 	 * @param array $elements элементы выборки
 	 * @param array $fields
-	 * @param array $sort
+	 * @param array $inner_sorts
 	 * @return array элементы выборки, дополненные внешними данными
 	 */
-	private function HookExternalFields($elements, $fields, $sort) {
+	private function HookExternalFields($elements, $fields, $inner_sorts) {
 		if (empty($elements)) return $elements;
 		foreach ($fields as $key => $value) {
 			if (!is_array($value)) {
@@ -1220,7 +1221,7 @@ abstract class SCRUD {
 				$code = strtoupper($key);
 				$subfields = $value;
 			}
-			$subsort = $sort[$code] ?: [];
+			$subsort = $inner_sorts[$code] ?: [];
 			$elements = $this->Types[$code]->HookExternalField($elements, $subfields, $subsort);
 		}
 		return $elements;
