@@ -5,7 +5,7 @@ namespace BlackFox;
 class AdminerUsers extends Adminer {
 
 	public function Execute($PARAMS = [], $REQUEST = []) {
-		$PARAMS['SCRUD'] = 'BlackFox\Users';
+		$PARAMS['SCRUD'] = \BlackFox\Users::N();
 		parent::Execute($PARAMS, $REQUEST);
 	}
 

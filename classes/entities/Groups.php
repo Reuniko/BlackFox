@@ -39,6 +39,15 @@ class Groups extends SCRUD {
 					'ru' => 'Описание',
 				]),
 			],
+			'USERS'       => [
+				'TYPE'      => 'INNER',
+				'NAME'      => T([
+					'en' => 'Users',
+					'ru' => 'Пользователи',
+				]),
+				'LINK'      => 'Users2Groups',
+				'INNER_KEY' => 'GROUP',
+			],
 		];
 	}
 

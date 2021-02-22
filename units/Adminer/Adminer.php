@@ -180,39 +180,31 @@ class Adminer extends \BlackFox\Unit {
 	}
 
 
-	public function Create($FIELDS = [], $REDIRECT = 'Stay') {
+	public function Create($FIELDS = [], $REDIRECT = null) {
 		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
 			$FIELDS[$code] = $value;
 		}
 		$ID = $this->SCRUD->Create($FIELDS);
-		$link = $this->GetLinkForRedirect($ID, $REDIRECT);
-		$this->Redirect($link, T([
+		if (empty($REDIRECT)) {
+			$get = $_GET;
+			unset($get['NEW']);
+			$REDIRECT = '?' . http_build_query(array_merge($get, ['ID' => $ID]));
+		}
+		$this->Redirect($REDIRECT, T([
 			'en' => "Element <a href='?ID={$ID}'>#{$ID}</a> has been created",
 			'ru' => "Создан элемент <a href='?ID={$ID}'>№{$ID}</a>",
 		]));
 	}
 
-	public function Update($ID, $FIELDS = [], $REDIRECT = 'Stay') {
+	public function Update($ID, $FIELDS = [], $REDIRECT = null) {
 		foreach ($this->PARAMS['RESTRICTIONS'] as $code => $value) {
 			unset($FIELDS[$code]);
 		}
 		$this->SCRUD->Update($ID, $FIELDS);
-		$link = $this->GetLinkForRedirect($ID, $REDIRECT);
-		$this->Redirect($link, T([
+		$this->Redirect($REDIRECT, T([
 			'en' => "Element <a href='?ID={$ID}'>#{$ID}</a> has been updated",
 			'ru' => "Обновлен элемент <a href='?ID={$ID}'>№{$ID}</a>",
 		]));
-	}
-
-	public function GetLinkForRedirect($ID, $REDIRECT) {
-		$get = $_GET;
-		unset($get['NEW']);
-		$variants = [
-			'Stay' => '?' . http_build_query(array_merge($get, ['ID' => $ID])),
-			'Back' => $this->GetBackLink(),
-			'New'  => "?NEW",
-		];
-		return $variants[$REDIRECT];
 	}
 
 	public function Delete($ID) {

@@ -4,7 +4,7 @@
 	class="btn btn-primary"
 	type="submit"
 	name="REDIRECT"
-	value="Back"
+	value="<?= $RESULT['BACK'] ?>"
 >
 	<span class="material-icons">save</span>
 	<span class="d-none d-md-inline-block"><?= T([
@@ -17,7 +17,7 @@
 	class="btn btn-success"
 	type="submit"
 	name="REDIRECT"
-	value="Stay"
+	value=""
 >
 	<span class="material-icons">save_alt</span>
 	<span class="d-none d-md-inline-block"><?= T([

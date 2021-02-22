@@ -482,7 +482,7 @@ abstract class Unit {
 	 * | массив массивов, представляющих собой уведомления в формате [TEXT => '...', TYPE => (success|info|warning|danger)]
 	 */
 	public function Redirect($url, $alerts = []) {
-		$url = is_null($url) ? $_SERVER['REQUEST_URI'] : $url;
+		$url = $url ?: $_SERVER['REQUEST_URI'];
 		$alerts = is_array($alerts) ? $alerts : [$alerts];
 		foreach ($alerts as &$alert) {
 			if (is_string($alert)) {

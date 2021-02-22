@@ -461,8 +461,10 @@ class MySQL extends Database {
 		$default = $field['DEFAULT'];
 		if (is_array($default))
 			$default = implode(',', $default);
-		if ($default <> $column['Default'])
-			return "Change default: {$column['Default']} -> {$default}";
+		if (is_bool($default))
+			$default = (int)$default;
+		if ((string)$default <> (string)$column['Default'])
+			return "Change default: " . (string)$column['Default'] . " -> " . (string)$default;
 
 		return false;
 	}

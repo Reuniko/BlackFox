@@ -204,6 +204,7 @@
 	margin: 0;
 }
 
-.adminer .form-group {
+.adminer .form-group,
+.adminer .group_header {
 	margin-bottom: 0.5rem;
 }
