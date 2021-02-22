@@ -91,7 +91,7 @@ class Engine {
 
 	public function InitSession() {
 		session_start();
-		$lifetime = 7 * 24 * 60 * 60;
+		$lifetime = $this->config['session_lifetime'] ?: 7 * 24 * 60 * 60;
 		setcookie(session_name(), session_id(), time() + $lifetime, '/');
 	}
 
