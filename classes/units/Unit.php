@@ -53,8 +53,8 @@ abstract class Unit {
 	public $view_relative_folder;
 
 	public function __construct(
-		Engine $Engine = null,
-		User $User = null
+		?Engine $Engine = null,
+		?User $User = null
 	) {
 		$this->ENGINE = $Engine ?: Engine::I();
 		$this->USER = $User ?: User::I();
@@ -295,14 +295,18 @@ abstract class Unit {
 		//$this->Debug($parameters, 'Invoke $parameters');
 		$arguments = [];
 		foreach ($parameters as $parameter) {
+			// lookup is case-insensitive (request keys are lowercased above),
+			// but the argument must be keyed by the real, case-sensitive
+			// parameter name - invokeArgs() treats string keys as named
+			// arguments since PHP 8.0, which are matched case-sensitively
 			$code = strtolower($parameter->name);
 			if (isset($request[$code])) {
-				$arguments[$code] = $request[$code];
+				$arguments[$parameter->name] = $request[$code];
 			} else {
 				try {
-					$arguments[$code] = $parameter->getDefaultValue();
+					$arguments[$parameter->name] = $parameter->getDefaultValue();
 				} catch (\Exception $error) {
-					$arguments[$code] = null;
+					$arguments[$parameter->name] = null;
 				}
 			}
 		}

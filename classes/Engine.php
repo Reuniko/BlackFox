@@ -69,6 +69,7 @@ class Engine {
 	 */
 	public function __construct() {
 		$this->InitConfig(static::GetConfig());
+		$this->InitErrorHandler();
 		$this->InitSession();
 		$this->InitAutoloadClasses();
 		$this->InitExceptionHandler();
@@ -101,6 +102,30 @@ class Engine {
 
 	public function InitExceptionHandler() {
 		set_exception_handler([$this, 'ExceptionHandler']);
+	}
+
+	public function InitErrorHandler() {
+		set_error_handler([$this, 'ErrorHandler']);
+	}
+
+	/**
+	 * Engine-wide paradigm: a missing array key (or a chain like $a['x']['y']
+	 * where $a['x'] itself doesn't exist) is treated the same as null
+	 * everywhere in this codebase, by design - it's not guarded at every
+	 * call site. PHP 8 reclassified that from a Notice to a Warning
+	 * ("Undefined array key" / "Trying to access array offset on null"),
+	 * which would otherwise flood output/logs for completely intended
+	 * behavior. Silence those two specifically; let every other
+	 * warning/notice through to PHP's normal handler.
+	 */
+	public function ErrorHandler($errno, $errstr) {
+		if ($errno === E_WARNING && (
+				strpos($errstr, 'Undefined array key') === 0
+				|| strpos($errstr, 'Trying to access array offset on null') === 0
+			)) {
+			return true;
+		}
+		return false;
 	}
 
 	public function ExceptionHandler(\Throwable $Exception) {
@@ -627,7 +652,7 @@ class Engine {
 	 * @return string relative path
 	 * @throws Exception
 	 */
-	public function GetRelativePath(string $absolute_path, string $root_path = null) {
+	public function GetRelativePath(string $absolute_path, ?string $root_path = null) {
 		$root_path = $root_path ?: $_SERVER['DOCUMENT_ROOT'];
 
 		$root_path = str_replace('\\', '/', $root_path);
@@ -720,7 +745,7 @@ class Engine {
 			$browser_language_string = explode(',', $browser_language_string);
 			$browser_languages = [];
 			foreach ($browser_language_string as $item) {
-				list($language, $priority) = explode(';', $item);
+				list($language, $priority) = array_pad(explode(';', $item), 2, null);
 				$browser_languages[$priority ?: 'q=1.0'] = $language;
 			}
 			foreach ($browser_languages as $priority => $browser_language) {
@@ -729,7 +754,8 @@ class Engine {
 				}
 			}
 		}
-		return reset(array_keys($this->languages));
+		$language_codes = array_keys($this->languages);
+		return reset($language_codes);
 	}
 
 	public function SetLanguage(string $language) {

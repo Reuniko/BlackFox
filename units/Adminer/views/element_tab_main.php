@@ -1,13 +1,13 @@
 <?php /** @var \BlackFox\Adminer $this */ ?>
 <?php /** @var array $RESULT */ ?>
 
-<? @include($this->PathInclude('element_actions.php')); ?>
+<? if ($path = $this->PathInclude('element_actions.php')) include($path); ?>
 
 <form method="post" enctype="multipart/form-data" class="form-horizontal">
 
 	<input type="hidden" name="ACTION" value="<?= $RESULT['MODE'] ?>"/>
 
-	<? @include($this->PathInclude('element_head.php')); ?>
+	<? if ($path = $this->PathInclude('element_head.php')) include($path); ?>
 
 	<? foreach ($this->SCRUD->composition as $group_code => $group): ?>
 		<? if (!empty($group['FIELDS'])): ?>
@@ -44,11 +44,11 @@
 		<? endforeach; ?>
 	<? endforeach; ?>
 
-	<? @include($this->PathInclude('element_foot.php')); ?>
+	<? if ($path = $this->PathInclude('element_foot.php')) include($path); ?>
 
 	<hr/>
 
 	<div class="buttons">
-		<? @include($this->PathInclude('element_bottom_buttons.php')); ?>
+		<? if ($path = $this->PathInclude('element_bottom_buttons.php')) include($path); ?>
 	</div>
 </form>

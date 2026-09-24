@@ -11,7 +11,7 @@ $this->TITLE = T([
 			class="form-control"
 			name="PHP"
 			rows="5"
-		><?= htmlspecialchars($_REQUEST['PHP']) ?></textarea>
+		><?= htmlspecialchars($_REQUEST['PHP'] ?? '') ?></textarea>
 	</div>
 	<input
 		type="submit"

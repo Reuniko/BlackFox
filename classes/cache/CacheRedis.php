@@ -59,7 +59,7 @@ class CacheRedis extends Cache {
 		return is_array($key) ? $answer : reset($answer);
 	}
 
-	public function Put(string $key, $value, int $ttl = null, array $tags = []) {
+	public function Put(string $key, $value, ?int $ttl = null, array $tags = []) {
 		$params = (is_null($ttl)) ? [] : ['nx', 'ex' => $ttl];
 		$result = $this->Redis->set("val|{$key}", serialize($value), $params);
 		if ($result === false) {

@@ -23,6 +23,7 @@ class Cache {
 	 * @throws ExceptionCache "Value for key '...' not found"
 	 */
 	public function Get($key) {
+		$key = is_array($key) ? implode(', ', $key) : $key;
 		throw new ExceptionCache("Value for key '{$key}' not found");
 	}
 
@@ -37,7 +38,7 @@ class Cache {
 	 * @param array $tags tags (optional)
 	 * @throws ExceptionCache "Key already exist: '{$key}'"
 	 */
-	public function Put(string $key, $value, int $ttl = null, array $tags = []) {
+	public function Put(string $key, $value, ?int $ttl = null, array $tags = []) {
 	}
 
 	/**
@@ -58,7 +59,7 @@ class Cache {
 	 * @param array $tags tags (optional)
 	 * @throws ExceptionCache
 	 */
-	public function Set(string $key, $value, int $ttl = null, array $tags = []) {
+	public function Set(string $key, $value, ?int $ttl = null, array $tags = []) {
 		$this->Delete($key);
 		$this->Put($key, $value, $ttl, $tags);
 	}

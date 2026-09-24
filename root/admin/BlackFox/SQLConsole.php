@@ -11,7 +11,7 @@ $this->TITLE = T([
 			class="form-control"
 			name="SQL"
 			rows="5"
-		><?= htmlspecialchars($_REQUEST['SQL']) ?></textarea>
+		><?= htmlspecialchars($_REQUEST['SQL'] ?? '') ?></textarea>
 	</div>
 	<input
 		type="submit"

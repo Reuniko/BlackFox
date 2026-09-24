@@ -33,9 +33,9 @@ class KCaptcha extends \BlackFox\Captcha {
 		while (true) {
 			$word = '';
 			for ($i = 0; $i < $this->config['length']; $i++) {
-				$word .= $this->config['allowed_symbols']{mt_rand(0, strlen($this->config['allowed_symbols']) - 1)};
+				$word .= $this->config['allowed_symbols'][mt_rand(0, strlen($this->config['allowed_symbols']) - 1)];
 			}
-			if (!preg_match('/cp|cb|ck|c6|c9|rn|rm|mm|co|do|cl|db|qp|qb|dp|ww/', $this->$word)) break;
+			if (!preg_match('/cp|cb|ck|c6|c9|rn|rm|mm|co|do|cl|db|qp|qb|dp|ww/', $word)) break;
 		}
 		$_SESSION['CAPTCHA']['WORD'] = $word;
 		return $word;
@@ -83,13 +83,13 @@ class KCaptcha extends \BlackFox\Captcha {
 			$transparent = (imagecolorat($font, $i, 0) >> 24) == 127;
 
 			if (!$reading_symbol && !$transparent) {
-				$font_metrics[$this->config['alphabet']{$symbol}] = ['start' => $i];
+				$font_metrics[$this->config['alphabet'][$symbol]] = ['start' => $i];
 				$reading_symbol = true;
 				continue;
 			}
 
 			if ($reading_symbol && $transparent) {
-				$font_metrics[$this->config['alphabet']{$symbol}]['end'] = $i;
+				$font_metrics[$this->config['alphabet'][$symbol]]['end'] = $i;
 				$reading_symbol = false;
 				$symbol++;
 				continue;
@@ -108,7 +108,7 @@ class KCaptcha extends \BlackFox\Captcha {
 		$odd = mt_rand(0, 1);
 		if ($odd == 0) $odd = -1;
 		for ($i = 0; $i < $this->config['length']; $i++) {
-			$m = $font_metrics[$word{$i}];
+			$m = $font_metrics[$word[$i]];
 
 			$y = (($i % 2) * $this->config['fluctuation_amplitude'] - $this->config['fluctuation_amplitude'] / 2) * $odd
 				+ mt_rand(-round($this->config['fluctuation_amplitude'] / 3), round($this->config['fluctuation_amplitude'] / 3))

@@ -5,7 +5,7 @@
 	<? $this->ShowAlerts(); ?>
 	<form method="POST" class="form form-horizontal" enctype="multipart/form-data">
 		<? foreach ($RESULT['FIELDS'] as $code => $field): ?>
-			<? if ($field->info['TYPE'] === 'BOOL'): ?>
+			<? if ($field['TYPE'] === 'BOOL'): ?>
 				<div class="form-group text-center">
 					<?
 					// -------------------------------------------------------------------------------------------

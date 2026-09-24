@@ -2,6 +2,26 @@
 
 namespace BlackFox;
 
+/**
+ * Shared storage for the Instance trait.
+ * PHP gives every class that uses a trait its own copy of the trait's static
+ * properties, so overrides/instances can't live on the trait itself if they're
+ * meant to be a single global registry - they need a real class to live on.
+ */
+class InstanceRegistry {
+
+	/**
+	 * @var array $overrides array of classes to be overridden:
+	 * key - string, name of the interface or abstract class or concrete class (which should be overridden);
+	 * value - string, name of the final class (with trait Instance);
+	 */
+	public static $overrides = null;
+
+	/** @var Instance[] array of instantiated classes: key - class name, value - Object */
+	public static $instances = [];
+
+}
+
 trait Instance {
 
 	/**
@@ -17,19 +37,9 @@ trait Instance {
 			if ($old_class_name === $new_class_name) {
 				throw new Exception("Wrong override: '{$old_class_name}' => '{$new_class_name}'");
 			}
-			Instance::$overrides[$old_class_name] = $new_class_name;
+			InstanceRegistry::$overrides[$old_class_name] = $new_class_name;
 		}
 	}
-
-	/**
-	 * @var Instance[] $overrides array of classes to be overridden:
-	 * key - string, name of the interface or abstract class or concrete class (which should be overridden);
-	 * value - string, name of the final class (with trait Instance);
-	 */
-	public static $overrides = null;
-
-	/** @var Instance[] array of instantiated classes: key - class name, value - Object */
-	public static $instances = [];
 
 	/** @var bool if the class has been instanced - in most cases it is required to prohibit a change in its internal state */
 	public $is_global_instance = false;
@@ -46,27 +56,27 @@ trait Instance {
 	 * @throws Exception
 	 */
 	public static function I($params = []) {
-		if (Instance::$overrides === null) {
-			Instance::$overrides = [];
+		if (InstanceRegistry::$overrides === null) {
+			InstanceRegistry::$overrides = [];
 			$config = Engine::GetConfig();
-			Instance::AddOverrides($config['overrides'] ?: []);
+			static::AddOverrides($config['overrides'] ?: []);
 		}
 
 		/** @var Instance|string $class */
 		$class = get_called_class();
-		if (Instance::$overrides[$class]) {
-			return Instance::$overrides[$class]::I($params);
+		if (!empty(InstanceRegistry::$overrides[$class])) {
+			return InstanceRegistry::$overrides[$class]::I($params);
 		}
-		if (isset(Instance::$instances[$class])) {
+		if (isset(InstanceRegistry::$instances[$class])) {
 			if (empty($params)) {
-				return Instance::$instances[$class];
+				return InstanceRegistry::$instances[$class];
 			} else {
 				throw new Exception("Can't initiate global instance of class '{$class}': global instance already exist");
 			}
 		}
-		Instance::$instances[$class] = $class::N($params);
-		Instance::$instances[$class]->is_global_instance = true;
-		return Instance::$instances[$class];
+		InstanceRegistry::$instances[$class] = $class::N($params);
+		InstanceRegistry::$instances[$class]->is_global_instance = true;
+		return InstanceRegistry::$instances[$class];
 	}
 
 	/**
@@ -87,8 +97,8 @@ trait Instance {
 	public static function N($params = []) {
 		try {
 			$class = get_called_class();
-			if (Instance::$overrides[$class]) {
-				return Instance::$overrides[$class]::N();
+			if (!empty(InstanceRegistry::$overrides[$class])) {
+				return InstanceRegistry::$overrides[$class]::N($params);
 			}
 
 			$ReflectionClass = new \ReflectionClass(get_called_class());
@@ -130,7 +140,7 @@ trait Instance {
 				$traits = (new \ReflectionClass($p_class))->getTraits();
 				if (isset($traits['BlackFox\Instance'])) {
 					/**@var string|self $p_class */
-					$args[$p_class] = $p_class::I();
+					$args[$Parameter->getName()] = $p_class::I();
 				} else {
 					throw new Exception("Can't construct class '{$class}': non-optional parameter '{$Parameter->getName()}' of type '{$p_class}' doesn't have 'BlackFox\Instance' trait");
 				}

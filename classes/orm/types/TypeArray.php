@@ -12,7 +12,7 @@ class TypeArray extends TypeText {
 
 	public function FormatOutputValue($element) {
 		$code = $this->field['CODE'];
-		$element[$code] = json_decode($element[$code], true);
+		$element[$code] = json_decode($element[$code] ?? '', true);
 		if (json_last_error()) {
 			$element[$code] = null;
 		}

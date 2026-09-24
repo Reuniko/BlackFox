@@ -14,7 +14,7 @@ class TypeDate extends Type {
 
 	public function FormatOutputValue($element) {
 		$code = $this->field['CODE'];
-		$element[$code . '|TIMESTAMP'] = strtotime($element[$code]);
+		$element[$code . '|TIMESTAMP'] = strtotime($element[$code] ?? '');
 		return $element;
 	}
 

@@ -339,7 +339,7 @@ abstract class SCRUD {
 			$row = $this->FormatOutputValues($row);
 			if ($params['ESCAPE']) {
 				array_walk_recursive($row, function (&$value) {
-					$value = htmlspecialchars($value);
+					$value = htmlspecialchars((string)$value);
 				});
 			}
 		}
@@ -383,13 +383,14 @@ abstract class SCRUD {
 	 * @throws Exception
 	 */
 	public function Read($filter, $fields = ['*@@'], $sort = [], $escape = true) {
-		return reset($this->Select([
+		$elements = $this->Select([
 			'FILTER' => $filter,
 			'FIELDS' => $fields,
 			'SORT'   => $sort,
 			'ESCAPE' => $escape,
 			'LIMIT'  => 1,
-		]));
+		]);
+		return reset($elements);
 	}
 
 	/**
@@ -427,7 +428,7 @@ abstract class SCRUD {
 	 * @return array массив идентификаторов элементов
 	 * @throws Exception
 	 */
-	public function GetColumn($filter = [], string $field = null, array $sort = [], bool $escape = false) {
+	public function GetColumn($filter = [], ?string $field = null, array $sort = [], bool $escape = false) {
 		$field = $field ?: $this->key();
 		$elements = $this->Select([
 			'FILTER' => $filter,
@@ -945,7 +946,7 @@ abstract class SCRUD {
 
 			if (count($result['PATH']) > 0) {
 				if (is_a($this->Types[$result['PATH'][0]], 'BlackFox\TypeInner')) {
-					$func = ['ACS' => 'MIN', 'DESC' => 'MAX'][$sort];
+					$func = ['ASC' => 'MIN', 'DESC' => 'MAX'][$sort];
 					$order[] = "{$func}({$result['TABLE']}." . $this->Database->Quote($result['CODE']) . ") {$sort}";
 					continue;
 				}
