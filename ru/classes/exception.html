@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Exception — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/exception.html">English</a>
+		<a class="btn btn-secondary active" href="exception.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Exception</h1>
+
+		<p>
+			Класс
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/exceptions/Exception.php">BlackFox\Exception</a>
+			является прямым потомком <path>\Exception</path>,
+			в конструкторе принимает на вход не только строку, но и массив строк.
+			Это позволяет группировать исключения:
+		</p>
+
+		<code class="language-php">$errors = [];
+if (empty($user['LOGIN'])) $errors[] = "Specify login";
+if (empty($user['EMAIL'])) $errors[] = "Specify email";
+if (empty($user['PASSWORD'])) $errors[] = "Specify password";
+if ($errors) throw new \BlackFox\Exception($errors);</code>
+
+		<p>
+			В дальнейшем это исключение может быть отловлено и обработано как <path>\Exception</path>,
+			в этом случае метод <path>getMessage()</path> склеит массив в строку.
+			Рекомендуется отлавливать такие исключения как <path>\BlackFox\Exception</path> и
+			использовать метод <path>getArray()</path> для доступа к массиву строк исключения.
+		</p>
+
+		<code class="language-php">try {
+	// call with possibility of exception
+} catch (\BlackFox\Exception $Exception) {
+	$errors = $Exception->getArray();
+	\BlackFox\Engine::I()->ShowErrors($errors);
+} catch (\Exception $Exception) {
+	$error = $Exception->getMessage();
+	\BlackFox\Engine::I()->ShowErrors([$error]);
+}</code>
+
+		<h2>Классы-наследники</h2>
+		<p>
+			Перечисленные ниже классы-наследники не обладают каким-либо дополнительным внутренним функционалом.
+			Некоторые из них обрабатываются движком особым образом.
+		</p>
+
+		<ul>
+			<li>ExceptionAccessDenied — заставляет движок отобразить страницу авторизации, если пользователь не авторизован</li>
+			<li>ExceptionAuthRequired — заставляет движок отобразить страницу авторизации</li>
+			<li>ExceptionCache</li>
+			<li>ExceptionCaptcha</li>
+			<li>ExceptionElementNotFound — заставляет движок отобразить страницу 404</li>
+			<li>ExceptionNotAllowed</li>
+			<li>ExceptionNotImplemented</li>
+			<li>ExceptionPageNotFound — заставляет движок отобразить страницу 404</li>
+			<li>ExceptionSQL</li>
+			<li>ExceptionType</li>
+		</ul>
+
+		<h2>Собственное исключение</h2>
+		<p>
+			Для того чтобы использовать это исключение в своём модуле, у вас есть выбор:
+		</p>
+		<ul>
+			<li>
+				Каждый раз указывать полный путь к исключению:
+				<path>throw new \BlackFox\Exception([...]);</path>
+			</li>
+			<li>
+				Указать use в начале файла:
+				<path>use \BlackFox\Exception;</path>
+			</li>
+			<li>
+				Создать пустой класс-наследник Exception, поместив его в неймспейс модуля (рекомендуется):
+			</li>
+		</ul>
+		<code class="language-php">namespace Example;
+class Exception extends \BlackFox\Exception {}</code>
+	</div>
+</main>
+
+</body>
+</html>

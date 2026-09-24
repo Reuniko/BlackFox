@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>SCRUD — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="scrud.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/scrud.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">SCRUD</h1>
+
+		<p>
+			Abstract class
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/orm/SCRUD.php">BlackFox\SCRUD</a>
+			(Select|Search, Create, Read, Update, Delete)
+			provides functionality for working with tables in a relational database.
+		</p>
+		<p>To create a table, you must:</p>
+		<ol>
+			<li>Create a class descendant of <path>BlackFox\SCRUD</path></li>
+			<li>Describe the table fields in the <a href="#fields">$fields</a> property</li>
+			<li>Add it to the Scheme of the Core and run the Upgrade method</li>
+		</ol>
+
+		<h2>Properties</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead><tr><th>Name</th><th style="min-width: 300px;">Description</th></tr></thead>
+				<tbody>
+					<tr><td>$name</td><td>name of the table or its elements in the plural form</td></tr>
+					<tr><td>$code *</td><td>symbolic code of the table for use in the database</td></tr>
+					<tr><td><a href="#fields">$fields</a></td><td>structure of table fields</td></tr>
+					<tr><td>$groups</td><td>fields groups dictionary, key — code, value — name</td></tr>
+					<tr><td>$keys *</td><td>codes of primary keys</td></tr>
+					<tr><td>$composition *</td><td>composition of groups and fields</td></tr>
+					<tr><td>$increment *</td><td>code of the auto-incrementing field</td></tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="alert alert-info">* generated automatically</div>
+
+		<p>
+			By default, the symbolic code for the table in the database is formed in lowercase
+			in the format "Namespace_Class". If desired, you can override it in the <path>$code</path> property.
+		</p>
+
+		<h2 id="fields">Table structure</h2>
+		<p>
+			Property <path>$fields</path> is a multidimensional dictionary that describes
+			the structure of the table fields, the keys of which are field codes, and the
+			values are dictionaries describing the type of the field.
+		</p>
+		<h3>Keys in the dictionary that describes the field type</h3>
+		<div class="row">
+			<div class="col-xl-6">
+				<div class="table-responsive">
+					<table class="table table-sm table-bordered bg-white">
+						<thead><tr><th>Name</th><th></th><th>Description</th><th>Types</th></tr></thead>
+						<tbody>
+							<tr><td>TYPE</td><td>string</td><td>Symbolic code of the type, <a target="_blank" href="https://github.com/Reuniko/BlackFox/tree/master/classes/orm/types">list of available types</a></td><td></td></tr>
+							<tr><td>NAME</td><td>string</td><td>Name</td><td></td></tr>
+							<tr><td>GROUP</td><td>string</td><td>Group</td><td></td></tr>
+							<tr><td>NOT_NULL</td><td>flag</td><td>Prohibit null value</td><td></td></tr>
+							<tr><td>INDEX</td><td>flag</td><td>Index field</td><td></td></tr>
+							<tr><td>PRIMARY</td><td>flag</td><td>Primary key (multiple possible)</td><td></td></tr>
+							<tr><td>AUTO_INCREMENT</td><td>flag</td><td>Incremental field (only one possible)</td><td></td></tr>
+							<tr><td>DISABLED</td><td>flag</td><td>Disable the ability to change the field in the admin section</td><td></td></tr>
+							<tr><td>VITAL</td><td>flag</td><td>Mark field as important, selected by default via '@'</td><td></td></tr>
+							<tr><td>VALUES</td><td>dictionary</td><td>Possible values</td><td>SET, ENUM</td></tr>
+							<tr><td>LINK</td><td>string</td><td>Link to another table</td><td><nobr>OUTER, INNER</nobr></td></tr>
+							<tr><td>FOREIGN</td><td>string</td><td>Mode of foreign key</td><td>OUTER</td></tr>
+							<tr><td>...</td><td></td><td>Other properties depending on type</td><td></td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$fields = [
+	'ID'      =&gt; self::ID,
+	'MOMENT'  =&gt; [
+		'TYPE'     =&gt; 'DATETIME',
+		'NAME'     =&gt; 'Moment',
+		'NOT_NULL' =&gt; true,
+		'DISABLED' =&gt; true,
+	],
+	'MESSAGE' =&gt; [
+		'TYPE'  =&gt; 'TEXT',
+		'NAME'  =&gt; 'Message',
+		'VITAL' =&gt; true,
+	],
+	'AUTHOR'  =&gt; [
+		'TYPE'     =&gt; 'OUTER',
+		'NAME'     =&gt; 'Author',
+		'LINK'     =&gt; 'BlackFox\Users',
+		'NOT_NULL' =&gt; true,
+		'VITAL'    =&gt; true,
+	],
+	'SCORE'   =&gt; [
+		'TYPE'   =&gt; 'ENUM',
+		'NAME'   =&gt; 'Score',
+		'VALUES' =&gt; [
+			'LIKE'    =&gt; 'Like',
+			'DISLIKE' =&gt; 'Dislike',
+		],
+	],
+];</code>
+			</div>
+		</div>
+
+		<h2>Basic methods</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead><tr><th>Name</th><th>Parameters</th><th style="min-width: 300px;">Description</th></tr></thead>
+				<tbody>
+					<tr><td>Init</td><td></td><td>Runs once in the constructor when a new instance is created after linking to the database and calculating the $code property, before running the <path>ProvideIntegrity</path> method. Can override properties dynamically: $fields, $code, $groups.</td></tr>
+					<tr><td>Create</td><td>$element</td><td>Creates a new row in the table and returns its ID.</td></tr>
+					<tr><td>Update</td><td><a href="#filter">$filter</a>, $element</td><td>Changes the values of the specified fields in rows that match the filter.</td></tr>
+					<tr><td>Delete</td><td><a href="#filter">$filter</a></td><td>Removes rows that match the filter.</td></tr>
+					<tr><td>Read</td><td><a href="#filter">$filter</a>, $fields, $sort, $escape</td><td>Selects the first element that matches the filter.</td></tr>
+					<tr><td>Select</td><td rowspan="2">$params - dictionary with keys:<br>SORT, <a href="#filter">FILTER</a>, CONDITIONS, FIELDS, LIMIT, PAGE, KEY, ESCAPE, GROUP, <path>INNER_SORTS</path></td><td>Selects elements page by page, filtering and sorting. Returns a two-dimensional array of elements.</td></tr>
+					<tr><td>Search</td><td>Selects elements page by page, filtering and sorting. Performs an additional SQL query to find the total number of items that match the filter. Returns a dictionary with keys: ELEMENTS, PAGER.</td></tr>
+					<tr><td>GetColumn</td><td rowspan="2"><a href="#filter">$filter</a>, $field, $sort, $escape</td><td>Selects a column by filtering and sorting. Returns a dictionary of elements, in which: key - element identifier, value - the value of the selected element field.</td></tr>
+					<tr><td>GetCell</td><td>Selects and returns the value of the specified field of the first element matching filter and sorting.</td></tr>
+				</tbody>
+			</table>
+		</div>
+		<h2>Usage examples</h2>
+
+		<div class="mb-3">
+			<div class="row">
+				<div class="col-xl-6">
+					To create a new table, create a children of SCRUD and define it's fields:
+					<code class="language-php">class Rooms extends \BlackFox\SCRUD {
+	public $fields = [
+		'ID'    =&gt; self::ID,
+		'TITLE' =&gt; [
+			'TYPE'     =&gt; 'STRING',
+			'NAME'     =&gt; 'Title',
+			'NOT_NULL' =&gt; true,
+		],
+	];
+}</code>
+				</div>
+				<div class="col-xl-6">
+					If you need to calculate some properties dynamically, use method <path>Init</path> as wrapper:
+					<code class="language-php">class Rooms extends \BlackFox\SCRUD {
+	public function Init() {
+		$this->fields = [
+			'ID'    =&gt; self::ID,
+			'TITLE' =&gt; [
+				'TYPE'     =&gt; 'STRING',
+				'NAME'     =&gt; T(['en' =&gt; 'Title', 'ru' =&gt; 'Название']),
+				'NOT_NULL' =&gt; true,
+			],
+		];
+	}
+}</code>
+				</div>
+			</div>
+		</div>
+
+		<div class="mb-3">
+			The helper class <a href="scheme.html">Scheme</a> does the migration, synchronizing the
+			structure of table columns between your php code and database:
+			<code class="language-php">( new \BlackFox\Scheme([Rooms::I()]) )->Synchronize();</code>
+		</div>
+
+		<div class="mb-3">
+			SCRUD allows you to <path>Create</path>:
+			<code class="language-php">$ID = Rooms::I()->Create(['TITLE' =&gt; 'Room number 567']);</code>
+		</div>
+
+		<div class="mb-3">
+			It allows you to <path>Update</path>:
+			<code class="language-php">Rooms::I()->Update(5, ['TITLE' =&gt; 'Room number 5']);
+Rooms::I()->Update([6, 7, 8], ['TITLE' =&gt; 'Storage']);
+Rooms::I()->Update(['TITLE' =&gt; 'Unused'], ['TITLE' =&gt; 'Gum']);</code>
+		</div>
+
+		<div class="mb-3">
+			It allows you to <path>Delete</path>:
+			<code class="language-php">Rooms::I()->Delete(5);
+Rooms::I()->Delete([6, 7, 8]);
+Rooms::I()->Delete(['TITLE' =&gt; 'Gum']);</code>
+		</div>
+
+		<div class="mb-3">
+			It allows you to <path>Read</path>:
+			<code class="language-php">$room = Rooms::I()->Read(5);
+// $room is array: ['ID' =&gt; 5, 'TITLE' =&gt; 'Room number 5']
+
+$room = Rooms::I()->Read(5, ['TITLE']);
+// $room is array: ['TITLE' =&gt; 'Room number 5']
+
+$room = Rooms::I()->Read([], ['*'], ['ID' =&gt; 'DESC']);
+// [] means empty condition, ['*'] means all fields, the third param is sort
+// so the result is gonna be the top element by ID</code>
+		</div>
+
+		<div class="mb-3">
+			It allows you to <path>Search</path>:
+			<code class="language-php">// each parameter is optional
+$result = Rooms::I()->Search([
+	'FIELDS' =&gt; ['ID', 'TITLE'],
+	'FILTER' =&gt; [
+		'ID'    =&gt; [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+		'TITLE' =&gt; 'Gum',
+	],
+	'LIMIT'  =&gt; 10,
+	'PAGE'   =&gt; 2,
+]);</code>
+			The result is gonna be an array with 2 keys: ELEMENTS and PAGER.
+			ELEMENTS is an array of rooms.
+			PAGER is an array, that can be used to build page navigation.
+		</div>
+
+		<div class="mb-3">
+			If you need no page navigation you can use method <path>Select</path> instead:
+			<code class="language-php">// each parameter is optional
+$rooms = Rooms::I()->Select([
+	'FIELDS' =&gt; ['ID', 'TITLE'],
+	'FILTER' =&gt; [
+		'~TITLE' =&gt; $_REQUEST['TITLE'],
+	],
+]);</code>
+			<path>$rooms</path>:
+			<code class="language-php">[
+	5 =&gt; [
+		'ID'    =&gt; 5,
+		'TITLE' =&gt; 'Room number 567',
+	],
+	7 =&gt; [
+		'ID'    =&gt; 7,
+		'TITLE' =&gt; 'Room number 700',
+	],
+]</code>
+		</div>
+
+		<div class="mb-3">
+			If you need only one column you can use method <path>GetColumn</path>:
+			<code class="language-php">$result = Rooms::I()->GetColumn([], 'TITLE');</code>
+			The result is gonna be associative array with keys - IDs, values - titles
+		</div>
+
+		<h2 id="filter">Filter</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					A filter is an associative array (key — condition + code of the filtered field, value —
+					value of the filter). The structure of the filter is designed so that it can be passed
+					directly from the form to the model without changes. It is possible
+					<hint rel="#filter_dot">to filter by fields of related elements</hint>.
+					It is possible to attach and combine the conditions using OR|AND operators.
+				</p>
+				<p>
+					Instead of an associative array, you can pass
+					<hint rel="#filter_value">value</hint> (numeric, string) or
+					<hint rel="#filter_list">list of values</hint>, in this case
+					the filter will be treated as an identifier or a list of identifiers.
+				</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php"><span id="filter_value">$filter = 15;</span>
+<span id="filter_list">$filter = [15, 16, 17, 18, 19, 20];</span>
+$filter = [
+	'MESSAGE'       =&gt; 'test',
+	'&gt;&gt;MOMENT'      =&gt; time() - 7 * 24 * 60 * 60,
+	<span id="filter_dot">'~AUTHOR.LOGIN' =&gt; 'uniko',</span>
+];</code>
+			</div>
+		</div>
+
+		<h2 id="fields2">Fields</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					Fields is a mixed array. In the simple case, this is a list of selectable fields.
+					If you need to select fields of related elements, add a key (pointing to the linking
+					field) with a value — a list of selectable fields for the associated element.
+				</p>
+				<p>You can specify a pseudofield:</p>
+				<ul>
+					<li><strong>@</strong> — all important fields</li>
+					<li><strong>*</strong> — all fields</li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$fields = ['@'];
+$fields = ['*'];
+$fields = [
+	'ID',
+	'NAME',
+	'DESCRIPTION',
+];</code>
+			</div>
+		</div>
+
+		<h2>Many-to-one</h2>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>
+					The <path>OUTER</path> type describes the relationship "many-to-one", in other words —
+					it is a reference to an element in an external table.
+					You must specify the <path>LINK</path> field property:
+				</p>
+				<ul><li><path>LINK</path> — the name of the SCRUD descendant class that describes an external table with a single primary key</li></ul>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+class Log extends SCRUD {
+	public $fields = [
+		'ID'   =&gt; self::ID,
+		// ...
+		'USER' =&gt; [
+			'TYPE' =&gt; 'OUTER',
+			'LINK' =&gt; 'Users',
+			'NAME' =&gt; 'User',
+		],
+		// ...
+	];
+}</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>To fetch fields from a related table <hint rel=".fields_key">add a pair key / value</hint> where key — code of field, value — list of selected fields in the related table.</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$logs = \BlackFox\Log::I()->Select([
+	'FIELDS' =&gt; [
+		'ID',
+		<span class="fields_key">'USER' =&gt; ['ID', 'LOGIN', 'EMAIL'],</span>
+	],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>To filter the fields of the linked element <hint rel=".filter_dot2">specify the path, separating through the point</hint>. It supports an unlimited nesting along the chain.</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$logs = \BlackFox\Log::I()->Select([
+	'FILTER' =&gt; [
+		<span class="filter_dot2">'USER.LOGIN' =&gt; 'Reuniko',</span>
+	],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Putting <path>FIELDS</path> and <path>FILTER</path> together:</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$logs = \BlackFox\Log::I()->Select([
+	'FIELDS' =&gt; [
+		'ID',
+		'USER' =&gt; ['ID', 'LOGIN', 'EMAIL'],
+	],
+	'FILTER' =&gt; [
+		'USER.LOGIN' =&gt; 'Reuniko',
+	],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">// $logs:
+[
+	42 =&gt; [
+		'ID'   =&gt; 42,
+		'USER' =&gt; [
+			'ID'    =&gt; 1,
+			'LOGIN' =&gt; 'Reuniko',
+			'EMAIL' =&gt; 'reuniko@gmail.com',
+		],
+	],
+	// ...
+]</code>
+			</div>
+		</div>
+
+		<h2>One-to-many</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					The <path>INNER</path> type describes the relationship "one-to-many", in other words —
+					describes a reference from an external table to an element in the current one.
+					You must specify the properties of the <path>LINK</path> and <path>INNER_KEY</path> fields:
+				</p>
+				<ul>
+					<li><path>LINK</path> — the name of the SCRUD descendant class that describes the table that contains the reference field to the current table</li>
+					<li><path>INNER_KEY</path> — the field code in the external table that references the current table</li>
+				</ul>
+				<p>Field of this type is virtual — it is not present in the database, but it can be selected and filtered just like the <path>OUTER</path> type.</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+class Users extends SCRUD {
+	public $fields = [
+		'ID'   =&gt; self::ID,
+		// ...
+		'LOGS' =&gt; [
+			'TYPE'      =&gt; 'INNER',
+			'NAME'      =&gt; 'Logs',
+			'LINK'      =&gt; 'BlackFox\Log',
+			'INNER_KEY' =&gt; 'USER',
+		],
+	];
+}</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>It's selected just like <path>OUTER</path>:</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$users = Users::I()->Select([
+	'FIELDS' =&gt; ['ID', 'LOGIN', 'LOGS' =&gt; ['ID', 'MESSAGE']],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">// $users:
+[
+	1 =&gt; [
+		'ID'    =&gt; 1,
+		'LOGIN' =&gt; 'Reuniko',
+		'LOGS'  =&gt; [
+			90 =&gt; ['ID' =&gt; 90, 'MESSAGE' =&gt; 'Successful authorization'],
+			77 =&gt; ['ID' =&gt; 77, 'MESSAGE' =&gt; 'Successful authorization'],
+			// ...
+		],
+	],
+	// ...
+]</code>
+			</div>
+		</div>
+
+		<h2>Many-to-many</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>In fact, a 'many-to-many' relationship is a combination of 'one-to-many' and 'many-to-one' relationships.</p>
+				<p>To create such a relationship, you must create a staging table that contains:</p>
+				<ul>
+					<li>master key (ID)</li>
+					<li>reference to the first table (type <path>OUTER</path>)</li>
+					<li>reference to the second table (type <path>OUTER</path>)</li>
+				</ul>
+				<p>In the linked tables you must create virtual fields of type <path>INNER</path>, referring to the fields in staging table.</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+class Users2Groups extends SCRUD {
+	public $fields = [
+		'ID'    =&gt; self::ID,
+		'USER'  =&gt; [
+			'TYPE'    =&gt; 'OUTER',
+			'LINK'    =&gt; 'Users',
+			<span class="many2many_foreign">'FOREIGN' =&gt; 'CASCADE',</span>
+		],
+		'GROUP' =&gt; [
+			'TYPE'    =&gt; 'OUTER',
+			'LINK'    =&gt; 'Groups',
+			<span class="many2many_foreign">'FOREIGN' =&gt; 'CASCADE',</span>
+		],
+	];
+}</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Expose it from either side with an <path>INNER</path> field pointing at the staging table:</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+class Users extends SCRUD {
+	public $fields = [
+		'ID'     =&gt; self::ID,
+		// ...
+		'GROUPS' =&gt; [
+			'TYPE'      =&gt; 'INNER',
+			'NAME'      =&gt; 'Groups',
+			'LINK'      =&gt; 'BlackFox\Users2Groups',
+			'INNER_KEY' =&gt; 'USER',
+		],
+	];
+}</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Selecting it returns the staging rows; nest one level further, through the staging row's own <path>GROUP</path> field, to reach the group's fields:</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$users = Users::I()->Select([
+	'FIELDS' =&gt; ['ID', 'LOGIN', 'GROUPS' =&gt; ['ID', 'GROUP' =&gt; ['ID', 'NAME']]],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">// $users:
+[
+	1 =&gt; [
+		'ID'     =&gt; 1,
+		'LOGIN'  =&gt; 'Reuniko',
+		'GROUPS' =&gt; [
+			1 =&gt; [
+				'ID'    =&gt; 1,
+				'GROUP' =&gt; [
+					'ID'   =&gt; 1,
+					'NAME' =&gt; 'Root',
+				],
+			],
+			2 =&gt; [
+				'ID'    =&gt; 2,
+				'GROUP' =&gt; [
+					'ID'   =&gt; 2,
+					'NAME' =&gt; 'Editors',
+				],
+			],
+		],
+	],
+	// ...
+]</code>
+			</div>
+		</div>
+
+		<h2>Foreign keys</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					By default, the <path>OUTER</path> type describes a "lazy" link, which doesn't care
+					about the consistency of the data in the database.
+					To impose a constraint (foreign key) on a link, you must add to the description of the field
+					<hint rel=".many2many_foreign">property <path>FOREIGN</path></hint>.
+				</p>
+				<p>
+					Helper class <a href="scheme.html">Scheme</a> will take care of checking the presence or
+					absence of these restrictions in the database (as well as the structure of fields, primary
+					keys and indexes) and will provide a sorted set of SQL strings to synchronize the database structure.
+				</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+$Scheme = new Scheme([
+	User::I(),
+	Groups::I(),
+	Users2Groups::I(),
+]);
+$diffs = $Scheme->Compare();
+foreach ($diffs as $diff)
+	Database::I()->Query($diff['SQL']);
+// or:
+$Scheme->Synchronize();</code>
+			</div>
+		</div>
+
+	</div>
+</main>
+
+</body>
+</html>

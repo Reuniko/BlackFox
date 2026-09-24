@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Database — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="database.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/database.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Database</h1>
+
+		<p>
+			Abstract class
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/database/Database.php">BlackFox\Database</a>
+			is an interface that describes access to a relational database.
+			<br>
+			This class must be overridden in the
+			<a href="../basics/config.html">configuration</a> with one of its descendants:
+		</p>
+		<ul>
+			<li>BlackFox\MySQL</li>
+			<li>BlackFox\Postgres</li>
+			<li>... or write your own driver :)</li>
+		</ul>
+
+		<h2>Methods</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Title</th>
+					<th>Options</th>
+					<th style="min-width: 300px;">Description</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>Query</td><td>$SQL, $key = null</td><td>Must execute any SQL query and return the result as a two-dimensional array if it was a SELECT query</td></tr>
+				<tr><td>QuerySingleInsert</td><td>$SQL, $increment = null</td><td>Must execute an INSERT query and return the last value of the specified column (usually the identifier)</td></tr>
+				<tr><td>Escape</td><td>$data</td><td>Escapes special characters in a string for use in an SQL statement</td></tr>
+				<tr><td>Quote</td><td>$data</td><td>Wraps the string in the quotation marks used by the current database to denote string constants</td></tr>
+				<tr><td>Random</td><td></td><td>Returns a string describing the SQL random number function</td></tr>
+				<tr><td>StartTransaction</td><td></td><td>Starts a transaction</td></tr>
+				<tr><td>Rollback</td><td></td><td>Rolls back a transaction</td></tr>
+				<tr><td>Commit</td><td></td><td>Commits a transaction</td></tr>
+				<tr><td>CompileSQLSelect</td><td>array $parts</td><td>Glues an array of parts of an SQL SELECT query into a string</td></tr>
+				<tr><td>Truncate</td><td>$table</td><td>Removes all data from the table and resets its internal counter</td></tr>
+				<tr><td>Drop</td><td>$table</td><td>Deletes a table</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Access to the global instance</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<ul>
+					<li>In the engine and SCRUD contexts: <path>$this-&gt;Database-&gt;</path></li>
+					<li>In other contexts: <path>\BlackFox\Database::I()-&gt;</path></li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$DB = \BlackFox\Database::I();
+$users = $DB-&gt;Query("SELECT * FROM system_users");</code>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Redirects — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="redirects.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/redirects.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Redirects</h1>
+
+		<p>
+			Class
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/entities/Redirects.php">BlackFox\Redirects</a>
+			is a descendant of <a href="scrud.html">SCRUD</a>,
+			describing the redirects table.
+		</p>
+
+		<h2>Fields</h2>
+		<div class="table-responsive">
+			<table class="table table-responsive table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Code</th>
+					<th></th>
+					<th>Type</th>
+					<th>Name</th>
+					<th style="min-width: 300px;">Description</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>ID</td><td><span class="red">*</span></td><td>NUMBER</td><td>ID</td><td></td></tr>
+				<tr><td>URL</td><td><span class="red">*</span></td><td>STRING</td><td>URL</td><td>unique, indexed</td></tr>
+				<tr><td>REDIRECT</td><td><span class="red">*</span></td><td>STRING</td><td>Redirect</td><td>the target URL to redirect to</td></tr>
+				<tr><td>COUNT</td><td><span class="red">*</span></td><td>INTEGER</td><td>Click counter</td><td>default 0, not editable in the admin section</td></tr>
+				<tr><td>NOTES</td><td></td><td>TEXT</td><td>Notes</td><td></td></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

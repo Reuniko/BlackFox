@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Структура — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/basics/structure.html">English</a>
+		<a class="btn btn-secondary active" href="structure.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Структура</h1>
+
+		<p>
+			Обычно, каждая папка в корне веб-сайта является <strong>ядром</strong> (но не обязательно).
+			<br/><strong>Ядро</strong> — это набор из классов, юнитов, шаблонов и виртуального корня.
+			<br/>Фреймворк является ядром,
+			ваша папка тоже будет являться ядром (её нужно создать),
+			каждое ядро следует хранить в отдельных репозиториях.
+		</p>
+
+		<p>
+			В простом случае у вас будет всего два ядра, например: <path>/BlackFox</path> для фреймворка и <path>/Site</path> для вашего проекта.
+			<br/>Возможно добавление дополнительных ядер.
+			<br/>Все активные ядра нужно зарегистрировать в файле <path>/config.php</path> (ключ '<a href="config.html#cores">cores</a>').
+		</p>
+
+		<p>Внутри ядра могут содержаться следующие папки:</p>
+		<ul>
+			<li><path>classes</path> — содержит исходный код классов</li>
+			<li><path>units</path> — содержит папки юнитов</li>
+			<li><path>root</path> — виртуальный <a href="root.html">корень</a> сервера</li>
+			<li><path>templates</path> — содержит папки <a href="template.html">шаблонов</a></li>
+		</ul>
+
+		<h2 id="core">Ядро</h2>
+		<p>
+			Ядро — это структурная единица, представляющая из себя папку с файлом <path>Core.php</path>
+			а также другими файлами, среди которых php-классы и прочие файлы.
+			Имя ядра совпадает с именем папки и неймспейсом.
+			Обычно используется один неймспейс верхнего уровня без вложенности.
+		</p>
+		<p>
+			Файл <path>Core.php</path> должен содержать в себе класс-наследник от <path>BlackFox\ACore</path> с именем
+			<path>{КодЯдра}\Core</path>:
+		</p>
+
+		<div class="row">
+			<div class="col-xl-6">
+				<code class="language-php">namespace Example;
+class Core extends \BlackFox\ACore {
+	public function GetScheme() {/* ... */}
+	public function Upgrade() {/* ... */}
+	public function Load() {/* ... */}
+	public function Menu() {/* ... */}
+}</code>
+			</div>
+			<div class="col-xl-6">
+				<dl class="dl-horizontal">
+					<dt>GetScheme</dt>
+					<dd>
+						должен вернуть экземпляр класса <a href="../classes/scheme.html">Scheme</a>
+					</dd>
+
+					<dt>Upgrade</dt>
+					<dd>
+						вызывается при установке и изменении ядра,
+						используется для синхронизации структуры таблиц и прочих поправок
+						(смотри наследников для примера)
+					</dd>
+
+					<dt>Load</dt>
+					<dd>
+						вызывается всегда, если ядро активно
+					</dd>
+
+					<dt>Menu</dt>
+					<dd>
+						вызывается юнитом административного меню,
+						должен вернуть массив, описывающий раздел административного меню
+						(смотри наследников для примера)
+					</dd>
+				</dl>
+			</div>
+		</div>
+
+		<br/>
+		<h2>Автозагрузка классов</h2>
+
+		<p>
+			По умолчанию ядро сканирует собственные подпапки <path>classes</path> и <path>units</path>,
+			ищет в них любые php-файлы и регистрирует их как одноименные классы в неймспейсе ядра.
+			Глубина сканирования различается:
+		</p>
+		<ul>
+			<li><path>classes</path> — сканируются все подпапки, неограниченная вложенность</li>
+			<li><path>units</path> — сканируется на одну подпапку вглубь</li>
+		</ul>
+		<p>
+			Таким образом, при разработке собственного ядра помещайте
+			классы в подпапку <path>classes</path>,
+			юниты в подпапку <path>units</path>,
+			именуйте файлы так же, как именуется класс внутри них,
+			тогда они будут автоматически зарегистрированы в движке.
+		</p>
+
+		<h2>Собственный автолоад классов</h2>
+		<p>
+			При желании вышеописанное поведение ядра можно переопределить.
+			Для этого переопределите метод <path>GetClasses</path> ядра.
+			Метод не принимает параметров и должен вернуть словарь классов:
+		</p>
+		<ul>
+			<li>ключ — имя класса вместе с неймспейсом</li>
+			<li>значение — абсолютный путь к php-файлу, описывающему класс</li>
+		</ul>
+
+		<h2>Модель</h2>
+		<p>
+			Модель — это набор классов, описывающих бизнес-логику приложения.
+			<br>Рекомендуется располагать их в подпапке
+			<path>classes</path> ядра, для того чтобы движок их зарегистрировал в автозагрузку.
+			<br>Рекомендуется использовать один общий неймспейс первого уровня, для того чтобы
+			обращение к другим классам того же ядра происходило напрямую без указания неймспейса.
+			<br>Класс модели может быть оригинальным или наследовать любой другой класс,
+			но как правило класс модели является наследником от <a href="../classes/scrud.html">SCRUD</a>,
+			описывающим структуру и доступ к таблице.
+		</p>
+
+		<h2>Контроллеры</h2>
+		<p>
+			Контроллеры — это набор классов, которые
+			описывают порядок доступа к классам и методам модели
+			и (не обязательно) сводят результат их выполнения к вьюшке.
+			<br>Класс контроллера может быть оригинальным или наследовать любой другой класс,
+			но как правило класс контроллера является наследником от <a href="../classes/unit.html">Unit</a>
+			и располагается в подпапке <path>units</path> ядра.
+		</p>
+	</div>
+</main>
+
+</body>
+</html>

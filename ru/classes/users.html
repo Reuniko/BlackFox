@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Users — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/users.html">English</a>
+		<a class="btn btn-secondary active" href="users.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Users</h1>
+
+		<p>
+			Класс
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/entities/Users.php">BlackFox\Users</a>
+			является наследником <a href="scrud.html">SCRUD</a>,
+			описывает таблицу пользователей.
+		</p>
+
+		<h2>Поля</h2>
+		<div class="row">
+			<div class="col-xl-7">
+				<table class="table table-responsive table-sm table-bordered bg-white">
+					<thead>
+					<tr>
+						<th>Код</th>
+						<th></th>
+						<th>Тип</th>
+						<th>Имя</th>
+						<th style="min-width: 300px;">Описание</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr><td>ID</td><td><span class="red">*</span></td><td>NUMBER</td><td>ID</td><td></td></tr>
+					<tr><td>LOGIN</td><td><span class="red">*</span></td><td>STRING</td><td>Логин</td><td></td></tr>
+					<tr><td>PASSWORD</td><td><span class="red">*</span></td><td>PASSWORD</td><td>Пароль</td><td>В базе хранится sha1 хеш пароля</td></tr>
+					<tr><td>SALT</td><td><span class="red">*</span></td><td>STRING</td><td>Соль</td><td></td></tr>
+					<tr><td>HASH</td><td></td><td>STRING</td><td>Хэш</td><td>Для восстановления пароля</td></tr>
+					<tr><td>LANGUAGE</td><td></td><td>STRING</td><td>Язык</td><td></td></tr>
+					<tr><td>LAST_AUTH</td><td></td><td>DATETIME</td><td>Последнее время авторизации</td><td></td></tr>
+					<tr><td>REGISTER_MOMENT</td><td></td><td>DATETIME</td><td>Время регистрации</td><td></td></tr>
+					<tr><td>FIRST_NAME</td><td></td><td>STRING</td><td>Имя</td><td></td></tr>
+					<tr><td>LAST_NAME</td><td></td><td>STRING</td><td>Фамилия</td><td></td></tr>
+					<tr><td>MIDDLE_NAME</td><td></td><td>STRING</td><td>Отчество</td><td></td></tr>
+					<tr><td>EMAIL</td><td></td><td>STRING</td><td>Электропочта</td><td></td></tr>
+					<tr><td>PHONE</td><td></td><td>STRING</td><td>Телефон</td><td></td></tr>
+					<tr><td>AVATAR</td><td></td><td>FILE</td><td>Аватар</td><td>120x120</td></tr>
+					<tr><td>BIRTH_DAY</td><td></td><td>DATE</td><td>День рождения</td><td></td></tr>
+					<tr><td>ABOUT</td><td></td><td>TEXT</td><td>О себе</td><td></td></tr>
+					<tr><td>GROUPS</td><td></td><td>INNER</td><td>Группы</td><td></td></tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-xl-5">
+				<code class="language-php">$Users = \BlackFox\Users::I();
+
+$user = $Users-&gt;Read(['LOGIN' =&gt; 'Root']);
+if (empty($user))
+	throw new \BlackFox\ExceptionElementNotFound();
+
+$Users-&gt;Update($user['ID'], [
+	'FIRST_NAME' =&gt; 'Root',
+	'EMAIL'      =&gt; 'email@email.com',
+]);
+
+$Users-&gt;AddGroup($user['ID'], 'root');
+
+$Users-&gt;SetPassword($user['ID'], '123456');
+
+if (!$Users-&gt;CheckPassword($user['ID'], '123456'))
+	throw new \BlackFox\ExceptionAccessDenied();
+
+$recovery_string = $Users-&gt;GetRecoveryString($user['ID']);</code>
+			</div>
+		</div>
+
+		<h2>Методы</h2>
+		<p>Наряду со всеми методами, которые предоставляет SCRUD, класс обладает дополнительными методами:</p>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Параметры</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>SetPassword</td><td>$ID, $password</td><td>Устанавливает новый пароль</td></tr>
+				<tr><td>CheckPassword</td><td>$ID, $password</td><td>Проверяет пароль</td></tr>
+				<tr><td>AddGroup</td><td>$ID, $group</td><td>Добавляет пользователя в группу</td></tr>
+				<tr><td>GetRecoveryString</td><td>$ID</td><td>Генерирует и возвращает новую строку для восстановления пароля (HASH)</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Переопределение класса</h2>
+		<p>
+			Если описанный выше набор полей и методов вас не устраивает, вам следует
+			создать класс-наследник от <path>BlackFox\Users</path>,
+			добавить/модифицировать/удалить поля/методы,
+			и переопределить класс в <a href="../basics/config.html">конфигурации</a>.
+		</p>
+		<div class="row">
+			<div class="col-xl-6">
+				<code class="language-php">namespace Example;
+class Users extends \BlackFox\Users {
+	public function Init() {
+		parent::Init(); // сперва заполняет $this-&gt;fields базовым набором
+		unset($this-&gt;fields['AVATAR']);
+		$this-&gt;fields += [
+			'VK_ID' =&gt; [
+				'TYPE' =&gt; 'NUMBER',
+				'NAME' =&gt; 'Vk identifier',
+			],
+		];
+	}
+}</code>
+			</div>
+			<div class="col-xl-6">
+				<path>/config.php</path>
+				<code class="language-php">return [
+	// ...
+	'overrides' =&gt; [
+		// ...
+		'BlackFox\Users' =&gt; 'Example\Users',
+	],
+];</code>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

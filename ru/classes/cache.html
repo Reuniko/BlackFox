@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Cache — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/cache.html">English</a>
+		<a class="btn btn-secondary active" href="cache.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Cache</h1>
+
+		<p>
+			Класс
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/cache/Cache.php">BlackFox\Cache</a>
+			является интерфейсом, определяющим работу с кешем.
+			<br/>
+			Сам по себе он не работает, поэтому
+			его следует переопределить <a href="../basics/config.html">в конфиге</a> на один из драйверов:
+		</p>
+		<ul>
+			<li>BlackFox\CacheRedis</li>
+			<li>... ваш драйвер</li>
+		</ul>
+
+		<h2>Методы</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Параметры</th>
+					<th style="min-width: 300px;">Описание</th>
+					<th>Исключение</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>Get</td>
+					<td>string|array $key</td>
+					<td>Извлекает значение/значения по ключу/ключам, сохраняя тип</td>
+					<td>Значение не найдено</td>
+				</tr>
+				<tr>
+					<td>Put</td>
+					<td rowspan="2">
+						string $key,
+						$value,
+						<br/>
+						int $ttl = null,
+						array $tags = []
+					</td>
+					<td>Сохраняет значение в указанный ключ</td>
+					<td>Значение в указанном ключе уже существует</td>
+				</tr>
+				<tr>
+					<td>Set</td>
+					<td>Перезаписывает значение в указанный ключ, даже если оно уже существует</td>
+				</tr>
+				<tr>
+					<td>Delete</td>
+					<td>string $key</td>
+					<td>Удаляет значение по ключу, если оно существует</td>
+				</tr>
+				<tr>
+					<td>Strike</td>
+					<td>string|array $tags</td>
+					<td>Удаляет все ключи и значения, связанные с указанными тегами</td>
+				</tr>
+				<tr>
+					<td>Clear</td>
+					<td></td>
+					<td>Очищает кеш</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Примеры</h2>
+		<code class="language-php">try {
+	$elements = \BlackFox\Cache::I()-&gt;Get('elements');
+} catch (\BlackFox\ExceptionCache $error) {
+	$elements = \Example\Elements::I()-&gt;Select();
+	\BlackFox\Cache::I()-&gt;Set('elements', $elements);
+}
+return $elements;</code>
+		<br/>
+		<a target="_blank" href="https://github.com/Reuniko/BlackFox-Testing/blob/master/classes/tests/TestCache.php">Больше примеров</a>
+	</div>
+</main>
+
+</body>
+</html>

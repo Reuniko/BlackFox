@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Конфигурирование — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/basics/config.html">English</a>
+		<a class="btn btn-secondary active" href="config.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Конфигурирование</h1>
+
+		<p>
+			Файл <path>/config.php</path> должен вернуть конфигурационный массив.
+			Вы можете добавлять в него свои ключи и использовать их.
+		</p>
+
+		<div class="row">
+			<div class="col-xl-6">
+				<h3>Пример</h3>
+				<code class="language-php">return [
+	'debug'     =&gt; true,
+	'cores'     =&gt; [
+		'Site'     =&gt; $_SERVER['DOCUMENT_ROOT'] . '/Site',
+		'BlackFox' =&gt; $_SERVER['DOCUMENT_ROOT'] . '/BlackFox',
+	],
+	'roots'     =&gt; [
+		'/Site/root'     =&gt; $_SERVER['DOCUMENT_ROOT'] . '/Site/root',
+		'/BlackFox/root' =&gt; $_SERVER['DOCUMENT_ROOT'] . '/BlackFox/root',
+	],
+	'languages' =&gt; [
+		'en' =&gt; 'English',
+		'ru' =&gt; 'Русский',
+	],
+	'templates' =&gt; [
+		'main'  =&gt; '/Site/templates/main',
+		'admin' =&gt; '/BlackFox/templates/admin',
+	],
+	'overrides' =&gt; [
+		'BlackFox\Engine'   =&gt; 'Site\Engine',
+		'BlackFox\Database' =&gt; 'BlackFox\MySQL',
+	],
+	'database'  =&gt; [
+		'HOST'     =&gt; 'localhost',
+		'PORT'     =&gt; 3306,
+		'USER'     =&gt; 'root',
+		'PASSWORD' =&gt; '',
+		'DATABASE' =&gt; 'site',
+	],
+];</code>
+				<br/>
+				<ul>
+					<li><path>/Site</path> — папка с вашим ядром</li>
+					<li><path>/BlackFox</path> — папка с фреймворком (которое тоже является ядром)</li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+
+				<h3>Расшифровка ключей</h3>
+				<dl class="dl-horizontal" style="max-width: 1000px;">
+
+					<dt>debug</dt>
+					<dd>bool, установка параметра в true позволяет глобальной функции <a href="functions.html#debug">debug()</a> работать</dd>
+
+					<dt id="cores">cores</dt>
+					<dd>
+						словарь <a href="structure.html#core">ядер</a>:
+						<li>key - неймспейс ядра</li>
+						<li>value - абсолютный путь к папке с ядром</li>
+						первый ключ обладает высшим приоритетом
+					</dd>
+
+					<dt id="roots">roots</dt>
+					<dd>
+						словарь <a href="root.html">корней</a>:
+						<li>key - относительный путь к папке с корнем</li>
+						<li>value - абсолютный путь к папке с корнем</li>
+						первый ключ обладает высшим приоритетом
+					</dd>
+
+					<dt>languages</dt>
+					<dd>
+						словарь используемых языков (может быть пустым):
+						<li>key - символьный код языка</li>
+						<li>value - название языка</li>
+						первый ключ является языком по умолчанию
+					</dd>
+
+					<dt>templates</dt>
+					<dd>
+						словарь доступных <a href="template.html">шаблонов</a>:
+						<li>key - код шаблона</li>
+						<li>value - относительный путь к папке шаблона</li>
+					</dd>
+
+					<dt>overrides</dt>
+					<dd>
+						словарь, описывает <a href="../classes/instance.html#overrides">переопределение классов</a>:
+						<li>key - переопределяемый класс</li>
+						<li>value - переопределяющий класс</li>
+						для совместимости рекомендуется переопределять классы их наследниками
+					</dd>
+
+					<dt>database</dt>
+					<dd>
+						словарь реквизитов для подключения к базе данных по умолчанию, ключи зависят от драйвера
+					</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

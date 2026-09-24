@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Global functions — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="functions.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/basics/functions.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Global functions</h1>
+
+		<p>
+			The framework defines two global functions, available everywhere without a namespace or import.
+			Both live in
+			<a href="https://github.com/Reuniko/BlackFox/tree/master/functions">/BlackFox/functions</a>
+			and are guarded by <path>function_exists()</path>, so a project can safely redefine either of them earlier in the include chain.
+		</p>
+
+		<h2 id="t">T($variants)</h2>
+		<p>
+			Picks a translated string out of a dictionary keyed by language code.
+			It reads the current language from <path>\BlackFox\Engine::I()-&gt;GetLanguage()</path> and returns the matching value;
+			if the current language is missing from the dictionary, it falls back to the first value in the array.
+			<br/>
+			This is the mechanism behind every translatable <path>NAME</path>/<path>TITLE</path>/message string you've seen throughout these docs
+			(field names, exception messages, unit alerts, and so on).
+		</p>
+		<code class="language-php">$name = T([
+	'en' =&gt; 'Title',
+	'ru' =&gt; 'Название',
+]);
+
+throw new \BlackFox\Exception(T([
+	'en' =&gt; 'Login must be specified',
+	'ru' =&gt; 'Укажите логин',
+]));</code>
+		<p>
+			<path>$variants</path> doesn't have to list every configured language — whichever key is missing just falls back to the first one, so it's safe to
+			leave a string untranslated while a project only has one active language.
+		</p>
+
+		<h2 id="debug">debug($data = [], $title = '', $mode = 'print_r', $target = '/debug.txt')</h2>
+		<p>
+			A lightweight global debug helper. It only does anything when the <path>debug</path> key in
+			<a href="config.html">/config.php</a> is set to <path>true</path>, and it's skipped entirely if the request carries a
+			<path>turn_off_debug</path> (or <path>TURN_OFF_DEBUG</path>) key — handy for muting debug output on specific AJAX calls
+			without turning debug off globally.
+		</p>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr><th>$mode</th><th style="min-width: 300px;">Behavior</th></tr>
+				</thead>
+				<tbody>
+				<tr><td>print_r <em>(default)</em></td><td>Renders <path>print_r</path> output into a hidden <path>&lt;textarea&gt;</path> on the page, toggled visible with <strong>Alt + `</strong> (tilde/backtick key)</td></tr>
+				<tr><td>var_export</td><td>Same hidden textarea, using <path>var_export</path> output</td></tr>
+				<tr><td>var_dump</td><td>Same hidden textarea, using <path>var_dump</path> output</td></tr>
+				<tr><td>console</td><td>Echoes a <path>&lt;script&gt;console.log(...)&lt;/script&gt;</path> tag</td></tr>
+				<tr><td>log</td><td>Appends to a file, path is <path>$target</path> relative to the server document root (default <path>/debug.txt</path>)</td></tr>
+				<tr><td>email</td><td>Sends the dump via <path>mail()</path> to the address in <path>$target</path></td></tr>
+				</tbody>
+			</table>
+		</div>
+		<code class="language-php">debug($user, 'user');
+debug($SQL, 'query', 'console');
+debug($payload, 'webhook', 'log', '/logs/webhook.txt');</code>
+	</div>
+</main>
+
+</body>
+</html>

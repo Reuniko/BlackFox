@@ -1,0 +1,80 @@
+/* Layout glue that isn't in the original docs-style.css / wrapper.css / menu.css -
+   those three are copied from the real site as-is. This file only adds what's
+   needed to lay them out without the rest of the admin template around them. */
+
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; }
+
+.header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+.header .spacer { flex: 1 1 auto; }
+.header .icon-btn { font-size: 1rem; line-height: 1; padding: 0.375rem 0.65rem; }
+
+main.layout {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	flex: 1 1 auto;
+}
+.sidebar {
+	min-width: 250px;
+	max-width: 250px;
+	padding: 0.5rem;
+}
+.content {
+	flex: 1 1 auto;
+	min-width: 0;
+	padding: 1rem;
+}
+
+@media (max-width: 900px) {
+	.sidebar { display: none; }
+}
+
+/* language switcher: two plain links, in the header where the original
+   LanguageSwitcher dropdown sits - each points at the sibling page under
+   the other /en/ or /ru/ tree, no JS involved. */
+.lang-switch .btn { font-size: 0.9rem; }
+.lang-switch .btn.active {
+	background: #495057;
+	color: #fff;
+	border-color: #495057;
+}
+
+/* homepage (index.html): static stand-in for the live "feedback.php" iframe
+   demo (the original embedded a working guestbook - not possible on GitHub
+   Pages with no PHP backend). Real feedback text is blurred since it's not
+   live data, just a visual approximation of the original layout. */
+.feedback-demo {
+	height: 430px;
+	overflow-y: auto;
+	background: #fff;
+	border: 1px solid #ccc;
+}
+.feedback-demo .feedback-entry {
+	~filter: blur(3px);
+	user-select: none;
+	margin-bottom: 1rem;
+}
+.feedback-demo .feedback-entry strong {
+	white-space: nowrap;
+}
+
+/* homepage (index.html): "Paradigms" / "Features" lists.
+   Copied from the <style> block that was inline in docs/root/index.php. */
+.features ul.root {
+	padding-left: 0;
+}
+.features ul.root > li {
+	font-size: 150%;
+	padding-top: 16px;
+	list-style: none;
+}
+.features ul.root > li > ul {
+	padding-left: 40px;
+	font-size: 75%;
+}

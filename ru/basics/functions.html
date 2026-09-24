@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Глобальные функции — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/basics/functions.html">English</a>
+		<a class="btn btn-secondary active" href="functions.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Глобальные функции</h1>
+
+		<p>
+			Фреймворк определяет две глобальные функции, доступные везде без неймспейса и подключения.
+			Обе лежат в
+			<a href="https://github.com/Reuniko/BlackFox/tree/master/functions">/BlackFox/functions</a>
+			и обёрнуты в проверку <path>function_exists()</path>, так что проект может безопасно переопределить любую из них раньше по цепочке подключения.
+		</p>
+
+		<h2 id="t">T($variants)</h2>
+		<p>
+			Выбирает переведённую строку из словаря, где ключ — код языка.
+			Функция берёт текущий язык из <path>\BlackFox\Engine::I()-&gt;GetLanguage()</path> и возвращает соответствующее значение;
+			если текущего языка нет в словаре — возвращает первое значение массива.
+			<br/>
+			Именно на этом механизме построены все переводимые строки <path>NAME</path>/<path>TITLE</path>/сообщения,
+			которые встречались во всей этой документации (названия полей, тексты исключений, алерты юнитов и т.д.).
+		</p>
+		<code class="language-php">$name = T([
+	'en' =&gt; 'Title',
+	'ru' =&gt; 'Название',
+]);
+
+throw new \BlackFox\Exception(T([
+	'en' =&gt; 'Login must be specified',
+	'ru' =&gt; 'Укажите логин',
+]));</code>
+		<p>
+			<path>$variants</path> не обязан перечислять все языки, настроенные в проекте, — отсутствующий ключ просто заменится первым значением массива,
+			так что можно оставить строку непереведённой, если в проекте активен только один язык.
+		</p>
+
+		<h2 id="debug">debug($data = [], $title = '', $mode = 'print_r', $target = '/debug.txt')</h2>
+		<p>
+			Лёгкий глобальный помощник для отладки. Работает только если ключ <path>debug</path> в
+			<a href="config.html">/config.php</a> установлен в <path>true</path>, и полностью отключается, если в запросе присутствует ключ
+			<path>turn_off_debug</path> (или <path>TURN_OFF_DEBUG</path>) — удобно, чтобы приглушить отладочный вывод для конкретных AJAX-запросов,
+			не выключая отладку глобально.
+		</p>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr><th>$mode</th><th style="min-width: 300px;">Поведение</th></tr>
+				</thead>
+				<tbody>
+				<tr><td>print_r <em>(по умолчанию)</em></td><td>Выводит <path>print_r</path> в невидимую <path>&lt;textarea&gt;</path> на странице, отображается по нажатию <strong>Alt + `</strong> (клавиша тильды/ё)</td></tr>
+				<tr><td>var_export</td><td>Та же невидимая textarea, но вывод <path>var_export</path></td></tr>
+				<tr><td>var_dump</td><td>Та же невидимая textarea, но вывод <path>var_dump</path></td></tr>
+				<tr><td>console</td><td>Выводит тег <path>&lt;script&gt;console.log(...)&lt;/script&gt;</path></td></tr>
+				<tr><td>log</td><td>Дописывает в файл, путь <path>$target</path> относительно корня сервера (по умолчанию <path>/debug.txt</path>)</td></tr>
+				<tr><td>email</td><td>Отправляет дамп через <path>mail()</path> на адрес из <path>$target</path></td></tr>
+				</tbody>
+			</table>
+		</div>
+		<code class="language-php">debug($user, 'user');
+debug($SQL, 'query', 'console');
+debug($payload, 'webhook', 'log', '/logs/webhook.txt');</code>
+	</div>
+</main>
+
+</body>
+</html>

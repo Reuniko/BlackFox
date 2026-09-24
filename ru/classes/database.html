@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Database — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/database.html">English</a>
+		<a class="btn btn-secondary active" href="database.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Database</h1>
+
+		<p>
+			Абстрактный класс
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/database/Database.php">BlackFox\Database</a>
+			является интерфейсом, описывающим доступ к реляционной базе данных.
+			<br>
+			Этот класс должен быть переопределён в
+			<a href="../basics/config.html">конфигурации</a> на одного из своих наследников:
+		</p>
+		<ul>
+			<li>BlackFox\MySQL</li>
+			<li>BlackFox\Postgres</li>
+			<li>... или напишите собственный драйвер :)</li>
+		</ul>
+
+		<h2>Методы</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Параметры</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>Query</td><td>$SQL, $key = null</td><td>Должен выполнить любой SQL-запрос и вернуть результат в виде двухмерного массива, если это был SQL-запрос SELECT</td></tr>
+				<tr><td>QuerySingleInsert</td><td>$SQL, $increment = null</td><td>Должен выполнить SQL-запрос INSERT и вернуть последнее значение указанной колонки (обычно идентификатора)</td></tr>
+				<tr><td>Escape</td><td>$data</td><td>Экранирует специальные символы в строке для использования в SQL-выражении</td></tr>
+				<tr><td>Quote</td><td>$data</td><td>Оборачивает строку в кавычки, используемые текущей базой данных для обозначения строковых констант</td></tr>
+				<tr><td>Random</td><td></td><td>Возвращает строку, описывающую SQL-функцию случайного числа</td></tr>
+				<tr><td>StartTransaction</td><td></td><td>Начинает транзакцию</td></tr>
+				<tr><td>Rollback</td><td></td><td>Отменяет транзакцию</td></tr>
+				<tr><td>Commit</td><td></td><td>Закрепляет транзакцию</td></tr>
+				<tr><td>CompileSQLSelect</td><td>array $parts</td><td>Склеивает массив частей SQL-запроса SELECT в строку</td></tr>
+				<tr><td>Truncate</td><td>$table</td><td>Удаляет все данные из таблицы и сбрасывает её внутренний счётчик</td></tr>
+				<tr><td>Drop</td><td>$table</td><td>Удаляет таблицу</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Доступ к глобальному инстансу</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<ul>
+					<li>В контекстах движка и SCRUD: <path>$this-&gt;Database-&gt;</path></li>
+					<li>В иных контекстах: <path>\BlackFox\Database::I()-&gt;</path></li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$DB = \BlackFox\Database::I();
+$users = $DB-&gt;Query("SELECT * FROM system_users");</code>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Виртуальный корень — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/basics/root.html">English</a>
+		<a class="btn btn-secondary active" href="root.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Виртуальный корень</h1>
+
+		<p>
+			По умолчанию все запросы от пользователей на исполняемый файл (*.php) или папку
+			обрабатываются фреймворком (класс <path>Engine</path>) следующим образом:
+			для каждого указанного ниже файла,
+			для каждого виртуального корня от первого к последнему
+			идёт поиск указанных файлов:
+		</p>
+
+		<ol>
+			<li>
+				непосредственно запрошенный php-файл
+				или
+				файл <path>index.php</path> в запрошенной папке
+			</li>
+			<li>файл <path>.router.php</path> вверх по иерархии директорий относительно запроса</li>
+		</ol>
+
+		<p>
+			Как только первый файл найден — исполняет его, прерывая дальнейший поиск.
+			<br/>
+			Все активные виртуальные корни должны быть зарегистрированы в конфиге (ключ '<a href="config.html#roots">roots</a>').
+		</p>
+
+		<h3>Например</h3>
+		<p>
+			Допустим, что у нас есть два виртуальных корня <path>/Site/root</path> и <path>/BlackFox/root</path>:
+		</p>
+		<div class="table-responsive">
+			<table class="table table-info table-bordered table-hover">
+				<thead>
+				<tr>
+					<th width="10%">
+						<nobr>Запрос</nobr>
+					</th>
+					<th>Поиск подключаемой сущности</th>
+				</tr>
+				</thead>
+				<tr>
+					<td>/feedback.php</td>
+					<td>
+						<li>/Site/root/feedback.php</li>
+						<li>/BlackFox/root/feedback.php</li>
+						<li>/Site/root/.router.php</li>
+						<li>/BlackFox/root/.router.php</li>
+					</td>
+				</tr>
+				<tr>
+					<td>/admin/</td>
+					<td>
+						<li>/Site/root/admin/index.php</li>
+						<li>/BlackFox/root/admin/index.php</li>
+						<li>/Site/root/admin/.router.php</li>
+						<li>/BlackFox/root/admin/.router.php</li>
+						<li>/Site/root/.router.php</li>
+						<li>/BlackFox/root/.router.php</li>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>
+			Следуя этой логике, вы можете переопределить любой файл в виртуальном корне фреймворка, создав
+			в своём виртуальном корне файл по аналогичному относительному пути.
+		</p>
+
+		<p>
+			Если ни один файл не найден, <path>Engine</path> ищет редирект или контент из базы данных
+			(сущности <a href="../classes/redirects.html">Redirects</a> и <a href="../classes/pages.html">Pages</a>),
+			<br/>
+			а если и там ничего не найдено — бросает исключение <path>ExceptionPageNotFound</path>,
+			которое в последующем обрабатывается в методе <path>Show404</path>.
+		</p>
+		<p>
+			Это поведение движка можно изменить, изучив и переопределив метод <path>MakeContent</path>.
+		</p>
+
+		<h2>Доступ к разделам (папкам)</h2>
+		<p>
+			<path>Engine</path> позволяет для каждого раздела переопределять подключаемый шаблон и/или обёртку шаблона,
+			а также ограничить/разрешить доступ к разделу и всем подразделам для конкретных групп пользователей.
+			Для этого нужно создать файл <path>.section.php</path> в корне раздела и вернуть в нём ассоциативный массив,
+			описывающий раздел (все ключи не обязательны):
+		</p>
+		<ul>
+			<li><path>TEMPLATE</path> — код шаблона</li>
+			<li><path>WRAPPER</path> — код обёртки шаблона</li>
+			<li>
+				<path>ACCESS</path> — ассоциативный массив, описывающий доступ к разделу:
+				ключ - код группы пользователей,
+				значение - true/false флаг доступа
+			</li>
+		</ul>
+
+		<h3>Например</h3>
+		<div class="row">
+			<div class="col-xl-6 order-xl-2">
+				<code class="language-php">&lt;?php
+return [
+	'TEMPLATE' =&gt; 'admin',
+	'ACCESS'   =&gt; [
+		'*'    =&gt; false,
+		'root' =&gt; true,
+	],
+];</code>
+			</div>
+			<div class="col-xl-6 order-xl-1">
+				<ul>
+					<li><path>*</path> — псевдо-код для любого пользователя (в том числе не авторизованного)</li>
+					<li><path>@</path> — псевдо-код для авторизованного пользователя</li>
+					<li><path>root</path> — код группы пользователей "Рут"</li>
+				</ul>
+				<p>Для более сложной логики ограничения доступа используйте исключения в собственном коде.</p>
+			</div>
+		</div>
+
+		<h2>Шаблон</h2>
+		<p>
+			По завершении обработки запроса, Engine оборачивает результат в обёртку
+			<a href="template.html">шаблона</a>, если это необходимо.
+		</p>
+	</div>
+</main>
+
+</body>
+</html>

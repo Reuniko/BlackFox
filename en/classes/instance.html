@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Instance — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="instance.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/instance.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Instance</h1>
+
+		<p>
+			Trait
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/patterns/Instance.php">BlackFox\Instance</a>
+			adds static methods <path>::N()</path> and <path>::I()</path> to a class,
+			performing factory tasks of creating local or global instances of this class.
+		</p>
+
+		<h2>Dependency Inversion</h2>
+		<p>
+			Often you need to create a class and its instance (the dependent),
+			which depends on another class or interface (the dependency).
+			<br/>
+			For example, the class <path>Users</path> uses public methods of the class <path>MySQL</path>:
+		</p>
+		<code class="language-php">class Users {
+	public function GetByID(int $ID) {
+		global $MySQL;
+		return $MySQL->Query("SELECT * FROM users WHERE ID='{$ID}'");
+	}
+}</code>
+		<p>
+			In this implementation, the class
+			<path>Users</path> becomes impossible to reuse in conjunction with another database.
+			More generally: a dependent class loses its flexibility regarding the dependency.
+			To solve this problem, the Dependency Inversion principle is used, the implementation of which is as follows:
+		</p>
+		<ul>
+			<li>pass the dependency to the constructor of the dependent class as a strongly typed parameter (the type can be a specific class, abstract class or interface)</li>
+			<li>save a link to the dependency in a property of the dependent class</li>
+			<li>use this link to access dependency methods strictly within the contract described by the dependency</li>
+		</ul>
+		<code class="language-php">class Users {
+	/**@var Database $Database */
+	private $Database;
+
+	public function __construct(Database $Database) {
+		$this->Database = $Database;
+	}
+
+	public function GetByID(int $ID) {
+		return $this->Database->Query("SELECT * FROM users WHERE ID='{$ID}'");
+	}
+}</code>
+		<p>
+			Now the class <path>Users</path> can be used in conjunction with many different databases,
+			as long as they abide by the contract described by the class or interface <path>Database</path>.
+			<br/>
+			But in such an implementation, it is not very convenient to instantiate new instances of the dependent class:
+		</p>
+		<code class="language-php">$Database = new Database();
+$Users = new Users($Database);</code>
+		<p>
+			To simplify the creation of new instances of dependent classes, you can add the trait
+			<path>Instance</path> to your class:
+		</p>
+		<code class="language-php">class Users {
+	use \BlackFox\Instance;
+	// ...
+}</code>
+		<p>
+			Then two static methods <path>::N()</path> and <path>::I()</path> will appear in the dependent class,
+			which will automatically substitute global instances of the required dependencies into the constructor parameters:
+		</p>
+		<code class="language-php">// make new local instance
+$Users = Users::N();
+$data = $Users->GetByID(1);
+
+// get (or make and get) global instance
+$data = Users::I()->GetByID(1);</code>
+		<p>
+			This retains the ability to locally redefine some or all of the dependencies:
+		</p>
+		<code class="language-php">// make another local instance connected to another database
+$AnotherUsers = Users::N(['Database' => AnotherDatabase::I()]);
+$data = $AnotherUsers->GetByID(1);</code>
+
+		<h2>::N() — creating a new instance</h2>
+		<p>
+			The static method
+			<path>::N()</path>
+			takes a
+			<a href="#params">one-dimensional dictionary of constructor parameters</a>
+			as input and returns a new instance of the
+			<a href="#overrides">appropriate</a>
+			class.
+		</p>
+		<code class="language-php">class User {
+	use \BlackFox\Instance;
+
+	public function __construct(Database $Database, int $ID, bool $optional_flag = true) {
+		$this->Database = $Database;
+		$this->ID = $ID;
+		$this->optional_flag = $optional_flag;
+	}
+}
+
+$User1 = User::N(['ID' => 1]); // ok
+$User2 = User::N(['ID' => 2, 'optional_flag' => false]); // ok
+$User3 = User::N(['ID' => 3, 'Database' => AnotherDatabase::I()]); // ok
+$User4 = User::N([]); // error: ID is missing</code>
+
+		<h2>::I() — return (or create and return) a global instance</h2>
+		<p>
+			Often a project requires one universal global object (instance), accessible from any part of the code.
+			<br/>
+			The static method
+			<path>::I()</path> accepts, once, a
+			<a href="#params">one-dimensional dictionary of constructor parameters</a>,
+			creates a global instance of the
+			<a href="#overrides">appropriate</a>
+			class (if one hasn't already been created), and returns a link to it.
+			<br/>
+			Calling <path>::I()</path> with a parameter again will throw an error, since a global instance already exists.
+			<br/>
+			Calling <path>::I()</path> without parameters returns a link to the existing global instance.
+		</p>
+		<code class="language-php">class Database {
+	use \BlackFox\Instance;
+	public function __construct(array $params) {}
+	public function Query($SQL) {}
+}
+
+Database::I(['params' => $params]); // ok
+Database::I()->Query($SQL1); // ok
+Database::I()->Query($SQL2); // ok
+Database::I(['params' => $params]); // error</code>
+
+		<h2 id="params">Dictionary of parameters</h2>
+		<p>
+			The one-dimensional dictionary of constructor parameters is optional and is processed as follows:
+		</p>
+		<ul>
+			<li>If a value for the parameter is passed, use it</li>
+			<li>
+				If the parameter value is missing:
+				<ul>
+					<li>If the parameter is optional, substitute its default value</li>
+					<li>
+						If the parameter is required:
+						<ul>
+							<li>If the parameter has no type, or its type is a built-in one, throw an error</li>
+							<li>
+								If the parameter type is not built-in (a specific class, abstract class, or interface):
+								<ul>
+									<li>If it's possible to map the type to a global instance, substitute a link to that global instance</li>
+									<li>Otherwise, throw an error</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		<p>
+			Mapping a parameter's type to a global instance works as follows:
+		</p>
+		<ul>
+			<li>If there is a key in the global override configuration describing this type, use the corresponding global instance</li>
+			<li>Otherwise, if the type is a specific class using the <path>Instance</path> trait, use its own global instance</li>
+			<li>Otherwise, throw an error, since it cannot find a suitable global instance</li>
+		</ul>
+
+		<h2 id="overrides">Global override rules</h2>
+		<p>
+			The current class is considered "appropriate" unless otherwise specified in the global override rules configuration.
+			<br/>
+			The global override rules are a dictionary described under the 'overrides' key of the configuration array:
+		</p>
+		<ul>
+			<li>key — string, identifier of a specific class, abstract class, or interface which should be overridden</li>
+			<li>value — string, identifier of the specific class to override with</li>
+		</ul>
+		<code class="language-php">return [
+	// ...
+	'overrides' =&gt; [
+		'BlackFox\Engine'   =&gt; 'Example\Engine',
+		'BlackFox\Database' =&gt; 'BlackFox\MySQL',
+		'BlackFox\Captcha'  =&gt; 'BlackFox\CaptchaGoogleRecaptchaV2',
+		'BlackFox\Users'    =&gt; 'Example\Users',
+		'BlackFox\Cache'    =&gt; 'BlackFox\CacheRedis',
+	],
+	// ...
+];
+
+BlackFox\Engine::I();   // &lt;-- Example\Engine
+BlackFox\Database::I(); // &lt;-- BlackFox\MySQL
+BlackFox\Captcha::I();  // &lt;-- BlackFox\CaptchaGoogleRecaptchaV2
+BlackFox\Users::I();    // &lt;-- Example\Users
+BlackFox\Cache::I();    // &lt;-- BlackFox\CacheRedis</code>
+		<p>
+			It's worth noting that these rules are used only by the <path>Instance</path> trait methods,
+			so it remains possible to create any objects locally using the <path>new</path> keyword.
+		</p>
+
+		<h2>Method AddOverrides</h2>
+		<p>
+			The global static method
+			<path>::AddOverrides(array $overrides)</path> allows you to add or replace override rules dynamically.
+		</p>
+		<code class="language-php">// AddOverrides is a static trait method - call it through any class using \BlackFox\Instance
+\BlackFox\Engine::AddOverrides([
+	'BlackFox\Cache' =&gt; 'BlackFox\CacheRedis',
+]);</code>
+	</div>
+</main>
+
+</body>
+</html>

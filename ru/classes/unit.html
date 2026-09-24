@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Unit — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/unit.html">English</a>
+		<a class="btn btn-secondary active" href="unit.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Unit</h1>
+
+		<p>
+			Абстрактный класс
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/units/Unit.php">BlackFox\Unit</a>
+			представляет собой среду для создания контроллеров.
+		</p>
+		<p>
+			Класс-наследник находится в файле и папке с такими же названиями,
+			а также содержит подпапку <path>views</path>,
+			в которой находятся файлы-отображения.
+			<br/>
+			Любой публичный метод является действием, а параметры к ним формируются из запроса пользователя.
+			<br/>
+			Возможен запуск нескольких действий.
+			Возможно отключить подключение шаблона+отображения.
+			Возможно наследовать юниты друг от друга, при этом шаблоны+отображения тоже наследуются.
+			<br/>
+			По умолчанию используется действие <path>Default</path>, отображение
+			<path>Default</path> (подключает файл 'Default.php').
+		</p>
+
+		<h2>Свойства</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Тип</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>$ENGINE</td><td>объект</td><td>ссылка на инстанс <a href="engine.html">BlackFox\Engine</a></td></tr>
+				<tr><td>$USER</td><td>объект</td><td>ссылка на инстанс <a href="user.html">BlackFox\User</a></td></tr>
+				<tr><td>$options</td><td>массив</td><td>словарь словарей, описывающий возможные параметры</td></tr>
+				<tr><td>$parents</td><td>массив</td><td>предки юнита</td></tr>
+				<tr><td>$class</td><td>строка</td><td>название текущего класса</td></tr>
+				<tr><td>$view</td><td>строка</td><td>подключаемое отображение (название файла без расширения)</td></tr>
+				<tr><td>$REQUEST</td><td>массив</td><td>запрос пользователя, формируется методом <path>GetRequest()</path></td></tr>
+				<tr><td>$PARAMS</td><td>массив</td><td>параметры вызова</td></tr>
+				<tr><td>$RESULT</td><td>массив</td><td>объединённый результат работы всех выполненных действий</td></tr>
+				<tr><td>$ALERTS</td><td>массив</td><td>сообщения+предупреждения+ошибки, возникшие в процессе работы</td></tr>
+				<tr><td>$unit_absolute_folder</td><td>строка</td><td>абсолютный путь к папке юнита</td></tr>
+				<tr><td>$unit_relative_folder</td><td>строка</td><td>относительный путь к папке юнита</td></tr>
+				<tr><td>$view_absolute_folder</td><td>строка</td><td>абсолютный путь к папке отображений</td></tr>
+				<tr><td>$view_relative_folder</td><td>строка</td><td>относительный путь к папке отображений</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Действия</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					Действие — это публичный метод юнита.
+					<br/>
+					Юнит последовательно запускает действия,
+					формируя параметры из запроса пользователя,
+					который формируется методом <path>GetRequest()</path>.
+					<br/>
+					Если у действия есть параметр без значения по умолчанию, а пользователь не указал это значение —
+					юнит кидает исключение.
+				</p>
+				<p>
+					Последовательность выполняемых действий (в виде списка строк) формируется в методе
+					<path>GetActions($request)</path>.
+				</p>
+				<p>
+					Желательно переопределить этот метод, иначе он будет работать по умолчанию следующим образом:
+				</p>
+				<ul>
+					<li>
+						если пользователь указал в запросе ключ 'action' или 'ACTION' — это действие будет добавлено в список выполняемых действий
+					</li>
+					<li>
+						если пользователь указал в запросе ключ 'view' или 'VIEW' — это действие будет добавлено в список выполняемых действий,
+						иначе в список будет добавлено действие 'Default'.
+					</li>
+				</ul>
+				<p>
+					Есть три способа завершить действие:
+				</p>
+				<ul>
+					<li>вернуть массив, строку или null</li>
+					<li>бросить исключение</li>
+					<li>использовать метод <path>Redirect()</path></li>
+				</ul>
+				<p>
+					Действия делятся на две категории: предварительные действия и финальное действие.
+					Последний элемент списка действий (из метода
+					<path>GetActions($request)</path>) становится финальным действием, все остальные — предварительными.
+				</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace Example;
+class UnitNames extends \BlackFox\Unit {
+
+	public function GetActions(array $request = []) {
+		if ($request['ACTION'] == 'Rename') {
+			return ['Rename', 'Default'];
+		}
+		return ['Default'];
+	}
+
+	// $page = $_REQUEST['page'] ?: 1
+	public function Default($page = 1) {
+		if ($page &lt; 1) {
+			throw new \BlackFox\Exception("page must be positive");
+		}
+		$RESULT['ELEMENTS'] = Names::I()-&gt;Select(['PAGE' =&gt; $page]);
+		return $RESULT;
+	}
+
+	// $ID = $_REQUEST['ID']
+	// $new_name = $_REQUEST['new_name']
+	public function Rename($ID, $new_name) {
+		if (!is_numeric($ID)) {
+			throw new \BlackFox\Exception("id must be numeric");
+		}
+		Names::I()-&gt;Update($ID, ['NAME' =&gt; $new_name]);
+		$this-&gt;Redirect(null, "Rename successful");
+	}
+
+}</code>
+			</div>
+		</div>
+
+		<div class="row mt-3">
+			<div class="col-xl-6">
+				<h3>Предварительные действия</h3>
+				<ul>
+					<li>могут пытаться изменить внутреннее состояние модели</li>
+					<li>могут подготавливать дополнительные данные для отображения</li>
+					<li>
+						успех — агрегирует ответ:
+						<ul>
+							<li>массив — в результат ($RESULT)</li>
+							<li>строку — в успешные сообщения ($ALERTS)</li>
+						</ul>
+					</li>
+					<li>ошибка — ловит исключение и агрегирует его в $ALERTS (через метод <path>Error</path>)</li>
+					<li>редирект — прекращает выполнение</li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+				<h3>Финальное действие</h3>
+				<ul>
+					<li>не пытается изменить внутреннее состояние модели</li>
+					<li>подготавливает основные данные для отображения</li>
+					<li>успех — преобразует ответ в массив и агрегирует его в результат ($RESULT)</li>
+					<li>ошибка — не ловит исключение, позволяя ему всплыть на уровень выше</li>
+					<li>редирект — прекращает выполнение</li>
+				</ul>
+			</div>
+		</div>
+
+		<h2>Методы</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Параметры</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>Run</td><td>$params = [], $request = []</td><td>Статический метод, запускает юнит, используется на страницах виртуального корня. Ловит все исключения и направляет их в метод <path>ShowErrors</path> <a href="engine.html">движка</a>.</td></tr>
+				<tr><td>Execute</td><td>$params = [], $request = []</td><td>Исполняет юнит, не ловит исключения</td></tr>
+				<tr><td>Init</td><td>$params = []</td><td>Инициализирует параметры юнита, проверяя их на соответствие <path>$options</path></td></tr>
+				<tr><td>GetRequest</td><td>array $request = []</td><td>Склеивает в единый массив переданный параметр и суперглобальные массивы $_REQUEST и $_FILES, корректируя структуру $_FILES (может быть переопределён)</td></tr>
+				<tr><td>GetActions</td><td>array $request = []</td><td>Анализирует запрос пользователя и возвращает список действий, которые нужно запустить (следует переопределять)</td></tr>
+				<tr><td>Controller</td><td>array $request = []</td><td>Последовательно запускает предварительные действия, затем финальное, собирая ответы и исключения в <path>$RESULT</path> и <path>$ALERTS</path></td></tr>
+				<tr><td>Invoke</td><td>$method, $request</td><td>Пытается запустить действие, подставив в его параметры подходящие части запроса пользователя (приватный, вызывается из <path>Controller</path>)</td></tr>
+				<tr><td>Error</td><td>$Exception, $action = null, $request = []</td><td>Обрабатывает исключения, возникшие при работе предварительных действий: помещает их в <path>$ALERTS</path> (может быть переопределён)</td></tr>
+				<tr><td>ShowAlerts</td><td></td><td>Отображает массив <path>$ALERTS</path> в HTML-виде (может быть переопределён)</td></tr>
+				<tr><td>Redirect</td><td>$url, string|array $alerts</td><td>Перенаправляет на другой URL, сохраняя сообщения в сессию пользователя</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Подключение шаблона и отображения</h2>
+		<p>
+			Если в результате выполнения финального действия не произошло ошибок,
+			а также оказалось не пустым свойство <path>$view</path>,
+			юнит берёт результат и подключает его в соответствующее отображение как переменную <path>$RESULT</path>.
+			<br/>
+			По умолчанию, метод <path>Controller</path>, прежде чем выполнить действия, устанавливает свойство <path>$view</path>
+			равным названию финального действия.
+			Если в процессе выполнения действия выяснится, что необходимо подключить иное отображение, измените свойство
+			<path>$view</path>.
+		</p>
+
+		<h2>Наследование шаблонов и отображений</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					При необходимости подключить отображение, юнит ищет его сперва в собственной папке <path>views</path>,
+					затем идёт поиск вверх по папкам юнитов-родителей.
+					Этот поиск происходит в методе <path>Path($path)</path>.
+					Если использовать его в собственных отображениях для подключения суб-отображений,
+					это позволит юнитам-наследникам переопределять суб-отображения.
+				</p>
+
+				<path>.../UnitExample/views/default.php</path>
+				<code class="language-php">/**@var \BlackFox\Unit $this */
+/**@var array $RESULT */
+foreach ($RESULT as $element) {
+	// usual way, successors can't override 'element' view
+	require 'element.php';
+	// better way, successor may override 'element' view
+	require($this-&gt;Path('element.php'));
+}</code>
+			</div>
+			<div class="col-xl-6">
+				<p>
+					Метод <path>GetParentView()</path> возвращает абсолютный путь к отображению юнита-родителя,
+					которое можно подключить в отображении наследника, чтобы его дополнить, а не полностью переопределить.
+				</p>
+
+				<path>.../UnitExample/views/element.php</path>
+				<code class="language-php">/**@var \BlackFox\Unit $this */
+/**@var array $element */
+?&gt;
+&lt;div class="i_want_to_wrap_element"&gt;
+	&lt;h3&gt;&lt;?= $element['NAME'] ?&gt;&lt;/h3&gt;
+	&lt;? require($this-&gt;GetParentView()); ?&gt;
+&lt;/div&gt;</code>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

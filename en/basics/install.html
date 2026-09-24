@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Install — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="install.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/basics/install.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Install</h1>
+
+		<ol>
+			<li>Setup server with PHP 7+ and (MySQL 8+ or MariaDB 10+ or Postgres 10+) environment</li>
+			<li>
+				<a href="https://github.com/Reuniko/BlackFox.git">Clone or download framework</a>
+				as a folder into your server root
+			</li>
+			<li>Copy all files from <path>/BlackFox/.example/</path> into your server root</li>
+			<li>
+				Update <path>/config.php</path> with requisites of the database
+				(<a href="config.html">more info</a>)
+			</li>
+			<li>Launch the file <path>/BlackFox/install.php</path> using php console</li>
+			<li>
+				If your HTTP server is different from Apache,
+				configure it in such a way that any user request for
+				non-static file (*.php and any folder) will be redirected to /index.php
+			</li>
+		</ol>
+
+		<p>There we go! Now you can log into admin panel (<path>/admin/</path>) with default requisites: <strong>Root@123456</strong></p>
+	</div>
+</main>
+
+</body>
+</html>

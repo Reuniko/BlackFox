@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>User — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/user.html">English</a>
+		<a class="btn btn-secondary active" href="user.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">User</h1>
+
+		<p>
+			Класс
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/User.php">BlackFox\User</a>
+			предназначен для работы с сессией текущего пользователя.
+			<br/>
+			В контексте движка он доступен через <path>$this-&gt;User-&gt;</path>;
+			в контексте юнита — через <path>$this-&gt;USER-&gt;</path> (обратите внимание на регистр);
+			в иных контекстах — через <path>\BlackFox\User::I()-&gt;</path>
+		</p>
+
+		<h2>Свойства</h2>
+
+		<div class="row">
+			<div class="col-xl-6">
+				<div class="table-responsive">
+					<table class="table table-sm table-bordered bg-white">
+						<thead>
+						<tr>
+							<th>Название</th>
+							<th>Тип</th>
+							<th style="min-width: 300px;">Описание</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr><td>$ID</td><td>число</td><td>Идентификатор пользователя</td></tr>
+						<tr><td>$FIELDS</td><td>массив</td><td>Словарь полей пользователя</td></tr>
+						<tr><td>$GROUPS</td><td>массив</td><td>Список групп пользователя</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$user_id = \BlackFox\User::I()-&gt;ID;
+$user_login = \BlackFox\User::I()-&gt;FIELDS['LOGIN'];
+$is_authorized = \BlackFox\User::I()-&gt;IsAuthorized();
+$is_root = \BlackFox\User::I()-&gt;InGroup('root');</code>
+			</div>
+		</div>
+
+		<h2>Методы</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Параметры</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr class="text-secondary">
+					<td>Init</td>
+					<td>$ID</td>
+					<td>Загружает данные пользователя, вызывается из конструктора</td>
+				</tr>
+				<tr>
+					<td>Authorization</td>
+					<td>$login, $password</td>
+					<td>Пытается авторизовать пользователя по указанным реквизитам</td>
+				</tr>
+				<tr>
+					<td>Login</td>
+					<td>$ID</td>
+					<td>Авторизует пользователя с указанным идентификатором</td>
+				</tr>
+				<tr>
+					<td>Logout</td>
+					<td></td>
+					<td>Деавторизует пользователя</td>
+				</tr>
+				<tr>
+					<td>IsAuthorized</td>
+					<td></td>
+					<td>Возвращает true, если пользователь авторизован</td>
+				</tr>
+				<tr>
+					<td>InGroup</td>
+					<td>$group</td>
+					<td>Возвращает true, если пользователь принадлежит указанной группе</td>
+				</tr>
+				<tr>
+					<td>InAnyOfGroups</td>
+					<td>$groups</td>
+					<td>Возвращает true, если пользователь принадлежит хотя бы одной из указанных групп</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+body {
+	font-family: 'Roboto', sans-serif;
+	background: #f5f5f5 url("img/body.png");
+}
+
+body.frame {
+	background-image: none;
+	padding: 1rem;
+}
+
+.header {
+	background-image: url("img/header.png");
+	border-bottom: 1px solid rgba(0, 0, 0, .125);
+}
+
+.footer {
+	background-image: url("img/header.png");
+	border-top: 1px solid rgba(0, 0, 0, .125);
+}
+
+.sidebar {
+	border-right: 1px solid rgba(0, 0, 0, .125);
+	background-image: url('img/sidebar.png');
+	min-width: 250px;
+}
+
+h1, h2, h3 {
+	color: #222;
+	margin-top: .5rem;
+	margin-bottom: .5rem;
+}
+
+h1 {
+	font-size: 2rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+}
+
+.dl-horizontal {
+	margin-top: 1rem;
+}
+
+@media (min-width: 800px) {
+	.dl-horizontal dt {
+		float: left;
+		width: 15%;
+		overflow: hidden;
+		clear: left;
+		text-align: right;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.dl-horizontal dd {
+		margin-left: 20%;
+	}
+
+	.dl-horizontal dd:after {
+		content: '\00A0';
+	}
+}
+
+.separator {
+	border-bottom: 1px solid rgba(0, 0, 0, .1);
+	padding-bottom: 1rem;
+	margin-bottom: 1rem;
+}
+
+.separator:last-child {
+	border-bottom: none;
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+
+.card-header {
+	font-weight: 500;
+	font-size: 110%;
+}
+
+code {
+	background-color: #f8f8f8;
+	color: black;
+	display: block;
+	white-space: pre-line;
+	margin-bottom: 1rem;
+	font-weight: normal;
+	border: 2px solid white;
+}
+
+.code {
+	background: #f8f8f8;
+	overflow: auto;
+	width: auto;
+	border: 2px solid #ffffff;
+	padding: .2em .6em;
+}
+
+:not(pre) > code[class*="language-"] {
+	white-space: pre-wrap !important;
+}
+
+path {
+	white-space: pre-wrap;
+	border: 1px solid rgba(0, 255, 69, 0.19);
+	padding: 0 2px;
+	border-radius: 2px;
+	background-color: rgba(0, 255, 55, 0.07);
+}
+
+hint {
+	border-bottom: 1px dashed gray;
+}
+
+.highlight {
+	background-color: #ffe928;
+}
+
+pre {
+	tab-size: 4;
+}
+
+pre a {
+	text-decoration: underline;
+}
+
+.red {
+	color: red;
+}
+
+span.path {
+	font-size: 90%;
+	display: block;
+	background: gray;
+	padding: 0 4px;
+	color: white;
+	overflow: auto;
+}
+
+input[type=checkbox], input[type=radio] {
+	display: inline-block;
+	width: 1.2rem;
+	height: 1.2rem;
+	vertical-align: middle;
+}

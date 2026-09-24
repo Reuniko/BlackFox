@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>SCRUD — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/scrud.html">English</a>
+		<a class="btn btn-secondary active" href="scrud.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">SCRUD</h1>
+
+		<p>
+			Абстрактный класс
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/orm/SCRUD.php">BlackFox\SCRUD</a>
+			(Select|Search, Create, Read, Update, Delete)
+			предоставляет функционал для работы с таблицами в реляционной базе данных.
+		</p>
+		<p>Для того чтобы создать таблицу, необходимо:</p>
+		<ol>
+			<li>Создать класс-наследник от <path>BlackFox\SCRUD</path></li>
+			<li>Описать в нем структуру таблицы в свойстве <a href="#fields">$fields</a></li>
+			<li>Добавить его в схему ядра и запустить апгрейд</li>
+		</ol>
+
+		<h2>Свойства</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead><tr><th>Название</th><th style="min-width: 300px;">Описание</th></tr></thead>
+				<tbody>
+					<tr><td>$name</td><td>Название таблицы или ее элементов во множественном числе</td></tr>
+					<tr><td>$code *</td><td>Символьный код таблицы для использования в базе данных</td></tr>
+					<tr><td><a href="#fields">$fields</a></td><td>Структура полей базы данных</td></tr>
+					<tr><td>$groups</td><td>Словарь групп полей, ключ — код, значение — название</td></tr>
+					<tr><td>$keys *</td><td>Лист первичных ключей</td></tr>
+					<tr><td>$composition *</td><td>Композиция из групп и полей</td></tr>
+					<tr><td>$increment *</td><td>Код прирастающего поля</td></tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="alert alert-info">* формируются автоматически</div>
+
+		<p>
+			По умолчанию, символьный код для таблицы в базе данных формируется в нижнем регистре
+			в формате "Неймспейс_Класс". При желании можно переопределить код в свойстве <path>$code</path>.
+		</p>
+
+		<h2 id="fields">Структура таблицы</h2>
+		<p>
+			Свойство <path>$fields</path>, структура полей таблицы — это многомерный словарь,
+			ключи которого являются кодом поля, а значения — словарями, описывающими тип поля.
+		</p>
+		<h3>Ключи словаря, описывающего тип поля</h3>
+		<div class="row">
+			<div class="col-xl-6">
+				<div class="table-responsive">
+					<table class="table table-sm table-bordered bg-white">
+						<thead><tr><th>Название</th><th></th><th>Описание</th><th>Типы</th></tr></thead>
+						<tbody>
+							<tr><td>TYPE</td><td>строка</td><td>Символьный код типа. <a target="_blank" href="https://github.com/Reuniko/BlackFox/tree/master/classes/orm/types">Список доступных типов</a>.</td><td></td></tr>
+							<tr><td>NAME</td><td>строка</td><td>Название</td><td></td></tr>
+							<tr><td>GROUP</td><td>строка</td><td>Группа (символьный код)</td><td></td></tr>
+							<tr><td>NOT_NULL</td><td>флаг</td><td>Запрет на пустое значение</td><td></td></tr>
+							<tr><td>INDEX</td><td>флаг</td><td>Индексировать поле</td><td></td></tr>
+							<tr><td>PRIMARY</td><td>флаг</td><td>Основной ключ (можно несколько)</td><td></td></tr>
+							<tr><td>AUTO_INCREMENT</td><td>флаг</td><td>Приростающее поле (можно только одно)</td><td></td></tr>
+							<tr><td>DISABLED</td><td>флаг</td><td>Отключает возможность изменения поля в админке</td><td></td></tr>
+							<tr><td>VITAL</td><td>флаг</td><td>Важное поле, выбирается по умолчанию через '@'</td><td></td></tr>
+							<tr><td>VALUES</td><td>словарь</td><td>Набор значений</td><td>SET, ENUM</td></tr>
+							<tr><td>LINK</td><td>строка</td><td>Ссылка на другую таблицу</td><td><nobr>OUTER, INNER</nobr></td></tr>
+							<tr><td>FOREIGN</td><td>строка</td><td>Режим работы внешнего ключа</td><td>OUTER</td></tr>
+							<tr><td>...</td><td></td><td>Иные свойства в зависимости от типа</td><td></td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$fields = [
+	'ID'      =&gt; self::ID,
+	'MOMENT'  =&gt; [
+		'TYPE'     =&gt; 'DATETIME',
+		'NAME'     =&gt; 'Момент',
+		'NOT_NULL' =&gt; true,
+		'DISABLED' =&gt; true,
+	],
+	'MESSAGE' =&gt; [
+		'TYPE'  =&gt; 'TEXT',
+		'NAME'  =&gt; 'Сообщение',
+		'VITAL' =&gt; true,
+	],
+	'AUTHOR'  =&gt; [
+		'TYPE'     =&gt; 'OUTER',
+		'NAME'     =&gt; 'Автор',
+		'LINK'     =&gt; 'BlackFox\Users',
+		'NOT_NULL' =&gt; true,
+		'VITAL'    =&gt; true,
+	],
+	'SCORE'   =&gt; [
+		'TYPE'   =&gt; 'ENUM',
+		'NAME'   =&gt; 'Оценка',
+		'VALUES' =&gt; [
+			'LIKE'    =&gt; 'Нравится',
+			'DISLIKE' =&gt; 'Не нравится',
+		],
+	],
+];</code>
+			</div>
+		</div>
+
+		<h2>Основные методы</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead><tr><th>Название</th><th>Параметры</th><th style="min-width: 300px;">Описание</th></tr></thead>
+				<tbody>
+					<tr><td>Init</td><td></td><td>Однократно запускается в конструкторе при создании нового экземпляра после линковки к базе данных и вычисления свойства $code, перед запуском метода <path>ProvideIntegrity</path>. Может динамически переопределять свойства: $fields, $code, $groups.</td></tr>
+					<tr><td>Create</td><td>$element</td><td>Создает новую строку в таблице и возвращает ее идентификатор.</td></tr>
+					<tr><td>Update</td><td><a href="#filter">$filter</a>, $element</td><td>Изменяет значения указанных полей в строках, подходящих под фильтр.</td></tr>
+					<tr><td>Delete</td><td><a href="#filter">$filter</a></td><td>Удаляет строки, подходящие под фильтр.</td></tr>
+					<tr><td>Read</td><td><a href="#filter">$filter</a>, $fields, $sort, $escape</td><td>Выбирает первый элемент, отсортированный и подходящий по фильтру.</td></tr>
+					<tr><td>Select</td><td rowspan="2">$params - словарь с ключами:<br>SORT, <a href="#filter">FILTER</a>, CONDITIONS, FIELDS, LIMIT, PAGE, KEY, ESCAPE, GROUP, <path>INNER_SORTS</path></td><td>Постранично выбирает элементы, фильтруя и сортируя. Возвращает двухмерный массив элементов.</td></tr>
+					<tr><td>Search</td><td>Постранично выбирает элементы, фильтруя и сортируя. Выполняет дополнительный SQL-запрос на поиск общего количества элементов, подходящих под фильтр. Возвращает словарь с ключами: ELEMENTS, PAGER.</td></tr>
+					<tr><td>GetColumn</td><td rowspan="2"><a href="#filter">$filter</a>, $field, $sort, $escape</td><td>Выбирает колонку, фильтруя и сортируя. Возвращает словарь элементов, в котором: ключ — идентификатор элемента, значение — значение выбранного поля элемента.</td></tr>
+					<tr><td>GetCell</td><td>Выбирает и возвращает значение указанного поля первого элемента, подходящего под фильтр и сортировку.</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Примеры использования</h2>
+
+		<div class="mb-3">
+			<div class="row">
+				<div class="col-xl-6">
+					Чтобы создать новую таблицу, нужно создать класс-наследник от SCRUD и определить ее поля:
+					<code class="language-php">class Rooms extends \BlackFox\SCRUD {
+	public $fields = [
+		'ID'    =&gt; self::ID,
+		'TITLE' =&gt; [
+			'TYPE'     =&gt; 'STRING',
+			'NAME'     =&gt; 'Название',
+			'NOT_NULL' =&gt; true,
+		],
+	];
+}</code>
+				</div>
+				<div class="col-xl-6">
+					Если необходимо некоторые свойства вычислять динамически, воспользуйтесь методом-обёрткой <path>Init</path>:
+					<code class="language-php">class Rooms extends \BlackFox\SCRUD {
+	public function Init() {
+		$this->fields = [
+			'ID'    =&gt; self::ID,
+			'TITLE' =&gt; [
+				'TYPE'     =&gt; 'STRING',
+				'NAME'     =&gt; T(['en' =&gt; 'Title', 'ru' =&gt; 'Название']),
+				'NOT_NULL' =&gt; true,
+			],
+		];
+	}
+}</code>
+				</div>
+			</div>
+		</div>
+
+		<div class="mb-3">
+			Вспомогательный класс <a href="scheme.html">Scheme</a> выполняет всю миграцию за вас,
+			синхронизируя структуру колонок таблиц между вашим php-кодом и базой данных:
+			<code class="language-php">( new \BlackFox\Scheme([Rooms::I()]) )->Synchronize();</code>
+		</div>
+
+		<div class="mb-3">
+			Метод <path>Create</path> создает новую запись в таблице и возвращает ее идентификатор:
+			<code class="language-php">$ID = Rooms::I()->Create(['TITLE' =&gt; 'Комната номер 567']);</code>
+		</div>
+
+		<div class="mb-3">
+			Метод <path>Update</path> изменяет в подходящих под фильтр строках значения указанных полей:
+			<code class="language-php">Rooms::I()->Update(5, ['TITLE' =&gt; 'Комната номер 5']);
+Rooms::I()->Update([6, 7, 8], ['TITLE' =&gt; 'Склад']);
+Rooms::I()->Update(['TITLE' =&gt; 'Не используется'], ['TITLE' =&gt; 'Хлам']);</code>
+		</div>
+
+		<div class="mb-3">
+			Метод <path>Delete</path> удаляет подходящие под фильтр строки:
+			<code class="language-php">Rooms::I()->Delete(5);
+Rooms::I()->Delete([6, 7, 8]);
+Rooms::I()->Delete(['TITLE' =&gt; 'Хлам']);</code>
+		</div>
+
+		<div class="mb-3">
+			Метод <path>Read</path> выбирает первый элемент, подходящий под фильтр:
+			<code class="language-php">$room = Rooms::I()->Read(5);
+// $room это массив: ['ID' =&gt; 5, 'TITLE' =&gt; 'Комната номер 5']
+
+$room = Rooms::I()->Read(5, ['TITLE']);
+// $room это массив: ['TITLE' =&gt; 'Комната номер 5']
+
+$room = Rooms::I()->Read([], ['*'], ['ID' =&gt; 'DESC']);
+// [] означает пустое условие, ['*'] означает все поля, третий параметр — сортировка
+// в результате будет самый верхний по ID элемент</code>
+		</div>
+
+		<div class="mb-3">
+			Метод <path>Search</path> постранично выбирает элементы:
+			<code class="language-php">// каждый параметр опционален
+$result = Rooms::I()->Search([
+	'FIELDS' =&gt; ['ID', 'TITLE'],
+	'FILTER' =&gt; [
+		'ID'    =&gt; [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+		'TITLE' =&gt; 'Хлам',
+	],
+	'LIMIT'  =&gt; 10,
+	'PAGE'   =&gt; 2,
+]);</code>
+			В результате будет ассоциативный массив с двумя ключами: ELEMENTS + PAGER.
+			ELEMENTS это ассоциативный массив элементов: ключ — идентификатор, значение — ассоциативный массив, описывающий элемент.
+			PAGER это ассоциативный массив, используемый для построения постраничной навигации.
+		</div>
+
+		<div class="mb-3">
+			Если вам не нужна постраничная навигация, используйте метод <path>Select</path>:
+			<code class="language-php">// каждый параметр опционален
+$rooms = Rooms::I()->Select([
+	'FIELDS' =&gt; ['ID', 'TITLE'],
+	'FILTER' =&gt; [
+		'~TITLE' =&gt; $_REQUEST['TITLE'],
+	],
+]);</code>
+			<path>$rooms</path>:
+			<code class="language-php">[
+	5 =&gt; [
+		'ID'    =&gt; 5,
+		'TITLE' =&gt; 'Комната номер 567',
+	],
+	7 =&gt; [
+		'ID'    =&gt; 7,
+		'TITLE' =&gt; 'Комната номер 700',
+	],
+]</code>
+		</div>
+
+		<div class="mb-3">
+			Если вам нужна только одна колонка, используйте метод <path>GetColumn</path>:
+			<code class="language-php">$result = Rooms::I()->GetColumn([], 'TITLE');</code>
+			В результате будет ассоциативный массив: ключ — идентификатор, значение — значение поля.
+		</div>
+
+		<h2 id="filter">Фильтрация</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					Фильтр — это ассоциативный массив (ключ — условие + код фильтруемого поля, значение —
+					значение фильтра). Структура фильтра устроена так, что его можно передавать напрямую
+					из формы в модель без изменений. Возможна <hint rel="#filter_dot">фильтрация по связанным элементам</hint>.
+					Можно комбинировать условия через OR|AND операторы.
+				</p>
+				<p>
+					Вместо ассоциативного массива можно передать <hint rel="#filter_value">значение</hint>
+					(числовое, строковое) или <hint rel="#filter_list">список значений</hint> — тогда фильтр
+					будет обработан как идентификатор или список идентификаторов.
+				</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php"><span id="filter_value">$filter = 15;</span>
+<span id="filter_list">$filter = [15, 16, 17, 18, 19, 20];</span>
+$filter = [
+	'MESSAGE'       =&gt; 'test',
+	'&gt;&gt;MOMENT'      =&gt; time() - 7 * 24 * 60 * 60,
+	<span id="filter_dot">'~AUTHOR.LOGIN' =&gt; 'uniko',</span>
+];</code>
+			</div>
+		</div>
+
+		<h2 id="fields2">Выборка</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					Выборка — это смешанный массив. В простом случае это список выбираемых полей. При
+					необходимости выбрать поля связанных элементов, добавьте ключ (указывающий на
+					связывающее поле) со значением — списком выбираемых полей у связанного элемента.
+				</p>
+				<p>Можно указать псевдополя:</p>
+				<ul>
+					<li><strong>@</strong> — все важные поля</li>
+					<li><strong>*</strong> — все поля</li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$fields = ['@'];
+$fields = ['*'];
+$fields = [
+	'ID',
+	'NAME',
+	'DESCRIPTION',
+];</code>
+			</div>
+		</div>
+
+		<h2>Многие-к-одному</h2>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>
+					Тип <path>OUTER</path> описывает связь между таблицами "многие-к-одному", другими
+					словами — является ссылкой на элемент во внешней таблице.
+					Необходимо указать свойство поля <path>LINK</path>:
+				</p>
+				<ul><li>название класса наследника SCRUD, описывающего таблицу с единственным основным ключом</li></ul>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+class Log extends SCRUD {
+	public $fields = [
+		'ID'   =&gt; self::ID,
+		// ...
+		'USER' =&gt; [
+			'TYPE' =&gt; 'OUTER',
+			'LINK' =&gt; 'Users',
+			'NAME' =&gt; 'Пользователь',
+		],
+		// ...
+	];
+}</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Для выборки полей связанного элемента <hint rel=".fields_key">добавьте в нее пару ключ-значение</hint>, где ключ — код поля-ссылки, значение — список выбираемых полей в связанной таблице.</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$logs = \BlackFox\Log::I()->Select([
+	'FIELDS' =&gt; [
+		'ID',
+		<span class="fields_key">'USER' =&gt; ['ID', 'LOGIN', 'EMAIL'],</span>
+	],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Для фильтрации по полям связанного элемента <hint rel=".filter_dot2">укажите к ним путь, разделяя через точку</hint>. Поддерживается неограниченная вложенность по цепочке.</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$logs = \BlackFox\Log::I()->Select([
+	'FILTER' =&gt; [
+		<span class="filter_dot2">'USER.LOGIN' =&gt; 'Reuniko',</span>
+	],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Совмещая <path>FIELDS</path> и <path>FILTER</path>:</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$logs = \BlackFox\Log::I()->Select([
+	'FIELDS' =&gt; [
+		'ID',
+		'USER' =&gt; ['ID', 'LOGIN', 'EMAIL'],
+	],
+	'FILTER' =&gt; [
+		'USER.LOGIN' =&gt; 'Reuniko',
+	],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">// $logs:
+[
+	42 =&gt; [
+		'ID'   =&gt; 42,
+		'USER' =&gt; [
+			'ID'    =&gt; 1,
+			'LOGIN' =&gt; 'Reuniko',
+			'EMAIL' =&gt; 'reuniko@gmail.com',
+		],
+	],
+	// ...
+]</code>
+			</div>
+		</div>
+
+		<h2>Один-ко-многим</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					Тип <path>INNER</path> описывает связь между таблицами "один-ко-многим", другими
+					словами — описывает ссылку из внешней таблицы на элемент в текущей.
+					Необходимо указать свойства поля <path>LINK</path> и <path>INNER_KEY</path>:
+				</p>
+				<ul>
+					<li><path>LINK</path> — название класса наследника SCRUD, описывающего таблицу, содержащую поле-ссылку на текущую таблицу</li>
+					<li><path>INNER_KEY</path> — код поля во внешней таблице, которое ссылается на текущую таблицу</li>
+				</ul>
+				<p>Поле такого типа является виртуальным — отсутствует в базе данных, но его можно выбирать и фильтровать так же как и тип <path>OUTER</path>.</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+class Users extends SCRUD {
+	public $fields = [
+		'ID'   =&gt; self::ID,
+		// ...
+		'LOGS' =&gt; [
+			'TYPE'      =&gt; 'INNER',
+			'NAME'      =&gt; 'Журнал',
+			'LINK'      =&gt; 'BlackFox\Log',
+			'INNER_KEY' =&gt; 'USER',
+		],
+	];
+}</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Выбирается точно так же, как и <path>OUTER</path>:</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$users = Users::I()->Select([
+	'FIELDS' =&gt; ['ID', 'LOGIN', 'LOGS' =&gt; ['ID', 'MESSAGE']],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">// $users:
+[
+	1 =&gt; [
+		'ID'    =&gt; 1,
+		'LOGIN' =&gt; 'Reuniko',
+		'LOGS'  =&gt; [
+			90 =&gt; ['ID' =&gt; 90, 'MESSAGE' =&gt; 'Успешная авторизация'],
+			77 =&gt; ['ID' =&gt; 77, 'MESSAGE' =&gt; 'Успешная авторизация'],
+			// ...
+		],
+	],
+	// ...
+]</code>
+			</div>
+		</div>
+
+		<h2>Многие-ко-многим</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>По сути связь "многие-ко-многим" является комбинацией связей "один-ко-многим" и "многие-к-одному".</p>
+				<p>Для создания такой связи следует создать промежуточную таблицу, содержащую:</p>
+				<ul>
+					<li>основной ключ (идентификатор)</li>
+					<li>ссылку на первую таблицу (тип <path>OUTER</path>)</li>
+					<li>ссылку на вторую таблицу (тип <path>OUTER</path>)</li>
+				</ul>
+				<p>А в связанных таблицах создаете виртуальные поля типа <path>INNER</path>, ссылающиеся на поля в промежуточной таблице.</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+class Users2Groups extends SCRUD {
+	public $fields = [
+		'ID'    =&gt; self::ID,
+		'USER'  =&gt; [
+			'TYPE'    =&gt; 'OUTER',
+			'LINK'    =&gt; 'Users',
+			<span class="many2many_foreign">'FOREIGN' =&gt; 'CASCADE',</span>
+		],
+		'GROUP' =&gt; [
+			'TYPE'    =&gt; 'OUTER',
+			'LINK'    =&gt; 'Groups',
+			<span class="many2many_foreign">'FOREIGN' =&gt; 'CASCADE',</span>
+		],
+	];
+}</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Доступ к ней можно открыть с любой стороны через поле <path>INNER</path>, указывающее на промежуточную таблицу:</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+class Users extends SCRUD {
+	public $fields = [
+		'ID'     =&gt; self::ID,
+		// ...
+		'GROUPS' =&gt; [
+			'TYPE'      =&gt; 'INNER',
+			'NAME'      =&gt; 'Группы',
+			'LINK'      =&gt; 'BlackFox\Users2Groups',
+			'INNER_KEY' =&gt; 'USER',
+		],
+	];
+}</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+				<p>Выборка вернёт строки самой промежуточной таблицы; чтобы добраться до полей группы, нужно углубиться ещё на уровень через её собственное поле <path>GROUP</path>:</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$users = Users::I()->Select([
+	'FIELDS' =&gt; ['ID', 'LOGIN', 'GROUPS' =&gt; ['ID', 'GROUP' =&gt; ['ID', 'NAME']]],
+]);</code>
+			</div>
+		</div>
+		<div class="row mb-2">
+			<div class="col-xl-6">
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">// $users:
+[
+	1 =&gt; [
+		'ID'     =&gt; 1,
+		'LOGIN'  =&gt; 'Reuniko',
+		'GROUPS' =&gt; [
+			1 =&gt; [
+				'ID'    =&gt; 1,
+				'GROUP' =&gt; [
+					'ID'   =&gt; 1,
+					'NAME' =&gt; 'Root',
+				],
+			],
+			2 =&gt; [
+				'ID'    =&gt; 2,
+				'GROUP' =&gt; [
+					'ID'   =&gt; 2,
+					'NAME' =&gt; 'Редакторы',
+				],
+			],
+		],
+	],
+	// ...
+]</code>
+			</div>
+		</div>
+
+		<h2>Внешние ключи</h2>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					По умолчанию тип <path>OUTER</path> описывает "ленивую" ссылку, которая не
+					беспокоится о консистентности данных в базе данных.
+					Чтобы наложить на ссылку ограничение (внешний ключ), необходимо добавить в описание поля
+					<hint rel=".many2many_foreign">свойство <path>FOREIGN</path></hint>.
+				</p>
+				<p>
+					Вспомогательный класс <a href="scheme.html">Scheme</a> позаботится о том чтобы проверить наличие
+					или отсутствие этих ограничений в базе данных (а так же структуру полей, первичных ключей и
+					индексов) и предоставит отсортированный набор SQL-строк для синхронизации структуры базы данных.
+				</p>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace BlackFox;
+$Scheme = new Scheme([
+	User::I(),
+	Groups::I(),
+	Users2Groups::I(),
+]);
+$diffs = $Scheme->Compare();
+foreach ($diffs as $diff)
+	Database::I()->Query($diff['SQL']);
+// или:
+$Scheme->Synchronize();</code>
+			</div>
+		</div>
+
+	</div>
+</main>
+
+</body>
+</html>

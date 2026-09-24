@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Config — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="config.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/basics/config.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Config</h1>
+
+		<p>
+			File <path>/config.php</path> returns a configuration array.
+			You can add your own keys and use them.
+		</p>
+
+		<div class="row">
+			<div class="col-xl-6">
+				<h3>Example</h3>
+				<code class="language-php">return [
+	'debug'     =&gt; true,
+	'cores'     =&gt; [
+		'Site'     =&gt; $_SERVER['DOCUMENT_ROOT'] . '/Site',
+		'BlackFox' =&gt; $_SERVER['DOCUMENT_ROOT'] . '/BlackFox',
+	],
+	'roots'     =&gt; [
+		'/Site/root'     =&gt; $_SERVER['DOCUMENT_ROOT'] . '/Site/root',
+		'/BlackFox/root' =&gt; $_SERVER['DOCUMENT_ROOT'] . '/BlackFox/root',
+	],
+	'languages' =&gt; [
+		'en' =&gt; 'English',
+		'ru' =&gt; 'Русский',
+	],
+	'templates' =&gt; [
+		'main'  =&gt; '/Site/templates/main',
+		'admin' =&gt; '/BlackFox/templates/admin',
+	],
+	'overrides' =&gt; [
+		'BlackFox\Engine'   =&gt; 'Site\Engine',
+		'BlackFox\Database' =&gt; 'BlackFox\MySQL',
+	],
+	'database'  =&gt; [
+		'HOST'     =&gt; 'localhost',
+		'PORT'     =&gt; 3306,
+		'USER'     =&gt; 'root',
+		'PASSWORD' =&gt; '',
+		'DATABASE' =&gt; 'site',
+	],
+];</code>
+				<br/>
+				<ul>
+					<li><path>/Site</path> — directory with your core</li>
+					<li><path>/BlackFox</path> — directory with framework (which is also a core)</li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+
+				<h3>Keys meaning</h3>
+				<dl class="dl-horizontal" style="max-width: 1000px;">
+
+					<dt>debug</dt>
+					<dd>bool, set this to true to allow global function <a href="functions.html#debug">debug()</a> to work</dd>
+
+					<dt id="cores">cores</dt>
+					<dd>
+						dictionary of <a href="structure.html#core">cores</a>:
+						<li>key - namespace of the core</li>
+						<li>value - absolute path to core folder</li>
+						first key has top priority
+					</dd>
+
+					<dt id="roots">roots</dt>
+					<dd>
+						dictionary of <a href="root.html">roots</a>:
+						<li>key - relative path to root</li>
+						<li>value - absolute path to root</li>
+						first key has top priority
+					</dd>
+
+					<dt>languages</dt>
+					<dd>
+						dictionary of languages (may be empty):
+						<li>key - symbolic code of language</li>
+						<li>value - name of language</li>
+						first element is the default language
+					</dd>
+
+					<dt>templates</dt>
+					<dd>
+						dictionary of <a href="template.html">templates</a>:
+						<li>key - template code</li>
+						<li>value - relative path to the template folder</li>
+					</dd>
+
+					<dt>overrides</dt>
+					<dd>
+						dictionary, describing <a href="../classes/instance.html#overrides">classes overriding</a>:
+						<li>key - class that needs to be overridden</li>
+						<li>value - class to override with</li>
+						remember that you can successfully override a class only with its descendant
+					</dd>
+
+					<dt>database</dt>
+					<dd>
+						dictionary of details for connecting to the database, keys vary by driver
+					</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

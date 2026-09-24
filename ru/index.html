@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>PHP фреймворк BlackFox</title>
+	<link rel="stylesheet" href="../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../assets/docs-style.css">
+	<link rel="stylesheet" href="../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../assets/menu.css">
+	<link rel="stylesheet" href="../assets/prism.css">
+	<link rel="stylesheet" href="../assets/site.css">
+	<script src="../assets/prism.js"></script>
+	<script src="../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = './';</script>
+	<script src="sidebar.js" defer></script>
+	<script src="../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../en/index.html">English</a>
+		<a class="btn btn-secondary active" href="index.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+
+		<div style="position: relative;">
+			<div class="intro bg-info d-flex align-items-center justify-content-center overflow-auto" style="height: 250px; color: black;">
+				<a style="position: absolute; top:0; right: 0;" href="https://github.com/Reuniko/BlackFox">
+					<img width="149" height="149" src="../assets/img/fork.png" alt="Fork me on GitHub">
+				</a>
+				<div class="mx-4">
+					<img height="200" src="../assets/img/blackfox.png">
+				</div>
+				<div>
+					<h1 style="font-size: 500%;">BlackFox</h1>
+					<span style="font-size: 200%;">PHP фреймворк для веб-сайтов и приложений</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="example p-3">
+			<div class="row">
+				<div class="col-sm">
+					<h2 class="text-center">Модель</h2>
+					<path>/Docs/classes/Feedback.php</path>
+					<code class="language-php">namespace Docs;
+class Feedback extends \BlackFox\SCRUD {
+
+	public $fields = [
+		'ID'      =&gt; self::ID,
+		'MOMENT'  =&gt; [
+			'TYPE'     =&gt; 'DATETIME',
+			'NAME'     =&gt; 'Момент',
+			'NOT_NULL' =&gt; true,
+		],
+		'AUTHOR'  =&gt; [
+			'TYPE'     =&gt; 'STRING',
+			'NAME'     =&gt; 'Автор',
+			'NOT_NULL' =&gt; true,
+		],
+		'MESSAGE' =&gt; [
+			'TYPE' =&gt; 'TEXT',
+			'NAME' =&gt; 'Сообщение',
+		],
+	];
+
+	public function Create($element) {
+		$element['MOMENT'] = time();
+		return parent::Create($element);
+	}
+}</code>
+				</div>
+				<div class="col-sm">
+					<h2 class="text-center">Контроллер</h2>
+					<path>/Docs/units/UnitFeedback/UnitFeedback.php</path>
+					<code class="language-php">namespace Docs;
+class UnitFeedback extends \BlackFox\Unit {
+
+	public function Default() {
+		$RESULT = Feedback::I()->Select([
+			'SORT'  =&gt; ['ID' =&gt; 'DESC'],
+			'LIMIT' =&gt; 10,
+		]);
+		return $RESULT;
+	}
+
+	public function AddFeedback(array $feedback) {
+		if ($feedback['AUTHOR'] === 'Reuniko') {
+			throw new \BlackFox\ExceptionAccessDenied();
+		}
+		$ID = Feedback::I()->Create($feedback);
+		$this->Redirect("?ID={$ID}", 'Ваш отзыв был добавлен');
+	}
+
+}</code>
+					<br>
+					<path>/Docs/root/feedback.php</path>
+					<code class="language-php">\Docs\UnitFeedback::Run();</code>
+				</div>
+				<div class="col-sm">
+					<h2 class="text-center">Вью</h2>
+					<path>/Docs/units/UnitFeedback/view/Default.php</path>
+					<code class="language-php">&lt;div class="row m-5"&gt;
+	&lt;div class="col"&gt;
+		&lt;? foreach ($RESULT as $feedback): ?&gt;
+			&lt;div&gt;
+				&lt;strong title="&lt;?= $feedback['MOMENT'] ?&gt;"&gt;
+					&lt;?= $feedback['AUTHOR'] ?&gt;
+				&lt;/strong&gt;:
+				&lt;span&gt;&lt;?= $feedback['MESSAGE'] ?&gt;&lt;/span&gt;
+			&lt;/div&gt;
+		&lt;? endforeach; ?&gt;
+	&lt;/div&gt;
+	&lt;div class="col"&gt;
+		&lt;form method="post"&gt;
+			&lt;?
+			\BlackFox\Form::Run([
+				'SCRUD'   =&gt; \Docs\Feedback::I(),
+				'FIELDS'  =&gt; ['AUTHOR', 'MESSAGE'],
+				'DATA'    =&gt; $_REQUEST['feedback'] ?: [],
+				'ELEMENT' =&gt; 'feedback',
+			]);
+			?&gt;
+			&lt;button class="btn btn-success" type="submit" name="ACTION" value="AddFeedback"&gt;Добавить отзыв&lt;/button&gt;
+		&lt;/form&gt;
+	&lt;/div&gt;
+&lt;/div&gt;</code>
+				</div>
+			</div>
+		</div>
+
+		<div class="example p-3 d-flex justify-content-center">
+			<div style="width: 1200px;">
+				<h2 class="text-center">Результат</h2>
+				<div class="feedback-demo">
+					<div class="row m-5">
+						<div class="col">
+							<div class="feedback-entry"><strong>Анна</strong>: Разобралась за пять минут, синтаксис ORM очень читаемый.</div>
+							<div class="feedback-entry"><strong>Максим</strong>: Уже два года в продакшене, ни разу не пожалел.</div>
+							<div class="feedback-entry"><strong>Ольга</strong>: Adminer избавил от написания собственной админки.</div>
+							<div class="feedback-entry"><strong>Том</strong>: В документации не хватает примеров, но сам код чистый.</div>
+							<div class="feedback-entry"><strong>Игорь</strong>: Виртуальные корни — отличная идея для мультисайтов.</div>
+						</div>
+						<div class="col">
+							<form onsubmit="return false;">
+								<div class="form-group">
+									<label>Автор</label>
+									<input class="form-control" disabled>
+								</div>
+								<div class="form-group">
+									<label>Сообщение</label>
+									<textarea class="form-control" rows="4" disabled></textarea>
+								</div>
+								<button class="btn btn-success" type="button" disabled>Добавить отзыв</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="example p-3">
+			<div class="row">
+				<div class="col-sm"></div>
+				<div class="col-sm">
+					<h2 class="text-center">Контроллер</h2>
+					<path>/Site/root/feedback/index.php</path>
+					<code class="language-php">\BlackFox\Adminer::Run(['SCRUD' =&gt; Docs\Feedback::I()]);</code>
+				</div>
+				<div class="col-sm"></div>
+			</div>
+		</div>
+
+		<div class="example p-3 text-center">
+			<h2>Результат</h2>
+			<p>административный интерфейс</p>
+			<div>
+				<div class="d-inline-block" style="max-width: 800px; border: 1px solid gray;">
+					<img width="100%" src="../assets/img/admin_table.png"/>
+				</div>
+				<div class="d-inline-block" style="max-width: 800px; border: 1px solid gray;">
+					<img width="100%" src="../assets/img/admin_element.png"/>
+				</div>
+			</div>
+		</div>
+
+		<hr/>
+
+		<div class="features p-3">
+			<div class="row">
+
+				<div class="col-lg">
+					<h2 class="text-center">Парадигмы</h2>
+					<div class="d-flex justify-content-center">
+						<ul class="root">
+							<li>
+								Отказ от обратной совместимости
+								<ul>
+									<li>Ничто не ограничивает фреймворк в развитии</li>
+									<li>Обновление через git pull</li>
+								</ul>
+							</li>
+							<li>
+								Отказ от правил и ограничений
+								<ul>
+									<li>Предоставляет только рекомендации</li>
+									<li>Творите в своем стиле</li>
+									<li>Упрощает и ускоряет разработку</li>
+								</ul>
+							</li>
+							<li>
+								Отказ от 100% тестирования
+								<ul>
+									<li>Тесты только в самых нужных местах</li>
+									<li>Сперва код, потом тесты</li>
+								</ul>
+							</li>
+							<li>
+								Фокус на программиста, а не на пользователя
+								<ul>
+									<li>Логика и структуры — в коде, контент — в базе данных</li>
+									<li>Для проектов, готовых позволить себе программиста на полную ставку</li>
+								</ul>
+							</li>
+							<li>
+								Фокус на внешних PHP библиотеках
+								<ul>
+									<li>Содержит минимум необходимого</li>
+									<li>Можно изучить очень быстро</li>
+								</ul>
+							</li>
+							<li>
+								Баланс между простотой и сложностью
+								<ul>
+									<li>Простые и доступные интерфейсы</li>
+									<li>Сложная, но устойчивая логика внутри</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-lg p-3 p-lg-0">
+					<h2 class="text-center">Фичи</h2>
+					<div class="d-flex justify-content-center">
+						<ul class="root">
+							<li>Независимые репозитории между фреймворком и вашим кодом</li>
+							<li>Простая маршрутизация</li>
+							<li>Возможность переопределять файлы и классы фреймворка</li>
+							<li>Автоматическая синхронизация структур таблиц</li>
+							<li>Экстремально простой формат массива для фильтрации</li>
+							<li>One-many, many-one, many-many связи</li>
+							<li>Административная страница для каждой таблицы</li>
+							<li>Пользовательские типы данных</li>
+							<li>Поддержка мультиязычности</li>
+							<li>Наследование шаблонов</li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+</main>
+
+</body>
+</html>

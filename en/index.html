@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>PHP framework BlackFox</title>
+	<link rel="stylesheet" href="../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../assets/docs-style.css">
+	<link rel="stylesheet" href="../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../assets/menu.css">
+	<link rel="stylesheet" href="../assets/prism.css">
+	<link rel="stylesheet" href="../assets/site.css">
+	<script src="../assets/prism.js"></script>
+	<script src="../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = './';</script>
+	<script src="sidebar.js" defer></script>
+	<script src="../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="index.html">English</a>
+		<a class="btn btn-secondary" href="../ru/index.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+
+		<div style="position: relative;">
+			<div class="intro bg-info d-flex align-items-center justify-content-center overflow-auto" style="height: 250px; color: black;">
+				<a style="position: absolute; top:0; right: 0;" href="https://github.com/Reuniko/BlackFox">
+					<img width="149" height="149" src="../assets/img/fork.png" alt="Fork me on GitHub">
+				</a>
+				<div class="mx-4">
+					<img height="200" src="../assets/img/blackfox.png">
+				</div>
+				<div>
+					<h1 style="font-size: 500%;">BlackFox</h1>
+					<span style="font-size: 200%;">PHP framework for web-sites and applications</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="example p-3">
+			<div class="row">
+				<div class="col-sm">
+					<h2 class="text-center">Model</h2>
+					<path>/Docs/classes/Feedback.php</path>
+					<code class="language-php">namespace Docs;
+class Feedback extends \BlackFox\SCRUD {
+
+	public $fields = [
+		'ID'      =&gt; self::ID,
+		'MOMENT'  =&gt; [
+			'TYPE'     =&gt; 'DATETIME',
+			'NAME'     =&gt; 'Moment',
+			'NOT_NULL' =&gt; true,
+		],
+		'AUTHOR'  =&gt; [
+			'TYPE'     =&gt; 'STRING',
+			'NAME'     =&gt; 'Author',
+			'NOT_NULL' =&gt; true,
+		],
+		'MESSAGE' =&gt; [
+			'TYPE' =&gt; 'TEXT',
+			'NAME' =&gt; 'Message',
+		],
+	];
+
+	public function Create($element) {
+		$element['MOMENT'] = time();
+		return parent::Create($element);
+	}
+}</code>
+				</div>
+				<div class="col-sm">
+					<h2 class="text-center">Controller</h2>
+					<path>/Docs/units/UnitFeedback/UnitFeedback.php</path>
+					<code class="language-php">namespace Docs;
+class UnitFeedback extends \BlackFox\Unit {
+
+	public function Default() {
+		$RESULT = Feedback::I()->Select([
+			'SORT'  =&gt; ['ID' =&gt; 'DESC'],
+			'LIMIT' =&gt; 10,
+		]);
+		return $RESULT;
+	}
+
+	public function AddFeedback(array $feedback) {
+		if ($feedback['AUTHOR'] === 'Reuniko') {
+			throw new \BlackFox\ExceptionAccessDenied();
+		}
+		$ID = Feedback::I()->Create($feedback);
+		$this->Redirect("?ID={$ID}", 'Your feedback has been added');
+	}
+
+}</code>
+					<br>
+					<path>/Docs/root/feedback.php</path>
+					<code class="language-php">\Docs\UnitFeedback::Run();</code>
+				</div>
+				<div class="col-sm">
+					<h2 class="text-center">View</h2>
+					<path>/Docs/units/UnitFeedback/view/Default.php</path>
+					<code class="language-php">&lt;div class="row m-5"&gt;
+	&lt;div class="col"&gt;
+		&lt;? foreach ($RESULT as $feedback): ?&gt;
+			&lt;div&gt;
+				&lt;strong title="&lt;?= $feedback['MOMENT'] ?&gt;"&gt;
+					&lt;?= $feedback['AUTHOR'] ?&gt;
+				&lt;/strong&gt;:
+				&lt;span&gt;&lt;?= $feedback['MESSAGE'] ?&gt;&lt;/span&gt;
+			&lt;/div&gt;
+		&lt;? endforeach; ?&gt;
+	&lt;/div&gt;
+	&lt;div class="col"&gt;
+		&lt;form method="post"&gt;
+			&lt;?
+			\BlackFox\Form::Run([
+				'SCRUD'   =&gt; \Docs\Feedback::I(),
+				'FIELDS'  =&gt; ['AUTHOR', 'MESSAGE'],
+				'DATA'    =&gt; $_REQUEST['feedback'] ?: [],
+				'ELEMENT' =&gt; 'feedback',
+			]);
+			?&gt;
+			&lt;button class="btn btn-success" type="submit" name="ACTION" value="AddFeedback"&gt;Add feedback&lt;/button&gt;
+		&lt;/form&gt;
+	&lt;/div&gt;
+&lt;/div&gt;</code>
+				</div>
+			</div>
+		</div>
+
+		<div class="example p-3 d-flex justify-content-center">
+			<div style="width: 1200px;">
+				<h2 class="text-center">Result</h2>
+				<div class="feedback-demo">
+					<div class="row m-5">
+						<div class="col">
+							<div class="feedback-entry"><strong>Anna</strong>: Signed up in five minutes, the ORM syntax is very readable.</div>
+							<div class="feedback-entry"><strong>Max</strong>: Been running this in production for two years, zero regrets.</div>
+							<div class="feedback-entry"><strong>Olga</strong>: Adminer panel saved me from writing a whole back office by hand.</div>
+							<div class="feedback-entry"><strong>Tom</strong>: Docs could use more examples, but the code itself is clean.</div>
+							<div class="feedback-entry"><strong>Igor</strong>: Virtual roots are a great idea for multi-site setups.</div>
+						</div>
+						<div class="col">
+							<form onsubmit="return false;">
+								<div class="form-group">
+									<label>Author</label>
+									<input class="form-control" disabled>
+								</div>
+								<div class="form-group">
+									<label>Message</label>
+									<textarea class="form-control" rows="4" disabled></textarea>
+								</div>
+								<button class="btn btn-success" type="button" disabled>Add feedback</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="example p-3">
+			<div class="row">
+				<div class="col-sm"></div>
+				<div class="col-sm">
+					<h2 class="text-center">Controller</h2>
+					<path>/Site/root/feedback/index.php</path>
+					<code class="language-php">\BlackFox\Adminer::Run(['SCRUD' =&gt; Docs\Feedback::I()]);</code>
+				</div>
+				<div class="col-sm"></div>
+			</div>
+		</div>
+
+		<div class="example p-3 text-center">
+			<h2>Result</h2>
+			<p>administrative pages</p>
+			<div>
+				<div class="d-inline-block" style="max-width: 800px; border: 1px solid gray;">
+					<img width="100%" src="../assets/img/admin_table.png"/>
+				</div>
+				<div class="d-inline-block" style="max-width: 800px; border: 1px solid gray;">
+					<img width="100%" src="../assets/img/admin_element.png"/>
+				</div>
+			</div>
+		</div>
+
+		<hr/>
+
+		<div class="features p-3">
+			<div class="row">
+
+				<div class="col-lg">
+					<h2 class="text-center">Paradigms</h2>
+					<div class="d-flex justify-content-center">
+						<ul class="root">
+							<li>
+								Disclaimer of backward compatibility
+								<ul>
+									<li>Nothing limits framework development</li>
+									<li>Allows to be updated through git pull</li>
+								</ul>
+							</li>
+							<li>
+								Disclaimer of rules and restrictions
+								<ul>
+									<li>Provides only recommendations</li>
+									<li>Be creative in your style</li>
+									<li>Simplifies and speeds up development</li>
+								</ul>
+							</li>
+							<li>
+								Disclaimer of 100% testing
+								<ul>
+									<li>Tests only in the most necessary places</li>
+									<li>First the code, then the tests</li>
+								</ul>
+							</li>
+							<li>
+								Focus on programmer, not on user
+								<ul>
+									<li>Logic and structures — in the code, content — in the database</li>
+									<li>For projects that are willing to afford a full-time programmer</li>
+								</ul>
+							</li>
+							<li>
+								Focus on external PHP libraries
+								<ul>
+									<li>Contains the absolute minimum of necessary</li>
+									<li>You can learn it very fast</li>
+								</ul>
+							</li>
+							<li>
+								Balance between simplicity and complexity
+								<ul>
+									<li>Simple and affordable interfaces</li>
+									<li>Difficult but steady logic inside</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="col-lg p-3 p-lg-0">
+					<h2 class="text-center">Features</h2>
+					<div class="d-flex justify-content-center">
+						<ul class="root">
+							<li>Independent VCS between framework and your code</li>
+							<li>Simple traditional routing</li>
+							<li>Ability to override framework files and classes</li>
+							<li>Automatic synchronization of table structures</li>
+							<li>Extremely simple array format for filtering</li>
+							<li>One-many, many-one, many-many links</li>
+							<li>Administrative page for each database table</li>
+							<li>Custom data types</li>
+							<li>Multi-language support</li>
+							<li>View inheritance</li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+</main>
+
+</body>
+</html>

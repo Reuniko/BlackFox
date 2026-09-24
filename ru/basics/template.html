@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Шаблон и обёртка — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/basics/template.html">English</a>
+		<a class="btn btn-secondary active" href="template.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Шаблон и обёртка</h1>
+
+		<p>
+			Шаблон — это папка с php-файлами, некоторые из которых используются как обёртки для генерации страницы.
+			<br>Обёртка — это php-файл, содержащий шапку (хидер) + вызов контента страницы + подвал (футер).
+			<br>Название папки является кодом шаблона (например: <path>bootstrap</path>).
+			<br>Название php-файла без расширения является кодом обёртки шаблона (по умолчанию: <path>wrapper</path>).
+			<br>Один шаблон может содержать множество обёрток.
+			<br>Помимо исполняемых файлов шаблон может содержать прочие статичные файлы для подключения (скрипты, стили и изображения).
+		</p>
+
+		<p>
+			Обёртка шаблона должна содержать вызов на печать названия страницы, заголовков и контента:
+		</p>
+		<code class="language-php">&lt;?php /** @var \BlackFox\Engine $this */ ?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+	&lt;?= $this-&gt;GetHeader() ?&gt;
+	&lt;title&gt;&lt;?= $this-&gt;TITLE ?&gt;&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;&lt;?= $this-&gt;TITLE ?&gt;&lt;/h1&gt;
+&lt;?= $this-&gt;CONTENT ?&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code>
+
+		<dl class="dl-horizontal" style="max-width: 1000px;">
+			<dt>$CONTENT</dt>
+			<dd>
+				контент страницы,
+				генерируется в подключаемом файле, находящемся в виртуальном корне
+			</dd>
+
+			<dt>$TITLE</dt>
+			<dd>название страницы</dd>
+
+			<dt>$TEMPLATE_PATH</dt>
+			<dd>путь к папке шаблона относительно корня сервера</dd>
+
+			<dt>GetHeader()</dt>
+			<dd>динамически подключаемые скрипты и стили</dd>
+		</dl>
+
+		<p>
+			Скрипты и стили, присутствующие на всех страницах, можно подключить обычным способом.
+			<br>
+			Если в процессе генерации контента страницы понадобилось подключить дополнительные скрипты и стили,
+			воспользуйтесь методами <path>AddHeaderScript</path>, <path>AddHeaderStyle</path>, <path>AddHeaderString</path>:
+		</p>
+		<code class="language-php">&lt;?php
+/** @var \BlackFox\Engine $this */
+$this-&gt;AddHeaderScript($this-&gt;TEMPLATE_PATH . '/script.js');
+$this-&gt;AddHeaderStyle($this-&gt;TEMPLATE_PATH . '/style.css');
+$this-&gt;AddHeaderString('&lt;meta .../&gt;');</code>
+
+		<h2>Управление шаблоном и обёрткой</h2>
+		<p>
+			Есть возможность динамически переопределять код шаблона и код обёртки.
+		</p>
+		<div class="row">
+			<div class="col-xl-6">
+				Для всего раздела в файле <path>.section.php</path>:
+				<code class="language-php">return [
+	'TEMPLATE' =&gt; 'another_template',
+	'WRAPPER'  =&gt; 'another_wrapper',
+];</code>
+			</div>
+			<div class="col-xl-6">
+				Для конкретного исполняемого файла:
+				<code class="language-php">/** @var \BlackFox\Engine $this */
+$this-&gt;TEMPLATE = 'another_template';
+$this-&gt;WRAPPER = 'another_wrapper';</code>
+			</div>
+		</div>
+
+		<h2>Обработка ошибок при генерации страницы</h2>
+		<p>
+			Находящийся в корне шаблона файл <path>errors.php</path> не является обёрткой, используется движком для
+			генерации контента страницы, отображающего ошибки, возникшие при генерации оригинальной страницы.
+		</p>
+
+		<code class="language-php">&lt;?php /** @var \BlackFox\Engine $this */ ?&gt;
+&lt;?php /** @var array $errors */ ?&gt;
+&lt;?php foreach ($errors as $error): ?&gt;
+	&lt;div class="alert alert-danger"&gt;&lt;?= $error ?&gt;&lt;/div&gt;
+&lt;?php endforeach; ?&gt;</code>
+
+		<p>
+			При желании это поведение движка можно переопределить, переопределив метод <path>ShowErrors</path> класса
+			<path>Engine</path>.
+		</p>
+	</div>
+</main>
+
+</body>
+</html>

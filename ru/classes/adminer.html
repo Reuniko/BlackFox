@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Adminer — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/adminer.html">English</a>
+		<a class="btn btn-secondary active" href="adminer.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Adminer</h1>
+
+		<p>
+			Юнит
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/units/Adminer/Adminer.php">BlackFox\Adminer</a>
+			принимает на вход как параметр объект-наследник от SCRUD
+			и предоставляет полный контроль над таблицей:
+		</p>
+		<ul>
+			<li>
+				Просмотр в виде таблицы с возможностями фильтрации, сортировки, постраничного просмотра, а также персональных
+				настроек порядка и отображения столбцов таблицы и фильтра
+			</li>
+			<li>Формы для создания и редактирования элементов</li>
+			<li>Возможность удалять как отдельные элементы, так и элементы группами</li>
+		</ul>
+		<code class="language-php">\BlackFox\Adminer::Run(['SCRUD' =&gt; Docs\Feedback::I()]);</code>
+
+		<h2>Методы</h2>
+		<p>Публичные методы являются действиями</p>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Параметры</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>Section</td><td>$FILTER = [], $PAGE = 1, $SORT = ['ID' =&gt; 'DESC'], $FIELDS = ['*@@']</td><td>Отображает таблицу</td></tr>
+				<tr><td>GetDefaultValues</td><td></td><td>Возвращает словарь значений по умолчанию</td></tr>
+				<tr><td>GetBackLink</td><td></td><td>Возвращает ссылку на предыдущую страницу</td></tr>
+				<tr><td>CreateForm</td><td>$FILTER = [], $FIELDS = []</td><td>Отображает форму создания нового элемента</td></tr>
+				<tr><td>UpdateForm</td><td>$ID = null, $FIELDS = []</td><td>Отображает форму редактирования существующего элемента</td></tr>
+				<tr><td>Create</td><td>$FIELDS = [], $REDIRECT = null</td><td>Создаёт элемент</td></tr>
+				<tr><td>Update</td><td>$ID, $FIELDS = [], $REDIRECT = null</td><td>Редактирует элемент</td></tr>
+				<tr><td>Delete</td><td>$ID</td><td>Удаляет элемент(ы)</td></tr>
+				<tr><td>ExecuteAction</td><td>$ID, $action_id, $action_params = []</td><td>Запускает зарегистрированное действие элемента по его id</td></tr>
+				<tr><td>GetHref</td><td>array $element</td><td>Возвращает URL указанного элемента (используется для ссылок на строки в таблице)</td></tr>
+				<tr><td>ControlUrl</td><td></td><td>Чистит GET-запрос от пустых значений</td></tr>
+				<tr><td>SanitizeUrl</td><td>$url</td><td>Преобразует GET-запрос в человеко-понятный вид</td></tr>
+				<tr><td>LoadTableSettings</td><td></td><td>Загружает настройки таблицы</td></tr>
+				<tr><td>SaveTableSettings</td><td>$filters = [], $fields = []</td><td>Сохраняет настройки таблицы</td></tr>
+				<tr><td>GetTabsOfCreate</td><td></td><td>Возвращает массив вкладок формы создания элемента</td></tr>
+				<tr><td>GetTabsOfUpdate</td><td></td><td>Возвращает массив вкладок формы редактирования элемента</td></tr>
+				<tr><td>SearchOuter</td><td>$code, $search, $page = 1</td><td>Ищет подходящие значения для внешнего элемента</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Отображения</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>element</td><td>Набор вкладок, включающих форму создания/редактирования элемента</td></tr>
+				<tr><td>element_tab_main</td><td>Вкладка для формы создания/редактирования элемента</td></tr>
+				<tr class="text-secondary"><td>element_head</td><td>Заголовок от формы создания/редактирования элемента</td></tr>
+				<tr class="text-secondary"><td>element_foot</td><td>Подвал от формы создания/редактирования элемента</td></tr>
+				<tr><td>element_bottom_buttons</td><td>Кнопки "Сохранить", "Подтвердить", "Отмена", "Удалить"</td></tr>
+				<tr><td>element_tab_external</td><td>Вкладка для таблицы связанных элементов (может быть несколько)</td></tr>
+				<tr><td>filter</td><td>Фильтр</td></tr>
+				<tr><td>section</td><td>Секция: фильтр + таблица элементов</td></tr>
+				<tr><td>pager</td><td>Постраничная навигация</td></tr>
+				<tr><td>section_settings</td><td>Настройки отображения секции</td></tr>
+				<tr><td>section_settings_list</td><td>Настройки отображения секции: список полей</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Пример добавления отображения</h2>
+		<p>
+			Допустим, необходимо добавить дополнительную вкладку в форму
+			<u>редактирования</u> элемента, на которой расположить форму для нового действия.
+			<br/>
+			Для этого следует создать юнит-наследник от <path>Adminer</path>, а также:
+		</p>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>Дополнить метод <path>GetTabsOfUpdate</path>:</p>
+				<code class="language-php">namespace BlackFox;
+class AdminerUsers extends Adminer {
+	// ...
+	public function GetTabsOfUpdate() {
+		return parent::GetTabsOfUpdate() + [
+				'actions' =&gt; [
+					'NAME' =&gt; T([
+						'en' =&gt; 'Actions',
+						'ru' =&gt; 'Действия',
+					]),
+					'VIEW' =&gt; 'element_tab_actions',
+				],
+			];
+	}
+}</code>
+			</div>
+			<div class="col-xl-6">
+				<p>Создать отображение <path>element_tab_actions</path>:</p>
+				<code class="language-php">/** @var \BlackFox\Adminer $this */
+/** @var array $RESULT */
+?&gt;
+&lt;form method="post"&gt;
+	&lt;button
+		type="submit"
+		name="ACTION"
+		value="Login"
+		class="btn btn-info"
+	&gt;
+		&lt;?= T([
+			'en' =&gt; 'Log in with this user',
+			'ru' =&gt; 'Авторизоваться под этим пользователем',
+		]) ?&gt;
+	&lt;/button&gt;
+&lt;/form&gt;</code>
+			</div>
+		</div>
+
+		<h2>Пример наследования отображения</h2>
+		<p>
+			Допустим, необходимо переписать форму <u>создания</u> элемента.
+			<br/>
+			Для этого следует создать юнит-наследник от <path>Adminer</path>, а также
+			переопределить отображение <path>element</path>:
+		</p>
+		<div class="row">
+			<div class="col-xl-6">
+				<code class="language-php">&lt;?php /** @var \BlackFox\Adminer $this */ ?&gt;
+&lt;?php /** @var array $RESULT */ ?&gt;
+&lt;? if ($RESULT['MODE'] &lt;&gt; 'Create'): ?&gt;
+	&lt;? require $this-&gt;GetParentView(); ?&gt;
+&lt;? else: ?&gt;
+	&lt;form method="post" enctype="multipart/form-data"&gt;
+		&lt;!-- new form for create --&gt;
+	&lt;/form&gt;
+&lt;? endif; ?&gt;</code>
+			</div>
+			<div class="col-xl-6">
+				<p>Метод <path>GetParentView()</path> подключит оригинальное отображение.</p>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

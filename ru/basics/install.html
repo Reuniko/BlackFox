@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Установка — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/basics/install.html">English</a>
+		<a class="btn btn-secondary active" href="install.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Установка</h1>
+
+		<ol>
+			<li>Установите веб-сервер с PHP 7+ и (MySQL 8+ или MariaDB 10+ или Postgres 10+) окружением</li>
+			<li>
+				<a href="https://github.com/Reuniko/BlackFox.git">Склонируйте или скачайте фреймворк</a>
+				в виде папки в корень сайта
+			</li>
+			<li>Скопируйте все файлы из <path>/BlackFox/.example/</path> в корень сайта</li>
+			<li>
+				Укажите реквизиты подключения к базе данных в файле <path>/config.php</path>
+				(<a href="config.html">подробнее</a>)
+			</li>
+			<li>Однократно запустите файл <path>/BlackFox/install.php</path> с помощью командной строки PHP</li>
+			<li>
+				Если ваш сервер не Apache,
+				сконфигурируйте его таким образом что любой запрос
+				на не статичный файл (*.php или папка) будет переадресован на /index.php
+			</li>
+		</ol>
+
+		<p>Установка завершена! Теперь вы можете зайти в административный раздел (<path>/admin/</path>) используя реквизиты по умолчанию: <strong>Root@123456</strong></p>
+	</div>
+</main>
+
+</body>
+</html>

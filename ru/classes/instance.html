@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Instance — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/instance.html">English</a>
+		<a class="btn btn-secondary active" href="instance.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Instance</h1>
+
+		<p>
+			Трейт
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/patterns/Instance.php">BlackFox\Instance</a>
+			добавляет в класс статические методы <path>::N()</path> и <path>::I()</path>,
+			выполняющие фабричные задачи создания локальных или глобальных экземпляров (инстансов) данного класса.
+		</p>
+
+		<h2>Инверсия зависимостей</h2>
+		<p>
+			Часто нужно создать класс и его экземпляр (далее — зависимый),
+			который зависит от другого класса или интерфейса (далее — зависимость).
+			<br/>
+			Например, класс <path>Users</path> использует публичные методы класса <path>MySQL</path>:
+		</p>
+		<code class="language-php">class Users {
+	public function GetByID(int $ID) {
+		global $MySQL;
+		return $MySQL->Query("SELECT * FROM users WHERE ID='{$ID}'");
+	}
+}</code>
+		<p>
+			В подобной реализации класс
+			<path>Users</path> становится невозможно повторно использовать в связке с другой базой данных.
+			В более общих чертах: зависимый класс теряет свою гибкость относительно зависимости.
+			Для разрешения этой проблемы используют принцип инверсии зависимостей, реализация которого заключается в следующем:
+		</p>
+		<ul>
+			<li>передать зависимость в конструктор зависимого класса в виде строго типизированного параметра (тип может быть конкретным классом, абстрактным классом или интерфейсом)</li>
+			<li>сохранить ссылку на зависимость в свойстве зависимого класса</li>
+			<li>использовать эту ссылку для доступа к методам зависимости строго в рамках контракта, описанного зависимостью</li>
+		</ul>
+		<code class="language-php">class Users {
+	/**@var Database $Database */
+	private $Database;
+
+	public function __construct(Database $Database) {
+		$this->Database = $Database;
+	}
+
+	public function GetByID(int $ID) {
+		return $this->Database->Query("SELECT * FROM users WHERE ID='{$ID}'");
+	}
+}</code>
+		<p>
+			Теперь класс <path>Users</path> можно использовать в связке со множеством разных баз данных,
+			соблюдающих контракт, описанный в классе или интерфейсе <path>Database</path>.
+			<br/>
+			Но в подобной реализации не очень удобно инстанциировать новые экземпляры зависимого класса:
+		</p>
+		<code class="language-php">$Database = new Database();
+$Users = new Users($Database);</code>
+		<p>
+			Для упрощения создания новых экземпляров зависимых классов вы можете добавить в свой класс трейт
+			<path>Instance</path>:
+		</p>
+		<code class="language-php">class Users {
+	use \BlackFox\Instance;
+	// ...
+}</code>
+		<p>
+			После чего в зависимом классе появятся два статических метода <path>::N()</path> и <path>::I()</path>,
+			которые будут автоматически подставлять в параметры конструктора глобальные инстансы требуемых зависимостей:
+		</p>
+		<code class="language-php">// make new local instance
+$Users = Users::N();
+$data = $Users->GetByID(1);
+
+// get (or make and get) global instance
+$data = Users::I()->GetByID(1);</code>
+		<p>
+			При этом сохранится возможность локально переопределять некоторые или все зависимости:
+		</p>
+		<code class="language-php">// make another local instance connected to another database
+$AnotherUsers = Users::N(['Database' => AnotherDatabase::I()]);
+$data = $AnotherUsers->GetByID(1);</code>
+
+		<h2>::N() — создание нового экземпляра</h2>
+		<p>
+			Статический метод
+			<path>::N()</path> принимает на вход
+			<a href="#params">одномерный словарь параметров</a> конструктора и возвращает новый экземпляр
+			<a href="#overrides">подходящего</a> класса.
+		</p>
+		<code class="language-php">class User {
+	use \BlackFox\Instance;
+
+	public function __construct(Database $Database, int $ID, bool $optional_flag = true) {
+		$this->Database = $Database;
+		$this->ID = $ID;
+		$this->optional_flag = $optional_flag;
+	}
+}
+
+$User1 = User::N(['ID' => 1]); // ok
+$User2 = User::N(['ID' => 2, 'optional_flag' => false]); // ok
+$User3 = User::N(['ID' => 3, 'Database' => AnotherDatabase::I()]); // ok
+$User4 = User::N([]); // error: ID is missing</code>
+
+		<h2>::I() — возврат (или создание+возврат) глобального экземпляра</h2>
+		<p>
+			Зачастую в проекте требуется один универсальный глобальный объект (инстанс), доступ к которому возможен из любой части кода.
+			<br/>
+			Статический метод
+			<path>::I()</path> однократно принимает на вход <a href="#params">одномерный словарь параметров</a> конструктора,
+			создаёт глобальный инстанс
+			<a href="#overrides">подходящего</a> класса (если тот ещё не создан) и возвращает ссылку на него.
+			<br/>
+			Повторный вызов метода <path>::I()</path> с параметром кинет ошибку, поскольку глобальный инстанс уже создан.
+			<br/>
+			Повторный вызов метода <path>::I()</path> без параметров вернёт ссылку на глобальный инстанс.
+		</p>
+		<code class="language-php">class Database {
+	use \BlackFox\Instance;
+	public function __construct(array $params) {}
+	public function Query($SQL) {}
+}
+
+Database::I(['params' => $params]); // ok
+Database::I()->Query($SQL1); // ok
+Database::I()->Query($SQL2); // ok
+Database::I(['params' => $params]); // error</code>
+
+		<h2 id="params">Словарь параметров</h2>
+		<p>
+			Одномерный словарь параметров конструктора является опциональным и обрабатывается следующим образом:
+		</p>
+		<ul>
+			<li>Если значение параметра передано — подставляет его</li>
+			<li>
+				Если значение параметра отсутствует:
+				<ul>
+					<li>Если параметр опциональный — подставляет значение по умолчанию</li>
+					<li>
+						Если параметр обязательный:
+						<ul>
+							<li>Если у параметра тип отсутствует или является базовым — кидает ошибку</li>
+							<li>
+								Если тип параметра является пользовательским (конкретный класс, абстрактный класс или интерфейс):
+								<ul>
+									<li>Если возможно сопоставить пользовательский тип с глобальным инстансом — подставляет ссылку на глобальный инстанс в качестве передаваемого значения</li>
+									<li>В противном случае — кидает ошибку</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
+		<p>
+			Сопоставление пользовательского типа с глобальным инстансом происходит следующим образом:
+		</p>
+		<ul>
+			<li>Если в конфигурации глобального переопределения зависимостей есть ключ, описывающий связь пользовательского типа с глобальным инстансом — использует его</li>
+			<li>Иначе, если пользовательский тип является конкретным классом с трейтом <path>Instance</path> — использует его собственный глобальный инстанс</li>
+			<li>В противном случае кидает ошибку, поскольку не может найти подходящий глобальный инстанс</li>
+		</ul>
+
+		<h2 id="overrides">Глобальные правила переопределений</h2>
+		<p>
+			Подходящим считается текущий класс, если не указано иного в конфигурации правил глобальных переопределений.
+			<br/>
+			Конфигурация правил глобальных переопределений — это словарь, описанный в ключе 'overrides' массива конфигурации:
+		</p>
+		<ul>
+			<li>ключ — строка, идентификатор конкретного класса, абстрактного класса или интерфейса, который следует переопределять</li>
+			<li>значение — строка, идентификатор конкретного класса, которым следует переопределять</li>
+		</ul>
+		<code class="language-php">return [
+	// ...
+	'overrides' =&gt; [
+		'BlackFox\Engine'   =&gt; 'Example\Engine',
+		'BlackFox\Database' =&gt; 'BlackFox\MySQL',
+		'BlackFox\Captcha'  =&gt; 'BlackFox\CaptchaGoogleRecaptchaV2',
+		'BlackFox\Users'    =&gt; 'Example\Users',
+		'BlackFox\Cache'    =&gt; 'BlackFox\CacheRedis',
+	],
+	// ...
+];
+
+BlackFox\Engine::I();   // &lt;-- Example\Engine
+BlackFox\Database::I(); // &lt;-- BlackFox\MySQL
+BlackFox\Captcha::I();  // &lt;-- BlackFox\CaptchaGoogleRecaptchaV2
+BlackFox\Users::I();    // &lt;-- Example\Users
+BlackFox\Cache::I();    // &lt;-- BlackFox\CacheRedis</code>
+		<p>
+			Стоит отметить, что эти правила используются только методами трейта <path>Instance</path>,
+			а значит остаётся возможность создавать локально любые объекты, используя ключевое слово <path>new</path>.
+		</p>
+
+		<h2>Метод AddOverrides</h2>
+		<p>
+			Глобальный статический метод
+			<path>::AddOverrides(array $overrides)</path> позволяет динамично добавить или заменить правила переопределений.
+		</p>
+		<code class="language-php">// AddOverrides - это статический метод трейта, вызывается через любой класс с \BlackFox\Instance
+\BlackFox\Engine::AddOverrides([
+	'BlackFox\Cache' =&gt; 'BlackFox\CacheRedis',
+]);</code>
+	</div>
+</main>
+
+</body>
+</html>

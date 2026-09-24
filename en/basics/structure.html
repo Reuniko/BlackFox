@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Structure — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="structure.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/basics/structure.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Structure</h1>
+
+		<p>
+			Usually, each folder in the root of the website is a <strong>core</strong> (but not necessarily).
+			<br/>A <strong>core</strong> is a collection of classes, units, templates, and a virtual root folder.
+			<br/>The framework itself is a core,
+			your own folder will also be a core (you need to create it),
+			each core should be stored in a separate repository.
+		</p>
+
+		<p>
+			In the simple case, you will have only two cores, for example: <path>/BlackFox</path> for the framework and <path>/Site</path> for your project.
+			<br/>It is possible to add additional cores.
+			<br/>All active cores need to be registered in the <path>/config.php</path> file (the '<a href="config.html#cores">cores</a>' key).
+		</p>
+
+		<p>The following folders may be located inside a core:</p>
+		<ul>
+			<li><path>classes</path> — contains classes</li>
+			<li><path>units</path> — contains unit folders</li>
+			<li><path>root</path> — virtual <a href="root.html">server root</a></li>
+			<li><path>templates</path> — contains <a href="template.html">templates</a> folders</li>
+		</ul>
+
+		<h2 id="core">Core</h2>
+		<p>
+			A core is a structural entity — a folder with the file <path>Core.php</path>
+			and other files, including php-classes.
+			The core name is the same as the folder name and namespace.
+			Usually, one top-level namespace without nesting is used.
+		</p>
+		<p>
+			File <path>Core.php</path> must contain a descendant class of <path>BlackFox\ACore</path>
+			with class name <path>{YourCoreName}\Core</path> and namespace equal to the core name:
+		</p>
+
+		<div class="row">
+			<div class="col-xl-6">
+				<code class="language-php">namespace Example;
+class Core extends \BlackFox\ACore {
+	public function GetScheme() {/* ... */}
+	public function Upgrade() {/* ... */}
+	public function Load() {/* ... */}
+	public function Menu() {/* ... */}
+}</code>
+			</div>
+			<div class="col-xl-6">
+				<dl class="dl-horizontal">
+
+					<dt>GetScheme</dt>
+					<dd>
+						should return an instance of the class <a href="../classes/scheme.html">Scheme</a>
+					</dd>
+
+					<dt>Upgrade</dt>
+					<dd>
+						called when installing or upgrading a core,
+						use it to synchronize the structure of tables and other amendments
+						(see descendants for an example)
+					</dd>
+
+					<dt>Load</dt>
+					<dd>
+						always called if the core is active
+					</dd>
+
+					<dt>Menu</dt>
+					<dd>
+						called by the admin menu unit,
+						should return an array describing the administrative menu section
+						(see descendants for an example)
+					</dd>
+				</dl>
+			</div>
+		</div>
+
+		<br/>
+		<h2>Autoload classes</h2>
+
+		<p>
+			By default, the core scans its own subfolders <path>classes</path> and <path>units</path>,
+			looks for any php-files in them and registers them as classes with the same name in the namespace of the core.
+			Scan depth varies:
+		</p>
+		<ul>
+			<li><path>classes</path> — all subfolders are scanned, unlimited nesting</li>
+			<li><path>units</path> — scanned one nested subfolder deep</li>
+		</ul>
+		<p>
+			Thus, when developing your own core, place
+			classes in the subfolder <path>classes</path>,
+			units in the subfolder <path>units</path>,
+			name files the same as the classes inside them,
+			and they will be automatically registered in the engine.
+		</p>
+
+		<h2>Own autoload classes</h2>
+		<p>
+			If desired, the behavior described above can be overridden.
+			To do this, override the core's <path>GetClasses</path> method.
+			The method takes no parameters and must return a dictionary:
+		</p>
+		<ul>
+			<li>key — class name along with namespace</li>
+			<li>value — absolute path to the php-file</li>
+		</ul>
+
+		<h2>Model</h2>
+		<p>
+			A model is a set of classes that describe the business logic of an application.
+			<br>It's recommended to place them in the subfolder
+			<path>classes</path> of the core so the engine registers them in autoload.
+			<br>It's recommended to use a single namespace with no nesting to make it convenient to refer to other classes.
+			<br>A model class can be original or inherit any other class,
+			but generally the model class is a descendant of <a href="../classes/scrud.html">SCRUD</a>,
+			describing the structure of and access to a database table.
+		</p>
+
+		<h2>Controllers</h2>
+		<p>
+			Controllers are a collection of classes that
+			describe the order of access to the classes and methods of the model
+			and (optionally) reduce the result of their execution to a view.
+			<br>A controller class can be original or inherit any other class,
+			but generally the controller class is a descendant of <a href="../classes/unit.html">Unit</a>
+			and is located in the subfolder <path>units</path> of the core.
+		</p>
+	</div>
+</main>
+
+</body>
+</html>

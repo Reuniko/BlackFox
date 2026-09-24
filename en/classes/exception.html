@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Exception — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="exception.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/exception.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Exception</h1>
+
+		<p>
+			Class
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/exceptions/Exception.php">BlackFox\Exception</a>
+			is a direct descendant of <path>\Exception</path>;
+			its constructor accepts not only a string, but also an array of strings.
+			This allows you to group exceptions:
+		</p>
+
+		<code class="language-php">$errors = [];
+if (empty($user['LOGIN'])) $errors[] = "Specify login";
+if (empty($user['EMAIL'])) $errors[] = "Specify email";
+if (empty($user['PASSWORD'])) $errors[] = "Specify password";
+if ($errors) throw new \BlackFox\Exception($errors);</code>
+
+		<p>
+			Later, this exception can be caught and processed as <path>\Exception</path>,
+			in which case the method <path>getMessage()</path> glues the array into a string.
+			It is recommended to catch exceptions as <path>\BlackFox\Exception</path> and
+			use the method <path>getArray()</path> to access the array of exception strings.
+		</p>
+
+		<code class="language-php">try {
+	// call with possibility of exception
+} catch (\BlackFox\Exception $Exception) {
+	$errors = $Exception->getArray();
+	\BlackFox\Engine::I()->ShowErrors($errors);
+} catch (\Exception $Exception) {
+	$error = $Exception->getMessage();
+	\BlackFox\Engine::I()->ShowErrors([$error]);
+}</code>
+
+		<h2>Descendant classes</h2>
+		<p>
+			The descendant classes listed below do not have any additional internal functionality.
+			Some of them are processed in a special way by the <a href="engine.html">Engine</a>.
+		</p>
+
+		<ul>
+			<li>ExceptionAccessDenied — forces the engine to display the authorization page if the user is not authorized</li>
+			<li>ExceptionAuthRequired — forces the engine to display the authorization page</li>
+			<li>ExceptionCache</li>
+			<li>ExceptionCaptcha</li>
+			<li>ExceptionElementNotFound — forces the engine to display a 404 page</li>
+			<li>ExceptionNotAllowed</li>
+			<li>ExceptionNotImplemented</li>
+			<li>ExceptionPageNotFound — forces the engine to display a 404 page</li>
+			<li>ExceptionSQL</li>
+			<li>ExceptionType</li>
+		</ul>
+
+		<h2>Own exception</h2>
+		<p>
+			In order to use this exception in your module, you have a choice:
+		</p>
+		<ul>
+			<li>
+				Specify the full path to the exception each time:
+				<path>throw new \BlackFox\Exception([...]);</path>
+			</li>
+			<li>
+				Add a use statement at the top of the file:
+				<path>use \BlackFox\Exception;</path>
+			</li>
+			<li>
+				Create an empty Exception descendant class, placing it in your module's namespace (recommended):
+			</li>
+		</ul>
+		<code class="language-php">namespace Example;
+class Exception extends \BlackFox\Exception {}</code>
+	</div>
+</main>
+
+</body>
+</html>

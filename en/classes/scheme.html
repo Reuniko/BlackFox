@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Scheme — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="scheme.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/scheme.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Scheme</h1>
+
+		<p>
+			Class
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/orm/Scheme.php">BlackFox\Scheme</a>
+			accepts a list of SCRUD descendants in its constructor and provides methods
+			to synchronize the structure of the database.
+		</p>
+
+		<h2>Basic methods</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Method</th>
+					<th>Params</th>
+					<th style="min-width: 300px;">Description</th>
+					<th style="min-width: 300px;">Return</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>__construct</td>
+					<td>SCRUD[...]|string[...] $Tables</td>
+					<td>
+						You can pass a mixed array of objects and strings (names of SCRUD descendant classes) to the constructor.
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Compare</td>
+					<td></td>
+					<td>
+						Compares the structure of the database (tables, columns, keys, indexes, constraints) with the structure
+						described in the SCRUD descendant classes.
+					</td>
+					<td rowspan="2">
+						A multidimensional array describing possible changes to the database structure
+						needed to convert it to the structure described in the SCRUD descendant classes:
+						<ul>
+							<li><strong>MESSAGE</strong> — description of the change</li>
+							<li><strong>TABLE</strong> — code of the modified table, or the index or constraint associated with it</li>
+							<li><strong>SQL</strong> — SQL to make the change</li>
+							<li><strong>...</strong> — other data depending on the change</li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td>Synchronize</td>
+					<td></td>
+					<td>
+						Synchronizes the database structure if it differs from the structure described in the SCRUD descendant classes.
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Usage</h2>
+
+		<div class="row">
+			<div class="col-xl-6">
+				<p>
+					Usually, you don't need to run the methods above manually — instead you:
+				</p>
+				<ul>
+					<li>create and return an instance of the Scheme class in the <path>GetScheme</path> method of your core</li>
+					<li>run the schema sync from the <path>Upgrade</path> method of your core</li>
+					<li>
+						then, either:
+						<ul>
+							<li>run a full engine upgrade: the file <path>/BlackFox/upgrade.php</path></li>
+							<li>
+								or use the SchemeSynchronizer unit in the admin area, at
+								<path>/admin/BlackFox/SchemeSynchronizer.php</path>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">namespace Testing;
+class Core extends \BlackFox\ACore {
+	// ...
+	public function GetScheme() {
+		return new \BlackFox\Scheme([
+			Grades::I(),
+			Rooms::I(),
+			Timetable::I(),
+			Students::I(),
+		]);
+	}
+
+	public function Upgrade() {
+		$this-&gt;GetScheme()-&gt;Synchronize();
+	}
+	// ...
+}</code>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

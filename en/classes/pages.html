@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Pages — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="pages.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/pages.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Pages</h1>
+
+		<p>
+			Class
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/entities/Pages.php">BlackFox\Pages</a>
+			is a descendant of <a href="scrud.html">SCRUD</a>,
+			describing the table of content pages.
+		</p>
+
+		<h2>Fields</h2>
+		<div class="table-responsive">
+			<table class="table table-responsive table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Code</th>
+					<th></th>
+					<th>Type</th>
+					<th>Name</th>
+					<th style="min-width: 300px;">Description</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>ID</td><td><span class="red">*</span></td><td>NUMBER</td><td>ID</td><td></td></tr>
+				<tr><td>URL</td><td><span class="red">*</span></td><td>STRING</td><td>Url</td><td>Relative to the site root, unique, indexed</td></tr>
+				<tr><td>TITLE</td><td></td><td>STRING</td><td>Title</td><td></td></tr>
+				<tr><td>DESCRIPTION</td><td></td><td>STRING</td><td>Description</td><td></td></tr>
+				<tr><td>KEYWORDS</td><td></td><td>STRING</td><td>Key words</td><td></td></tr>
+				<tr><td>CONTENT</td><td></td><td>TEXT</td><td>Content</td><td>WYSIWYG editor</td></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

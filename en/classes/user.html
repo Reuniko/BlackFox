@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>User — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="user.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/user.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">User</h1>
+
+		<p>
+			Class
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/classes/User.php">BlackFox\User</a>
+			is designed to work with the current user's session.
+			<br/>
+			In the engine context, it's accessible via <path>$this-&gt;User-&gt;</path>;
+			in the unit context, via <path>$this-&gt;USER-&gt;</path> (note the different case);
+			in other contexts — via <path>\BlackFox\User::I()-&gt;</path>
+		</p>
+
+		<h2>Properties</h2>
+
+		<div class="row">
+			<div class="col-xl-6">
+				<div class="table-responsive">
+					<table class="table table-sm table-bordered bg-white">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Type</th>
+							<th style="min-width: 300px;">Description</th>
+						</tr>
+						</thead>
+						<tbody>
+						<tr><td>$ID</td><td>number</td><td>user ID</td></tr>
+						<tr><td>$FIELDS</td><td>array</td><td>dictionary of user fields</td></tr>
+						<tr><td>$GROUPS</td><td>array</td><td>list of user groups</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="col-xl-6">
+				<code class="language-php">$user_id = \BlackFox\User::I()-&gt;ID;
+$user_login = \BlackFox\User::I()-&gt;FIELDS['LOGIN'];
+$is_authorized = \BlackFox\User::I()-&gt;IsAuthorized();
+$is_root = \BlackFox\User::I()-&gt;InGroup('root');</code>
+			</div>
+		</div>
+
+		<h2>Methods</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Name</th>
+					<th>Parameters</th>
+					<th style="min-width: 300px;">Description</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr class="text-secondary">
+					<td>Init</td>
+					<td>$ID</td>
+					<td>Loads the user's data; called from the constructor</td>
+				</tr>
+				<tr>
+					<td>Authorization</td>
+					<td>$login, $password</td>
+					<td>Attempts to authorize the user with the specified credentials</td>
+				</tr>
+				<tr>
+					<td>Login</td>
+					<td>$ID</td>
+					<td>Authorizes the user with the specified ID</td>
+				</tr>
+				<tr>
+					<td>Logout</td>
+					<td></td>
+					<td>Deauthorizes the user</td>
+				</tr>
+				<tr>
+					<td>IsAuthorized</td>
+					<td></td>
+					<td>Returns true if the user is authorized</td>
+				</tr>
+				<tr>
+					<td>InGroup</td>
+					<td>$group</td>
+					<td>Returns true if the user belongs to the specified group</td>
+				</tr>
+				<tr>
+					<td>InAnyOfGroups</td>
+					<td>$groups</td>
+					<td>Returns true if the user belongs to any of the specified groups</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

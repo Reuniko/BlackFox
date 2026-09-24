@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Virtual root — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="root.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/basics/root.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Virtual root</h1>
+
+		<p>
+			By default, every user request for an executable file (*.php) or folder
+			is processed by the framework (<path>Engine</path> class) as follows:
+			for each file listed below,
+			for each virtual root from first to last,
+			it searches for the specified files:
+		</p>
+
+		<ol>
+			<li>
+				the directly requested php-file
+				or
+				the file <path>index.php</path> in the requested folder
+			</li>
+			<li>the file <path>.router.php</path> going up the directory hierarchy relative to the query</li>
+		</ol>
+
+		<p>
+			As soon as the first file is found, it gets executed, interrupting further search.
+			<br/>
+			All active virtual roots must be registered in the config (key '<a href="config.html#roots">roots</a>').
+		</p>
+
+		<h3>Example</h3>
+		<p>
+			Suppose we have two virtual roots <path>/Site/root</path> and <path>/BlackFox/root</path>:
+		</p>
+		<div class="table-responsive">
+			<table class="table table-info table-bordered table-hover">
+				<thead>
+				<tr>
+					<th width="10%">
+						<nobr>User request</nobr>
+					</th>
+					<th>Searching for a corresponding entity</th>
+				</tr>
+				</thead>
+				<tr>
+					<td>/feedback.php</td>
+					<td>
+						<li>/Site/root/feedback.php</li>
+						<li>/BlackFox/root/feedback.php</li>
+						<li>/Site/root/.router.php</li>
+						<li>/BlackFox/root/.router.php</li>
+					</td>
+				</tr>
+				<tr>
+					<td>/admin/</td>
+					<td>
+						<li>/Site/root/admin/index.php</li>
+						<li>/BlackFox/root/admin/index.php</li>
+						<li>/Site/root/admin/.router.php</li>
+						<li>/BlackFox/root/admin/.router.php</li>
+						<li>/Site/root/.router.php</li>
+						<li>/BlackFox/root/.router.php</li>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>
+			Following this logic, you can redefine any file in the framework's virtual root by creating
+			a file in your own virtual root along a similar relative path.
+		</p>
+
+		<p>
+			If no file is found, the <path>Engine</path> searches for a redirect or content from the database
+			(entities <a href="../classes/redirects.html">Redirects</a> and <a href="../classes/pages.html">Pages</a>);
+			<br/>
+			if nothing has been found, it throws the exception <path>ExceptionPageNotFound</path>,
+			which is subsequently processed by the <path>Show404</path> method.
+		</p>
+
+		<h2>Access to sections (folders)</h2>
+		<p>
+			The framework allows you to override the <a href="template.html">template and wrapper</a> for each section,
+			as well as to restrict/allow access to the section and all subsections for specific user groups.
+			To do this, create a file
+			<path>.section.php</path> at the root of the section, returning an associative array
+			describing the section (all keys are optional):
+		</p>
+		<ul>
+			<li><path>TEMPLATE</path> — code of the template</li>
+			<li><path>WRAPPER</path> — code of the wrapper</li>
+			<li>
+				<path>ACCESS</path> — dictionary describing access:
+				key - code of a user group,
+				value - true/false access flag
+			</li>
+		</ul>
+
+		<h3>Example</h3>
+		<div class="row">
+			<div class="col-xl-6 order-xl-2">
+				<code class="language-php">&lt;?php
+return [
+	'TEMPLATE' =&gt; 'admin',
+	'ACCESS'   =&gt; [
+		'*'    =&gt; false,
+		'root' =&gt; true,
+	],
+];</code>
+			</div>
+			<div class="col-xl-6 order-xl-1">
+				<ul>
+					<li><path>*</path> — pseudo-code for any user (including unauthorized)</li>
+					<li><path>@</path> — pseudo-code for an authorized user</li>
+					<li><path>root</path> — code of the 'Root' user group</li>
+				</ul>
+				<p>For more complex access restriction logic, use exceptions in your own code.</p>
+			</div>
+		</div>
+
+		<h2>Template and wrapper</h2>
+		<p>
+			When the request is complete, the engine wraps the result in a
+			<a href="template.html">template's wrapper</a>, if necessary.
+		</p>
+	</div>
+</main>
+
+</body>
+</html>

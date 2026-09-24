@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Engine — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Меню</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary" href="../../en/classes/engine.html">English</a>
+		<a class="btn btn-secondary active" href="engine.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Engine</h1>
+
+		<p>
+			Класс <a href="https://github.com/Reuniko/BlackFox/blob/master/classes/Engine.php">BlackFox\Engine</a>
+			выполняет задачи
+			менеджмента подключения необходимых сущностей,
+			генерации контента и генерации обёртки для контента.
+			Все запросы на php-файлы и папки должны быть перенаправлены в файл
+			<path>/index.php</path>, который запускает движок.
+		</p>
+		<p>
+			Работа движка происходит в два этапа:
+		</p>
+
+		<div class="row">
+			<div class="col-xl-6">
+				<h3>Конструктор</h3>
+				<ul>
+					<li>Загружает конфигурацию</li>
+					<li>Инициализирует сессию</li>
+					<li>Регистрирует метод автозагрузки классов</li>
+					<li>Регистрирует метод обработки упущенных исключений</li>
+					<li>Загружает ядро <path>BlackFox</path></li>
+					<li>Инициализирует глобальный инстанс подключения к базе данных</li>
+					<li>Инициализирует глобальный инстанс подключения к кешу</li>
+				</ul>
+			</div>
+			<div class="col-xl-6">
+				<h3>Метод Work</h3>
+				<ul>
+					<li>Загружает информацию о запрашиваемой секции</li>
+					<li>Инициализирует глобальный инстанс текущего пользователя</li>
+					<li>Проверяет наличие доступа к секции</li>
+					<li>Генерирует контент страницы (или контент, отображающий ошибку, произошедшую в процессе генерации контента страницы)</li>
+					<li>Если требуется, генерирует обёртку страницы и оборачивает контент в неё</li>
+				</ul>
+			</div>
+		</div>
+
+		<h2>Генерация контента</h2>
+		<p>
+			Генерация контента запрошенной страницы происходит в паре методов <path>ShowContent</path> и
+			<path>MakeContent</path>.
+			<br>
+			Метод <path>ShowContent</path> вызывает метод
+			<path>MakeContent</path> и обрабатывает все пришедшие из него исключения,
+			являясь таким образом безошибочным методом-обёрткой, отображающим контент в любом случае, даже если произошла ошибка.
+			<br>
+			Метод <path>MakeContent</path> последовательно пытается сгенерировать контент для запрошенной страницы:
+		</p>
+		<ol>
+			<li>Ищет запрошенный файл или файл <path>index.php</path> в запрошенной папке</li>
+			<li>Ищет файл <path>.router.php</path> вверх по иерархии директорий (перебирая все виртуальные корни)</li>
+			<li>Ищет <a href="redirects.html">редирект</a> или <a href="pages.html">контентную страницу</a> в базе данных</li>
+		</ol>
+		<p>
+			В случае неуспеха бросает исключение <path>ExceptionPageNotFound</path>, которое обрабатывается методом
+			<path>ShowContent</path>.
+		</p>
+		<div class="alert alert-info">
+			Дополнительная информация доступна в разделе <a href="../basics/root.html">Виртуальный корень</a>.
+		</div>
+
+		<h2>Полезные свойства и методы движка</h2>
+		<p>
+			Поскольку движок является общим хранилищем всех динамически генерируемых данных,
+			на него распространяется исключение в плане разрешения модификации внутреннего состояния глобального инстанса.
+		</p>
+		<p class="mb-0">
+			Доступ к нижеперечисленным свойствам и методам движка осуществляется:
+		</p>
+		<ul>
+			<li>в контексте страницы — через <path>$this-&gt;</path></li>
+			<li>в контексте юнита — через <path>$this-&gt;ENGINE-&gt;</path></li>
+			<li>в иных контекстах — через <path>\BlackFox\Engine::I()-&gt;</path></li>
+		</ul>
+
+		<h3>Свойства</h3>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Тип</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>$TITLE</td><td>строка</td><td>Заголовок страницы</td></tr>
+				<tr><td>$KEYWORDS</td><td>строка</td><td>Ключевые слова страницы</td></tr>
+				<tr><td>$DESCRIPTION</td><td>строка</td><td>Описание страницы</td></tr>
+				<tr><td>$HEADERS *</td><td>структура</td><td>Заголовки, которые необходимо расположить в html-блоке head</td></tr>
+				<tr><td>$TEMPLATE *</td><td>строка</td><td>Код шаблона</td></tr>
+				<tr><td>$WRAPPER</td><td>строка</td><td>Код обёртки шаблона</td></tr>
+				<tr><td>$TEMPLATE_PATH *</td><td>строка</td><td>Путь к папке шаблона, относительно корня сервера, используется для подключения файлов шаблона</td></tr>
+				<tr><td>$SECTION *</td><td>словарь</td><td>Данные, подгруженные из файла .section.php</td></tr>
+				<tr><td>$BREADCRUMBS *</td><td>словарь</td><td>Хлебные крошки</td></tr>
+				<tr><td>$Database</td><td>объект</td><td>Глобальный инстанс подключения к <a href="database.html">базе данных</a></td></tr>
+				<tr><td>$Cache</td><td>объект</td><td>Глобальный инстанс подключения к <a href="cache.html">кешу</a></td></tr>
+				<tr><td>$User</td><td>объект</td><td>Глобальный инстанс текущего <a href="user.html">пользователя</a></td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="alert alert-warning">
+			* не рекомендуется изменять эти свойства напрямую, используйте методы если это возможно
+		</div>
+
+		<h3>Методы</h3>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Название</th>
+					<th>Параметры</th>
+					<th style="min-width: 300px;">Описание</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>SetTemplate</td><td>$template</td><td>Устанавливает новый шаблон ($TEMPLATE), актуализирует относительный путь к нему ($TEMPLATE_PATH)</td></tr>
+				<tr><td>AddHeaderStyle</td><td>$path</td><td>Добавляет стиль в заголовки ($HEADERS)</td></tr>
+				<tr><td>AddHeaderScript</td><td>$path</td><td>Добавляет скрипт в заголовки ($HEADERS)</td></tr>
+				<tr><td>AddHeaderString</td><td>$string</td><td>Добавляет произвольную строку в заголовки ($HEADERS)</td></tr>
+				<tr><td>AddDelayedCall</td><td>$callable, $params = []</td><td>Создаёт отложенный вызов, возвращая уникальную строку, которая впоследствии будет заменена на результат вызова</td></tr>
+				<tr><td>GetHeader</td><td></td><td>Вызывает MakeHeader в отложенном режиме, что позволяет манипулировать заголовками в любом месте приложения</td></tr>
+				<tr><td>MakeHeader</td><td></td><td>Объединяет заголовки ($HEADERS) в одну строку, выводимую на печать в html-блоке head</td></tr>
+				<tr><td>ShowAuthForm</td><td>$message</td><td>Отображает форму авторизации</td></tr>
+				<tr><td>ShowErrors</td><td>$errors</td><td>Отображает ошибки, подключая файл errors.php в корне активного шаблона</td></tr>
+				<tr><td>Show404</td><td></td><td>Отображает ошибку 404</td></tr>
+				<tr><td>Show403</td><td></td><td>Отображает ошибку 403</td></tr>
+				<tr><td>SearchAncestorFile</td><td>$uri, $filename</td><td>Ищет файл вверх по иерархии директорий по виртуальным корням</td></tr>
+				<tr><td>GetRelativePath</td><td>$absolute_path, $root_path = null</td><td>Преобразует абсолютный путь в относительный</td></tr>
+				<tr><td>GetAbsolutePath</td><td>$relative_path</td><td>Преобразует относительный путь в абсолютный</td></tr>
+				<tr><td>AddBreadcrumb</td><td>$name, $link = null</td><td>Добавляет хлебную крошку в цепь ($BREADCRUMBS)</td></tr>
+				<tr><td>GetLanguage</td><td></td><td>Возвращает символьный код текущего языка</td></tr>
+				<tr><td>SetLanguage</td><td>$language</td><td>Устанавливает символьный код текущего языка</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Собственный движок</h2>
+		<p>
+			Для того чтобы дополнять или переопределять поведение методов движка, нужно:
+		</p>
+		<ul>
+			<li>отнаследовать его в своё ядро и неймспейс</li>
+			<li>переопределить ключ 'BlackFox\Engine' в конфигурации, в разделе 'overrides'</li>
+			<li>подключить в файле <path>/includes.php</path> (необходимо, поскольку движок не может найти сам себя, предварительно не загрузившись)</li>
+			<li>запустить в файле <path>/index.php</path> (опционально)</li>
+		</ul>
+		<div class="row">
+			<div class="col">
+				<path>/Site/classes/Engine.php</path>
+				<code class="language-php">namespace Site;
+class Engine extends \BlackFox\Engine {
+
+	public function Show403() {
+		require($_SERVER['DOCUMENT_ROOT'] . $this-&gt;TEMPLATE_PATH . '/403.php');
+	}
+
+	public function Show404() {
+		require($_SERVER['DOCUMENT_ROOT'] . $this-&gt;TEMPLATE_PATH . '/404.php');
+	}
+
+	public function ShowAuthForm($message = null) {
+		UnitLogin::Run([
+			'LINK_SUCCESS'  =&gt; '/profile/',
+			'LINK_FORGOT'   =&gt; '/auth/forgot.php',
+			'LINK_REGISTER' =&gt; '/auth/registration.php',
+			'MESSAGE'       =&gt; $message,
+		]);
+	}
+
+}</code>
+			</div>
+			<div class="col">
+				<path>/config.php</path>
+				<code class="language-php">return [
+	// ...
+	'overrides' =&gt; [
+		'BlackFox\Engine' =&gt; 'Site\Engine',
+		// ...
+	],
+	// ...
+];</code>
+				<path>/includes.php</path>
+				<code class="language-php">require_once('Site/classes/Engine.php');
+// ...</code>
+				<path>/index.php</path>
+				<code class="language-php">require_once("BlackFox/includes.php");
+\Site\Engine::I()-&gt;Work();</code>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>

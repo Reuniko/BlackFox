@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="h-100">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Adminer — BlackFox</title>
+	<link rel="stylesheet" href="../../assets/bootstrap.min.css">
+	<link rel="stylesheet" href="../../assets/docs-style.css">
+	<link rel="stylesheet" href="../../assets/docs-wrapper.css">
+	<link rel="stylesheet" href="../../assets/menu.css">
+	<link rel="stylesheet" href="../../assets/prism.css">
+	<link rel="stylesheet" href="../../assets/site.css">
+	<script src="../../assets/prism.js"></script>
+	<script src="../../assets/script.js" defer></script>
+	<script>window.SIDEBAR_BASE = '../';</script>
+	<script src="../sidebar.js" defer></script>
+	<script src="../../assets/sidebar-render.js" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+
+<nav class="header p-2">
+	<button class="btn btn-info d-inline-block d-md-none icon-btn" data-toggle-sidebar="">☰ Menu</button>
+	<a class="btn btn-secondary icon-btn" href="../index.html" title="BlackFox">🦊 BlackFox</a>
+	<span class="spacer"></span>
+	<div class="btn-group lang-switch" role="group">
+		<a class="btn btn-secondary active" href="adminer.html">English</a>
+		<a class="btn btn-secondary" href="../../ru/classes/adminer.html">Русский</a>
+	</div>
+	<a class="btn btn-secondary icon-btn" href="https://github.com/Reuniko/BlackFox" title="GitHub">GitHub ↗</a>
+</nav>
+
+<main class="layout flex-grow-1">
+	<div class="sidebar" id="sidebar"></div>
+
+	<div class="content overflow-hidden">
+		<h1 class="page-header">Adminer</h1>
+
+		<p>
+			Unit
+			<a href="https://github.com/Reuniko/BlackFox/blob/master/units/Adminer/Adminer.php">BlackFox\Adminer</a>
+			accepts a SCRUD descendant object as a parameter
+			and provides full control over the table:
+		</p>
+		<ul>
+			<li>
+				A table view with filtering, sorting, page navigation,
+				and the ability to change the display order of columns and filters.
+			</li>
+			<li>Forms for creating and updating elements</li>
+			<li>The ability to delete elements, individually or in groups</li>
+		</ul>
+		<code class="language-php">\BlackFox\Adminer::Run(['SCRUD' =&gt; Docs\Feedback::I()]);</code>
+
+		<h2>Methods</h2>
+		<p>Public methods are actions</p>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Name</th>
+					<th>Parameters</th>
+					<th style="min-width: 300px;">Description</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>Section</td><td>$FILTER = [], $PAGE = 1, $SORT = ['ID' =&gt; 'DESC'], $FIELDS = ['*@@']</td><td>Displays the table</td></tr>
+				<tr><td>GetDefaultValues</td><td></td><td>Returns the dictionary of default values</td></tr>
+				<tr><td>GetBackLink</td><td></td><td>Returns a link to the previous page</td></tr>
+				<tr><td>CreateForm</td><td>$FILTER = [], $FIELDS = []</td><td>Displays the form for creating a new element</td></tr>
+				<tr><td>UpdateForm</td><td>$ID = null, $FIELDS = []</td><td>Displays the form for editing an existing element</td></tr>
+				<tr><td>Create</td><td>$FIELDS = [], $REDIRECT = null</td><td>Creates an element</td></tr>
+				<tr><td>Update</td><td>$ID, $FIELDS = [], $REDIRECT = null</td><td>Updates an element</td></tr>
+				<tr><td>Delete</td><td>$ID</td><td>Deletes element(s)</td></tr>
+				<tr><td>ExecuteAction</td><td>$ID, $action_id, $action_params = []</td><td>Runs a registered element action by its id</td></tr>
+				<tr><td>GetHref</td><td>array $element</td><td>Returns the URL for the specified element (used for row links in the table view)</td></tr>
+				<tr><td>ControlUrl</td><td></td><td>Clears the GET request of empty values</td></tr>
+				<tr><td>SanitizeUrl</td><td>$url</td><td>Converts the GET request into a human-readable form</td></tr>
+				<tr><td>LoadTableSettings</td><td></td><td>Loads table settings</td></tr>
+				<tr><td>SaveTableSettings</td><td>$filters = [], $fields = []</td><td>Saves table settings</td></tr>
+				<tr><td>GetTabsOfCreate</td><td></td><td>Returns the array of tabs for the element creation form</td></tr>
+				<tr><td>GetTabsOfUpdate</td><td></td><td>Returns the array of tabs for the element edit form</td></tr>
+				<tr><td>SearchOuter</td><td>$code, $search, $page = 1</td><td>Looks for suitable values for an outer/linked element</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Views</h2>
+		<div class="table-responsive">
+			<table class="table table-sm table-bordered bg-white">
+				<thead>
+				<tr>
+					<th>Name</th>
+					<th style="min-width: 300px;">Description</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td>element</td><td>a set of tabs that include the form for creating/editing an element</td></tr>
+				<tr><td>element_tab_main</td><td>tab with the form for creating/editing the element</td></tr>
+				<tr class="text-secondary"><td>element_head</td><td>the header of the create/edit element form</td></tr>
+				<tr class="text-secondary"><td>element_foot</td><td>the footer of the create/edit element form</td></tr>
+				<tr><td>element_bottom_buttons</td><td>"Save", "Confirm", "Cancel", "Delete" buttons</td></tr>
+				<tr><td>element_tab_external</td><td>tab for a table of related elements (there can be several)</td></tr>
+				<tr><td>filter</td><td>filter</td></tr>
+				<tr><td>section</td><td>section: filter + element table</td></tr>
+				<tr><td>pager</td><td>page navigation</td></tr>
+				<tr><td>section_settings</td><td>section display settings</td></tr>
+				<tr><td>section_settings_list</td><td>section display settings: list of fields</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h2>Example: adding a view</h2>
+		<p>
+			Suppose you want to add an extra tab to the
+			<u>edit</u> form of an element, to hold the form for a new action.
+			<br/>
+			To do this, create a descendant unit of <path>Adminer</path>, and:
+		</p>
+		<div class="row">
+			<div class="col-xl-6">
+				<p>Override <path>GetTabsOfUpdate</path>:</p>
+				<code class="language-php">namespace BlackFox;
+class AdminerUsers extends Adminer {
+	// ...
+	public function GetTabsOfUpdate() {
+		return parent::GetTabsOfUpdate() + [
+				'actions' =&gt; [
+					'NAME' =&gt; T([
+						'en' =&gt; 'Actions',
+						'ru' =&gt; 'Действия',
+					]),
+					'VIEW' =&gt; 'element_tab_actions',
+				],
+			];
+	}
+}</code>
+			</div>
+			<div class="col-xl-6">
+				<p>Create the view <path>element_tab_actions</path>:</p>
+				<code class="language-php">/** @var \BlackFox\Adminer $this */
+/** @var array $RESULT */
+?&gt;
+&lt;form method="post"&gt;
+	&lt;button
+		type="submit"
+		name="ACTION"
+		value="Login"
+		class="btn btn-info"
+	&gt;
+		&lt;?= T([
+			'en' =&gt; 'Log in with this user',
+			'ru' =&gt; 'Авторизоваться под этим пользователем',
+		]) ?&gt;
+	&lt;/button&gt;
+&lt;/form&gt;</code>
+			</div>
+		</div>
+
+		<h2>Example: view inheritance</h2>
+		<p>
+			Suppose you want to rewrite the <u>create</u> form of an element.
+			<br/>
+			To do this, create a descendant unit of <path>Adminer</path>, and
+			override the <path>element</path> view:
+		</p>
+		<div class="row">
+			<div class="col-xl-6">
+				<code class="language-php">&lt;?php /** @var \BlackFox\Adminer $this */ ?&gt;
+&lt;?php /** @var array $RESULT */ ?&gt;
+&lt;? if ($RESULT['MODE'] &lt;&gt; 'Create'): ?&gt;
+	&lt;? require $this-&gt;GetParentView(); ?&gt;
+&lt;? else: ?&gt;
+	&lt;form method="post" enctype="multipart/form-data"&gt;
+		&lt;!-- new form for create --&gt;
+	&lt;/form&gt;
+&lt;? endif; ?&gt;</code>
+			</div>
+			<div class="col-xl-6">
+				<p>The method <path>GetParentView()</path> connects the original view.</p>
+			</div>
+		</div>
+	</div>
+</main>
+
+</body>
+</html>
