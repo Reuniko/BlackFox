@@ -48,13 +48,95 @@
 			</li>
 			<li>Launch the file <path>/BlackFox/install.php</path> using php console</li>
 			<li>
-				If your HTTP server is different from Apache,
-				configure it in such a way that any user request for
-				non-static file (*.php and any folder) will be redirected to /index.php
+				Configure your web server to route requests through <path>/index.php</path> —
+				see <a href="#apache">Apache</a> and <a href="#nginx">Nginx</a> below
 			</li>
 		</ol>
 
 		<p>There we go! Now you can log into admin panel (<path>/admin/</path>) with default requisites: <strong>Root@123456</strong></p>
+
+		<h2 id="apache">Apache</h2>
+
+		<p>
+			BlackFox is a single front-controller framework: every request for a non-static file
+			(a <path>*.php</path> file or a folder) must end up executed by <path>/index.php</path>,
+			which parses <path>$_SERVER['REQUEST_URI']</path> itself and decides what to show
+			(see <path>Engine::MakeContent()</path>). Requests are never routed to individual
+			<path>.php</path> files directly — that would let a raw request reach a content
+			fragment or an admin script, bypassing the <path>Engine</path>'s own routing and
+			access checks.
+		</p>
+		<p>
+			On Apache this is already taken care of: the <path>.htaccess</path> file copied from
+			<path>/BlackFox/.example/</path> in step 3
+			(<a href="https://github.com/Reuniko/BlackFox/blob/master/.example/.htaccess">see it on GitHub</a>)
+			rewrites every request for a non-static path to <path>/index.php</path> and adds a
+			trailing slash to folder-like URLs. All you need is <path>mod_rewrite</path> enabled
+			and <path>AllowOverride All</path> (or at least <path>FileInfo</path>) for the site's
+			directory.
+		</p>
+
+		<h2 id="nginx">Nginx</h2>
+
+		<p>
+			Nginx doesn't read <path>.htaccess</path>, so the same routing has to be described
+			directly in the server block. Three things matter:
+		</p>
+		<ol>
+			<li>
+				a URL with no extension and no trailing slash must be redirected with one added —
+				<path>Engine::MakeContent()</path> appends <path>index.php</path> straight onto a
+				folder path with no separator in between, so <path>/basics</path> would otherwise
+				resolve to the non-existent <path>/basicsindex.php</path> instead of
+				<path>/basics/index.php</path>
+			</li>
+			<li>real static files (css/js/images/fonts/...) are served directly, without touching PHP</li>
+			<li>everything else is passed to PHP as <path>/index.php</path>, regardless of the requested path</li>
+		</ol>
+
+		<code class="language-css">server {
+	listen       80;
+	server_name  example.com;
+	root         /path/to/your/server/root;
+	index        index.php;
+
+	# extension-less URLs must end with a slash before Engine sees them
+	location ~ ^(?&lt;slashless&gt;/[^.]*[^./])$ {
+		return 302 $slashless/;
+	}
+
+	# real static assets, served directly
+	location ~* \.(?:css|js|jpe?g|png|gif|ico|svg|webp|woff2?|ttf|eot|mp4|webm|pdf|txt|html)$ {
+		try_files $uri =404;
+		expires 1d;
+		access_log off;
+	}
+
+	# everything else goes through the single front controller
+	location / {
+		fastcgi_pass    127.0.0.1:9000;
+		fastcgi_index   index.php;
+		include         fastcgi_params;
+		fastcgi_param   SCRIPT_FILENAME  $document_root/index.php;
+		fastcgi_param   SCRIPT_NAME      /index.php;
+	}
+}</code>
+
+		<p>
+			<path>fastcgi_pass</path> needs something listening on the other end. On Linux
+			that's normally <path>php-fpm</path>; PHP for Windows doesn't ship it, so run the
+			bundled <path>php-cgi.exe</path> as a FastCGI server instead:
+		</p>
+
+		<code class="language-css">php-cgi.exe -b 127.0.0.1:9000</code>
+
+		<p>
+			If you registered more than one <a href="config.html#roots">root</a>, a static file
+			may physically live under a different root than the one requested — extend the
+			<path>try_files</path> fallback chain with those paths too, e.g.
+			<path>try_files $uri /BlackFox/root$uri =404;</path>
+			(see <a href="root.html">Virtual root</a>).
+		</p>
 	</div>
 </main>
 

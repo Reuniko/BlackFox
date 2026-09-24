@@ -48,13 +48,95 @@
 			</li>
 			<li>Однократно запустите файл <path>/BlackFox/install.php</path> с помощью командной строки PHP</li>
 			<li>
-				Если ваш сервер не Apache,
-				сконфигурируйте его таким образом что любой запрос
-				на не статичный файл (*.php или папка) будет переадресован на /index.php
+				Настройте веб-сервер так, чтобы все запросы проходили через <path>/index.php</path> —
+				см. <a href="#apache">Apache</a> и <a href="#nginx">Nginx</a> ниже
 			</li>
 		</ol>
 
 		<p>Установка завершена! Теперь вы можете зайти в административный раздел (<path>/admin/</path>) используя реквизиты по умолчанию: <strong>Root@123456</strong></p>
+
+		<h2 id="apache">Apache</h2>
+
+		<p>
+			BlackFox — фреймворк с единой точкой входа: любой запрос на не статичный файл
+			(<path>*.php</path> или папку) должен в итоге исполняться файлом <path>/index.php</path>,
+			который сам разбирает <path>$_SERVER['REQUEST_URI']</path> и решает, что показать
+			(см. <path>Engine::MakeContent()</path>). Запросы никогда не должны идти напрямую
+			на отдельные <path>.php</path>-файлы — иначе запрос может добраться до фрагмента
+			контента или админского скрипта в обход маршрутизации и проверок доступа самого
+			<path>Engine</path>.
+		</p>
+		<p>
+			На Apache это уже настроено: файл <path>.htaccess</path>, скопированный из
+			<path>/BlackFox/.example/</path> на шаге 3
+			(<a href="https://github.com/Reuniko/BlackFox/blob/master/.example/.htaccess">посмотреть на GitHub</a>),
+			перенаправляет любой запрос на не статичный путь на <path>/index.php</path> и
+			дописывает конечный слеш к запросам, похожим на папки. Всё, что нужно — включённый
+			<path>mod_rewrite</path> и <path>AllowOverride All</path> (или хотя бы
+			<path>FileInfo</path>) для директории сайта.
+		</p>
+
+		<h2 id="nginx">Nginx</h2>
+
+		<p>
+			Nginx не читает <path>.htaccess</path>, поэтому ту же маршрутизацию нужно описать
+			прямо в конфиге server-блока. Важны три вещи:
+		</p>
+		<ol>
+			<li>
+				URL без расширения и без конечного слеша нужно перенаправлять, дописывая слеш —
+				<path>Engine::MakeContent()</path> приклеивает <path>index.php</path> прямо к пути
+				папки без разделителя между ними, поэтому запрос <path>/basics</path> без
+				редиректа превратится в несуществующий <path>/basicsindex.php</path> вместо
+				<path>/basics/index.php</path>
+			</li>
+			<li>реальные статичные файлы (css/js/картинки/шрифты/...) отдаются напрямую, без обращения к PHP</li>
+			<li>всё остальное передаётся в PHP как <path>/index.php</path>, независимо от запрошенного пути</li>
+		</ol>
+
+		<code class="language-css">server {
+	listen       80;
+	server_name  example.com;
+	root         /path/to/your/server/root;
+	index        index.php;
+
+	# URL без расширения должны получить слеш ещё до того, как их увидит Engine
+	location ~ ^(?&lt;slashless&gt;/[^.]*[^./])$ {
+		return 302 $slashless/;
+	}
+
+	# реальные статичные файлы отдаются напрямую
+	location ~* \.(?:css|js|jpe?g|png|gif|ico|svg|webp|woff2?|ttf|eot|mp4|webm|pdf|txt|html)$ {
+		try_files $uri =404;
+		expires 1d;
+		access_log off;
+	}
+
+	# всё остальное идёт через единую точку входа
+	location / {
+		fastcgi_pass    127.0.0.1:9000;
+		fastcgi_index   index.php;
+		include         fastcgi_params;
+		fastcgi_param   SCRIPT_FILENAME  $document_root/index.php;
+		fastcgi_param   SCRIPT_NAME      /index.php;
+	}
+}</code>
+
+		<p>
+			<path>fastcgi_pass</path> должен указывать на что-то, что слушает порт. На Linux
+			это обычно <path>php-fpm</path>; сборки PHP для Windows его не содержат, поэтому
+			вместо него запускается штатный <path>php-cgi.exe</path> в режиме FastCGI-сервера:
+		</p>
+
+		<code class="language-css">php-cgi.exe -b 127.0.0.1:9000</code>
+
+		<p>
+			Если у вас зарегистрировано больше одного <a href="config.html#roots">корня</a>,
+			статичный файл может физически лежать не в том корне, что запрошен — добавьте эти
+			пути и в цепочку <path>try_files</path>, например
+			<path>try_files $uri /BlackFox/root$uri =404;</path>
+			(см. <a href="root.html">Виртуальный корень</a>).
+		</p>
 	</div>
 </main>
 
