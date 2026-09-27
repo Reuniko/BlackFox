@@ -55,6 +55,36 @@
 
 		<p>There we go! Now you can log into admin panel (<path>/admin/</path>) with default requisites: <strong>Root@123456</strong></p>
 
+		<h2 id="php">PHP configuration</h2>
+
+		<p>
+			Two <path>php.ini</path> settings aren't optional — without them the framework
+			doesn't run at all:
+		</p>
+		<dl>
+			<dt><path>short_open_tag = On</path></dt>
+			<dd>
+				the codebase uses the bare <path>&lt;?</path> tag throughout instead of
+				<path>&lt;?php</path> — with this off, PHP throws a parse error on the very
+				first file it loads
+			</dd>
+			<dt><path>extension=mbstring</path></dt>
+			<dd>
+				used by the <path>STRING</path>/<path>TEXT</path> field types
+				(<path>TypeString</path>, <path>TypeText</path>) to safely trim multibyte values
+			</dd>
+		</dl>
+
+		<p>
+			A few more extensions are only needed if you pick the matching class in
+			<path>config.php</path>'s <path>overrides</path> (<a href="config.html">more info</a>):
+		</p>
+		<ul>
+			<li><path>extension=mysqli</path> — for <path>BlackFox\MySQL</path>, the default database driver</li>
+			<li><path>extension=pgsql</path> — for <path>BlackFox\Postgres</path>, if you use it instead</li>
+			<li><path>extension=redis</path> — for <path>BlackFox\CacheRedis</path></li>
+		</ul>
+
 		<h2 id="apache">Apache</h2>
 
 		<p>
@@ -129,6 +159,13 @@
 		</p>
 
 		<code class="language-css">php-cgi.exe -b 127.0.0.1:9000</code>
+
+		<p>
+			Since <path>SCRIPT_FILENAME</path> is hardcoded above, set <path>cgi.fix_pathinfo = 0</path>
+			in <path>php.ini</path> — it's the standard hardening for any FastCGI setup (PHP-FPM or
+			php-cgi) against <path>PATH_INFO</path>-based attacks, and this framework never relies on
+			<path>PATH_INFO</path> anyway.
+		</p>
 
 		<p>
 			If you registered more than one <a href="config.html#roots">root</a>, a static file

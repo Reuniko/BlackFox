@@ -55,6 +55,37 @@
 
 		<p>Установка завершена! Теперь вы можете зайти в административный раздел (<path>/admin/</path>) используя реквизиты по умолчанию: <strong>Root@123456</strong></p>
 
+		<h2 id="php">Конфигурация PHP</h2>
+
+		<p>
+			Два параметра в <path>php.ini</path> — не рекомендация, а обязательное условие:
+			без них фреймворк вообще не запустится:
+		</p>
+		<dl>
+			<dt><path>short_open_tag = On</path></dt>
+			<dd>
+				кодовая база повсеместно использует голый тег <path>&lt;?</path> вместо
+				<path>&lt;?php</path> — если это выключено, PHP выдаст ошибку разбора уже на
+				первом же загружаемом файле
+			</dd>
+			<dt><path>extension=mbstring</path></dt>
+			<dd>
+				используется типами полей <path>STRING</path>/<path>TEXT</path>
+				(<path>TypeString</path>, <path>TypeText</path>) для безопасной обрезки
+				многобайтовых значений
+			</dd>
+		</dl>
+
+		<p>
+			Ещё несколько расширений нужны, только если вы включите соответствующий класс в
+			<path>overrides</path> файла <path>config.php</path> (<a href="config.html">подробнее</a>):
+		</p>
+		<ul>
+			<li><path>extension=mysqli</path> — для <path>BlackFox\MySQL</path>, драйвера базы данных по умолчанию</li>
+			<li><path>extension=pgsql</path> — для <path>BlackFox\Postgres</path>, если используете его вместо MySQL</li>
+			<li><path>extension=redis</path> — для <path>BlackFox\CacheRedis</path></li>
+		</ul>
+
 		<h2 id="apache">Apache</h2>
 
 		<p>
@@ -129,6 +160,13 @@
 		</p>
 
 		<code class="language-css">php-cgi.exe -b 127.0.0.1:9000</code>
+
+		<p>
+			Раз <path>SCRIPT_FILENAME</path> выше жёстко прописан, поставьте
+			<path>cgi.fix_pathinfo = 0</path> в <path>php.ini</path> — это стандартное
+			укрепление для любой связки FastCGI (PHP-FPM или php-cgi) против атак через
+			<path>PATH_INFO</path>, а фреймворк и так никогда на <path>PATH_INFO</path> не полагается.
+		</p>
 
 		<p>
 			Если у вас зарегистрировано больше одного <a href="config.html#roots">корня</a>,
